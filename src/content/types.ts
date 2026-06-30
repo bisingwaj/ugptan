@@ -76,7 +76,8 @@ export type DocumentCategorie = { code: DocCat; label: Bilingual };
 export type MgpFaqItem = { q: Bilingual; r: Bilingual };
 
 export type Media = {
-  videoYt: string; videoTitre: Bilingual; videoSource: Bilingual; videoNote: Bilingual;
+  videoYt: string; heroFilm: string;
+  videoTitre: Bilingual; videoSource: Bilingual; videoNote: Bilingual;
   img: Record<ImgKey, string>;
 };
 
