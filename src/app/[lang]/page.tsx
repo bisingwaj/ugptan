@@ -81,7 +81,7 @@ export default function Home({ params }: { params: { lang: string } }) {
       {/* ===== INTRO / QUESTION ===== */}
       <section className="section">
         <div className="section__inner cols2" style={{ gridTemplateColumns: ".42fr 1fr", gap: "clamp(28px,5vw,72px)" }}>
-          <div className="mono" style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ac)" }}>[ 01 / {meta.unite} ]</div>
+          <div className="mono" style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ac)" }}>[ 01 · {t.home.introKicker} ]</div>
           <div className="reveal">
             <p style={{ margin: 0, fontSize: "clamp(22px,2.7vw,34px)", lineHeight: 1.4, letterSpacing: "-0.01em", fontWeight: 300 }}>{t.home.introLead}</p>
             <div style={{ marginTop: 36, padding: "28px 30px", borderLeft: "3px solid var(--ac)", background: "var(--c-10)" }}>

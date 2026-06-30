@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { meta, langues } from "@/content/data";
+import { langues } from "@/content/data";
 import { NAV, NAV_PRIMARY, NAV_DRAWER, route } from "@/lib/routes";
 
 const Logo = ({ dark = false }: { dark?: boolean }) => (
@@ -31,21 +31,6 @@ export function Header({ lang }: { lang: Lang }) {
 
   return (
     <div style={{ position: "sticky", top: 0, zIndex: 50 }}>
-      {/* Topbar */}
-      <div className="hide-sm" style={{ background: "var(--c-black)", color: "var(--c-30)", fontFamily: "var(--font-mono)", fontSize: 11.5, letterSpacing: "0.06em" }}>
-        <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "7px var(--pad-x)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-            <span style={{ color: "#fff" }}>{meta.projetLong}</span>
-            <span style={{ opacity: 0.5 }}>·</span>
-            <span>{meta.code}</span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
-            <span style={{ width: 6, height: 6, background: "var(--green-bright)", display: "inline-block" }} />
-            <span>{meta.tutelle}</span>
-          </div>
-        </div>
-      </div>
-
       {/* Header bar */}
       <header style={{ background: "rgba(255,255,255,0.96)", borderBottom: "1px solid var(--c-20)", backdropFilter: "blur(6px)" }}>
         <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "0 var(--pad-x)", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18 }}>

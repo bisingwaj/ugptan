@@ -93,12 +93,13 @@ export function dict(lang: Lang) {
       heroKicker: t("Projet de Transformation Numérique · RDC", "Digital Transformation Project · DRC"),
       heroTitle: t("Transformer la RDC, une connexion à la fois.", "Transforming the DRC, one connection at a time."),
       heroLead: t(
-        "L'unité qui coordonne, exécute et supervise le Projet de Transformation Numérique de la RDC — un programme de 510 millions de dollars cofinancé par la Banque mondiale et l'AFD.",
-        "The unit that coordinates, delivers and supervises the DRC Digital Transformation Project — a 510 million dollar programme co-financed by the World Bank and AFD.",
+        "L'Unité qui pilote la transformation numérique de la RDC — 510 millions de dollars, cofinancés par la Banque mondiale et l'AFD, pour relier les 26 provinces et ouvrir l'accès, les services et les compétences au plus grand nombre.",
+        "The Unit steering the DRC's digital transformation — 510 million dollars, co-financed by the World Bank and AFD, to connect all 26 provinces and open up access, services and skills for the many.",
       ),
+      introKicker: t("Notre ambition", "Our ambition"),
       introLead: t(
-        "L'UGPTN s'impose une exigence simple : fonctionner avec les outils numériques qu'elle a mandat de déployer dans tout le pays — et être le premier endroit où cette transformation s'observe.",
-        "The UGPTN holds itself to a simple standard: to run on the very digital tools it is mandated to deploy nationwide — and to be the first place where that transformation can be observed.",
+        "Relier les territoires, moderniser les services publics, former une génération : le Projet met le numérique au service du quotidien — de la salle de classe au centre de santé, du champ au guichet de l'administration.",
+        "Connecting territories, modernising public services, training a generation: the Project puts digital at the service of everyday life — from the classroom to the health centre, from the field to the public-service counter.",
       ),
       statusEffective: t("Entrée en vigueur 31.10.2025", "Effectiveness 31.10.2025"),
       statusCompletion: t("Achèvement technique 31.12.2029", "Technical completion 31.12.2029"),
@@ -149,8 +150,8 @@ export function dict(lang: Lang) {
       ),
       plateformeTitle: t("Une plateforme, huit espaces sur mesure.", "One platform, eight tailored spaces."),
       plateformeLead: t(
-        "Derrière le site public, la plateforme métier offre à chacun des 8 profils son parcours, son accent et son point d'entrée — un produit unique et cohérent.",
-        "Behind the public site, the business platform gives each of the 8 stakeholder profiles its own journey, accent and entry point — a single, coherent product.",
+        "Au-delà de l'information publique, une plateforme métier donne à chacun des 8 profils son espace, son parcours et ses outils — un seul produit cohérent, du citoyen au bailleur.",
+        "Beyond public information, a single business platform gives each of the 8 profiles its own space, journey and tools — one coherent product, from citizen to donor.",
       ),
     },
 
@@ -249,7 +250,7 @@ export function dict(lang: Lang) {
       polesTitle: t("21 sous-rôles, 5 pôles.", "21 sub-roles, 5 clusters."),
       arrete: t("Créée par arrêté ministériel", "Created by ministerial order"),
       objLabel: t("Objectif & rôle", "Objective & role"),
-      objTitle: t("À quoi sert l'Unité.", "What the Unit is for."),
+      objTitle: t("Exécuter, mesurer, rendre compte.", "Deliver, measure, account."),
       objLead: t(
         "Derrière un nom technique, une mission simple : transformer 510 millions de dollars de financement en connectivité, en services et en compétences — proprement, et dans les délais.",
         "Behind a technical name, a simple mission: to turn 510 million dollars of financing into connectivity, services and skills — cleanly, and on time.",
@@ -419,7 +420,7 @@ export function dict(lang: Lang) {
 
     /* --- Actualités ------------------------------------------------------- */
     actus: {
-      heroTitle: t("Actualités & communiqués.", "News & releases."),
+      heroTitle: t("Décisions, jalons et communiqués.", "Decisions, milestones and releases."),
       heroLead: t(
         "L'avancement du Projet, au plus près : décisions, jalons et communiqués officiels, publiés au fur et à mesure de leur adoption.",
         "The Project's progress, up close: decisions, milestones and official releases, published as they are adopted.",
@@ -433,7 +434,7 @@ export function dict(lang: Lang) {
 
     /* --- Résultats -------------------------------------------------------- */
     resultats: {
-      heroTitle: t("Le projet, en pleine transparence.", "The project, in full transparency."),
+      heroTitle: t("Des cibles claires, des résultats publics.", "Clear targets, public results."),
       heroLead: t(
         "Le cadre de résultats distingue les indicateurs d'Objectif de Développement (impact) des indicateurs intermédiaires (réalisations). Suivi via les outils SIG / GEMS sur les 26 provinces.",
         "The results framework distinguishes Development Objective indicators (impact) from intermediate indicators (outputs). Tracked via MIS / GEMS tools across 26 provinces.",
