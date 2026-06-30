@@ -1,0 +1,92 @@
+UGPTN — SITE WEB INSTITUTIONNEL
+Dossier de livraison — prêt à l'implémentation
+================================================
+
+Projet : Projet de Transformation Numérique de la RDC (PTN-RDC · P180495)
+Tutelle : Ministère des Postes, Télécommunications et Numérique (MPTN)
+Source de vérité : Manuel d'Exécution du Projet (MEP) du 23 juin 2025.
+Les montants, dates, indicateurs et structures sont repris du MEP — ne pas altérer.
+
+
+1. CONTENU DU DOSSIER
+---------------------
+index.html ........................ Page d'accueil de la livraison (ouvre tous les sites)
+UGPTN-Site-institutionnel.html .... SITE RETENU, autonome (à ouvrir directement)
+alternatives/ ..................... Les 4 directions visuelles explorées (autonomes)
+    UGPTN-1-Carbon-Sobre.html
+    UGPTN-2-Editorial.html
+    UGPTN-3-Data.html
+    UGPTN-4-Humaniste.html
+sources/ .......................... Fichiers sources éditables (.dc.html + données)
+LISEZ-MOI.txt ..................... Ce fichier
+
+
+2. UTILISATION IMMÉDIATE
+------------------------
+- Décompressez le ZIP.
+- Ouvrez « index.html » (ou directement « UGPTN-Site-institutionnel.html »)
+  dans un navigateur récent (Chrome, Edge, Firefox, Safari).
+- Tout fonctionne HORS-LIGNE : les fichiers .html sont autonomes
+  (HTML/CSS/JS + photographies intégrées).
+
+
+3. CE QU'IL FAUT REMPLACER POUR LA PRODUCTION
+---------------------------------------------
+Les éléments suivants sont des PLACEHOLDERS soignés, à remplacer par vos visuels officiels :
+- Logo UGPTN officiel (actuellement un monogramme « U »).
+- Vidéo du héro : un LECTEUR INTÉGRÉ (lightbox) s'ouvre via « Voir le film du
+  projet ». La vidéo actuelle est provisoire (film institutionnel Banque mondiale,
+  2023) — à remplacer par le film officiel du Projet (champ D.media.videoYt dans
+  ugptn-data.js : il suffit d'y mettre l'identifiant YouTube de votre vidéo).
+- Photographies (citoyens, fibre, data center…) : ce sont de VRAIES photos
+  art-dirigées (duotone bleu), intégrées au fichier et donc visibles hors-ligne
+  — à remplacer par vos clichés sous licence. Sur le site retenu, elles sont
+  centralisées dans ugptn-data.js (objet D.media.img) et listées en haut du
+  fichier source via des balises <link rel="preload"> (mettre à jour les deux).
+- Noms et portraits de l'équipe (les rôles et pôles, eux, sont conformes au MEP).
+- Numéro vert MGP (affiché « XXX »), e-mail et adresse du siège.
+
+NE PAS MODIFIER (conformité MEP) : 510 M USD ; IDA 400 / AFD 110 ; 79 % / 21 % ;
+les 5 composantes et leurs montants ; les indicateurs ODP 2029 ; les 26 provinces
+(10 prioritaires) ; l'architecture COPIL · CTP · UGPTN ; les 21 sous-rôles / 5 pôles.
+
+
+4. PAGES LIVRÉES (SITE RETENU)
+------------------------------
+Accueil · Le Projet · L'UGPTN · Gouvernance · Marchés publics (avis + candidature)
+Transparence documentaire · Résultats · Actualités · MGP (formulaire + suivi +
+canal confidentiel EAS/HS) · Contact + carte des provinces · Connexion (8 profils).
+
+Fonctionnalités interactives :
+- Marchés publics (appels d'offres) : recherche plein texte, filtres par méthode
+  (AOI/AON/AMI/SFQC/DC) et par statut, compte à rebours d'échéance en direct, et
+  fiche détaillée par avis (budget, lieu, calendrier prévisionnel, addenda,
+  pièces du dossier).
+- Actualités / Avis : filtres par catégorie, pages d'article complètes (image +
+  corps de texte) et fil chronologique des jalons.
+- MGP : formulaire de dépôt en 5 étapes (catégorie → description → pièces
+  jointes → coordonnées → récapitulatif) avec numéro de référence horodaté ;
+  suivi de plainte (référence → état dans le pipeline) ; FAQ ; canal EAS/HS.
+- Espace soumissionnaire (démo) : tableau de bord, statut KYC, suivi des offres.
+- Transparence : recherche, tri, et aperçu de document à l'écran.
+- Vidéo : lecteur intégré (lightbox) sur le site retenu ET sur les 4 directions.
+- Carte des 26 provinces interactive (survol).
+- Sélecteur de langue (FR/EN opérationnels ; 6 langues prévues).
+- Navigation multi-pages, responsive (mobile / tablette / desktop).
+
+
+5. NOTES TECHNIQUES
+-------------------
+- Le site retenu utilise : héro vidéo (à fournir) + animation Canvas, photos en
+  duotone CSS, compteurs animés, révélations au scroll, design responsive.
+- Polices : Schibsted Grotesk, Libre Franklin, IBM Plex Mono (Google Fonts).
+  Pour un fonctionnement 100 % hors-ligne sans CDN, héberger ces polices localement.
+- Les versions « .html » (racine et alternatives/) sont des fichiers AUTONOMES,
+  idéaux pour démonstration et revue.
+- Le dossier « sources/ » contient les composants éditables (.dc.html) et le
+  fichier de données unique « ugptn-data.js » (montants, indicateurs, provinces,
+  composantes, marchés, documents…). Pour une refonte en stack web standard,
+  « ugptn-data.js » constitue le schéma de contenu de référence.
+
+================================================
+UGPTN · MPTN · IDA (Banque mondiale) + AFD · Kinshasa, 2026
