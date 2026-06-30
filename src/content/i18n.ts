@@ -130,7 +130,7 @@ export function dict(lang: Lang) {
       storiesTeaserCta: t("Voir toutes les histoires & vidéos", "See all stories & videos"),
       watchStory: t("Voir le témoignage", "Watch the testimonial"),
       evtLabel: t("Événements & activités", "Events & activities"),
-      evtTitle: t("Rencontrer l'Unité, participer.", "Meet the Unit, take part."),
+      evtTitle: t("Échanger, participer, contribuer.", "Exchange, take part, contribute."),
       evtLead: t(
         "Forums, ateliers, consultations publiques et webinaires organisés par ou avec l'Unité. Inscrivez-vous pour participer.",
         "Forums, workshops, public consultations and webinars organised by or with the Unit. Register to take part.",
@@ -301,7 +301,7 @@ export function dict(lang: Lang) {
       copilMembers: ["MPTN — Président", "Présidence / ADN", "Primature", "Min. Finances", "MIS", "MESU", "MEPME", "+1 désigné"],
       ctpMembers: ["MPTN (préside) +3", "ARPTC", "FDSU", "MIS ×2", "ONIP", "MESU", "MEPME", "MINFIN-CSPP", "ADN", "SOCOF", "Primature"],
       actLabel: t("La coordination en action", "Coordination in action"),
-      actTitle: t("Activité récente de la gouvernance.", "Recent governance activity."),
+      actTitle: t("La gouvernance à l'œuvre.", "Governance at work."),
       actLead: t(
         "La trace datée des décisions de pilotage et du travail de coordination — le COPIL, le CTP et l'Unité à l'œuvre.",
         "The dated trace of steering decisions and coordination work — the COPIL, the CTP and the Unit at work.",
@@ -365,8 +365,8 @@ export function dict(lang: Lang) {
     marches: {
       heroTitle: t("La commande publique, ouverte et tracée.", "Public procurement, open and traceable."),
       heroLead: t(
-        "Tous les avis du Projet, conformes aux Règlements de Passation des Marchés de la Banque mondiale (2025). Concurrence ouverte, méthodes affichées, résultats publiés.",
-        "All Project notices, compliant with the World Bank Procurement Regulations (2025). Open competition, published methods, published results.",
+        "La porte d'entrée des entreprises vers les marchés du Projet. Tous les avis, conformes aux Règlements de Passation de la Banque mondiale (2025) : concurrence ouverte, méthodes affichées, résultats publiés.",
+        "The gateway for businesses to the Project's contracts. Every notice, compliant with the World Bank Procurement Regulations (2025): open competition, published methods, published results.",
       ),
       search: t("Rechercher un avis, une référence, un lieu…", "Search a notice, reference, location…"),
       results: t("avis", "notice(s)"),
@@ -400,8 +400,8 @@ export function dict(lang: Lang) {
     docs: {
       heroTitle: t("Tout document divulgable, accessible et daté.", "Every disclosable document, accessible and dated."),
       heroLead: t(
-        "Le dépôt public officiel du Projet, en application de l'obligation de divulgation (NES 10) et de la politique d'accès à l'information de la Banque mondiale.",
-        "The Project's official public repository, under the disclosure obligation (ESS 10) and the World Bank's access-to-information policy.",
+        "L'information publique du Projet, en accès libre. Le dépôt officiel des documents divulgables, en application de l'obligation de divulgation (NES 10) et de la politique d'accès à l'information de la Banque mondiale.",
+        "The Project's public information, freely accessible. The official repository of disclosable documents, under the disclosure obligation (ESS 10) and the World Bank's access-to-information policy.",
       ),
       search: t("Rechercher un document…", "Search a document…"),
       sortBy: t("Trier par", "Sort by"),
@@ -436,8 +436,8 @@ export function dict(lang: Lang) {
     resultats: {
       heroTitle: t("Des cibles claires, des résultats publics.", "Clear targets, public results."),
       heroLead: t(
-        "Le cadre de résultats distingue les indicateurs d'Objectif de Développement (impact) des indicateurs intermédiaires (réalisations). Suivi via les outils SIG / GEMS sur les 26 provinces.",
-        "The results framework distinguishes Development Objective indicators (impact) from intermediate indicators (outputs). Tracked via MIS / GEMS tools across 26 provinces.",
+        "Ce que le Projet vise, et comment on le mesure. Les indicateurs d'objectif (l'impact) côtoient les indicateurs intermédiaires (les réalisations), suivis sur les 26 provinces via les outils SIG / GEMS.",
+        "What the Project aims for, and how it's measured. Development-objective indicators (the impact) sit alongside intermediate indicators (the outputs), tracked across all 26 provinces via MIS / GEMS tools.",
       ),
       odpLabel: t("ODP · cibles 2029", "PDO · 2029 targets"),
       interLabel: t("Indicateurs intermédiaires", "Intermediate indicators"),
