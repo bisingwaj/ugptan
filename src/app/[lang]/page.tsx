@@ -27,9 +27,9 @@ export default function Home({ params }: { params: { lang: string } }) {
   return (
     <div>
       {/* ===== HERO ===== */}
-      <section data-hero style={{ position: "relative", borderBottom: "1px solid #1f2430", overflow: "hidden", background: "#0b0f1a", color: "#fff" }}>
+      <section data-hero style={{ position: "relative", borderBottom: "1px solid #1f2430", overflow: "hidden", background: "#0b0f1a", color: "#fff", minHeight: "calc(100svh - 64px)", display: "flex", flexDirection: "column" }}>
         <HeroVideo src={media.heroFilm} />
-        <div className="hero-grid" style={{ position: "relative", maxWidth: "var(--maxw)", margin: "0 auto", padding: "clamp(56px,8vw,116px) var(--pad-x) 0", display: "grid", gridTemplateColumns: "1.35fr .9fr", gap: "clamp(32px,5vw,72px)", alignItems: "end" }}>
+        <div className="hero-grid" style={{ position: "relative", flex: 1, width: "100%", maxWidth: "var(--maxw)", margin: "0 auto", padding: "clamp(40px,6vw,88px) var(--pad-x) 0", display: "grid", gridTemplateColumns: "1.35fr .9fr", gap: "clamp(32px,5vw,72px)", alignItems: "end", alignContent: "end" }}>
           <div style={{ paddingBottom: "clamp(48px,7vw,96px)" }}>
             <Kicker light>{t.home.heroKicker}</Kicker>
             <h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(38px,6.2vw,82px)", lineHeight: 1.0, letterSpacing: "-0.03em", color: "#fff" }}>{t.home.heroTitle}</h1>

@@ -34,7 +34,7 @@ export function ConnexionClient({ lang }: { lang: Lang }) {
   if (mode === "creating") {
     const pct = Math.min(100, Math.round((authStep / 4) * 100));
     return (
-      <section style={{ minHeight: "calc(100svh - 98px)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--c-black)", color: "#fff", padding: "clamp(24px,5vw,60px)" }}>
+      <section style={{ minHeight: "calc(100svh - 64px)", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--c-black)", color: "#fff", padding: "clamp(24px,5vw,60px)" }}>
         <div style={{ width: "100%", maxWidth: 440, textAlign: "center" }}>
           <div className="spin" style={{ width: 54, height: 54, margin: "0 auto 26px", border: "3px solid var(--c-90)", borderTopColor: "var(--ac)", borderRadius: "50%" }} />
           <div style={{ fontWeight: 600, fontSize: "clamp(20px,2.4vw,26px)", letterSpacing: "-0.02em" }}>{t.creatingSteps[Math.min(3, authStep)]}…</div>
@@ -57,7 +57,7 @@ export function ConnexionClient({ lang }: { lang: Lang }) {
   }
 
   return (
-    <section style={{ minHeight: "calc(100svh - 98px)", overflow: "hidden", background: "var(--c-10)", display: "flex" }}>
+    <section style={{ minHeight: "calc(100svh - 64px)", overflow: "hidden", background: "var(--c-10)", display: "flex" }}>
       <div className="auth-split" style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 0 }}>
         {/* Brand */}
         <div className="auth-brand" style={{ position: "relative", background: "var(--c-black)", color: "#fff", padding: "clamp(28px,4vw,56px)", display: "flex", flexDirection: "column", justifyContent: "space-between", overflow: "hidden" }}>
