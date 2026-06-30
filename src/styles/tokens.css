@@ -1,0 +1,51 @@
+:root {
+  /* Accent (overridable per deployment) */
+  --ac: #0f62fe;
+  --acd: #0043ce;
+
+  /* Carbon greyscale */
+  --c-black: #161616;
+  --c-90: #262626;
+  --c-80: #393939;
+  --c-70: #525252;
+  --c-60: #6f6f6f;
+  --c-50: #8d8d8d;
+  --c-40: #a8a8a8;
+  --c-30: #c6c6c6;
+  --c-20: #e0e0e0;
+  --c-10: #f4f4f4;
+  --c-white: #ffffff;
+
+  /* Accent on dark */
+  --ac-light: #78a9ff;
+  --ac-pale: #edf5ff;
+  --ac-line: #d0e2ff;
+
+  /* Component / status colours */
+  --teal: #009d9a;
+  --violet: #8a3ffc;
+  --magenta: #ee5396;
+  --green: #198038;
+  --green-bright: #24a148;
+  --green-soft: #42be65;
+  --orange: #ff832b;
+  --red: #da1e28;
+
+  /* Status tints */
+  --ok-bg: #defbe6;
+  --ok-bd: #a7d4b4;
+  --ok-fg: #0e6027;
+
+  /* Layout */
+  --maxw: 1600px;
+  --pad-x: clamp(20px, 5vw, 80px);
+  --pad-y: clamp(72px, 9vw, 128px);
+  --pad-y-sm: clamp(56px, 7vw, 100px);
+
+  /* Type — IBM Plex (loaded via stylesheet link in the root layout) */
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Motion */
+  --rev: revUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

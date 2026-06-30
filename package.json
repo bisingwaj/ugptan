@@ -1,0 +1,26 @@
+{
+  "name": "ugptan-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site institutionnel public de l'UGPTN — Projet de Transformation Numérique de la RDC (PTN-RDC · P180495). Refonte Next.js (App Router) de la direction « Carbon ».",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.10",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "eslint": "8.57.0",
+    "eslint-config-next": "^14.2.35",
+    "typescript": "5.5.3"
+  }
+}
