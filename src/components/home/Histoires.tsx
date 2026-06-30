@@ -17,7 +17,7 @@ export function Histoires({ lang }: { lang: Lang }) {
     <div className="grid-auto reveal">
       {histoires.map((h) => (
         <div key={h.name} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
-          <button onClick={() => openVideo(h.videoYt)} className="duo" style={{ aspectRatio: "4/3", display: "block", width: "100%", padding: 0, ["--duo" as string]: h.color }}>
+          <button onClick={() => openVideo(h.videoYt)} className="duo" data-video-slot={`Témoignage — ${h.name}`} data-slot-ratio="16:9" style={{ aspectRatio: "4/3", display: "block", width: "100%", padding: 0, ["--duo" as string]: h.color }}>
             <Photo src={media.img[h.img]} alt={h.name} />
             <span style={{ position: "absolute", left: 14, bottom: 14, display: "inline-flex", alignItems: "center", gap: 9, color: "#fff", fontSize: 12.5, fontWeight: 600 }}>
               <span style={{ width: 34, height: 34, background: "rgba(255,255,255,.92)", color: "var(--c-black)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 11, paddingLeft: 2 }}>▶</span>

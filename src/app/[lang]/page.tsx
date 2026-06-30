@@ -27,7 +27,7 @@ export default function Home({ params }: { params: { lang: string } }) {
   return (
     <div>
       {/* ===== HERO ===== */}
-      <section style={{ position: "relative", borderBottom: "1px solid var(--c-20)", overflow: "hidden" }}>
+      <section data-hero style={{ position: "relative", borderBottom: "1px solid var(--c-20)", overflow: "hidden" }}>
         <HeroCanvas />
         <div className="hero-grid" style={{ position: "relative", maxWidth: "var(--maxw)", margin: "0 auto", padding: "clamp(48px,7vw,104px) var(--pad-x) 0", display: "grid", gridTemplateColumns: "1.35fr .9fr", gap: "clamp(32px,5vw,72px)", alignItems: "end" }}>
           <div style={{ paddingBottom: "clamp(48px,7vw,96px)" }}>
@@ -37,7 +37,7 @@ export default function Home({ params }: { params: { lang: string } }) {
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 38 }}>
               <Link href={route(lang, NAV.projet)} className="btn btn--primary">{t.cta.discover}<span className="arrow">→</span></Link>
               <Link href={route(lang, NAV.connexion)} className="btn btn--outline">{t.cta.connect}</Link>
-              <VideoButton className="btn btn--ghost" style={{ paddingLeft: 15 }}>
+              <VideoButton className="btn btn--ghost" style={{ paddingLeft: 15 }} dataSlot="Film du projet (lightbox)" dataRatio="16:9">
                 <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--ac)", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, paddingLeft: 1 }}>▶</span>
                 {t.video.watch}
               </VideoButton>

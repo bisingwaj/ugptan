@@ -10,6 +10,10 @@
 # production
 /build
 
+# remotion render output
+/out
+/remotion/out
+
 # misc
 .DS_Store
 *.pem
