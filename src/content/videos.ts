@@ -24,9 +24,9 @@ export const videoSlots: VideoSlot[] = [
   {
     key: "hero-accueil",
     page: { fr: "Accueil", en: "Home" },
-    zone: { fr: "Héros — film du projet (fond animé + lightbox « Voir le film »)", en: "Hero — project film (animated background + « Watch the film » lightbox)" },
+    zone: { fr: "Héros — film du projet (fond vidéo + lightbox « Voir le film »)", en: "Hero — project film (background video + « Watch the film » lightbox)" },
     ratio: "16:9", duree: "60–90 s", status: "provisoire",
-    note: { fr: "Film institutionnel d'ouverture. Actuellement une vidéo provisoire (Banque mondiale). À remplacer par le film officiel du Projet.", en: "Institutional opening film. Currently a placeholder (World Bank). Replace with the Project's official film." },
+    note: { fr: "Vidéo en place (public/videos/hero-film.mp4) : fond muet en boucle + lecture avec son via « Voir le film ». Extrait provisoire à remplacer par le film complet.", en: "Video in place (public/videos/hero-film.mp4): muted looping background + sound playback via « Watch the film ». Provisional excerpt to be replaced by the full film." },
   },
   {
     key: "hero-pages",

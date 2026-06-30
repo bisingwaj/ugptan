@@ -13,7 +13,7 @@ import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
 import { Photo } from "@/components/ui/Photo";
-import { HeroCanvas } from "@/components/home/HeroCanvas";
+import { HeroVideo } from "@/components/home/HeroVideo";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
 import { Histoires } from "@/components/home/Histoires";
 import { EventsGrid } from "@/components/events/EventsGrid";
@@ -27,53 +27,53 @@ export default function Home({ params }: { params: { lang: string } }) {
   return (
     <div>
       {/* ===== HERO ===== */}
-      <section data-hero style={{ position: "relative", borderBottom: "1px solid var(--c-20)", overflow: "hidden" }}>
-        <HeroCanvas />
-        <div className="hero-grid" style={{ position: "relative", maxWidth: "var(--maxw)", margin: "0 auto", padding: "clamp(48px,7vw,104px) var(--pad-x) 0", display: "grid", gridTemplateColumns: "1.35fr .9fr", gap: "clamp(32px,5vw,72px)", alignItems: "end" }}>
+      <section data-hero style={{ position: "relative", borderBottom: "1px solid #1f2430", overflow: "hidden", background: "#0b0f1a", color: "#fff" }}>
+        <HeroVideo src={media.heroFilm} />
+        <div className="hero-grid" style={{ position: "relative", maxWidth: "var(--maxw)", margin: "0 auto", padding: "clamp(56px,8vw,116px) var(--pad-x) 0", display: "grid", gridTemplateColumns: "1.35fr .9fr", gap: "clamp(32px,5vw,72px)", alignItems: "end" }}>
           <div style={{ paddingBottom: "clamp(48px,7vw,96px)" }}>
-            <Kicker>{t.home.heroKicker}</Kicker>
-            <h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(38px,6.2vw,82px)", lineHeight: 1.0, letterSpacing: "-0.03em" }}>{t.home.heroTitle}</h1>
-            <p style={{ margin: "28px 0 0", maxWidth: 560, fontSize: "clamp(16px,1.5vw,19px)", lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.heroLead}</p>
+            <Kicker light>{t.home.heroKicker}</Kicker>
+            <h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(38px,6.2vw,82px)", lineHeight: 1.0, letterSpacing: "-0.03em", color: "#fff" }}>{t.home.heroTitle}</h1>
+            <p style={{ margin: "28px 0 0", maxWidth: 560, fontSize: "clamp(16px,1.5vw,19px)", lineHeight: 1.6, color: "#c6c6c6" }}>{t.home.heroLead}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 38 }}>
               <Link href={route(lang, NAV.projet)} className="btn btn--primary">{t.cta.discover}<span className="arrow">→</span></Link>
-              <Link href={route(lang, NAV.connexion)} className="btn btn--outline">{t.cta.connect}</Link>
-              <VideoButton className="btn btn--ghost" style={{ paddingLeft: 15 }} dataSlot="Film du projet (lightbox)" dataRatio="16:9">
+              <Link href={route(lang, NAV.connexion)} className="btn btn--on-dark">{t.cta.connect}</Link>
+              <VideoButton id={media.heroFilm} className="btn" style={{ paddingLeft: 15, background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.28)", color: "#fff", backdropFilter: "blur(4px)" }} dataSlot="Film du projet (lecture avec son)" dataRatio="16:9">
                 <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--ac)", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, paddingLeft: 1 }}>▶</span>
                 {t.video.watch}
               </VideoButton>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", marginTop: 40, borderTop: "1px solid var(--c-20)" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", marginTop: 40, borderTop: "1px solid rgba(255,255,255,.14)" }}>
               {[[t.cta.docs, NAV.transparence], [t.cta.marches, NAV.marches], [t.cta.mgp, NAV.mgp]].map(([label, slug], i) => (
-                <Link key={i} href={route(lang, slug as string)} className="mono" style={{ display: "flex", alignItems: "center", gap: 9, padding: i === 0 ? "14px 22px 0 0" : "14px 22px 0", fontSize: 12.5, letterSpacing: "0.04em", color: "var(--c-80)", borderLeft: i ? "1px solid var(--c-20)" : "none" }}>
-                  <span style={{ color: "var(--ac)" }}>↳</span>{label as string}
+                <Link key={i} href={route(lang, slug as string)} className="mono" style={{ display: "flex", alignItems: "center", gap: 9, padding: i === 0 ? "14px 22px 0 0" : "14px 22px 0", fontSize: 12.5, letterSpacing: "0.04em", color: "#c6c6c6", borderLeft: i ? "1px solid rgba(255,255,255,.14)" : "none" }}>
+                  <span style={{ color: "var(--ac-light)" }}>↳</span>{label as string}
                 </Link>
               ))}
             </div>
           </div>
-          <div style={{ border: "1px solid var(--c-20)", background: "rgba(255,255,255,.86)", backdropFilter: "blur(4px)", marginBottom: "clamp(48px,7vw,96px)" }}>
-            <div className="mono" style={{ padding: "16px 20px", borderBottom: "1px solid var(--c-20)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--c-60)", display: "flex", justifyContent: "space-between" }}>
-              <span>{t.sec.chiffres}</span><span style={{ color: "var(--ac)" }}>USD</span>
+          <div style={{ border: "1px solid rgba(255,255,255,.14)", background: "rgba(13,17,26,.55)", backdropFilter: "blur(8px)", marginBottom: "clamp(48px,7vw,96px)", color: "#fff" }}>
+            <div className="mono" style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,.12)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a8a8a8", display: "flex", justifyContent: "space-between" }}>
+              <span>{t.sec.chiffres}</span><span style={{ color: "var(--ac-light)" }}>USD</span>
             </div>
             {chiffres.map((c) => (
-              <div key={c.label.fr} style={{ padding: "18px 20px", borderBottom: "1px solid var(--c-10)", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
+              <div key={c.label.fr} style={{ padding: "18px 20px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, color: "var(--c-70)", lineHeight: 1.3 }}>{pick(c.label, lang)}</div>
-                  <div className="mono" style={{ fontSize: 10.5, color: "var(--c-50)", marginTop: 3 }}>{pick(c.sub, lang)}</div>
+                  <div style={{ fontSize: 13, color: "#e0e0e0", lineHeight: 1.3 }}>{pick(c.label, lang)}</div>
+                  <div className="mono" style={{ fontSize: 10.5, color: "#8d8d8d", marginTop: 3 }}>{pick(c.sub, lang)}</div>
                 </div>
                 <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                  <span className="stat__num" style={{ fontSize: "clamp(24px,2.4vw,32px)" }}><Counter to={c.value} dur={1500} /></span>
-                  <span className="mono" style={{ fontSize: 12, color: "var(--c-60)", marginLeft: 5 }}>{c.unit}</span>
-                  {c.pct && <div className="mono" style={{ fontSize: 12, color: "var(--ac)", marginTop: 2 }}>{c.pct}</div>}
+                  <span className="stat__num" style={{ fontSize: "clamp(24px,2.4vw,32px)", color: "#fff" }}><Counter to={c.value} dur={1500} /></span>
+                  <span className="mono" style={{ fontSize: 12, color: "#a8a8a8", marginLeft: 5 }}>{c.unit}</span>
+                  {c.pct && <div className="mono" style={{ fontSize: 12, color: "var(--ac-light)", marginTop: 2 }}>{c.pct}</div>}
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <div style={{ position: "relative", borderTop: "1px solid var(--c-20)", background: "var(--c-10)", fontFamily: "var(--font-mono)", fontSize: 11.5, color: "var(--c-70)", overflow: "hidden" }}>
+        <div style={{ position: "relative", borderTop: "1px solid #1f2430", background: "rgba(11,15,26,.6)", backdropFilter: "blur(4px)", fontFamily: "var(--font-mono)", fontSize: 11.5, color: "#a8a8a8", overflow: "hidden" }}>
           <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "11px var(--pad-x)", display: "flex", flexWrap: "wrap", gap: "8px 28px" }}>
-            <span><span style={{ color: "var(--ac)" }}>●</span> {t.home.statusEffective}</span>
-            <span><span style={{ color: "var(--ac)" }}>●</span> {t.home.statusCompletion}</span>
-            <span><span style={{ color: "var(--ac)" }}>●</span> {meta.approche}</span>
+            <span><span style={{ color: "var(--ac-light)" }}>●</span> {t.home.statusEffective}</span>
+            <span><span style={{ color: "var(--ac-light)" }}>●</span> {t.home.statusCompletion}</span>
+            <span><span style={{ color: "var(--ac-light)" }}>●</span> {meta.approche}</span>
           </div>
         </div>
       </section>

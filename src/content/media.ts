@@ -8,9 +8,11 @@ export const FALLBACK_IMG =
 
 export const media: Media = {
   videoYt: "2ZJGxoF610c",
-  videoTitre: { fr: "Accélérer la transformation numérique de l'Afrique", en: "Accelerating Africa's Digital Transformation" },
-  videoSource: { fr: "Groupe de la Banque mondiale · 2023", en: "World Bank Group · 2023" },
-  videoNote: { fr: "Vidéo d'illustration provisoire — à remplacer par le film institutionnel du Projet.", en: "Interim illustrative video — to be replaced by the Project's institutional film." },
+  /** Film du projet hébergé localement (fond + lightbox du héros). */
+  heroFilm: "/videos/hero-film.mp4",
+  videoTitre: { fr: "Film du projet", en: "Project film" },
+  videoSource: { fr: "UGPTN · PTN-RDC", en: "UGPTN · PTN-RDC" },
+  videoNote: { fr: "Extrait provisoire — à remplacer par le film institutionnel complet.", en: "Provisional excerpt — to be replaced by the full institutional film." },
   img: {
     hero: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1920&q=70",
     citoyens: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1100&q=72",
