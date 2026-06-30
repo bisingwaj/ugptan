@@ -8,6 +8,7 @@ import { VideoProvider } from "@/components/video/VideoProvider";
 import { Header } from "@/components/chrome/Header";
 import { Footer } from "@/components/chrome/Footer";
 import { Newsletter } from "@/components/chrome/Newsletter";
+import { SlotsOverlay } from "@/components/dev/SlotsOverlay";
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
@@ -52,6 +53,7 @@ export default function LangLayout({ children, params }: { children: React.React
           <main>{children}</main>
           <Newsletter lang={lang} />
           <Footer lang={lang} />
+          <SlotsOverlay />
         </VideoProvider>
       </body>
     </html>

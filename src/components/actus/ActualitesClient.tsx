@@ -71,7 +71,7 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
                 <p key={i} style={{ margin: "0 0 20px", fontSize: 16, lineHeight: 1.75, color: "var(--c-80)" }}>{p}</p>
               ))}
               {article.videoYt && (
-                <button onClick={() => openVideo(article.videoYt)} className="btn btn--ghost" style={{ marginTop: 8, paddingLeft: 13 }}>
+                <button onClick={() => openVideo(article.videoYt)} className="btn btn--ghost" data-video-slot="Vidéo de l'article" data-slot-ratio="16:9" style={{ marginTop: 8, paddingLeft: 13 }}>
                   <span style={{ width: 36, height: 36, background: "var(--ac)", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 11, paddingLeft: 2 }}>▶</span>{t.relatedVideo}
                 </button>
               )}

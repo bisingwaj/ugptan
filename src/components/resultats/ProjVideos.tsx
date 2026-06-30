@@ -12,7 +12,7 @@ export function ProjVideos({ lang }: { lang: Lang }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 1, background: "var(--c-80)", border: "1px solid var(--c-80)" }}>
       {projVideos.map((v) => (
-        <button key={v.comp} onClick={() => openVideo()} style={{ background: "var(--c-black)", display: "flex", flexDirection: "column", textAlign: "left", padding: 0 }}>
+        <button key={v.comp} onClick={() => openVideo()} data-video-slot={`Vidéo composante ${v.comp}`} data-slot-ratio="16:9" style={{ background: "var(--c-black)", display: "flex", flexDirection: "column", textAlign: "left", padding: 0 }}>
           <div className="duo" style={{ aspectRatio: "16/9", ["--duo" as string]: v.color }}>
             <Photo src={media.img[v.img]} alt={pick(v.titre, lang)} />
             <span className="mono" style={{ position: "absolute", top: 12, left: 12, fontSize: 11, fontWeight: 600, color: "#fff", background: v.color, padding: "4px 9px" }}>{v.comp}</span>

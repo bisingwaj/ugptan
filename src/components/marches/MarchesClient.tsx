@@ -139,7 +139,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
   return (
     <div className="scrim scrim--right" onClick={onClose}>
       <div className="drawer" onClick={(e) => e.stopPropagation()}>
-        <div className="duo" style={{ aspectRatio: "16/6.6", ["--duo" as string]: cc }}>
+        <div className="duo" data-video-slot="Bannière de l'avis (vidéo)" data-slot-ratio="16:9" style={{ aspectRatio: "16/6.6", ["--duo" as string]: cc }}>
           <Photo src={media.img[compImg[m.comp] || "fibre"]} alt={pick(m.objet, lang)} />
           <button onClick={onClose} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 42, height: 42, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.4)", backdropFilter: "blur(6px)" }}>✕</button>
           <button onClick={() => openVideo()} style={{ position: "absolute", top: 16, left: 16, display: "inline-flex", alignItems: "center", gap: 9, padding: "8px 14px 8px 8px", background: "rgba(255,255,255,.92)", color: "var(--c-black)", fontSize: 12.5, fontWeight: 600 }}>
