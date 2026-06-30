@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/styles/tokens.css";
 import "@/styles/globals.css";
 import { asLang, LOCALES } from "@/lib/params";
 import { dict } from "@/content/i18n";
