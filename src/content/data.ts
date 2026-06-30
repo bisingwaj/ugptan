@@ -201,13 +201,13 @@ export const profils: Profil[] = [
 ];
 
 export const question: Bilingual = {
-  fr: "Comment une Unité chargée de numériser un pays peut-elle être crédible si ses propres procédures restent sur papier ?",
-  en: "How can a Unit tasked with digitalising a country be credible if its own procedures remain on paper?",
+  fr: "Quand un pays se connecte, tout change : l'école apprend autrement, la santé soigne plus loin, le marché s'ouvre et l'État se rapproche du citoyen.",
+  en: "When a country connects, everything changes: classrooms teach in new ways, healthcare reaches further, markets open up, and the State draws closer to its citizens.",
 };
 
 export const engagement: Bilingual = {
-  fr: "510 millions de dollars nous ont été confiés pour transformer le numérique de la RDC. Notre première preuve, c'est de commencer par nous-mêmes.",
-  en: "510 million dollars have been entrusted to us to transform the DRC's digital sector. Our first proof is to begin with ourselves.",
+  fr: "Faire du numérique un droit, et non un privilège : 510 millions de dollars pour que chaque Congolaise et chaque Congolais puisse accéder, apprendre et entreprendre.",
+  en: "Making digital a right, not a privilege: 510 million dollars so that every Congolese woman and man can connect, learn and build.",
 };
 
 /* Component colour code → accent (C1 blue, C2 teal, C3 violet, C4 magenta, C5 grey). */
