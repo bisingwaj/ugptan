@@ -5,16 +5,22 @@ import { m, useScroll, useTransform, useSpring } from "framer-motion";
 import type { CSSProperties } from "react";
 import { usePrefersReducedMotion } from "@/components/motion/useReducedMotion";
 
-/** Fond vidéo du héros : autoplay muet en boucle + calques de lisibilité
- *  (gauche sombre, teinte bleue) + parallaxe verticale subtile au scroll.
- *  `poster` = premier rendu instantané (avant que la vidéo ne charge).
- *  Parallaxe désactivée au tactile (vidéo conservée mais statique) et en
- *  « réduire les animations » (vidéo en pause). */
-export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
+/** Fond vidéo du héros — optimisé pour un chargement rapide.
+ *  - Le `poster` est peint INSTANTANÉMENT (calque image de fond, toujours
+ *    présent sous la vidéo) → première image immédiate, même avant la vidéo.
+ *  - La vidéo n'est chargée QUE si pertinent : jamais en « réduire les
+ *    animations », ni en mode économie de données / réseau lent (2G) → on
+ *    épargne plusieurs Mo aux connexions lentes (essentiel pour le public RDC).
+ *  - Sources multiples : WebM (léger) d'abord, MP4 (compatibilité) ensuite.
+ *  - Parallaxe verticale subtile, désactivée au tactile et en reduced-motion.
+ *  Prérequis fichier : ré-encoder le MP4 en « faststart » (moov au début) pour
+ *  une lecture progressive — cf. scripts/optimize-hero-video.sh. */
+export function HeroVideo({ src, srcWebm, poster }: { src: string; srcWebm?: string; poster?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const reduce = usePrefersReducedMotion();
   const [coarse, setCoarse] = useState(false);
+  const [load, setLoad] = useState(false);
 
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
   const yRaw = useTransform(scrollYProgress, [0, 1], ["0px", "64px"]);
@@ -24,15 +30,22 @@ export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
     setCoarse(window.matchMedia("(pointer: coarse)").matches);
   }, []);
 
+  // Faut-il charger la vidéo ? Sinon : poster seul, zéro octet de vidéo.
+  useEffect(() => {
+    if (reduce) return setLoad(false);
+    const c = (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const slow = !!c && (c.saveData === true || c.effectiveType === "slow-2g" || c.effectiveType === "2g");
+    setLoad(!slow);
+  }, [reduce]);
+
+  // Autoplay muet (React ne pose `muted` qu'en attribut).
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
-    // Forcer la propriété muted (React ne la pose qu'en attribut) pour autoriser l'autoplay.
+    if (!v || !load) return;
     v.muted = true;
-    if (reduce) { v.pause(); return; }
     const p = v.play();
     if (p && typeof p.catch === "function") p.catch(() => {});
-  }, [reduce]);
+  }, [load]);
 
   const still = reduce || coarse;
   const base: CSSProperties = { position: "absolute", left: 0, width: "100%", objectFit: "cover" };
@@ -42,8 +55,17 @@ export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
 
   return (
     <div ref={wrapRef} style={{ position: "absolute", inset: 0, overflow: "hidden" }} aria-hidden>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <m.video ref={videoRef} src={src} poster={poster} autoPlay muted loop playsInline preload="auto" style={videoStyle} />
+      {/* Poster : première peinture instantanée (toujours présent, sous la vidéo). */}
+      {poster && (
+        <div style={{ position: "absolute", inset: 0, backgroundImage: `url("${poster}")`, backgroundSize: "cover", backgroundPosition: "center" }} />
+      )}
+      {load && (
+        // eslint-disable-next-line jsx-a11y/media-has-caption
+        <m.video ref={videoRef} poster={poster} autoPlay muted loop playsInline preload="auto" style={videoStyle}>
+          {srcWebm && <source src={srcWebm} type="video/webm" />}
+          <source src={src} type="video/mp4" />
+        </m.video>
+      )}
       {/* lisibilité du texte (héros à dominante gauche) */}
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(110deg, rgba(11,15,26,0.94) 0%, rgba(11,15,26,0.80) 38%, rgba(11,15,26,0.46) 70%, rgba(11,15,26,0.62) 100%)" }} />
       {/* teinte de marque (duotone bleu) */}
