@@ -22,6 +22,7 @@ export function Newsletter({ lang }: { lang: Lang }) {
             <>
               <form
                 onSubmit={(e) => { e.preventDefault(); if (email.includes("@")) setDone(true); }}
+                className="stack-sm"
                 style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
               >
                 <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.placeholder} aria-label={t.label} className="field field--dark" style={{ flex: 1, minWidth: 200, fontSize: 15, padding: "15px 16px" }} />

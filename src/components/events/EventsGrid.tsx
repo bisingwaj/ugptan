@@ -7,6 +7,7 @@ import { dict } from "@/content/i18n";
 import type { Evenement } from "@/content/types";
 import { media } from "@/content/media";
 import { Photo } from "@/components/ui/Photo";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 type Props = { lang: Lang; events: Evenement[]; withImage?: boolean };
 
@@ -33,10 +34,10 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
 
   return (
     <>
-      <div className="grid-auto">
+      <RevealGroup className="grid-auto" gap={0.045}>
         {events.map((e) =>
           withImage ? (
-            <div key={e.id} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
+            <RevealItem key={e.id} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
               <div className="duo" style={{ aspectRatio: "16/9", ["--duo" as string]: e.color }}>
                 <Photo src={media.img[e.img]} alt={pick(e.titre, lang)} />
                 <span className="mono" style={{ position: "absolute", top: 12, left: 12, fontSize: 11, fontWeight: 600, color: "#fff", background: e.color, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{pick(e.type, lang)}</span>
@@ -56,9 +57,9 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
                   )}
                 </div>
               </div>
-            </div>
+            </RevealItem>
           ) : (
-            <div key={e.id} style={{ background: "#fff", padding: "24px clamp(20px,2.4vw,28px)", display: "flex", flexDirection: "column", borderTop: `3px solid ${e.color}` }}>
+            <RevealItem key={e.id} style={{ background: "#fff", padding: "24px clamp(20px,2.4vw,28px)", display: "flex", flexDirection: "column", borderTop: `3px solid ${e.color}` }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <span className="mono" style={{ fontSize: 11, fontWeight: 600, color: "#fff", background: e.color, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{pick(e.type, lang)}</span>
                 <span className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>{pick(e.date, lang)}</span>
@@ -68,10 +69,10 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
                 <span className="mono" style={{ fontSize: 11.5, color: "var(--c-70)" }}>{pick(e.lieu, lang)}</span>
                 <RegisterBtn e={e} />
               </div>
-            </div>
+            </RevealItem>
           ),
         )}
-      </div>
+      </RevealGroup>
 
       {reg && (
         <div className="scrim scrim--center" onClick={close}>
@@ -84,7 +85,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
                   <div style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.3 }}>{pick(reg.titre, lang)}</div>
                   <div className="mono" style={{ fontSize: 12, color: "var(--c-40)", marginTop: 8 }}>{pick(reg.date, lang)} · {pick(reg.lieu, lang)}</div>
                 </div>
-                <button onClick={close} aria-label="Fermer" style={{ width: 38, height: 38, flex: "0 0 auto", border: "1px solid var(--c-80)", color: "#fff", fontSize: 15, background: "var(--c-90)" }}>✕</button>
+                <button onClick={close} aria-label="Fermer" style={{ width: 44, height: 44, flex: "0 0 auto", border: "1px solid var(--c-80)", color: "#fff", fontSize: 16, background: "var(--c-90)" }}>✕</button>
               </div>
             </div>
             {!done ? (

@@ -40,11 +40,11 @@ Deux façons :
 
 ```bash
 npm run remotion:studio                 # ouvre Remotion Studio (preview live)
-npm run remotion:render -- UgptnIntro   # rend remotion/out/UgptnIntro.mp4
+npm run remotion:render -- UgptanIntro   # rend remotion/out/UgptanIntro.mp4
 ```
 
-- Compositions dans [`remotion/`](../remotion) : `UgptnIntro` (intro de marque 16:9),
-  `UgptnIntroVertical` (9:16), `KeyFigures` (chiffres-clés animés).
+- Compositions dans [`remotion/`](../remotion) : `UgptanIntro` (intro de marque 16:9),
+  `UgptanIntroVertical` (9:16), `KeyFigures` (chiffres-clés animés).
 - Éditez-les en React (`remotion/compositions/*`). Le rendu produit un `.mp4`
   à déposer comme média de slot, ou à héberger et référencer.
 - Pour intégrer une vidéo **locale** (mp4) plutôt que YouTube dans un slot, on pourra

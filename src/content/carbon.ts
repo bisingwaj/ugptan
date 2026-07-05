@@ -10,10 +10,10 @@ import type {
 
 /* --- Accueil + Résultats : témoignages de bénéficiaires --------------------- */
 export const histoires: Histoire[] = [
-  { name: "Esther, 24 ans", role: { fr: "Étudiante — Goma", en: "Student — Goma" }, img: "formation", color: "#8a3ffc", story: { fr: "« Avant, on se partageait un manuel rare. Aujourd'hui je suis des cours en ligne — et j'ai commencé à coder. »", en: "“I used to share one rare textbook. Now I follow courses online — and I've started to code.”" } },
-  { name: "Jean-Pierre", role: { fr: "Commerçant — Tshikapa", en: "Trader — Tshikapa" }, img: "citoyens", color: "#0f62fe", story: { fr: "« Je vends maintenant dans tout le pays et j'encaisse par mobile. »", en: "“I now sell across the whole country and get paid by mobile money.”" } },
-  { name: "Dr Mwamba", role: { fr: "Médecin — Kindu", en: "Doctor — Kindu" }, img: "datacenter", color: "#009d9a", story: { fr: "« Le dossier partagé et la téléconsultation changent la prise en charge des patients. »", en: "“Shared records and tele-consultation are changing how we care for patients.”" } },
-  { name: "Mama Kavira", role: { fr: "Agricultrice — Butembo", en: "Farmer — Butembo" }, img: "tour", color: "#198038", story: { fr: "« Je connais enfin les vrais prix du marché — en temps réel, avant de vendre. »", en: "“I finally know the real market prices — in real time, before I sell.”" } },
+  { name: "Esther, 24 ans", role: { fr: "Étudiante — Goma", en: "Student — Goma" }, img: "formation", color: "#8a3ffc", videoYt: "lLIB8fyagio", story: { fr: "« Avant, on se partageait un manuel rare. Aujourd'hui je suis des cours en ligne — et j'ai commencé à coder. »", en: "“I used to share one rare textbook. Now I follow courses online — and I've started to code.”" } },
+  { name: "Jean-Pierre", role: { fr: "Commerçant — Tshikapa", en: "Trader — Tshikapa" }, img: "citoyens", color: "#0f62fe", videoYt: "xQpTar5oOgA", story: { fr: "« Je vends maintenant dans tout le pays et j'encaisse par mobile. »", en: "“I now sell across the whole country and get paid by mobile money.”" } },
+  { name: "Dr Mwamba", role: { fr: "Médecin — Kindu", en: "Doctor — Kindu" }, img: "sante", color: "#009d9a", videoYt: "2ZJGxoF610c", story: { fr: "« Le dossier partagé et la téléconsultation changent la prise en charge des patients. »", en: "“Shared records and tele-consultation are changing how we care for patients.”" } },
+  { name: "Mama Kavira", role: { fr: "Agricultrice — Butembo", en: "Farmer — Butembo" }, img: "agri", color: "#198038", videoYt: "1MKgrHH04dM", story: { fr: "« Je connais enfin les vrais prix du marché — en temps réel, avant de vendre. »", en: "“I finally know the real market prices — in real time, before I sell.”" } },
 ];
 
 /* --- Résultats : une vidéo par composante ---------------------------------- */
@@ -55,20 +55,20 @@ export const gouvActivites: GouvActivite[] = [
 
 /* --- Gouvernance : rôles de coordination ----------------------------------- */
 export const gouvLeads: GouvLead[] = [
-  { role: { fr: "Coordonnateur national", en: "National Coordinator" }, pole: { fr: "Coordination", en: "Coordination" }, color: "#0f62fe", mandate: { fr: "Dirige l'Unité, garantit la cohérence et la relation avec les bailleurs.", en: "Leads the Unit, secures coherence and the relationship with donors." } },
+  { role: { fr: "Coordonnateur national", en: "National Coordinator" }, pole: { fr: "Coordination", en: "Coordination" }, color: "#0f62fe", mandate: { fr: "Dirige l'Unité, garantit la cohérence et la relation avec les bailleurs.", en: "Leads the Unit, secures coherence and the relationship with donors." }, nom: "Noël Jean-David Litanga", img: "/portraits/coordonnateur-litanga.jpg" },
   { role: { fr: "Coordonnateur technique adjoint", en: "Deputy Technical Coordinator" }, pole: { fr: "Technique & normes", en: "Technical & standards" }, color: "#8a3ffc", mandate: { fr: "Pilote la qualité des livrables et le respect des normes.", en: "Drives delivery quality and compliance with standards." } },
   { role: { fr: "Spécialiste principal en passation", en: "Lead Procurement Specialist" }, pole: { fr: "Passation", en: "Procurement" }, color: "#009d9a", mandate: { fr: "Conduit une passation ouverte et traçable selon les règles de la Banque mondiale.", en: "Runs open, traceable procurement under World Bank rules." } },
   { role: { fr: "Spécialiste suivi-évaluation", en: "M&E Specialist" }, pole: { fr: "Suivi-évaluation", en: "M&E" }, color: "#198038", mandate: { fr: "Mesure les résultats au regard du cadre 2029, sur 26 provinces.", en: "Measures results against the 2029 framework, across 26 provinces." } },
 ];
 
-/* --- UGPTN : mission (coordonner / exécuter / rendre compte) ---------------- */
-export const ugptnMission: MissionItem[] = [
+/* --- UGPTAN : mission (coordonner / exécuter / rendre compte) ---------------- */
+export const ugptanMission: MissionItem[] = [
   { t: { fr: "Coordonner", en: "Coordinate" }, d: { fr: "Aligner ministères, partenaires et bailleurs autour d'un seul plan et d'une seule source de vérité.", en: "Align ministries, partners and donors around one plan and one source of truth." } },
   { t: { fr: "Exécuter", en: "Deliver" }, d: { fr: "Passer les marchés, contractualiser et superviser les travaux, services et systèmes du Projet.", en: "Procure, contract and supervise the works, services and systems of the Project." } },
   { t: { fr: "Rendre compte", en: "Account" }, d: { fr: "Mesurer les résultats, sécuriser les fonds et rendre compte — aux citoyens et aux bailleurs.", en: "Measure results, safeguard funds and report — to citizens and to donors." } },
 ];
 
-/* --- UGPTN : mission + activité en cours par pôle -------------------------- */
+/* --- UGPTAN : mission + activité en cours par pôle -------------------------- */
 export const polesAction: PoleAction[] = [
   { pole: { fr: "Coordination & administration", en: "Coordination & administration" }, color: "#0f62fe", mission: { fr: "Tient le plan d'ensemble et fait tourner l'Unité au quotidien.", en: "Holds the plan together and runs the Unit day to day." }, act: { fr: "En cours : plan de travail glissant 18 mois & reporting bailleurs.", en: "Now: rolling 18-month work plan & donor reporting." } },
   { pole: { fr: "Passation des marchés", en: "Procurement" }, color: "#009d9a", mission: { fr: "Transforme les besoins en marchés ouverts et traçables.", en: "Turns needs into open, traceable contracts." }, act: { fr: "En cours : appel d'offres fibre Est de 2 500 km (AOI/C1).", en: "Now: 2,500 km Eastern fibre tender (AOI/C1)." } },
@@ -77,7 +77,7 @@ export const polesAction: PoleAction[] = [
   { pole: { fr: "Suivi-évaluation & sauvegardes", en: "M&E & safeguards" }, color: "#198038", mission: { fr: "Mesure l'impact et protège les personnes et l'environnement.", en: "Measures impact and protects people and the environment." }, act: { fr: "En cours : étude de référence & MGP sur 26 provinces.", en: "Now: baseline study & GRM across 26 provinces." } },
 ];
 
-/* --- UGPTN : « Du financement aux résultats » (5 étapes) -------------------- */
+/* --- UGPTAN : « Du financement aux résultats » (5 étapes) -------------------- */
 export const methode: MethodeEtape[] = [
   { t: { fr: "Planifier", en: "Plan" }, d: { fr: "Traduire le MEP en plan d'action et de passation daté (PTBA / PPM).", en: "Translate the PIM into a dated action and procurement plan (AWPB / PP)." } },
   { t: { fr: "Passer les marchés", en: "Procure" }, d: { fr: "Mettre en concurrence, de manière ouverte et traçable, selon les règles de la Banque mondiale.", en: "Run open, traceable competition under World Bank rules." } },
@@ -86,7 +86,7 @@ export const methode: MethodeEtape[] = [
   { t: { fr: "Mesurer & rendre compte", en: "Measure & account" }, d: { fr: "Suivre les indicateurs, conduire les audits et rendre compte aux citoyens et aux bailleurs.", en: "Track indicators, run audits and report to citizens and donors." } },
 ];
 
-/* --- UGPTN : engagements / standards --------------------------------------- */
+/* --- UGPTAN : engagements / standards --------------------------------------- */
 export const engagementsList: EngagementItem[] = [
   { t: { fr: "Transparence", en: "Transparency" }, d: { fr: "Chaque avis publié, chaque attribution rendue publique.", en: "Every notice published, every award made public." }, color: "#0f62fe" },
   { t: { fr: "Traçabilité", en: "Traceability" }, d: { fr: "Chaque processus daté et journalisé, de bout en bout.", en: "Every process dated and logged, end to end." }, color: "#009d9a" },
@@ -96,7 +96,7 @@ export const engagementsList: EngagementItem[] = [
   { t: { fr: "Conformité", en: "Compliance" }, d: { fr: "Prérogatives des bailleurs intégralement préservées — aucun raccourci.", en: "Donor prerogatives fully preserved — no shortcuts." }, color: "#ff832b" },
 ];
 
-/* --- UGPTN : glossaire des sigles ------------------------------------------ */
+/* --- UGPTAN : glossaire des sigles ------------------------------------------ */
 export const glossaire: GlossaireItem[] = [
   { s: "MEP", d: { fr: "Manuel d'Exécution du Projet — la source de vérité.", en: "Project Implementation Manual — the source of truth." } },
   { s: "COPIL", d: { fr: "Comité de Pilotage — orientation stratégique.", en: "Steering Committee — strategic orientation." } },
@@ -110,11 +110,11 @@ export const glossaire: GlossaireItem[] = [
   { s: "IDA / AFD", d: { fr: "Les deux cofinanceurs du projet.", en: "The project's two co-financiers." } },
 ];
 
-/* --- UGPTN : FAQ sur l'Unité ----------------------------------------------- */
-export const ugptnFaq: FaqItem[] = [
-  { q: { fr: "Qu'est-ce que l'UGPTN, exactement ?", en: "What exactly is the UGPTN?" }, r: { fr: "Une unité d'exécution dédiée — pas une nouvelle administration — créée pour mettre en œuvre le Projet de Transformation Numérique pour le compte de l'État, dans le respect des règles de financement.", en: "A dedicated execution unit — not a new administration — set up to deliver the Digital Transformation Project on behalf of the State, within the financing rules." } },
+/* --- UGPTAN : FAQ sur l'Unité ----------------------------------------------- */
+export const ugptanFaq: FaqItem[] = [
+  { q: { fr: "Qu'est-ce que l'UGPTAN, exactement ?", en: "What exactly is the UGPTAN?" }, r: { fr: "Une unité d'exécution dédiée — pas une nouvelle administration — créée pour mettre en œuvre le Projet de Transformation Numérique pour le compte de l'État, dans le respect des règles de financement.", en: "A dedicated execution unit — not a new administration — set up to deliver the Digital Transformation Project on behalf of the State, within the financing rules." } },
   { q: { fr: "Quelle différence avec le Ministère ?", en: "How is it different from the Ministry?" }, r: { fr: "Les ministères définissent la politique et exercent la tutelle ; l'Unité exécute — elle planifie, passe les marchés, supervise et rend compte. Elle ne s'y substitue jamais.", en: "The ministries set policy and provide oversight; the Unit executes — it plans, procures, supervises and reports. It never replaces them." } },
-  { q: { fr: "Qui dirige l'Unité ?", en: "Who leads the Unit?" }, r: { fr: "Un Coordonnateur national, appuyé par cinq pôles et vingt-et-un sous-rôles. Les noms et portraits sont confirmés par l'Unité.", en: "A National Coordinator, supported by five clusters and twenty-one sub-roles. Names and portraits are confirmed by the Unit." } },
+  { q: { fr: "Qui dirige l'Unité ?", en: "Who leads the Unit?" }, r: { fr: "Un Coordonnateur national, appuyé par cinq pôles fonctionnels — Direction, Composantes, Fiduciaire, Passation et Sauvegardes & transversal — et vingt-et-un sous-rôles, du pilotage à la liaison provinciale.", en: "A National Coordinator, supported by five functional clusters — Management, Components, Fiduciary, Procurement and Safeguards & cross-cutting — and twenty-one sub-roles, from steering to provincial liaison." } },
   { q: { fr: "Comment est-elle financée ?", en: "How is it financed?" }, r: { fr: "Par le Projet : 510 millions de dollars cofinancés par la Banque mondiale (IDA) et l'AFD. Le fonctionnement de l'Unité relève de la composante de gestion.", en: "Through the Project: 510 million dollars co-financed by the World Bank (IDA) and AFD. The Unit's own operating costs are part of the management component." } },
   { q: { fr: "L'Unité décide-t-elle des attributions ?", en: "Does the Unit decide who wins contracts?" }, r: { fr: "Elle conduit le processus de manière transparente, mais les attributions suivent une évaluation traçable et l'avis de non-objection du bailleur. Les outils proposent et tracent ; les responsables habilités décident.", en: "It runs the process transparently, but awards follow traceable evaluation and the donor's no-objection. Tools propose and trace; authorised officials decide." } },
   { q: { fr: "Comment travailler avec l'Unité ?", en: "How can I work with the Unit?" }, r: { fr: "Les entreprises soumissionnent via la page Marchés et l'espace soumissionnaire ; les citoyens peuvent participer aux événements, suivre l'actualité ou saisir le mécanisme de plaintes.", en: "Companies bid through the tenders page and the bidder space; citizens can take part in events, follow the news, or use the grievance mechanism." } },
@@ -122,14 +122,15 @@ export const ugptnFaq: FaqItem[] = [
 
 /* --- Accueil : partenaires (logos placeholders) ---------------------------- */
 export const partners: Partner[] = [
-  { name: "Banque mondiale", kind: { fr: "Bailleur · IDA", en: "Donor · IDA" } },
-  { name: "AFD", kind: { fr: "Bailleur", en: "Donor" } },
-  { name: "MPTN", kind: { fr: "Tutelle", en: "Supervision" } },
-  { name: "ARPTC", kind: { fr: "Régulateur", en: "Regulator" } },
-  { name: "ADN", kind: { fr: "Agence du Numérique", en: "Digital Agency" } },
-  { name: "ONIP", kind: { fr: "Identité", en: "Identity" } },
-  { name: "MESU", kind: { fr: "Enseignement sup.", en: "Higher education" } },
-  { name: "MEPME", kind: { fr: "PME", en: "PME" } },
+  { name: "Banque mondiale", kind: { fr: "Bailleur · IDA", en: "Donor · IDA" }, logo: "/partenaires/banque-mondiale.png" },
+  { name: "AFD", kind: { fr: "Bailleur", en: "Donor" }, logo: "/partenaires/afd.png" },
+  { name: "MPTN", kind: { fr: "Tutelle", en: "Supervision" }, logo: "/partenaires/mptn.png" },
+  { name: "Ministère de l'Économie Numérique", kind: { fr: "Ministère", en: "Ministry" }, logo: "/partenaires/economie-numerique.png" },
+  { name: "ARPTC", kind: { fr: "Régulateur", en: "Regulator" }, logo: "/partenaires/arptc.png" },
+  { name: "ADN", kind: { fr: "Agence du Numérique", en: "Digital Agency" }, logo: "/partenaires/adn.png" },
+  { name: "ONIP", kind: { fr: "Identité", en: "Identity" }, logo: "/partenaires/onip.png" },
+  { name: "MESU", kind: { fr: "Enseignement sup.", en: "Higher education" }, logo: "/partenaires/mesu.png" },
+  { name: "MEPME", kind: { fr: "PME", en: "PME" }, logo: "/partenaires/mepme.png" },
 ];
 
 /* --- Ressources & publications --------------------------------------------- */
@@ -144,7 +145,7 @@ export const ressources: Ressource[] = [
   { k: { fr: "Note d'orientation", en: "Sector note" }, color: "#009d9a", pole: { fr: "Passation & fiduciaire", en: "Procurement & fiduciary" }, date: { fr: "Janvier 2026", en: "Jan 2026" }, titre: { fr: "Passation ouverte et traçable : application des règles de la Banque mondiale", en: "Open, traceable procurement: applying World Bank rules" }, meta: "PDF · 1,1 Mo" },
 ];
 
-/* --- UGPTN : chiffres de l'Unité ------------------------------------------- */
+/* --- UGPTAN : chiffres de l'Unité ------------------------------------------- */
 export const uniteStats: UniteStat[] = [
   { v: "5", l: { fr: "pôles", en: "clusters" } },
   { v: "21", l: { fr: "sous-rôles", en: "sub-roles" } },

@@ -3,8 +3,8 @@ import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } fr
 const AC = "#0f62fe";
 const BLACK = "#161616";
 
-/** Intro de marque UGPTN — fonctionne en 16:9 et en 9:16. */
-export const UgptnIntro = () => {
+/** Intro de marque UGPTAN — fonctionne en 16:9 et en 9:16. */
+export const UgptanIntro = () => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const vertical = height > width;
@@ -34,7 +34,7 @@ export const UgptnIntro = () => {
           une connexion à la fois.
         </div>
         <div style={{ color: "#78a9ff", fontFamily: "'IBM Plex Mono', monospace", fontSize: unit * 0.022, letterSpacing: "0.1em", marginTop: unit * 0.04, opacity: subO, textTransform: "uppercase" }}>
-          UGPTN · PTN-RDC · P180495
+          UGPTAN · PTN-RDC · P180495
         </div>
       </div>
     </AbsoluteFill>

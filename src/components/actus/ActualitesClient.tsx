@@ -8,6 +8,7 @@ import { actualites } from "@/content/actualites";
 import { media } from "@/content/media";
 import { Photo } from "@/components/ui/Photo";
 import { useVideo } from "@/components/video/VideoProvider";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function ActualitesClient({ lang }: { lang: Lang }) {
   const t = dict(lang).actus;
@@ -36,21 +37,23 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(358px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+      <RevealGroup style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(358px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }} gap={0.045}>
         {view.map(({ a, i }) => (
-          <button key={i} onClick={() => setSel(i)} style={{ textAlign: "left", background: "#fff", display: "flex", flexDirection: "column", padding: 0 }}>
-            <div className="duo" style={{ aspectRatio: "16/9" }}>
-              <Photo src={media.img[a.img]} alt={pick(a.title, lang)} />
-              <span className="mono" style={{ position: "absolute", top: 12, left: 12, fontSize: 10.5, color: "#fff", background: "var(--ac)", padding: "5px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{pick(a.cat, lang)}</span>
-            </div>
-            <div style={{ padding: "22px clamp(18px,2vw,24px) 24px", display: "flex", flexDirection: "column", flex: 1 }}>
-              <div className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>{a.date} · {a.lieu}</div>
-              <h3 style={{ margin: "12px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.32, flex: 1 }}>{pick(a.title, lang)}</h3>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 18, fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>{t.readArticle} →</span>
-            </div>
-          </button>
+          <RevealItem key={i}>
+            <button onClick={() => setSel(i)} style={{ textAlign: "left", background: "#fff", display: "flex", flexDirection: "column", padding: 0, width: "100%" }}>
+              <div className="duo" style={{ aspectRatio: "16/9" }}>
+                <Photo src={media.img[a.img]} alt={pick(a.title, lang)} />
+                <span className="mono" style={{ position: "absolute", top: 12, left: 12, fontSize: 10.5, color: "#fff", background: "var(--ac)", padding: "5px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{pick(a.cat, lang)}</span>
+              </div>
+              <div style={{ padding: "22px clamp(18px,2vw,24px) 24px", display: "flex", flexDirection: "column", flex: 1 }}>
+                <div className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>{a.date} · {a.lieu}</div>
+                <h3 style={{ margin: "12px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.32, flex: 1 }}>{pick(a.title, lang)}</h3>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 18, fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>{t.readArticle} →</span>
+              </div>
+            </button>
+          </RevealItem>
         ))}
-      </div>
+      </RevealGroup>
 
       {article && (
         <div className="scrim scrim--right" onClick={() => setSel(null)}>
@@ -77,7 +80,7 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
               )}
               <div style={{ marginTop: 30, paddingTop: 24, borderTop: "1px solid var(--c-20)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
                 <button onClick={() => setSel(null)} className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 9, fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>← {t.allNews}</button>
-                <span className="mono" style={{ fontSize: 11, color: "var(--c-50)" }}>UGPTN · {article.date}</span>
+                <span className="mono" style={{ fontSize: 11, color: "var(--c-50)" }}>UGPTAN · {article.date}</span>
               </div>
             </div>
           </div>

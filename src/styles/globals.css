@@ -3,7 +3,15 @@
    Base
 =========================================================================== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+/* Smooth scroll géré par Lenis (cf. components/motion/SmoothScroll.tsx) — pas
+   de scroll-behavior natif qui se battrait avec l'inertie. CSS requis par Lenis : */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+/* Verrou de défilement quand un overlay est ouvert (mode reduced-motion). */
+html.scroll-locked, html.scroll-locked body { overflow: hidden; }
 body {
   background: var(--c-white);
   color: var(--c-black);
@@ -26,7 +34,7 @@ img { display: block; max-width: 100%; }
    Layout
 =========================================================================== */
 .container { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--pad-x); }
-.section { padding: var(--pad-y) var(--pad-x); border-bottom: 1px solid var(--c-20); }
+.section { padding-block: var(--pad-y); padding-inline: max(var(--pad-x), var(--sa-l)) max(var(--pad-x), var(--sa-r)); border-bottom: 1px solid var(--c-20); }
 .section--sm { padding-block: var(--pad-y-sm); }
 .section--grey { background: var(--c-10); }
 .section--dark { background: var(--c-black); color: #fff; }
@@ -35,7 +43,7 @@ img { display: block; max-width: 100%; }
 .section__inner { max-width: var(--maxw); margin: 0 auto; }
 
 /* Page hero (inner pages) */
-.page-hero { padding: clamp(54px, 7vw, 92px) var(--pad-x) clamp(38px, 4vw, 56px); border-bottom: 1px solid var(--c-20); }
+.page-hero { padding: clamp(54px, 7vw, 92px) max(var(--pad-x), var(--sa-r)) clamp(38px, 4vw, 56px) max(var(--pad-x), var(--sa-l)); border-bottom: 1px solid var(--c-20); }
 .page-hero__crumb { font-family: var(--font-mono); font-size: 12px; color: var(--c-50); letter-spacing: 0.05em; margin-bottom: 22px; }
 .page-hero h1 { font-weight: 600; font-size: clamp(34px, 5.2vw, 68px); line-height: 1.0; letter-spacing: -0.03em; max-width: 16ch; }
 .page-hero__lead { margin-top: 24px; max-width: 680px; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.6; color: var(--c-70); }
@@ -93,9 +101,89 @@ img { display: block; max-width: 100%; }
 =========================================================================== */
 .celled { display: grid; gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
 .celled--dark { background: var(--c-80); border-color: var(--c-80); }
+/* Spécificité accrue : sur grille sombre, les filets restent gris sombre
+   (sinon .grid-4/-3/-5 — définis plus bas — repassent en var(--c-20) clair). */
+.grid-3.celled--dark, .grid-4.celled--dark, .grid-5.celled--dark { background: var(--c-80); border-color: var(--c-80); }
 .celled--top { border-top: 2px solid var(--c-black); }
-.cell { background: #fff; padding: 28px 24px; }
+.cell { background: #fff; padding: 28px 24px; position: relative; overflow: hidden; isolation: isolate; }
 .celled--dark .cell { background: var(--c-black); }
+
+/* === Survol « nappes de couleur » des cellules (cf. ui/FlowLines.tsx) ======
+   Au survol : surface bleu nuit + rubans colorés + voile de lisibilité ;
+   le texte des cellules claires passe en clair via .cell--invert (variables). */
+.cell--fx {
+  --cell-fg: var(--c-black);
+  --cell-mut: var(--c-70);
+  --cell-acc: var(--ac);
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cell--fx :is(h1, h2, h3, h4, p, span, div, a, strong) { transition: color 0.4s ease, border-color 0.4s ease; }
+/* Cellules claires : bascule du texte en clair au survol */
+.cell--invert:hover { --cell-fg: #ffffff; --cell-mut: #c8d0e0; --cell-acc: var(--ac-light); }
+
+/* Pile d'effet, derrière le texte */
+.cell-fx { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.cell-fx__surface, .cell-fx__scrim { position: absolute; inset: 0; opacity: 0; transition: opacity 0.5s ease; }
+.cell-fx__lines { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.cell-fx__surface { background: radial-gradient(135% 150% at 12% 108%, #112247 0%, #0b1530 46%, #080d1e 100%); }
+.cell-fx__scrim { background: linear-gradient(180deg, rgba(7, 11, 22, 0.6) 0%, rgba(7, 11, 22, 0.08) 38%, rgba(7, 11, 22, 0.26) 68%, rgba(7, 11, 22, 0.64) 100%); }
+.cell-fx__glow { filter: blur(10px); opacity: 0.6; }
+.cell-fx__drift { transform-box: fill-box; transform-origin: 50% 60%; animation: flowSway 13s ease-in-out infinite alternate; animation-play-state: paused; will-change: transform; }
+@keyframes flowSway { from { transform: translate(0, 0) scale(1); } to { transform: translate(-11px, -6px) scale(1.05); } }
+
+/* Tracé progressif des rubans : remplissage de la zone (gauche → droite, décalé) */
+.cell-fx path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 0.8s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: calc(var(--d, 0) * 1ms); }
+
+/* État survol */
+.cell--fx:hover { transform: translateY(-3px); z-index: 3; box-shadow: 0 24px 48px -26px rgba(6, 10, 22, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+.cell--fx:hover .cell-fx__surface, .cell--fx:hover .cell-fx__scrim { opacity: 1; }
+.cell--fx:hover .cell-fx path { stroke-dashoffset: 0; }
+.cell--fx:hover .cell-fx__drift { animation-play-state: running; }
+
+/* Variante claire : rubans tracés sur fond BLANC, texte qui reste sombre */
+.cell--light .cell-fx__surface { background: radial-gradient(140% 160% at 12% 108%, #ffffff 0%, #f1f6ff 50%, #e7eefb 100%); }
+.cell--light .cell-fx__scrim { background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 64%, rgba(255, 255, 255, 0.82) 100%); }
+.cell--light .cell-fx__glow { opacity: 0.4; }
+.cell--light .cell-fx__lines { opacity: 0.8; }
+.cell--light.cell--fx:hover { box-shadow: 0 18px 40px -22px rgba(22, 45, 99, 0.3), inset 0 0 0 1px rgba(20, 40, 90, 0.08); }
+
+/* === Floraison de couleur du secteur, sur fond BLANC (cf. ui/CellBloom.tsx) ==
+   Deux halos de la couleur (--sec) éclosent depuis des coins opposés + dérive. */
+.cell--bloom { --cell-fg: var(--c-black); --cell-mut: var(--c-70); transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.cell--bloom :is(h1, h2, h3, p, span) { transition: color 0.4s ease; }
+.cell-bloom { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.cell-bloom__a, .cell-bloom__b { position: absolute; border-radius: 50%; filter: blur(34px); opacity: 0; background: radial-gradient(closest-side, var(--sec), transparent 72%); transition: opacity 0.55s ease, transform 0.85s cubic-bezier(0.16, 1, 0.3, 1); }
+.cell-bloom__a { width: 78%; height: 135%; left: -14%; top: -42%; transform: scale(0.55); transform-origin: top left; }
+.cell-bloom__b { width: 60%; height: 120%; right: -12%; bottom: -40%; transform: scale(0.45); transform-origin: bottom right; }
+.cell--bloom:hover { transform: translateY(-3px); z-index: 3; box-shadow: 0 20px 44px -24px rgba(20, 32, 66, 0.42); }
+.cell--bloom:hover .cell-bloom__a { opacity: 0.2; transform: scale(1); animation: bloomFloatA 9s ease-in-out infinite alternate 0.5s; }
+.cell--bloom:hover .cell-bloom__b { opacity: 0.15; transform: scale(1); transition-delay: 0.08s; animation: bloomFloatB 11s ease-in-out infinite alternate 0.6s; }
+@keyframes bloomFloatA { from { translate: 0 0; } to { translate: 9px 11px; } }
+@keyframes bloomFloatB { from { translate: 0 0; } to { translate: -11px -9px; } }
+
+/* === Lavis de couleur très discret au survol (épuré, uniforme) =============
+   Un fond accent quasi transparent se remplit de gauche à droite. Posé derrière
+   le texte (z-index:-1) ; n'altère pas les cellules à effet riche (fx / bloom). */
+.comp-row { position: relative; isolation: isolate; overflow: hidden; }
+.comp-row::before,
+.cell:not(.cell--fx):not(.cell--bloom)::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(15, 98, 254, 0.07), rgba(15, 98, 254, 0.025));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.celled--dark .cell:not(.cell--fx):not(.cell--bloom)::before {
+  background: linear-gradient(90deg, rgba(120, 169, 255, 0.10), rgba(120, 169, 255, 0.03));
+}
+.comp-row:hover::before,
+.cell:not(.cell--fx):not(.cell--bloom):hover::before { transform: scaleX(1); }
+
+/* === Curseur personnalisé (cf. components/motion/Cursor.tsx) ================
+   mix-blend-mode: difference posé DIRECTEMENT sur l'anneau/point (pas de wrapper
+   à z-index, qui isolerait la fusion) → toujours visible, fond clair comme sombre. */
+html.cursor-custom, html.cursor-custom * { cursor: none !important; }
+.cursor-ring { position: fixed; top: 0; left: 0; z-index: 10000; width: 28px; height: 28px; margin: -14px 0 0 -14px; border: 1.5px solid #fff; border-radius: 50%; mix-blend-mode: difference; pointer-events: none; will-change: transform; }
+.cursor-dot { position: fixed; top: 0; left: 0; z-index: 10000; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; background: #fff; border-radius: 50%; mix-blend-mode: difference; pointer-events: none; will-change: transform; }
 
 /* Stat */
 .stat__num { font-family: var(--font-mono); font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
@@ -145,6 +233,73 @@ img { display: block; max-width: 100%; }
 @media (max-width: 640px) { .comp-head { grid-template-columns: 1fr !important; } }
 @media (max-width: 680px) { .gov-act { grid-template-columns: 1fr !important; } }
 
+/* Utilitaires partagés (base) — le flou et le hamburger sont pilotés en mobile */
+.blur-sm { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.nav-burger { display: inline-flex; }
+@media (min-width: 861px) { .nav-burger { display: none !important; } }
+
+/* ===========================================================================
+   Mobile — conception dédiée (≤ 760px) : espace resserré, héros jamais rogné,
+   cibles tactiles confortables, contenu lisible, pas de débordement.
+=========================================================================== */
+@media (max-width: 760px) {
+  :root { --pad-y: clamp(46px, 11vw, 72px); --pad-y-sm: clamp(40px, 9vw, 60px); }
+
+  /* Champs : 16px pour empêcher le zoom auto iOS au focus (bat les styles inline) */
+  .field, input, textarea, select { font-size: 16px !important; }
+  .field { padding: 14px 15px; }
+
+  /* Utilitaires : empilement pleine largeur, cartes, overlays plein écran, flou coupé */
+  .stack-sm { flex-direction: column !important; align-items: stretch !important; }
+  .stack-sm > .btn, .stack-sm > a.btn, .stack-sm > button { width: 100% !important; justify-content: center; }
+  .card-sm { grid-template-columns: 1fr !important; gap: 10px !important; }
+  .blur-sm { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  a.btn, button.btn, .chip { min-height: 44px; }
+  .drawer { width: 100% !important; }
+  .modal { width: 100% !important; max-width: 100% !important; max-height: calc(100dvh - var(--sa-t) - var(--sa-b)); overflow: auto; }
+
+  /* Héros mobile : carte chiffres condensée, liens et barre d'état allégés */
+  .hero-figures { margin-bottom: 0 !important; background: rgba(11, 16, 28, 0.9) !important; }
+  .hero-figures > div { padding: 14px 16px !important; }
+  .hero-figures .stat__num { font-size: 26px !important; }
+  .hero-links a { border-left: none !important; padding: 10px 0 !important; }
+
+  /* Héros : hauteur pilotée par le contenu (jamais de rognage), depuis le haut */
+  [data-hero] { min-height: auto !important; }
+  .hero-grid { align-content: start !important; align-items: start !important; padding-top: clamp(26px, 9vw, 52px) !important; gap: 20px !important; }
+  .hero-grid > div:first-child { padding-bottom: 26px !important; }
+  .hero-grid > div:last-child { margin-bottom: 0 !important; }
+
+  /* Cibles tactiles (≥ 44px) */
+  .btn { min-height: 48px; }
+  .btn--sm { min-height: 42px; }
+  .chip { min-height: 40px; }
+
+  /* Titres un cran plus compacts */
+  .page-hero h1 { font-size: clamp(29px, 9vw, 44px); max-width: 20ch; }
+  .h2 { font-size: clamp(25px, 7.6vw, 34px); }
+  .h2--sm { font-size: clamp(23px, 7vw, 32px); }
+
+  /* Actualités : empilées en gardant la date + la catégorie (au lieu de masquer) */
+  .actu-row { grid-template-columns: 1fr !important; gap: 7px !important; padding: 18px 0 !important; align-items: start !important; }
+  .actu-row > :nth-child(1), .actu-row > :nth-child(2) { display: inline-flex !important; }
+  .actu-row > :nth-child(4) { display: none !important; }
+
+  /* Garde-fous anti-débordement horizontal */
+  img, video, svg { max-width: 100%; }
+}
+
+/* Petits écrans : tout en pleine largeur, marges minimales */
+@media (max-width: 480px) {
+  :root { --pad-x: clamp(16px, 5vw, 22px); }
+  .grid-4, .grid-3, .grid-5, .cols2-sm { grid-template-columns: 1fr !important; }
+  .cols2 { gap: 26px !important; }
+  /* Anti-débordement : les grilles minmax(2xx/3xx/4xx) passent en 1 colonne
+     (sinon minmax(400px) force une piste plus large que l'écran → scroll horizontal) */
+  [style*="minmax(2"], [style*="minmax(3"], [style*="minmax(4"] { grid-template-columns: 1fr !important; }
+  .hero-status { gap: 6px 16px !important; font-size: 11px !important; }
+}
+
 /* ===========================================================================
    Animations
 =========================================================================== */
@@ -160,12 +315,8 @@ img { display: block; max-width: 100%; }
 .blink { animation: blink 2s infinite; }
 .spin { animation: spinmark 0.9s linear infinite; }
 
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .reveal { animation: revUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; animation-timeline: view(); animation-range: entry 4% cover 30%; }
-    .reveal-cell { animation: revUp 0.62s cubic-bezier(0.16, 1, 0.3, 1) both; animation-timeline: view(); animation-range: entry 0% cover 20%; }
-  }
-}
+/* Les reveals au scroll sont désormais gérés par framer-motion (cross-browser) :
+   cf. components/motion/Reveal.tsx & RevealGroup.tsx. */
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -182,9 +333,9 @@ img { display: block; max-width: 100%; }
 
 /* Overlay (lightbox / drawer scrim) */
 .scrim { position: fixed; inset: 0; z-index: 200; background: rgba(22, 22, 22, 0.62); display: flex; animation: ovF 0.22s both; }
-.scrim--center { align-items: center; justify-content: center; padding: clamp(16px, 4vw, 56px); }
+.scrim--center { align-items: center; justify-content: center; padding: max(clamp(16px, 4vw, 56px), var(--sa-t)) clamp(16px, 4vw, 56px) max(clamp(16px, 4vw, 56px), var(--sa-b)); }
 .scrim--right { justify-content: flex-end; }
-.drawer { width: min(900px, 100%); height: 100%; background: #fff; overflow: auto; animation: revSlideR 0.34s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.drawer { width: min(900px, 100%); height: 100%; background: #fff; overflow: auto; overscroll-behavior: contain; padding-bottom: var(--sa-b); animation: revSlideR 0.34s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .modal { animation: ovS 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* Field */

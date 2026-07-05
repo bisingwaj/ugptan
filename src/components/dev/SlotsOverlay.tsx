@@ -14,6 +14,9 @@ export function SlotsOverlay() {
   const [boxes, setBoxes] = useState<Box[]>([]);
 
   useEffect(() => {
+    // Outil de repérage réservé au développement : jamais activable en production
+    // (même avec ?slots=1) pour ne pas exposer d'overlays internes sur le site public.
+    if (process.env.NODE_ENV !== "development") return;
     setOn(new URLSearchParams(window.location.search).get("slots") === "1");
   }, []);
 

@@ -4,13 +4,13 @@ import type { Lang } from "./pick";
 export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 
 export type NavKey =
-  | "accueil" | "projet" | "ugptn" | "gouvernance" | "marches" | "transparence"
+  | "accueil" | "projet" | "ugptan" | "gouvernance" | "marches" | "transparence"
   | "actualites" | "resultats" | "ressources" | "evenements" | "contact" | "mgp" | "connexion";
 
 export type NavItem = { slug: string; key: NavKey };
 
 export const NAV: Record<NavKey, string> = {
-  accueil: "", projet: "/projet", ugptn: "/ugptn", gouvernance: "/gouvernance",
+  accueil: "", projet: "/projet", ugptan: "/ugptan", gouvernance: "/gouvernance",
   marches: "/marches", transparence: "/transparence", actualites: "/actualites",
   resultats: "/resultats", ressources: "/ressources", evenements: "/evenements",
   contact: "/contact", mgp: "/mgp", connexion: "/connexion",
@@ -18,7 +18,7 @@ export const NAV: Record<NavKey, string> = {
 
 export const NAV_PRIMARY: NavItem[] = [
   { slug: NAV.projet, key: "projet" },
-  { slug: NAV.ugptn, key: "ugptn" },
+  { slug: NAV.ugptan, key: "ugptan" },
   { slug: NAV.marches, key: "marches" },
   { slug: NAV.actualites, key: "actualites" },
 ];
@@ -26,7 +26,7 @@ export const NAV_PRIMARY: NavItem[] = [
 export const NAV_DRAWER: NavItem[] = [
   { slug: NAV.accueil, key: "accueil" },
   { slug: NAV.projet, key: "projet" },
-  { slug: NAV.ugptn, key: "ugptn" },
+  { slug: NAV.ugptan, key: "ugptan" },
   { slug: NAV.gouvernance, key: "gouvernance" },
   { slug: NAV.marches, key: "marches" },
   { slug: NAV.transparence, key: "transparence" },
@@ -39,7 +39,7 @@ export const NAV_DRAWER: NavItem[] = [
 
 export const NAV_FOOTER: NavItem[] = [
   { slug: NAV.projet, key: "projet" },
-  { slug: NAV.ugptn, key: "ugptn" },
+  { slug: NAV.ugptan, key: "ugptan" },
   { slug: NAV.marches, key: "marches" },
   { slug: NAV.actualites, key: "actualites" },
 ];

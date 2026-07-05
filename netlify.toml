@@ -1,0 +1,13 @@
+# Déploiement Netlify — Next.js 14 (App Router).
+# Le plugin officiel gère le SSR, le middleware i18n, l'optimisation d'images
+# et les en-têtes définis dans next.config.mjs.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

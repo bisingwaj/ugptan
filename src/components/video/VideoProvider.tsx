@@ -30,7 +30,7 @@ export function VideoProvider({ lang, children }: { lang: Lang; children: ReactN
     <VideoCtx.Provider value={open}>
       {children}
       {src && (
-        <div className="scrim scrim--center" style={{ backdropFilter: "blur(8px)", background: "rgba(22,22,22,0.86)" }} onClick={close}>
+        <div className="scrim scrim--center blur-sm" style={{ backdropFilter: "blur(8px)", background: "rgba(22,22,22,0.86)" }} onClick={close}>
           <div className="modal" style={{ width: "100%", maxWidth: 1080 }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginBottom: 14 }}>
               <div>

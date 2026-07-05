@@ -25,7 +25,8 @@ export function Counter({ to, dur = 1300, dec = 0, prefix = "", suffix = "" }: P
           const t0 = performance.now();
           const tick = (now: number) => {
             const p = Math.min(1, (now - t0) / dur);
-            const eased = 1 - Math.pow(1 - p, 3);
+            // easeOutExpo — accordé sur la courbe des reveals (vif puis posé).
+            const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
             setVal(to * eased);
             if (p < 1) raf = requestAnimationFrame(tick);
             else setVal(to);

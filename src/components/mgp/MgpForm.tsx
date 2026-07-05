@@ -21,7 +21,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
   const anon = !contact.email && !contact.tel;
 
   const reset = () => { setRef(null); setStep(1); setCat(""); setMsg(""); setFiles([]); setContact({ email: "", tel: "", prov: "" }); };
-  const submit = () => setRef("UGPTN-MGP-2026-" + (1000 + Math.floor(Math.random() * 9000)));
+  const submit = () => setRef("UGPTAN-MGP-2026-" + (1000 + Math.floor(Math.random() * 9000)));
 
   if (ref) {
     return (

@@ -4,6 +4,9 @@ import { dict } from "@/content/i18n";
 import { contact } from "@/content/carbon";
 import { Kicker } from "@/components/ui/Kicker";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
+import { PageHero } from "@/components/ui/PageHero";
+import { Reveal } from "@/components/motion/Reveal";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   return { title: dict(asLang(params.lang)).contact.titre };
@@ -16,39 +19,33 @@ export default function ContactPage({ params }: { params: { lang: string } }) {
 
   return (
     <div>
-      <section className="page-hero">
-        <div className="section__inner">
-          <div className="page-hero__crumb">UGPTN / {c.titre}</div>
-          <h1>{c.titre}</h1>
-          <p className="page-hero__lead">{c.lead}</p>
-        </div>
-      </section>
+      <PageHero crumb={`UGPTAN / ${c.titre}`} title={c.titre} lead={c.lead} />
 
       {/* Coordonnées */}
       <section style={{ padding: "clamp(48px,6vw,80px) var(--pad-x) 0" }}>
         <div className="section__inner">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
-            <div className="cell" style={{ padding: "30px 28px" }}>
+          <RevealGroup gap={0.045} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+            <RevealItem className="cell" style={{ padding: "30px 28px" }}>
               <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)" }}>{c.lblAddress}</div>
               <div style={{ fontSize: 16, fontWeight: 600, marginTop: 14, lineHeight: 1.4 }}>{contact.adresse}</div>
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{contact.quartier}</div>
-            </div>
-            <div className="cell" style={{ padding: "30px 28px" }}>
+            </RevealItem>
+            <RevealItem className="cell" style={{ padding: "30px 28px" }}>
               <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)" }}>{c.lblPhone}</div>
               <a href={`tel:${contact.tel.replace(/\s/g, "")}`} className="mono" style={{ display: "block", fontSize: 21, fontWeight: 600, marginTop: 14 }}>{contact.tel}</a>
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.phoneNote}</div>
-            </div>
-            <div className="cell" style={{ padding: "30px 28px" }}>
+            </RevealItem>
+            <RevealItem className="cell" style={{ padding: "30px 28px" }}>
               <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)" }}>E-mail</div>
               <a href={`mailto:${contact.email}`} style={{ display: "block", fontSize: 18, fontWeight: 600, marginTop: 14, color: "var(--ac)", wordBreak: "break-all" }}>{contact.email}</a>
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.emailNote}</div>
-            </div>
-            <div className="cell" style={{ padding: "30px 28px" }}>
+            </RevealItem>
+            <RevealItem className="cell" style={{ padding: "30px 28px" }}>
               <div className="mono" style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--green-bright)" }}><span className="blink" style={{ width: 8, height: 8, background: "var(--green-bright)", borderRadius: "50%" }} />{c.numeroVert}</div>
               <div className="mono" style={{ fontSize: 30, fontWeight: 600, marginTop: 14 }}>{contact.numeroVert}</div>
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.numeroVertNote}</div>
-            </div>
-          </div>
+            </RevealItem>
+          </RevealGroup>
           <div style={{ marginTop: 1, background: "var(--c-black)", color: "#fff", padding: "24px 28px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "14px 22px" }}>
             <span className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ac-light)" }}>{c.lblTutelle}</span>
             {contact.tutelles.map((tu) => <span key={tu} style={{ fontSize: 14.5, fontWeight: 500 }}>{tu}</span>)}
@@ -59,38 +56,40 @@ export default function ContactPage({ params }: { params: { lang: string } }) {
       {/* MGP modes + EAS */}
       <section className="section">
         <div className="section__inner">
-          <Kicker>{c.mgpLabel}</Kicker>
-          <h2 className="h2--sm" style={{ margin: "0 0 12px" }}>{c.mgpModesTitle}</h2>
-          <p style={{ margin: "0 0 40px", fontSize: 15, color: "var(--c-70)" }}>{c.slaText}</p>
-          <div className="grid-4">
+          <Reveal>
+            <Kicker>{c.mgpLabel}</Kicker>
+            <h2 className="h2--sm" style={{ margin: "0 0 12px" }}>{c.mgpModesTitle}</h2>
+            <p style={{ margin: "0 0 40px", fontSize: 15, color: "var(--c-70)" }}>{c.slaText}</p>
+          </Reveal>
+          <RevealGroup className="grid-4" gap={0.045}>
             {c.mgpModes.map((m) => (
-              <div key={m.n} className="cell" style={{ padding: "26px 22px", minHeight: 180, display: "flex", flexDirection: "column" }}>
+              <RevealItem key={m.n} className="cell" style={{ padding: "26px 22px", minHeight: 180, display: "flex", flexDirection: "column" }}>
                 <div className="mono" style={{ fontWeight: 600, fontSize: 24, color: "var(--ac)" }}>{m.n}</div>
                 <h3 style={{ margin: "auto 0 0", fontSize: 17, fontWeight: 600 }}>{m.t}</h3>
                 <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--c-70)", lineHeight: 1.5 }}>{m.d}</p>
-              </div>
+              </RevealItem>
             ))}
-          </div>
-          <div className="cols2" style={{ marginTop: 1, gridTemplateColumns: "1.2fr .8fr", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", borderTop: "none" }}>
-            <div style={{ background: "var(--c-black)", color: "#fff", padding: "34px clamp(20px,3vw,36px)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 20 }}>
+          </RevealGroup>
+          <RevealGroup className="cols2" gap={0.045} style={{ marginTop: 1, gridTemplateColumns: "1.2fr .8fr", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", borderTop: "none" }}>
+            <RevealItem style={{ background: "var(--c-black)", color: "#fff", padding: "34px clamp(20px,3vw,36px)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 20 }}>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 600 }}>{c.generalTitle}</div>
                 <div style={{ fontSize: 13.5, color: "var(--c-40)", marginTop: 6, maxWidth: 380, lineHeight: 1.5 }}>{c.generalDesc}</div>
               </div>
               <button className="btn btn--primary btn--sm">{t.cta.report}<span className="arrow">→</span></button>
-            </div>
-            <div style={{ background: "var(--c-10)", padding: "34px clamp(20px,3vw,36px)", borderLeft: "3px solid var(--c-50)" }}>
+            </RevealItem>
+            <RevealItem style={{ background: "var(--c-10)", padding: "34px clamp(20px,3vw,36px)", borderLeft: "3px solid var(--c-50)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 15 }}>🔒</span><div style={{ fontSize: 16, fontWeight: 600 }}>{c.easLabel}</div></div>
               <p style={{ margin: "12px 0 0", fontSize: 13, color: "var(--c-70)", lineHeight: 1.55 }}>{c.easText}</p>
-            </div>
-          </div>
+            </RevealItem>
+          </RevealGroup>
         </div>
       </section>
 
       {/* Map */}
       <section className="section">
         <div className="section__inner cols2 cols2--center" style={{ gridTemplateColumns: ".85fr 1.15fr" }}>
-          <div>
+          <Reveal>
             <Kicker>{c.focalLabel}</Kicker>
             <h2 className="h2--sm">26 provinces.<br />10 {t.words.prio}.</h2>
             <p style={{ margin: "22px 0 0", fontSize: 15, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 420 }}>{t.home.couvertureLead}</p>
@@ -98,7 +97,7 @@ export default function ContactPage({ params }: { params: { lang: string } }) {
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 11, height: 11, background: "var(--ac)" }} /><span style={{ color: "var(--c-80)" }}>{t.lbl.prio} (CPF)</span></div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 11, height: 11, border: "1px solid var(--c-50)", background: "#fff" }} /><span style={{ color: "var(--c-80)" }}>{t.lbl.autres}</span></div>
             </div>
-          </div>
+          </Reveal>
           <ProvinceMap lang={lang} />
         </div>
       </section>

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export type QA = { q: string; r: string };
 
-/** Shared FAQ accordion (UGPTN FAQ, citizen FAQ, MGP FAQ). */
+/** Shared FAQ accordion (UGPTAN FAQ, citizen FAQ, MGP FAQ). */
 export function Accordion({ items, first = 0 }: { items: QA[]; first?: number | null }) {
   const [open, setOpen] = useState<number | null>(first);
   return (

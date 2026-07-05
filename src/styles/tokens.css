@@ -41,8 +41,13 @@
   --pad-x: clamp(20px, 5vw, 80px);
   --pad-y: clamp(72px, 9vw, 128px);
   --pad-y-sm: clamp(56px, 7vw, 100px);
+  /* Zones sûres (encoche / barre d'accueil) — viewport-fit: cover est actif */
+  --sa-t: env(safe-area-inset-top, 0px);
+  --sa-r: env(safe-area-inset-right, 0px);
+  --sa-b: env(safe-area-inset-bottom, 0px);
+  --sa-l: env(safe-area-inset-left, 0px);
 
-  /* Type — IBM Plex (loaded via stylesheet link in the root layout) */
+  /* Type — IBM Plex (chargé via lien feuille de style dans le layout racine) */
   --font-sans: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 
