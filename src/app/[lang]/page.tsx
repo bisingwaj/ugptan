@@ -331,19 +331,16 @@ export default function Home({ params }: { params: { lang: string } }) {
       <section className="section section--sm">
         <div className="section__inner">
           <Reveal style={{ marginBottom: 40, maxWidth: 640 }}><Kicker>{t.home.partenairesLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 14 }}>{t.home.partenairesTitle}</h2><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.partenairesLead}</p></Reveal>
-          <RevealGroup gap={0.04} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(208px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+          <RevealGroup gap={0.04} className="logos-grid">
             {partners.map((p) => (
-              <RevealItem key={p.name} style={{ background: "#fff", aspectRatio: "16/9", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, padding: 18 }}>
+              <RevealItem key={p.name} className="logo-cell">
                 {p.logo ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.logo} alt={p.name} loading="lazy" decoding="async" style={{ maxWidth: "84%", maxHeight: 50, width: "auto", height: "auto", objectFit: "contain" }} />
+                  <img src={p.logo} alt={p.name} loading="lazy" decoding="async" />
                 ) : (
-                  <>
-                    <div style={{ width: 40, height: 40, border: "1px solid var(--c-30)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: 15 }}>{p.name.charAt(0)}</div>
-                    <div style={{ fontSize: 13.5, fontWeight: 600, textAlign: "center", lineHeight: 1.25 }}>{p.name}</div>
-                  </>
+                  <div style={{ fontSize: 13.5, fontWeight: 600, textAlign: "center", lineHeight: 1.25 }}>{p.name}</div>
                 )}
-                <div className="mono" style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--c-50)" }}>{pick(p.kind, lang)}</div>
+                <div className="logo-cell__kind">{pick(p.kind, lang)}</div>
               </RevealItem>
             ))}
           </RevealGroup>
