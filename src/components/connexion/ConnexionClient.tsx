@@ -64,7 +64,7 @@ export function ConnexionClient({ lang }: { lang: Lang }) {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(120% 120% at 88% 8%, rgba(15,98,254,.34), transparent 55%)" }} />
           <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ width: 30, height: 30, background: "var(--ac)", position: "relative", display: "inline-flex", flex: "0 0 auto" }}><span style={{ position: "absolute", right: 5, bottom: 5, width: 11, height: 11, background: "#fff" }} /></span>
-            <span style={{ fontWeight: 700, fontSize: 19 }}>UGPTN</span>
+            <span style={{ fontWeight: 700, fontSize: 19 }}>UGPTAN</span>
           </div>
           <div style={{ position: "relative" }}>
             <div className="mono" style={{ fontSize: 11.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ac-light)", marginBottom: 18 }}>{t.bidderSpace}</div>
@@ -106,7 +106,7 @@ export function ConnexionClient({ lang }: { lang: Lang }) {
                   <input required placeholder="Entreprise / Groupement" className="field" style={{ background: "var(--c-10)", marginBottom: 13 }} />
                   <label className="label-mono">{t.emailPro}</label>
                   <input required type="email" placeholder="contact@entreprise.cd" className="field" style={{ background: "var(--c-10)", marginBottom: 13 }} />
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13, marginBottom: 8 }}>
+                  <div className="cols2-sm" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13, marginBottom: 8 }}>
                     <div><label className="label-mono">{t.country}</label><input placeholder="RDC" className="field" style={{ background: "var(--c-10)" }} /></div>
                     <div><label className="label-mono">{t.passwordLabel}</label><input type="password" placeholder="••••••••" className="field" style={{ background: "var(--c-10)" }} /></div>
                   </div>
@@ -149,7 +149,7 @@ function Dashboard({ lang, onLogout }: { lang: Lang; onLogout: () => void }) {
             <span className="mono" style={{ fontSize: 11, color: "var(--c-50)" }}>{t.demoNote}</span>
           </div>
           {t.offres.map((o) => (
-            <div key={o.ref} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 22px", borderBottom: "1px solid var(--c-20)", flexWrap: "wrap" }}>
+            <div key={o.ref} className="stack-sm" style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 22px", borderBottom: "1px solid var(--c-20)", flexWrap: "wrap" }}>
               <span className="mono" style={{ fontSize: 11.5, color: "var(--c-70)", width: 150, flex: "0 0 auto" }}>{o.ref}</span>
               <span style={{ flex: 1, minWidth: 140, fontSize: 14, fontWeight: 600 }}>{o.objet}</span>
               <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 11.5, fontWeight: 600, color: o.color }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: o.color }} />{o.statut}</span>

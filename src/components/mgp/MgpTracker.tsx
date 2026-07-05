@@ -5,6 +5,7 @@ import type { Lang } from "@/lib/pick";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { mgpPipeline } from "@/content/mgp";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function MgpTracker({ lang }: { lang: Lang }) {
   const t = dict(lang).mgp;
@@ -28,7 +29,7 @@ export function MgpTracker({ lang }: { lang: Lang }) {
       <h2 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(20px,2.4vw,26px)", letterSpacing: "-0.02em" }}>{t.trackTitle}</h2>
       <p style={{ margin: "10px 0 0", fontSize: 13.5, color: "var(--c-40)", lineHeight: 1.55 }}>{t.trackLead}</p>
       <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
-        <input value={ref} onChange={(e) => setRef(e.target.value)} onKeyDown={(e) => e.key === "Enter" && track()} placeholder="UGPTN-MGP-2026-…" className="field field--dark mono" style={{ flex: 1, minWidth: 0 }} />
+        <input value={ref} onChange={(e) => setRef(e.target.value)} onKeyDown={(e) => e.key === "Enter" && track()} placeholder="UGPTAN-MGP-2026-…" className="field field--dark mono" style={{ flex: 1, minWidth: 0 }} />
         <button onClick={track} className="btn btn--primary btn--sm" style={{ whiteSpace: "nowrap" }}>{t.track}</button>
       </div>
 
@@ -43,17 +44,17 @@ export function MgpTracker({ lang }: { lang: Lang }) {
           <div style={{ marginTop: 16, height: 6, background: "var(--c-80)", overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${Math.round(((status.idx + 1) / stages.length) * 100)}%`, background: "var(--ac)" }} />
           </div>
-          <div style={{ marginTop: 18, display: "flex", flexDirection: "column" }}>
+          <RevealGroup style={{ marginTop: 18, display: "flex", flexDirection: "column" }} gap={0.045}>
             {stages.map((label, i) => {
               const done = i < status.idx, cur = i === status.idx;
               return (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "7px 0" }}>
+                <RevealItem key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "7px 0" }}>
                   <span className="mono" style={{ width: 24, height: 24, flex: "0 0 auto", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 11, background: done ? "var(--ac)" : cur ? "var(--ac-pale)" : "#fff", color: done ? "#fff" : cur ? "var(--ac)" : "var(--c-50)", border: `1px solid ${cur ? "var(--ac)" : "var(--c-20)"}` }}>{done ? "✓" : cur ? "●" : i + 1}</span>
                   <span style={{ fontSize: 13, color: i <= status.idx ? "#fff" : "var(--c-50)", fontWeight: cur ? 600 : 400 }}>{label}</span>
-                </div>
+                </RevealItem>
               );
             })}
-          </div>
+          </RevealGroup>
         </div>
       )}
 

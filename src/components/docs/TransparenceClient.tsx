@@ -6,6 +6,7 @@ import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { documents, documentsCats } from "@/content/marches";
 import type { Document } from "@/content/types";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function TransparenceClient({ lang }: { lang: Lang }) {
   const t = dict(lang).docs;
@@ -62,22 +63,24 @@ export function TransparenceClient({ lang }: { lang: Lang }) {
           <p style={{ margin: 0, fontSize: 15, color: "var(--c-70)" }}>{t.noResult}</p>
         </div>
       ) : (
-        <div style={{ border: "1px solid var(--c-black)", borderTopWidth: 2 }}>
+        <RevealGroup style={{ border: "1px solid var(--c-black)", borderTopWidth: 2 }} gap={0.045}>
           <div className="mono hide-sm" style={{ display: "flex", alignItems: "center", gap: 16, padding: "13px 22px", background: "var(--c-10)", borderBottom: "1px solid var(--c-20)", fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)" }}>
             <span style={{ width: 54 }}>Réf</span><span style={{ flex: 1 }}>{t.colDoc}</span><span style={{ width: 260, textAlign: "right" }}>{t.colMeta}</span>
           </div>
           {view.map((d) => (
-            <button key={d.sigle} onClick={() => setSel(d)} style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 16, padding: "17px 22px", borderBottom: "1px solid var(--c-20)", background: "#fff" }}>
-              <span className="mono" style={{ width: 54, flex: "0 0 auto", fontWeight: 600, fontSize: 12, color: "var(--ac)" }}>{d.sigle}</span>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ fontSize: 15, fontWeight: 600, display: "block" }}>{d.titre}</span>
-                <span className="mono" style={{ fontSize: 10.5, color: "var(--c-50)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{catLabel(d.cat)}</span>
-              </span>
-              <span className="mono hide-sm" style={{ width: 260, flex: "0 0 auto", textAlign: "right", fontSize: 11.5, color: "var(--c-70)" }}>{d.version} · {d.date} · {d.langue} · {d.taille}</span>
-              <span style={{ flex: "0 0 auto", width: 34, height: 34, background: "var(--ac-pale)", color: "var(--ac)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>⤢</span>
-            </button>
+            <RevealItem key={d.sigle}>
+              <button onClick={() => setSel(d)} style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", gap: 16, padding: "17px 22px", borderBottom: "1px solid var(--c-20)", background: "#fff" }}>
+                <span className="mono" style={{ width: 54, flex: "0 0 auto", fontWeight: 600, fontSize: 12, color: "var(--ac)" }}>{d.sigle}</span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: 15, fontWeight: 600, display: "block" }}>{d.titre}</span>
+                  <span className="mono" style={{ fontSize: 10.5, color: "var(--c-50)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{catLabel(d.cat)}</span>
+                </span>
+                <span className="mono hide-sm" style={{ width: 260, flex: "0 0 auto", textAlign: "right", fontSize: 11.5, color: "var(--c-70)" }}>{d.version} · {d.date} · {d.langue} · {d.taille}</span>
+                <span style={{ flex: "0 0 auto", width: 34, height: 34, background: "var(--ac-pale)", color: "var(--ac)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>⤢</span>
+              </button>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
       )}
 
       <div style={{ marginTop: 22, display: "flex", gap: 12, padding: "18px 22px", background: "var(--c-10)", borderLeft: "3px solid var(--ac)" }}>
@@ -93,7 +96,7 @@ export function TransparenceClient({ lang }: { lang: Lang }) {
                 <span style={{ width: 46, height: 46, background: "var(--ac-pale)", color: "var(--ac)", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: 13, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{sel.sigle}</span>
                 <div><div style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.3 }}>{sel.titre}</div><div className="mono" style={{ fontSize: 11, color: "var(--c-50)", marginTop: 4, textTransform: "uppercase" }}>{catLabel(sel.cat)}</div></div>
               </div>
-              <button onClick={() => setSel(null)} aria-label="Fermer" style={{ width: 38, height: 38, flex: "0 0 auto", background: "var(--c-10)", border: "1px solid var(--c-20)", color: "var(--c-70)", fontSize: 15 }}>✕</button>
+              <button onClick={() => setSel(null)} aria-label="Fermer" style={{ width: 44, height: 44, flex: "0 0 auto", background: "var(--c-10)", border: "1px solid var(--c-20)", color: "var(--c-70)", fontSize: 16 }}>✕</button>
             </div>
             <div style={{ padding: 26, background: "var(--c-10)" }}>
               <div style={{ background: "#fff", border: "1px solid var(--c-20)", padding: "30px 28px", aspectRatio: "1 / 1.32", overflow: "hidden", position: "relative" }}>

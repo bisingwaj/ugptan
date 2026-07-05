@@ -15,6 +15,10 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Skip Next internals, API and any file with an extension (assets).
-  matcher: ["/((?!_next|api|favicon.ico|.*\\..*).*)"],
+  // Skip Next internals, API, any file with an extension (assets), and the
+  // extensionless metadata routes (opengraph-image / twitter-image) — sinon la
+  // redirection i18n renverrait le crawler vers /fr/opengraph-image (404).
+  // robots.txt / sitemap.xml / manifest.webmanifest / icon.svg ont une extension
+  // → déjà exclus par `.*\\..*`.
+  matcher: ["/((?!_next|api|favicon.ico|opengraph-image|twitter-image|.*\\..*).*)"],
 };

@@ -17,6 +17,17 @@ export function formatNumber(
 export const thousands = (n: number): string =>
   String(n).replace(/\B(?=(\d{3})+(?!\d))/g, NBSP);
 
+/** Monogramme : initiales d'un libellé de rôle (ex. « Coordonnateur Adjoint » → « CA »).
+ *  Utilisé comme visuel de portrait quand aucune photo n'est fournie. */
+export const initials = (s: string): string =>
+  s
+    .replace(/\(.*?\)/g, " ")
+    .split(/[\s—–-]+/)
+    .filter((w) => w.length > 1 && /[A-Za-zÀ-ÿ]/.test(w[0]))
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
 export type Countdown = {
   expired: boolean;
   urgent: boolean;

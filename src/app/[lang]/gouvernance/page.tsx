@@ -4,7 +4,11 @@ import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { gouvernance } from "@/content/data";
 import { gouvActivites, gouvLeads } from "@/content/carbon";
+import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
+import { PageHero } from "@/components/ui/PageHero";
+import { Reveal } from "@/components/motion/Reveal";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   return { title: dict(asLang(params.lang)).gouv.titre };
@@ -17,20 +21,14 @@ export default function GouvernancePage({ params }: { params: { lang: string } }
 
   return (
     <div>
-      <section className="page-hero">
-        <div className="section__inner">
-          <div className="page-hero__crumb">UGPTN / {g.titre}</div>
-          <h1>{g.titre}</h1>
-          <p className="page-hero__lead">{g.lead}</p>
-        </div>
-      </section>
+      <PageHero crumb={`UGPTAN / ${g.titre}`} title={g.titre} lead={g.lead} />
 
       {/* Bodies */}
       <section className="section">
         <div className="section__inner">
-          <div className="grid-3 celled--top">
+          <RevealGroup className="grid-3 celled--top" gap={0.05}>
             {gouvernance.map((b) => (
-              <div key={b.sigle} className="cell" style={{ padding: "32px 30px", display: "flex", flexDirection: "column" }}>
+              <RevealItem key={b.sigle} className="cell" style={{ padding: "32px 30px", display: "flex", flexDirection: "column" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <span style={{ fontWeight: 700, fontSize: 30 }}>{b.sigle}</span>
                   <span className="mono" style={{ fontSize: 11, color: "#fff", background: "var(--ac)", padding: "4px 10px" }}>{b.effectif}</span>
@@ -41,9 +39,9 @@ export default function GouvernancePage({ params }: { params: { lang: string } }
                     <div key={i}><div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--c-50)" }}>{k}</div><div style={{ fontSize: 14.5, marginTop: 4 }}>{v}</div></div>
                   ))}
                 </div>
-              </div>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </div>
       </section>
 
@@ -94,26 +92,35 @@ export default function GouvernancePage({ params }: { params: { lang: string } }
       {/* Leads */}
       <section className="section">
         <div className="section__inner">
-          <div style={{ maxWidth: 640, marginBottom: 42 }}>
+          <Reveal style={{ maxWidth: 640, marginBottom: 42 }}>
             <Kicker>{g.leadsLabel}</Kicker>
             <h2 className="h2--sm" style={{ marginBottom: 14 }}>{g.leadsTitle}</h2>
             <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{g.leadsLead}</p>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(262px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+          </Reveal>
+          <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(262px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
             {gouvLeads.map((l, i) => (
-              <div key={i} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
-                <div style={{ aspectRatio: "5/4", backgroundImage: "repeating-linear-gradient(135deg,#eaeaea 0 9px,#f4f4f4 9px 18px)", position: "relative", display: "flex", alignItems: "flex-end", padding: 14, borderTop: `3px solid ${l.color}` }}>
-                  <span className="mono" style={{ fontSize: 10, color: "var(--c-40)" }}>[ PORTRAIT ]</span>
+              <RevealItem key={i} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
+                <div style={{ aspectRatio: "5/4", backgroundColor: l.img ? "#e8ebf0" : "#eef1f7", position: "relative", overflow: "hidden", display: "flex", alignItems: l.img ? "flex-end" : "center", justifyContent: "center", padding: 14, borderTop: `3px solid ${l.color}` }}>
+                  {l.img ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={l.img} alt={l.nom ? `${l.nom} — ${pick(l.role, lang)}` : pick(l.role, lang)} loading="lazy" decoding="async" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 22%" }} />
+                  ) : (
+                    <span className="mono" style={{ fontSize: "clamp(32px,4.4vw,46px)", fontWeight: 600, color: "var(--c-30)", letterSpacing: "0.02em" }}>{initials(pick(l.role, lang))}</span>
+                  )}
                 </div>
                 <div style={{ padding: "18px 18px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
                   <div style={{ fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{pick(l.role, lang)}</div>
                   <span className="mono" style={{ display: "inline-block", alignSelf: "flex-start", marginTop: 10, fontSize: 10.5, fontWeight: 600, color: l.color, border: `1px solid ${l.color}`, padding: "3px 8px" }}>{pick(l.pole, lang)}</span>
                   <p style={{ margin: "14px 0 0", fontSize: 13, lineHeight: 1.5, color: "var(--c-70)", flex: 1 }}>{pick(l.mandate, lang)}</p>
-                  <div className="mono" style={{ fontSize: 11, color: "var(--c-50)", marginTop: 14, borderTop: "1px solid var(--c-10)", paddingTop: 12 }}>{t.words.nomAVenir}</div>
+                  {l.nom && (
+                    <div style={{ marginTop: 14, borderTop: "1px solid var(--c-10)", paddingTop: 12 }}>
+                      <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--c-black)" }}>{l.nom}</span>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </div>
       </section>
     </div>

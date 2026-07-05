@@ -32,11 +32,11 @@ export function Header({ lang }: { lang: Lang }) {
   return (
     <div style={{ position: "sticky", top: 0, zIndex: 50 }}>
       {/* Header bar */}
-      <header style={{ background: "rgba(255,255,255,0.96)", borderBottom: "1px solid var(--c-20)", backdropFilter: "blur(6px)" }}>
-        <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "0 var(--pad-x)", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18 }}>
+      <header className="blur-sm" style={{ background: "rgba(255,255,255,0.96)", borderBottom: "1px solid var(--c-20)", backdropFilter: "blur(6px)" }}>
+        <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "var(--sa-t) max(var(--pad-x), var(--sa-r)) 0 max(var(--pad-x), var(--sa-l))", height: "calc(64px + var(--sa-t))", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18 }}>
           <Link href={route(lang)} style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Logo />
-            <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "0.02em" }}>UGPTN</span>
+            <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "0.02em" }}>UGPTAN</span>
           </Link>
 
           <nav className="nav-desktop" style={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -77,7 +77,7 @@ export function Header({ lang }: { lang: Lang }) {
               {t.cta.connect}<span className="arrow">→</span>
             </Link>
 
-            <button onClick={() => setNavOpen(true)} aria-label="Menu" style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px solid var(--c-black)", background: "var(--c-black)", color: "#fff", fontSize: 13.5, fontWeight: 600 }}>
+            <button onClick={() => setNavOpen(true)} aria-label="Menu" className="nav-burger" style={{ alignItems: "center", gap: 10, padding: "10px 14px", border: "1px solid var(--c-black)", background: "var(--c-black)", color: "#fff", fontSize: 13.5, fontWeight: 600 }}>
               <span style={{ display: "inline-flex", flexDirection: "column", gap: 3 }}>
                 {[0, 1, 2].map((i) => <span key={i} style={{ width: 16, height: 1.5, background: "#fff", display: "block" }} />)}
               </span>
@@ -92,7 +92,7 @@ export function Header({ lang }: { lang: Lang }) {
         <>
           <div onClick={() => setNavOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 210, background: "rgba(22,22,22,0.5)", animation: "ovF .2s both" }} />
           <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 211, width: "min(444px,100%)", background: "var(--c-black)", color: "#fff", display: "flex", flexDirection: "column", animation: "revSlideR .32s cubic-bezier(.16,1,.3,1) both" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px var(--pad-x)", borderBottom: "1px solid var(--c-80)", flex: "0 0 auto" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "calc(20px + var(--sa-t)) var(--pad-x) 20px", borderBottom: "1px solid var(--c-80)", flex: "0 0 auto" }}>
               <span className="mono" style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ac-light)" }}>Navigation</span>
               <button onClick={() => setNavOpen(false)} aria-label="Fermer" style={{ width: 40, height: 40, border: "1px solid var(--c-80)", color: "#fff", fontSize: 16, background: "var(--c-90)" }}>✕</button>
             </div>
@@ -104,7 +104,12 @@ export function Header({ lang }: { lang: Lang }) {
                 </Link>
               ))}
             </div>
-            <div style={{ flex: "0 0 auto", padding: "18px var(--pad-x)", borderTop: "1px solid var(--c-80)", display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ flex: "0 0 auto", padding: "18px var(--pad-x) calc(18px + var(--sa-b))", borderTop: "1px solid var(--c-80)", display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+                {(["fr", "en"] as Lang[]).map((l) => (
+                  <Link key={l} href={localePath(l)} onClick={() => setNavOpen(false)} className="mono" style={{ flex: 1, minHeight: 48, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--c-80)", background: lang === l ? "var(--ac)" : "transparent", color: lang === l ? "#fff" : "var(--c-30)", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.08em" }}>{l}</Link>
+                ))}
+              </div>
               <Link href={route(lang, NAV.connexion)} onClick={() => setNavOpen(false)} className="btn btn--primary" style={{ justifyContent: "center" }}>{t.cta.connect}<span className="arrow">→</span></Link>
               <Link href={route(lang, NAV.mgp)} onClick={() => setNavOpen(false)} className="btn btn--on-dark" style={{ justifyContent: "center" }}>{t.cta.mgp}</Link>
             </div>

@@ -1,14 +1,14 @@
 import type { Bilingual, Localizable } from "@/lib/pick";
 
 /* ---------------------------------------------------------------------------
-   Content schema — the single source of truth for the UGPTN institutional site.
-   Mirrors the canonical `ugptn-data.js` (MEP of 23 June 2025) plus the content
+   Content schema — the single source of truth for the UGPTAN institutional site.
+   Mirrors the canonical `ugptan-data.js` (MEP of 23 June 2025) plus the content
    that was previously hard-coded inside the Carbon `renderVals()`.
 --------------------------------------------------------------------------- */
 
 export type ImgKey =
   | "hero" | "citoyens" | "fibre" | "datacenter" | "formation"
-  | "femmes" | "tour" | "ville" | "hub" | "data";
+  | "femmes" | "tour" | "ville" | "hub" | "data" | "sante" | "agri";
 
 export type Meta = {
   unite: string; uniteLong: string;
@@ -40,7 +40,7 @@ export type GouvBody = {
 export type Mandat = { n: string; titre: Bilingual; desc: Bilingual };
 export type Principe = { titre: Bilingual; desc: Bilingual };
 export type Pole = { nom: Bilingual; role: Bilingual; roles: string[] };
-export type Membre = { role: Bilingual; pole: Bilingual };
+export type Membre = { role: Bilingual; pole: Bilingual; nom?: string; img?: string };
 export type Jalon = { date: string; text: Bilingual };
 export type Province = { nom: string; x: number; y: number; prio: boolean };
 export type Langue = { code: string; label: string; greeting: string };
@@ -92,14 +92,14 @@ export type Evenement = {
   statut: EventStatut; img: ImgKey; titre: Bilingual; desc: Bilingual; places: Bilingual;
 };
 export type GouvActivite = { date: Bilingual; org: string; color: string; titre: Bilingual; note: Bilingual };
-export type GouvLead = { role: Bilingual; pole: Bilingual; color: string; mandate: Bilingual };
+export type GouvLead = { role: Bilingual; pole: Bilingual; color: string; mandate: Bilingual; nom?: string; img?: string };
 export type MissionItem = { t: Bilingual; d: Bilingual };
 export type PoleAction = { pole: Bilingual; color: string; mission: Bilingual; act: Bilingual };
 export type MethodeEtape = { t: Bilingual; d: Bilingual };
 export type EngagementItem = { t: Bilingual; d: Bilingual; color: string };
 export type GlossaireItem = { s: string; d: Bilingual };
 export type FaqItem = { q: Bilingual; r: Bilingual };
-export type Partner = { name: string; kind: Bilingual };
+export type Partner = { name: string; kind: Bilingual; logo?: string };
 export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: string };
 export type UniteStat = { v: string; u?: string; l: Bilingual };
 export type GalleryItem = { nom: string; img: ImgKey };

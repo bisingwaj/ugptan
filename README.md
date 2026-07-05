@@ -1,7 +1,7 @@
-# UGPTN — Site institutionnel public
+# UGPTAN — Site institutionnel public
 
 Refonte **Next.js (App Router)** de la direction visuelle « Carbon » du site institutionnel de
-l'**UGPTN** — Unité de Gestion du Projet de Transformation Numérique de la RDC
+l'**UGPTAN** — Unité de Gestion du Projet de Transformation Numérique de la RDC
 (**PTN-RDC · P180495**, 510 M USD, cofinancement IDA / Banque mondiale + AFD, 26 provinces,
 horizon 2029).
 
@@ -13,7 +13,7 @@ horizon 2029).
 ## 1. Ce qui a changé par rapport à la livraison initiale
 
 La livraison d'origine était un fichier `*.dc.html` autonome (framework « DC » maison + React inliné)
-avec **deux endroits où vivait le contenu** : `ugptn-data.js` **et** des blocs codés en dur dans
+avec **deux endroits où vivait le contenu** : `ugptan-data.js` **et** des blocs codés en dur dans
 `renderVals()` (histoires, vidéos par composante, dialogues, événements, gouvernance, glossaire,
 FAQ, partenaires, ressources…).
 
@@ -42,7 +42,7 @@ npm run typecheck      # tsc --noEmit
 npm run lint
 ```
 
-Node ≥ 18 (testé sous Node 22).
+Node ≥ 18.17 — le dépôt épingle **Node 20** (`.nvmrc`, `netlify.toml`) pour des builds reproductibles.
 
 ---
 
@@ -53,7 +53,7 @@ src/
 ├── app/[lang]/              # routes localisées (fr | en) — un dossier par page
 │   ├── layout.tsx           # <html lang>, fonts, header/footer/newsletter, lightbox vidéo, SEO
 │   ├── page.tsx             # Accueil
-│   ├── projet/ ugptn/ gouvernance/ resultats/
+│   ├── projet/ ugptan/ gouvernance/ resultats/
 │   ├── marches/ transparence/ actualites/ ressources/ evenements/
 │   └── mgp/ connexion/ contact/
 ├── content/                 # ← SOURCE UNIQUE DE VÉRITÉ (typée, bilingue)
@@ -113,7 +113,7 @@ Tout le contenu éditable est dans `src/content/`. Exemples :
 
 ## 6. À renseigner avant la mise en production
 
-- **Logo UGPTN officiel** (actuellement un monogramme).
+- **Logo UGPTAN officiel** (actuellement un monogramme).
 - **Numéro vert MGP** : affiché « XXX » → `content/carbon.ts` (`contact.numeroVert`).
 - **Noms & portraits** de l'équipe et des leads (les rôles/pôles sont conformes au MEP).
 - **Photographies & vidéo** réelles (cf. §5).
@@ -122,11 +122,50 @@ Tout le contenu éditable est dans `src/content/`. Exemples :
 
 ---
 
-## 7. Déploiement
+## 7. Déploiement (Vercel ou Netlify)
 
-Build statique standard Next.js — déployable sur Vercel, Netlify, ou tout hébergeur Node.
-Le routage de langue est géré par `middleware.ts` (préfixe `/fr` · `/en`).
+Le dépôt est **prêt à déployer**. Le routage de langue est géré par `middleware.ts`
+(préfixe `/fr` · `/en`) et fonctionne nativement sur les deux plateformes.
+
+### Inclus dans le dépôt
+| Fichier | Rôle |
+|---|---|
+| `vercel.json` | Preset Next.js + commandes (Vercel) |
+| `netlify.toml` | Build + `@netlify/plugin-nextjs` + Node 20 (Netlify) |
+| `.nvmrc` | Version de Node épinglée (**20**) |
+| `.env.example` | Variables d'environnement à définir |
+| `next.config.mjs` | En-têtes de sécurité + formats d'image AVIF/WebP + `X-Powered-By` retiré |
+| `src/app/robots.ts` · `sitemap.ts` | `/robots.txt` + `/sitemap.xml` (26 URLs FR/EN) |
+| `src/app/manifest.ts` · `icon.svg` · `opengraph-image.tsx` | Manifeste PWA, favicon, image de partage social 1200×630 |
+
+### Variable d'environnement (une seule)
+`NEXT_PUBLIC_SITE_URL` — origine publique canonique, utilisée pour les URL absolues
+(sitemap, robots, Open Graph, canonical). Défaut : `https://www.ugpatn.cd`.
+La définir dans le projet **pour chaque environnement** (et sur l'URL de preview si souhaité).
+
+### A. Vercel (recommandé pour Next.js — zéro config)
+1. Importer le dépôt Git → Vercel détecte **Next.js** automatiquement.
+2. Environment Variables → ajouter `NEXT_PUBLIC_SITE_URL = https://www.ugpatn.cd`.
+3. **Deploy**. Ajouter le domaine `www.ugpatn.cd` (Settings → Domains) et suivre les instructions DNS.
+
+### B. Netlify
+1. Importer le dépôt → Netlify lit `netlify.toml` (build `npm run build`, plugin Next.js, Node 20).
+2. Site settings → Environment → ajouter `NEXT_PUBLIC_SITE_URL = https://www.ugpatn.cd`.
+3. **Deploy**. Ajouter le domaine, suivre les instructions DNS.
+   *(Le plugin `@netlify/plugin-nextjs` est installé automatiquement.)*
+
+### Vérifié au build (26 pages SSG + 5 routes techniques)
+`npm run typecheck` → 0 · `npm run build` → 0 · `/robots.txt`, `/sitemap.xml` (26 URLs),
+`/manifest.webmanifest`, `/opengraph-image` (200 image/png), `/icon.svg`, en-têtes de sécurité,
+redirection i18n `/ → /fr`, `hreflang` FR/EN et `canonical` absolus.
+
+### Après le premier déploiement
+- Vérifier `https://<domaine>/robots.txt` et `/sitemap.xml`, puis **soumettre le sitemap**
+  dans Google Search Console.
+- Contrôler l'aperçu social (Open Graph) — l'image se génère sur `/opengraph-image`.
+- Régler `NEXT_PUBLIC_SITE_URL` sur le domaine **définitif** avant l'indexation.
+- Rappel contenu (§6) : logo officiel, numéro vert MGP, portraits, visuels/vidéo réels.
 
 ---
 
-*UGPTN · MPTN · IDA (Banque mondiale) + AFD · Kinshasa, 2026*
+*UGPTAN · MPTN · IDA (Banque mondiale) + AFD · Kinshasa, 2026*

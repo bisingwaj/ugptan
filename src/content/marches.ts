@@ -66,9 +66,9 @@ export const marches: Marche[] = [
   {
     ref: "AON/C4/2026-022", type: "AON", comp: "C4", publie: "18 juin 2026", limite: "5 août 2026", limiteISO: "2026-08-05T15:00:00", statut: "ouvert",
     revue: { fr: "Postérieure", en: "Post" }, budget: "≈ 1,8 M USD",
-    lieu: { fr: "Kinshasa (siège de l'UGPTN)", en: "Kinshasa (UGPTN headquarters)" }, lots: 2,
+    lieu: { fr: "Kinshasa (siège de l'UGPTAN)", en: "Kinshasa (UGPTAN headquarters)" }, lots: 2,
     soum: 7, vues: 528, questions: 5,
-    objet: { fr: "Fourniture d'équipements informatiques et de visioconférence pour l'UGPTN", en: "Supply of IT and videoconferencing equipment for the UGPTN" },
+    objet: { fr: "Fourniture d'équipements informatiques et de visioconférence pour l'UGPTAN", en: "Supply of IT and videoconferencing equipment for the UGPTAN" },
     resume: { fr: "Fourniture, installation et garantie d'équipements informatiques, de matériel de visioconférence et d'infrastructure réseau pour le siège de l'Unité et les antennes provinciales.", en: "Supply, installation and warranty of IT equipment, videoconferencing hardware and network infrastructure for the Unit's headquarters and provincial offices." },
     addenda: [],
     pieces: [

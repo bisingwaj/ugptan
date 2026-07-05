@@ -13,7 +13,7 @@ export function dict(lang: Lang) {
     nav: {
       accueil: t("Accueil", "Home"),
       projet: t("Le Projet", "The Project"),
-      ugptn: t("L'UGPTN", "The UGPTN"),
+      ugptan: t("L'UGPTAN", "The UGPTAN"),
       gouvernance: t("Gouvernance", "Governance"),
       marches: t("Marchés", "Tenders"),
       transparence: t("Transparence", "Transparency"),
@@ -73,7 +73,6 @@ export function dict(lang: Lang) {
       roles: t("sous-rôles", "sub-roles"),
       poles: t("pôles", "clusters"),
       bidders: t("soumissionnaires", "bidders"),
-      nomAVenir: t("Nom — à venir", "Name — to be confirmed"),
       navigation: t("Navigation", "Navigation"),
       redevabilite: t("Redevabilité", "Accountability"),
       avant: t("Aujourd'hui", "Today"),
@@ -112,8 +111,8 @@ export function dict(lang: Lang) {
         "Nationwide coverage of all 26 provinces, with a prioritised rollout across the 10 provinces of the Country Partnership Framework.",
       ),
       equipeLead: t(
-        "21 sous-rôles regroupés en 5 pôles fonctionnels, de la direction à la liaison provinciale. Noms et portraits à fournir.",
-        "21 sub-roles grouped into 5 functional clusters, from management to provincial liaison. Names and portraits to be provided.",
+        "Une équipe d'exécution organisée en cinq pôles — Direction, Composantes, Fiduciaire, Passation, Sauvegardes & transversal — et vingt-et-un sous-rôles, du pilotage national à la liaison avec les provinces.",
+        "An execution team organised into five clusters — Management, Components, Fiduciary, Procurement, Safeguards & cross-cutting — and twenty-one sub-roles, from national steering to provincial liaison.",
       ),
       humainLabel: t("Impact humain", "Human impact"),
       humainTitle: t("Derrière les chiffres, des vies.", "Behind the figures, real lives."),
@@ -235,9 +234,9 @@ export function dict(lang: Lang) {
       ),
     },
 
-    /* --- L'UGPTN ---------------------------------------------------------- */
-    ugptn: {
-      titre: t("L'UGPTN", "The UGPTN"),
+    /* --- L'UGPTAN ---------------------------------------------------------- */
+    ugptan: {
+      titre: t("L'UGPTAN", "The UGPTAN"),
       lead: t(
         "Le bras opérationnel permanent du projet : elle prépare, exécute et supervise — sans jamais se substituer aux bailleurs ni aux responsables habilités à décider.",
         "The project's permanent operational arm: it prepares, delivers and supervises — without ever standing in for the donors or the officials empowered to decide.",
@@ -309,8 +308,8 @@ export function dict(lang: Lang) {
       leadsLabel: t("L'équipe de coordination", "The coordination team"),
       leadsTitle: t("Les femmes et les hommes qui portent le mandat.", "The people who carry the mandate."),
       leadsLead: t(
-        "Un annuaire des rôles clés — noms et portraits à confirmer par l'Unité.",
-        "A directory of key roles — names and portraits to be confirmed by the Unit.",
+        "Les rôles clés de l'Unité : la coordination nationale, l'appui technique et les normes, la passation des marchés et le suivi-évaluation — chacun responsable d'un volet de l'exécution sur les 26 provinces.",
+        "The Unit's key roles: national coordination, technical support and standards, procurement, and monitoring & evaluation — each accountable for one strand of delivery across the 26 provinces.",
       ),
       bodyLabels: {
         nature: t("Nature", "Nature"),

@@ -1,5 +1,5 @@
 /* ============================================================================
-   UGPTN — Données canoniques (MEP du 23 juin 2025).
+   UGPTAN — Données canoniques (MEP du 23 juin 2025).
    Montants, dates, indicateurs et structures IMMUABLES (conformité MEP).
    ========================================================================== */
 import type {
@@ -9,7 +9,7 @@ import type {
 import type { Bilingual } from "@/lib/pick";
 
 export const meta: Meta = {
-  unite: "UGPTN",
+  unite: "UGPTAN",
   uniteLong: "Unité de Gestion du Projet de Transformation Numérique",
   projet: "PTN-RDC",
   projetLong:
@@ -99,7 +99,7 @@ export const composanteMax = Math.max(...composantes.map((c) => c.montant));
 export const gouvernance: GouvBody[] = [
   { sigle: "COPIL", nom: { fr: "Comité de Pilotage", en: "Steering Committee" }, nature: { fr: "Stratégique / décisionnel", en: "Strategic / decision-making" }, effectif: "8 membres", presidence: "MPTN", decision: { fr: "Consensus → majorité simple", en: "Consensus → simple majority" }, frequence: { fr: "Semestrielle (min.)", en: "Semi-annual (min.)" } },
   { sigle: "CTP", nom: { fr: "Comité Technique du Projet", en: "Project Technical Committee" }, nature: { fr: "Technique / coordination", en: "Technical / coordination" }, effectif: "12 représentants", presidence: "MPTN", decision: { fr: "Consensus → majorité 2/3", en: "Consensus → two-thirds majority" }, frequence: { fr: "Trimestrielle (min.)", en: "Quarterly (min.)" } },
-  { sigle: "UGPTN", nom: { fr: "Unité de Gestion du Projet", en: "Project Management Unit" }, nature: { fr: "Exécution / gestion", en: "Execution / management" }, effectif: "~21 sous-rôles", presidence: { fr: "Coordonnateur", en: "Coordinator" }, decision: { fr: "Application des décisions", en: "Implementation of decisions" }, frequence: { fr: "Permanente", en: "Permanent" } },
+  { sigle: "UGPTAN", nom: { fr: "Unité de Gestion du Projet", en: "Project Management Unit" }, nature: { fr: "Exécution / gestion", en: "Execution / management" }, effectif: "~21 sous-rôles", presidence: { fr: "Coordonnateur", en: "Coordinator" }, decision: { fr: "Application des décisions", en: "Implementation of decisions" }, frequence: { fr: "Permanente", en: "Permanent" } },
 ];
 
 export const mandat: Mandat[] = [
@@ -124,7 +124,7 @@ export const poles: Pole[] = [
 ];
 
 export const equipe: Membre[] = [
-  { role: { fr: "Coordonnateur", en: "Coordinator" }, pole: { fr: "Direction", en: "Management" } },
+  { role: { fr: "Coordonnateur", en: "Coordinator" }, pole: { fr: "Direction", en: "Management" }, nom: "Noël Jean-David Litanga", img: "/portraits/coordonnateur-litanga.jpg" },
   { role: { fr: "Coordonnateur Adjoint", en: "Deputy Coordinator" }, pole: { fr: "Direction", en: "Management" } },
   { role: { fr: "Auditeur Interne", en: "Internal Auditor" }, pole: { fr: "Direction", en: "Management" } },
   { role: { fr: "Responsable Composante 1", en: "Component 1 Lead" }, pole: { fr: "Accès & inclusion", en: "Access & inclusion" } },
@@ -141,7 +141,7 @@ export const equipe: Membre[] = [
 export const jalons: Jalon[] = [
   { date: "25 nov. 2024", text: { fr: "Signature de l'accord avec la Banque mondiale", en: "Financing agreement signed with the World Bank" } },
   { date: "14 mars 2025", text: { fr: "Signature de la convention avec l'AFD", en: "Financing convention signed with AFD" } },
-  { date: "15 avr. 2025", text: { fr: "Création de l'UGPTN (arrêté ministériel)", en: "Creation of the UGPTN (ministerial order)" } },
+  { date: "15 avr. 2025", text: { fr: "Création de l'UGPTAN (arrêté ministériel)", en: "Creation of the UGPTAN (ministerial order)" } },
   { date: "23 juin 2025", text: { fr: "Validation du Manuel d'Exécution (MEP)", en: "Validation of the Implementation Manual (PIM)" } },
   { date: "31 oct. 2025", text: { fr: "Entrée en vigueur du projet", en: "Project effectiveness" } },
   { date: "31 déc. 2029", text: { fr: "Achèvement technique", en: "Technical completion" } },
@@ -190,7 +190,7 @@ export const langues: Langue[] = [
 ];
 
 export const profils: Profil[] = [
-  { label: { fr: "UGPTN / Gouvernement", en: "UGPTN / Government" }, page: { fr: "Cockpit", en: "Cockpit" } },
+  { label: { fr: "UGPTAN / Gouvernement", en: "UGPTAN / Government" }, page: { fr: "Cockpit", en: "Cockpit" } },
   { label: { fr: "Entité bénéficiaire (MDA)", en: "Beneficiary entity (MDA)" }, page: { fr: "Tableau de bord", en: "Dashboard" } },
   { label: { fr: "Partenaire", en: "Partner" }, page: { fr: "Espace partenaire", en: "Partner space" } },
   { label: { fr: "Bailleur (BM / AFD)", en: "Donor (WB / AFD)" }, page: { fr: "Portefeuille", en: "Portfolio" } },

@@ -1,5 +1,5 @@
 /* ============================================================================
-   UGPTN — Données canoniques du site institutionnel
+   UGPTAN — Données canoniques du site institutionnel
    Source de vérité : Manuel d'Exécution du Projet (MEP) du 23 juin 2025.
    Les montants, dates, indicateurs et structures sont immuables.
    Exposé en global pour être consommé par chaque proposition (DC).
@@ -9,7 +9,7 @@
 
   /* --- Identité projet ---------------------------------------------------- */
   D.meta = {
-    unite: "UGPTN",
+    unite: "UGPTAN",
     uniteLong: "Unité de Gestion du Projet de Transformation Numérique",
     projet: "PTN-RDC",
     projetLong: "Projet de Transformation Numérique de la République Démocratique du Congo",
@@ -100,7 +100,7 @@
   D.gouvernance = [
     { sigle: "COPIL", nom: { fr: "Comité de Pilotage", en: "Steering Committee" }, nature: { fr: "Stratégique / décisionnel", en: "Strategic / decision-making" }, effectif: "8 membres", presidence: "MPTN", decision: { fr: "Consensus → majorité simple", en: "Consensus → simple majority" }, frequence: { fr: "Semestrielle (min.)", en: "Semi-annual (min.)" } },
     { sigle: "CTP", nom: { fr: "Comité Technique du Projet", en: "Project Technical Committee" }, nature: { fr: "Technique / coordination", en: "Technical / coordination" }, effectif: "12 représentants", presidence: "MPTN", decision: { fr: "Consensus → majorité 2/3", en: "Consensus → two-thirds majority" }, frequence: { fr: "Trimestrielle (min.)", en: "Quarterly (min.)" } },
-    { sigle: "UGPTN", nom: { fr: "Unité de Gestion du Projet", en: "Project Management Unit" }, nature: { fr: "Exécution / gestion", en: "Execution / management" }, effectif: "~21 sous-rôles", presidence: { fr: "Coordonnateur", en: "Coordinator" }, decision: { fr: "Application des décisions", en: "Implementation of decisions" }, frequence: { fr: "Permanente", en: "Permanent" } }
+    { sigle: "UGPTAN", nom: { fr: "Unité de Gestion du Projet", en: "Project Management Unit" }, nature: { fr: "Exécution / gestion", en: "Execution / management" }, effectif: "~21 sous-rôles", presidence: { fr: "Coordonnateur", en: "Coordinator" }, decision: { fr: "Application des décisions", en: "Implementation of decisions" }, frequence: { fr: "Permanente", en: "Permanent" } }
   ];
 
   /* --- Mandat (4 fonctions) ---------------------------------------------- */
@@ -147,7 +147,7 @@
   D.jalons = [
     { date: "25 nov. 2024", fr: "Signature de l'accord avec la Banque mondiale", en: "Financing agreement signed with the World Bank" },
     { date: "14 mars 2025", fr: "Signature de la convention avec l'AFD", en: "Financing convention signed with AFD" },
-    { date: "15 avr. 2025", fr: "Création de l'UGPTN (arrêté ministériel)", en: "Creation of the UGPTN (ministerial order)" },
+    { date: "15 avr. 2025", fr: "Création de l'UGPTAN (arrêté ministériel)", en: "Creation of the UGPTAN (ministerial order)" },
     { date: "23 juin 2025", fr: "Validation du Manuel d'Exécution (MEP)", en: "Validation of the Implementation Manual (PIM)" },
     { date: "31 oct. 2025", fr: "Entrée en vigueur du projet", en: "Project effectiveness" },
     { date: "31 déc. 2029", fr: "Achèvement technique", en: "Technical completion" },
@@ -197,7 +197,7 @@
 
   /* --- 8 profils plateforme ---------------------------------------------- */
   D.profils = [
-    { fr: "UGPTN / Gouvernement", en: "UGPTN / Government", page: { fr: "Cockpit", en: "Cockpit" } },
+    { fr: "UGPTAN / Gouvernement", en: "UGPTAN / Government", page: { fr: "Cockpit", en: "Cockpit" } },
     { fr: "Entité bénéficiaire (MDA)", en: "Beneficiary entity (MDA)", page: { fr: "Tableau de bord", en: "Dashboard" } },
     { fr: "Partenaire", en: "Partner", page: { fr: "Espace partenaire", en: "Partner space" } },
     { fr: "Bailleur (BM / AFD)", en: "Donor (WB / AFD)", page: { fr: "Portefeuille", en: "Portfolio" } },
@@ -211,8 +211,8 @@
   D.actualites = [
     { date: "23 juin 2025", dateISO: "2025-06-23", cat: { fr: "Institutionnel", en: "Institutional" }, img: "hub", lieu: "Kinshasa", fr: "Validation du Manuel d'Exécution du Projet par le Gouvernement, la Banque mondiale et l'AFD.", en: "Project Implementation Manual validated by the Government, the World Bank and AFD.",
       corps: { fr: ["Réunis à Kinshasa, les représentants du Gouvernement, de la Banque mondiale et de l'AFD ont validé le Manuel d'Exécution du Projet (MEP), document de référence qui fixe les règles de gouvernance, de passation, de gestion financière et de sauvegardes du PTN-RDC.", "Le MEP constitue désormais la source de vérité du projet : l'Unité l'applique sans le modifier, et chaque processus daté et tracé du site institutionnel en découle."], en: ["Meeting in Kinshasa, representatives of the Government, the World Bank and AFD validated the Project Implementation Manual (PIM), the reference document setting out governance, procurement, financial-management and safeguard rules for the PTN-RDC.", "The PIM is now the project's source of truth: the Unit applies it without altering it, and every dated, traceable process on the institutional site derives from it."] } },
-    { date: "15 avr. 2025", dateISO: "2025-04-15", cat: { fr: "Gouvernance", en: "Governance" }, img: "ville", lieu: "Kinshasa", fr: "Création officielle de l'UGPTN par arrêté ministériel du MPTN.", en: "Official creation of the UGPTN by ministerial order of the MPTN.",
-      corps: { fr: ["Par arrêté ministériel, le Ministre des Postes, Télécommunications et Numérique a institué l'Unité de Gestion du Projet de Transformation Numérique, structure d'exécution dotée de cinq pôles et de vingt-et-un sous-rôles.", "L'arrêté consacre l'articulation COPIL · CTP · UGPTN et préserve intégralement les prérogatives des bailleurs."], en: ["By ministerial order, the Minister of Posts, Telecommunications and Digital established the Digital Transformation Project Management Unit, an execution structure with five clusters and twenty-one sub-roles.", "The order enshrines the COPIL · CTP · UGPTN articulation and fully preserves donors' prerogatives."] } },
+    { date: "15 avr. 2025", dateISO: "2025-04-15", cat: { fr: "Gouvernance", en: "Governance" }, img: "ville", lieu: "Kinshasa", fr: "Création officielle de l'UGPTAN par arrêté ministériel du MPTN.", en: "Official creation of the UGPTAN by ministerial order of the MPTN.",
+      corps: { fr: ["Par arrêté ministériel, le Ministre des Postes, Télécommunications et Numérique a institué l'Unité de Gestion du Projet de Transformation Numérique, structure d'exécution dotée de cinq pôles et de vingt-et-un sous-rôles.", "L'arrêté consacre l'articulation COPIL · CTP · UGPTAN et préserve intégralement les prérogatives des bailleurs."], en: ["By ministerial order, the Minister of Posts, Telecommunications and Digital established the Digital Transformation Project Management Unit, an execution structure with five clusters and twenty-one sub-roles.", "The order enshrines the COPIL · CTP · UGPTAN articulation and fully preserves donors' prerogatives."] } },
     { date: "14 mars 2025", dateISO: "2025-03-14", cat: { fr: "Financement", en: "Financing" }, img: "data", lieu: "Paris / Kinshasa", fr: "Signature de la convention de financement avec l'Agence Française de Développement.", en: "Financing convention signed with the French Development Agency.",
       corps: { fr: ["La convention de financement avec l'AFD apporte 110 millions de dollars (100 millions d'euros), soit 21 % de l'enveloppe globale de 510 millions, en cofinancement avec l'IDA de la Banque mondiale.", "Ce cofinancement consolide l'assise financière du projet et son ancrage dans l'approche régionale de digitalisation inclusive."], en: ["The financing convention with AFD provides 110 million dollars (100 million euros), i.e. 21% of the global 510-million envelope, co-financed with the World Bank's IDA.", "This co-financing consolidates the project's financial base and its anchoring in the regional inclusive-digitalisation approach."] } },
     { date: "31 oct. 2025", dateISO: "2025-10-31", cat: { fr: "Jalon", en: "Milestone" }, img: "fibre", lieu: "Kinshasa", fr: "Entrée en vigueur du Projet de Transformation Numérique de la RDC.", en: "Effectiveness of the DRC Digital Transformation Project.",
@@ -232,7 +232,7 @@
   /* --- i18n (chrome, titres, CTA) ---------------------------------------- */
   D.i18n = {
     fr: {
-      nav_accueil: "Accueil", nav_projet: "Le Projet", nav_ugptn: "L'UGPTN", nav_gouvernance: "Gouvernance", nav_contact: "Contact",
+      nav_accueil: "Accueil", nav_projet: "Le Projet", nav_ugptan: "L'UGPTAN", nav_gouvernance: "Gouvernance", nav_contact: "Contact",
       cta_connect: "Se connecter", cta_docs: "Documents", cta_marches: "Marchés", cta_mgp: "Plaintes (MGP)", cta_discover: "Découvrir le projet", cta_more: "En savoir plus", cta_all: "Tout voir", cta_report: "Déposer une plainte",
       tag_public: "Site institutionnel public",
       sec_chiffres: "Le projet en chiffres", sec_composantes: "Les cinq composantes", sec_resultats: "Cadre de résultats — cibles 2029", sec_couverture: "Couverture géographique", sec_gouvernance: "Architecture de gouvernance", sec_equipe: "L'équipe de l'Unité", sec_actus: "Actualités & communiqués", sec_acces: "Accès rapides", sec_plateforme: "La plateforme métier — 8 espaces",
@@ -241,7 +241,7 @@
       langNote: "Contenu en cours de localisation — disponible au lancement."
     },
     en: {
-      nav_accueil: "Home", nav_projet: "The Project", nav_ugptn: "The UGPTN", nav_gouvernance: "Governance", nav_contact: "Contact",
+      nav_accueil: "Home", nav_projet: "The Project", nav_ugptan: "The UGPTAN", nav_gouvernance: "Governance", nav_contact: "Contact",
       cta_connect: "Sign in", cta_docs: "Documents", cta_marches: "Tenders", cta_mgp: "Grievances", cta_discover: "Discover the project", cta_more: "Learn more", cta_all: "View all", cta_report: "File a grievance",
       tag_public: "Public institutional website",
       sec_chiffres: "The project in figures", sec_composantes: "The five components", sec_resultats: "Results framework — 2029 targets", sec_couverture: "Geographic coverage", sec_gouvernance: "Governance architecture", sec_equipe: "The Unit's team", sec_actus: "News & releases", sec_acces: "Quick access", sec_plateforme: "The business platform — 8 spaces",
@@ -271,8 +271,8 @@
       addenda: [ { n: "01", date: "3 juil. 2026", note: { fr: "Précision sur les exigences d'expérience en Afrique subsaharienne.", en: "Clarification of Sub-Saharan Africa experience requirements." } } ],
       pieces: [ { nom: { fr: "Demande de Propositions (DP)", en: "Request for Proposals" }, taille: "2,6 Mo" }, { nom: { fr: "Termes de Référence (TDR)", en: "Terms of Reference" }, taille: "1,1 Mo" } ],
       calendrier: [ { date: "24 juin 2026", fr: "Publication de la DP", en: "RFP published", done: true }, { date: "20 août 2026", fr: "Dépôt des propositions", en: "Proposal submission", done: false }, { date: "sept. 2026", fr: "Évaluation technique", en: "Technical evaluation", done: false }, { date: "oct. 2026", fr: "Ouverture financière & négociation", en: "Financial opening & negotiation", done: false } ] },
-    { ref: "AON/C4/2026-022", type: "AON", comp: "C4", publie: "18 juin 2026", limite: "5 août 2026", limiteISO: "2026-08-05T15:00:00", statut: "ouvert", revue: { fr: "Postérieure", en: "Post" }, budget: "≈ 1,8 M USD", lieu: { fr: "Kinshasa (siège de l'UGPTN)", en: "Kinshasa (UGPTN headquarters)" }, lots: 2,
-      objet: { fr: "Fourniture d'équipements informatiques et de visioconférence pour l'UGPTN", en: "Supply of IT and videoconferencing equipment for the UGPTN" },
+    { ref: "AON/C4/2026-022", type: "AON", comp: "C4", publie: "18 juin 2026", limite: "5 août 2026", limiteISO: "2026-08-05T15:00:00", statut: "ouvert", revue: { fr: "Postérieure", en: "Post" }, budget: "≈ 1,8 M USD", lieu: { fr: "Kinshasa (siège de l'UGPTAN)", en: "Kinshasa (UGPTAN headquarters)" }, lots: 2,
+      objet: { fr: "Fourniture d'équipements informatiques et de visioconférence pour l'UGPTAN", en: "Supply of IT and videoconferencing equipment for the UGPTAN" },
       resume: { fr: "Fourniture, installation et garantie d'équipements informatiques, de matériel de visioconférence et d'infrastructure réseau pour le siège de l'Unité et les antennes provinciales.", en: "Supply, installation and warranty of IT equipment, videoconferencing hardware and network infrastructure for the Unit's headquarters and provincial offices." },
       addenda: [],
       pieces: [ { nom: { fr: "Dossier d'Appel d'Offres National", en: "National Bidding Document" }, taille: "3,1 Mo" }, { nom: { fr: "Spécifications techniques", en: "Technical specifications" }, taille: "0,7 Mo" } ],
@@ -360,7 +360,7 @@
       data:       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1100&q=72"
     },
     // Repli fiable (banque libre) si une photo ne se charge pas au runtime.
-    fallbackSeed: "ugptn"
+    fallbackSeed: "ugptan"
   };
 
   /* --- FAQ du Mécanisme de Gestion des Plaintes -------------------------- */
@@ -373,5 +373,5 @@
     { q: { fr: "Le canal EAS/HS est-il vraiment séparé ?", en: "Is the SEA/SH channel truly separate?" }, r: { fr: "Oui. Il est strictement cloisonné, centré sur la survivante, et géré uniquement par le Spécialiste VBG/EAS. Aucune de ses données n'apparaît ailleurs sur le site.", en: "Yes. It is strictly siloed, survivor-centred, and managed solely by the GBV/SEA Specialist. None of its data appears elsewhere on the site." } }
   ];
 
-  window.UGPTN_DATA = D;
+  window.UGPTAN_DATA = D;
 })();

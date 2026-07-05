@@ -1,12 +1,30 @@
 /** @type {import('next').NextConfig} */
+
+// En-têtes de sécurité appliqués à toutes les routes. Volontairement SANS
+// Content-Security-Policy stricte : le site intègre des iframes YouTube, des
+// images Unsplash et Google Fonts — une CSP mal calibrée les casserait.
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
+  { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+  { key: "X-DNS-Prefetch-Control", value: "on" },
+];
+
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   images: {
-    // Placeholder photography is served from Unsplash; swap for the CDN in production.
+    formats: ["image/avif", "image/webp"],
+    // Photographie de démonstration servie depuis Unsplash ; basculer vers le CDN en production.
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "cdn.ugpatn.cd" },
     ],
+  },
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
   },
 };
 

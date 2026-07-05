@@ -1,35 +1,49 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { m, useScroll, useTransform, useSpring } from "framer-motion";
+import type { CSSProperties } from "react";
+import { usePrefersReducedMotion } from "@/components/motion/useReducedMotion";
 
-/** Fond vidéo du héros : autoplay muet en boucle + calques de lisibilité (gauche sombre, teinte bleue). */
-export function HeroVideo({ src }: { src: string }) {
-  const ref = useRef<HTMLVideoElement>(null);
+/** Fond vidéo du héros : autoplay muet en boucle + calques de lisibilité
+ *  (gauche sombre, teinte bleue) + parallaxe verticale subtile au scroll.
+ *  `poster` = premier rendu instantané (avant que la vidéo ne charge).
+ *  Parallaxe désactivée au tactile (vidéo conservée mais statique) et en
+ *  « réduire les animations » (vidéo en pause). */
+export function HeroVideo({ src, poster }: { src: string; poster?: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const reduce = usePrefersReducedMotion();
+  const [coarse, setCoarse] = useState(false);
+
+  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end start"] });
+  const yRaw = useTransform(scrollYProgress, [0, 1], ["0px", "64px"]);
+  const y = useSpring(yRaw, { stiffness: 120, damping: 30, mass: 0.4 });
 
   useEffect(() => {
-    const v = ref.current;
+    setCoarse(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
     if (!v) return;
     // Forcer la propriété muted (React ne la pose qu'en attribut) pour autoriser l'autoplay.
     v.muted = true;
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { v.pause(); return; }
     const p = v.play();
     if (p && typeof p.catch === "function") p.catch(() => {});
-  }, []);
+  }, [reduce]);
+
+  const still = reduce || coarse;
+  const base: CSSProperties = { position: "absolute", left: 0, width: "100%", objectFit: "cover" };
+  const videoStyle = still
+    ? { ...base, inset: 0, height: "100%" }
+    : { ...base, top: "-8%", height: "116%", y };
 
   return (
-    <div style={{ position: "absolute", inset: 0, overflow: "hidden" }} aria-hidden>
+    <div ref={wrapRef} style={{ position: "absolute", inset: 0, overflow: "hidden" }} aria-hidden>
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <video
-        ref={ref}
-        src={src}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-      />
+      <m.video ref={videoRef} src={src} poster={poster} autoPlay muted loop playsInline preload="auto" style={videoStyle} />
       {/* lisibilité du texte (héros à dominante gauche) */}
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(110deg, rgba(11,15,26,0.94) 0%, rgba(11,15,26,0.80) 38%, rgba(11,15,26,0.46) 70%, rgba(11,15,26,0.62) 100%)" }} />
       {/* teinte de marque (duotone bleu) */}

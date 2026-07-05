@@ -14,6 +14,7 @@ import { thousands } from "@/lib/format";
 import { NAV, route } from "@/lib/routes";
 import { Photo } from "@/components/ui/Photo";
 import { useVideo } from "@/components/video/VideoProvider";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 const FILTERS = ["tous", "ouvert", "AOI", "AON", "AMI", "SFQC", "DC"] as const;
 
@@ -82,14 +83,15 @@ export function MarchesClient({ lang }: { lang: Lang }) {
           <button onClick={() => { setFilter("tous"); setQ(""); }} className="mono" style={{ fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>↺ {t.reset}</button>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(400px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+        <RevealGroup style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(400px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }} gap={0.045}>
           {view.map((m) => {
             const cc = compColors[m.comp] || "#0f62fe";
             const st = statut(m);
             const cd = now !== null ? computeCountdown(m.limiteISO, now) : null;
             const showCd = cd && m.statut === "ouvert";
             return (
-              <button key={m.ref} onClick={() => setSelRef(m.ref)} style={{ textAlign: "left", background: "#fff", padding: 24, display: "flex", flexDirection: "column" }}>
+              <RevealItem key={m.ref}>
+              <button onClick={() => setSelRef(m.ref)} style={{ textAlign: "left", background: "#fff", padding: 24, display: "flex", flexDirection: "column" }}>
                 <div style={{ height: 4, background: cc, margin: "-24px -24px 22px" }} />
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                   <span className="mono" style={{ fontSize: 12, color: "var(--c-70)" }}>{m.ref}</span>
@@ -116,9 +118,10 @@ export function MarchesClient({ lang }: { lang: Lang }) {
                   <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: "var(--ac)", whiteSpace: "nowrap" }}>{t.viewDetail} →</span>
                 </div>
               </button>
+              </RevealItem>
             );
           })}
-        </div>
+        </RevealGroup>
       )}
 
       {sel && <MarcheDrawer lang={lang} m={sel} now={now} onClose={() => setSelRef(null)} openVideo={openVideo} />}
@@ -141,7 +144,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
       <div className="drawer" onClick={(e) => e.stopPropagation()}>
         <div className="duo" data-video-slot="Bannière de l'avis (vidéo)" data-slot-ratio="16:9" style={{ aspectRatio: "16/6.6", ["--duo" as string]: cc }}>
           <Photo src={media.img[compImg[m.comp] || "fibre"]} alt={pick(m.objet, lang)} />
-          <button onClick={onClose} aria-label="Fermer" style={{ position: "absolute", top: 16, right: 16, width: 42, height: 42, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.4)", backdropFilter: "blur(6px)" }}>✕</button>
+          <button onClick={onClose} aria-label="Fermer" className="blur-sm" style={{ position: "absolute", top: "calc(16px + var(--sa-t))", right: 16, width: 44, height: 44, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.55)", backdropFilter: "blur(6px)" }}>✕</button>
           <button onClick={() => openVideo()} style={{ position: "absolute", top: 16, left: 16, display: "inline-flex", alignItems: "center", gap: 9, padding: "8px 14px 8px 8px", background: "rgba(255,255,255,.92)", color: "var(--c-black)", fontSize: 12.5, fontWeight: 600 }}>
             <span style={{ width: 26, height: 26, background: cc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, paddingLeft: 1 }}>▶</span>{dict(lang).video.watch}
           </button>
@@ -238,7 +241,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
             ))}
           </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+          <div className="stack-sm" style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
             <Link href={route(lang, NAV.connexion)} className="btn" style={{ flex: 1, minWidth: 200, justifyContent: "center", background: cc, color: "#fff" }}>{t.submitBid} <span className="arrow">→</span></Link>
             <Link href={route(lang, NAV.contact)} className="btn btn--outline">{w.askQuestion}</Link>
           </div>
