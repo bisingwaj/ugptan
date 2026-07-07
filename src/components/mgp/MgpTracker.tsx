@@ -29,7 +29,7 @@ export function MgpTracker({ lang }: { lang: Lang }) {
       <h2 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(20px,2.4vw,26px)", letterSpacing: "-0.02em" }}>{t.trackTitle}</h2>
       <p style={{ margin: "10px 0 0", fontSize: 13.5, color: "var(--c-40)", lineHeight: 1.55 }}>{t.trackLead}</p>
       <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
-        <input value={ref} onChange={(e) => setRef(e.target.value)} onKeyDown={(e) => e.key === "Enter" && track()} placeholder="UGPTAN-MGP-2026-…" className="field field--dark mono" style={{ flex: 1, minWidth: 0 }} />
+        <input value={ref} onChange={(e) => setRef(e.target.value)} onKeyDown={(e) => e.key === "Enter" && track()} placeholder="UGPTN-MGP-2026-…" className="field field--dark mono" style={{ flex: 1, minWidth: 0 }} />
         <button onClick={track} className="btn btn--primary btn--sm" style={{ whiteSpace: "nowrap" }}>{t.track}</button>
       </div>
 

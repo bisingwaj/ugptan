@@ -13,7 +13,7 @@ export default function TransparencePage({ params }: { params: { lang: string } 
   const t = dict(lang);
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${t.foot.transparence}`} title={t.docs.heroTitle} lead={t.docs.heroLead} />
+      <PageHero crumb={`UGPTN / ${t.foot.transparence}`} title={t.docs.heroTitle} lead={t.docs.heroLead} />
       <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(64px,8vw,110px)" }}>
         <div className="section__inner">
           <TransparenceClient lang={lang} />

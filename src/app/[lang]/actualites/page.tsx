@@ -18,7 +18,7 @@ export default function ActualitesPage({ params }: { params: { lang: string } })
   const t = dict(lang);
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${t.sec.actus}`} title={t.actus.heroTitle} lead={t.actus.heroLead} />
+      <PageHero crumb={`UGPTN / ${t.sec.actus}`} title={t.actus.heroTitle} lead={t.actus.heroLead} />
 
       <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(56px,7vw,90px)" }}>
         <div className="section__inner">

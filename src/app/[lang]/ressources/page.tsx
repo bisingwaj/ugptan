@@ -16,7 +16,7 @@ export default function RessourcesPage({ params }: { params: { lang: string } })
   const r = t.ressources;
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${r.titre}`} title={r.hero} lead={r.lead} />
+      <PageHero crumb={`UGPTN / ${r.titre}`} title={r.hero} lead={r.lead} />
       <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(64px,8vw,110px)" }}>
         <div className="section__inner">
           <RevealGroup gap={0.045} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(348px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>

@@ -24,7 +24,7 @@ export default function MediasPage({ params }: { params: { lang: string } }) {
   return (
     <div>
       <PageHero
-        crumb={`UGPTAN / ${en ? "Media plan" : "Plan médias"}`}
+        crumb={`UGPTN / ${en ? "Media plan" : "Plan médias"}`}
         title={en ? "Where videos go on the site." : "Où les vidéos prennent place sur le site."}
         lead={en
           ? "Every video slot planned across the site — heroes included. Use it to plan shoots and productions. Tip: add ?slots=1 to any page URL to highlight these slots in context."

@@ -26,7 +26,7 @@ export default function ResultatsPage({ params }: { params: { lang: string } }) 
   return (
     <div>
       <FlowLinesDefs />
-      <PageHero crumb={`UGPTAN / ${t.sec.resultats}`} title={r.heroTitle} lead={r.heroLead} />
+      <PageHero crumb={`UGPTN / ${t.sec.resultats}`} title={r.heroTitle} lead={r.heroLead} />
 
       {/* ODP */}
       <section className="section section--dark">

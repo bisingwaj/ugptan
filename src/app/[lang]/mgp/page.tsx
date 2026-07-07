@@ -22,7 +22,7 @@ export default function MgpPage({ params }: { params: { lang: string } }) {
 
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${dict(lang).cta.mgp}`} title={t.heroTitle} lead={t.heroLead}>
+      <PageHero crumb={`UGPTN / ${dict(lang).cta.mgp}`} title={t.heroTitle} lead={t.heroLead}>
         <Reveal variant="up" delay={0.18} style={{ display: "inline-flex", alignItems: "center", gap: 11, marginTop: 26, border: "1px solid var(--ok-bd)", background: "var(--ok-bg)", padding: "10px 16px" }}>
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--green)" }} />
           <span className="mono" style={{ fontSize: 12, color: "var(--ok-fg)" }}>{t.slaBadge}</span>

@@ -21,7 +21,7 @@ export function Footer({ lang }: { lang: Lang }) {
             <span style={{ width: 30, height: 30, background: "var(--ac)", position: "relative", display: "inline-flex" }}>
               <span style={{ position: "absolute", right: 5, bottom: 5, width: 11, height: 11, background: "var(--c-black)" }} />
             </span>
-            <span style={{ fontWeight: 700, fontSize: 19, color: "#fff" }}>UGPTAN</span>
+            <span style={{ fontWeight: 700, fontSize: 19, color: "#fff" }}>UGPTN</span>
           </div>
           <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "var(--c-50)", maxWidth: 300 }}>{meta.uniteLong}</p>
           <p className="mono" style={{ margin: "16px 0 0", fontSize: 11.5, color: "var(--c-60)", lineHeight: 1.7 }}>{meta.tutelleLong}<br />{meta.bailleurs}</p>
@@ -59,7 +59,7 @@ export function Footer({ lang }: { lang: Lang }) {
 
       <div style={{ borderTop: "1px solid var(--c-80)" }}>
         <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "18px var(--pad-x)", display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--c-60)" }}>
-          <span>© {t.words.year} UGPTAN · {meta.code} · {meta.ville}</span>
+          <span>© {t.words.year} UGPTN · {meta.code} · {meta.ville}</span>
           <span style={{ maxWidth: 680, textAlign: "right", lineHeight: 1.5 }}>{t.foot.legal}</span>
         </div>
       </div>

@@ -1,7 +1,7 @@
-# UGPTAN — Site institutionnel public
+# UGPTN — Site institutionnel public
 
 Refonte **Next.js (App Router)** de la direction visuelle « Carbon » du site institutionnel de
-l'**UGPTAN** — Unité de Gestion du Projet de Transformation Numérique de la RDC
+l'**UGPTN** — Unité de Gestion du Projet de Transformation Numérique de la RDC
 (**PTN-RDC · P180495**, 510 M USD, cofinancement IDA / Banque mondiale + AFD, 26 provinces,
 horizon 2029).
 
@@ -13,7 +13,7 @@ horizon 2029).
 ## 1. Ce qui a changé par rapport à la livraison initiale
 
 La livraison d'origine était un fichier `*.dc.html` autonome (framework « DC » maison + React inliné)
-avec **deux endroits où vivait le contenu** : `ugptan-data.js` **et** des blocs codés en dur dans
+avec **deux endroits où vivait le contenu** : `ugptn-data.js` **et** des blocs codés en dur dans
 `renderVals()` (histoires, vidéos par composante, dialogues, événements, gouvernance, glossaire,
 FAQ, partenaires, ressources…).
 
@@ -53,7 +53,7 @@ src/
 ├── app/[lang]/              # routes localisées (fr | en) — un dossier par page
 │   ├── layout.tsx           # <html lang>, fonts, header/footer/newsletter, lightbox vidéo, SEO
 │   ├── page.tsx             # Accueil
-│   ├── projet/ ugptan/ gouvernance/ resultats/
+│   ├── projet/ ugptn/ gouvernance/ resultats/
 │   ├── marches/ transparence/ actualites/ ressources/ evenements/
 │   └── mgp/ connexion/ contact/
 ├── content/                 # ← SOURCE UNIQUE DE VÉRITÉ (typée, bilingue)
@@ -113,7 +113,7 @@ Tout le contenu éditable est dans `src/content/`. Exemples :
 
 ## 6. À renseigner avant la mise en production
 
-- **Logo UGPTAN officiel** (actuellement un monogramme).
+- **Logo UGPTN officiel** (actuellement un monogramme).
 - **Numéro vert MGP** : affiché « XXX » → `content/carbon.ts` (`contact.numeroVert`).
 - **Noms & portraits** de l'équipe et des leads (les rôles/pôles sont conformes au MEP).
 - **Photographies & vidéo** réelles (cf. §5).
@@ -168,4 +168,4 @@ redirection i18n `/ → /fr`, `hreflang` FR/EN et `canonical` absolus.
 
 ---
 
-*UGPTAN · MPTN · IDA (Banque mondiale) + AFD · Kinshasa, 2026*
+*UGPTN · MPTN · IDA (Banque mondiale) + AFD · Kinshasa, 2026*

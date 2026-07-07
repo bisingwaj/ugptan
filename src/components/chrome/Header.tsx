@@ -36,7 +36,7 @@ export function Header({ lang }: { lang: Lang }) {
         <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "var(--sa-t) max(var(--pad-x), var(--sa-r)) 0 max(var(--pad-x), var(--sa-l))", height: "calc(64px + var(--sa-t))", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18 }}>
           <Link href={route(lang)} style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Logo />
-            <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "0.02em" }}>UGPTAN</span>
+            <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "0.02em" }}>UGPTN</span>
           </Link>
 
           <nav className="nav-desktop" style={{ display: "flex", alignItems: "center", gap: 2 }}>

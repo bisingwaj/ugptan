@@ -1,8 +1,8 @@
 import type { Bilingual, Localizable } from "@/lib/pick";
 
 /* ---------------------------------------------------------------------------
-   Content schema — the single source of truth for the UGPTAN institutional site.
-   Mirrors the canonical `ugptan-data.js` (MEP of 23 June 2025) plus the content
+   Content schema — the single source of truth for the UGPTN institutional site.
+   Mirrors the canonical `ugptn-data.js` (MEP of 23 June 2025) plus the content
    that was previously hard-coded inside the Carbon `renderVals()`.
 --------------------------------------------------------------------------- */
 

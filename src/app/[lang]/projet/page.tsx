@@ -25,7 +25,7 @@ export default function ProjetPage({ params }: { params: { lang: string } }) {
 
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${p.titre}`} title={p.titre} lead={p.lead} />
+      <PageHero crumb={`UGPTN / ${p.titre}`} title={p.titre} lead={p.lead} />
 
       {/* Contexte */}
       <section className="section">
