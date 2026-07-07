@@ -21,7 +21,7 @@ export default function MarchesPage({ params }: { params: { lang: string } }) {
 
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${t.nav.marches}`} title={t.marches.heroTitle} lead={t.marches.heroLead}>
+      <PageHero crumb={`UGPTN / ${t.nav.marches}`} title={t.marches.heroTitle} lead={t.marches.heroLead}>
         <Reveal variant="up" delay={0.18} style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 30 }}>
           {marchesMethodes.map((m) => (
             <div key={m.sigle} style={{ display: "flex", alignItems: "center", gap: 9, border: "1px solid var(--c-20)", padding: "8px 14px" }}>

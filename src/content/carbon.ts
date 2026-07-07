@@ -61,14 +61,14 @@ export const gouvLeads: GouvLead[] = [
   { role: { fr: "Spécialiste suivi-évaluation", en: "M&E Specialist" }, pole: { fr: "Suivi-évaluation", en: "M&E" }, color: "#198038", mandate: { fr: "Mesure les résultats au regard du cadre 2029, sur 26 provinces.", en: "Measures results against the 2029 framework, across 26 provinces." } },
 ];
 
-/* --- UGPTAN : mission (coordonner / exécuter / rendre compte) ---------------- */
-export const ugptanMission: MissionItem[] = [
+/* --- UGPTN : mission (coordonner / exécuter / rendre compte) ---------------- */
+export const ugptnMission: MissionItem[] = [
   { t: { fr: "Coordonner", en: "Coordinate" }, d: { fr: "Aligner ministères, partenaires et bailleurs autour d'un seul plan et d'une seule source de vérité.", en: "Align ministries, partners and donors around one plan and one source of truth." } },
   { t: { fr: "Exécuter", en: "Deliver" }, d: { fr: "Passer les marchés, contractualiser et superviser les travaux, services et systèmes du Projet.", en: "Procure, contract and supervise the works, services and systems of the Project." } },
   { t: { fr: "Rendre compte", en: "Account" }, d: { fr: "Mesurer les résultats, sécuriser les fonds et rendre compte — aux citoyens et aux bailleurs.", en: "Measure results, safeguard funds and report — to citizens and to donors." } },
 ];
 
-/* --- UGPTAN : mission + activité en cours par pôle -------------------------- */
+/* --- UGPTN : mission + activité en cours par pôle -------------------------- */
 export const polesAction: PoleAction[] = [
   { pole: { fr: "Coordination & administration", en: "Coordination & administration" }, color: "#0f62fe", mission: { fr: "Tient le plan d'ensemble et fait tourner l'Unité au quotidien.", en: "Holds the plan together and runs the Unit day to day." }, act: { fr: "En cours : plan de travail glissant 18 mois & reporting bailleurs.", en: "Now: rolling 18-month work plan & donor reporting." } },
   { pole: { fr: "Passation des marchés", en: "Procurement" }, color: "#009d9a", mission: { fr: "Transforme les besoins en marchés ouverts et traçables.", en: "Turns needs into open, traceable contracts." }, act: { fr: "En cours : appel d'offres fibre Est de 2 500 km (AOI/C1).", en: "Now: 2,500 km Eastern fibre tender (AOI/C1)." } },
@@ -77,7 +77,7 @@ export const polesAction: PoleAction[] = [
   { pole: { fr: "Suivi-évaluation & sauvegardes", en: "M&E & safeguards" }, color: "#198038", mission: { fr: "Mesure l'impact et protège les personnes et l'environnement.", en: "Measures impact and protects people and the environment." }, act: { fr: "En cours : étude de référence & MGP sur 26 provinces.", en: "Now: baseline study & GRM across 26 provinces." } },
 ];
 
-/* --- UGPTAN : « Du financement aux résultats » (5 étapes) -------------------- */
+/* --- UGPTN : « Du financement aux résultats » (5 étapes) -------------------- */
 export const methode: MethodeEtape[] = [
   { t: { fr: "Planifier", en: "Plan" }, d: { fr: "Traduire le MEP en plan d'action et de passation daté (PTBA / PPM).", en: "Translate the PIM into a dated action and procurement plan (AWPB / PP)." } },
   { t: { fr: "Passer les marchés", en: "Procure" }, d: { fr: "Mettre en concurrence, de manière ouverte et traçable, selon les règles de la Banque mondiale.", en: "Run open, traceable competition under World Bank rules." } },
@@ -86,7 +86,7 @@ export const methode: MethodeEtape[] = [
   { t: { fr: "Mesurer & rendre compte", en: "Measure & account" }, d: { fr: "Suivre les indicateurs, conduire les audits et rendre compte aux citoyens et aux bailleurs.", en: "Track indicators, run audits and report to citizens and donors." } },
 ];
 
-/* --- UGPTAN : engagements / standards --------------------------------------- */
+/* --- UGPTN : engagements / standards --------------------------------------- */
 export const engagementsList: EngagementItem[] = [
   { t: { fr: "Transparence", en: "Transparency" }, d: { fr: "Chaque avis publié, chaque attribution rendue publique.", en: "Every notice published, every award made public." }, color: "#0f62fe" },
   { t: { fr: "Traçabilité", en: "Traceability" }, d: { fr: "Chaque processus daté et journalisé, de bout en bout.", en: "Every process dated and logged, end to end." }, color: "#009d9a" },
@@ -96,7 +96,7 @@ export const engagementsList: EngagementItem[] = [
   { t: { fr: "Conformité", en: "Compliance" }, d: { fr: "Prérogatives des bailleurs intégralement préservées — aucun raccourci.", en: "Donor prerogatives fully preserved — no shortcuts." }, color: "#ff832b" },
 ];
 
-/* --- UGPTAN : glossaire des sigles ------------------------------------------ */
+/* --- UGPTN : glossaire des sigles ------------------------------------------ */
 export const glossaire: GlossaireItem[] = [
   { s: "MEP", d: { fr: "Manuel d'Exécution du Projet — la source de vérité.", en: "Project Implementation Manual — the source of truth." } },
   { s: "COPIL", d: { fr: "Comité de Pilotage — orientation stratégique.", en: "Steering Committee — strategic orientation." } },
@@ -110,9 +110,9 @@ export const glossaire: GlossaireItem[] = [
   { s: "IDA / AFD", d: { fr: "Les deux cofinanceurs du projet.", en: "The project's two co-financiers." } },
 ];
 
-/* --- UGPTAN : FAQ sur l'Unité ----------------------------------------------- */
-export const ugptanFaq: FaqItem[] = [
-  { q: { fr: "Qu'est-ce que l'UGPTAN, exactement ?", en: "What exactly is the UGPTAN?" }, r: { fr: "Une unité d'exécution dédiée — pas une nouvelle administration — créée pour mettre en œuvre le Projet de Transformation Numérique pour le compte de l'État, dans le respect des règles de financement.", en: "A dedicated execution unit — not a new administration — set up to deliver the Digital Transformation Project on behalf of the State, within the financing rules." } },
+/* --- UGPTN : FAQ sur l'Unité ----------------------------------------------- */
+export const ugptnFaq: FaqItem[] = [
+  { q: { fr: "Qu'est-ce que l'UGPTN, exactement ?", en: "What exactly is the UGPTN?" }, r: { fr: "Une unité d'exécution dédiée — pas une nouvelle administration — créée pour mettre en œuvre le Projet de Transformation Numérique pour le compte de l'État, dans le respect des règles de financement.", en: "A dedicated execution unit — not a new administration — set up to deliver the Digital Transformation Project on behalf of the State, within the financing rules." } },
   { q: { fr: "Quelle différence avec le Ministère ?", en: "How is it different from the Ministry?" }, r: { fr: "Les ministères définissent la politique et exercent la tutelle ; l'Unité exécute — elle planifie, passe les marchés, supervise et rend compte. Elle ne s'y substitue jamais.", en: "The ministries set policy and provide oversight; the Unit executes — it plans, procures, supervises and reports. It never replaces them." } },
   { q: { fr: "Qui dirige l'Unité ?", en: "Who leads the Unit?" }, r: { fr: "Un Coordonnateur national, appuyé par cinq pôles fonctionnels — Direction, Composantes, Fiduciaire, Passation et Sauvegardes & transversal — et vingt-et-un sous-rôles, du pilotage à la liaison provinciale.", en: "A National Coordinator, supported by five functional clusters — Management, Components, Fiduciary, Procurement and Safeguards & cross-cutting — and twenty-one sub-roles, from steering to provincial liaison." } },
   { q: { fr: "Comment est-elle financée ?", en: "How is it financed?" }, r: { fr: "Par le Projet : 510 millions de dollars cofinancés par la Banque mondiale (IDA) et l'AFD. Le fonctionnement de l'Unité relève de la composante de gestion.", en: "Through the Project: 510 million dollars co-financed by the World Bank (IDA) and AFD. The Unit's own operating costs are part of the management component." } },
@@ -145,7 +145,7 @@ export const ressources: Ressource[] = [
   { k: { fr: "Note d'orientation", en: "Sector note" }, color: "#009d9a", pole: { fr: "Passation & fiduciaire", en: "Procurement & fiduciary" }, date: { fr: "Janvier 2026", en: "Jan 2026" }, titre: { fr: "Passation ouverte et traçable : application des règles de la Banque mondiale", en: "Open, traceable procurement: applying World Bank rules" }, meta: "PDF · 1,1 Mo" },
 ];
 
-/* --- UGPTAN : chiffres de l'Unité ------------------------------------------- */
+/* --- UGPTN : chiffres de l'Unité ------------------------------------------- */
 export const uniteStats: UniteStat[] = [
   { v: "5", l: { fr: "pôles", en: "clusters" } },
   { v: "21", l: { fr: "sous-rôles", en: "sub-roles" } },

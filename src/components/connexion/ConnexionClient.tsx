@@ -64,7 +64,7 @@ export function ConnexionClient({ lang }: { lang: Lang }) {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(120% 120% at 88% 8%, rgba(15,98,254,.34), transparent 55%)" }} />
           <div style={{ position: "relative", display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ width: 30, height: 30, background: "var(--ac)", position: "relative", display: "inline-flex", flex: "0 0 auto" }}><span style={{ position: "absolute", right: 5, bottom: 5, width: 11, height: 11, background: "#fff" }} /></span>
-            <span style={{ fontWeight: 700, fontSize: 19 }}>UGPTAN</span>
+            <span style={{ fontWeight: 700, fontSize: 19 }}>UGPTN</span>
           </div>
           <div style={{ position: "relative" }}>
             <div className="mono" style={{ fontSize: 11.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ac-light)", marginBottom: 18 }}>{t.bidderSpace}</div>

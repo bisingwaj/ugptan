@@ -19,7 +19,7 @@ export default function ContactPage({ params }: { params: { lang: string } }) {
 
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${c.titre}`} title={c.titre} lead={c.lead} />
+      <PageHero crumb={`UGPTN / ${c.titre}`} title={c.titre} lead={c.lead} />
 
       {/* Coordonnées */}
       <section style={{ padding: "clamp(48px,6vw,80px) var(--pad-x) 0" }}>

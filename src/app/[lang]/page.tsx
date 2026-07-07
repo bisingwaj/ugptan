@@ -213,7 +213,7 @@ export default function Home({ params }: { params: { lang: string } }) {
         <div className="section__inner">
           <Reveal>
             <Kicker n="05">{t.sec.gouvernance}</Kicker>
-            <h2 className="h2" style={{ margin: "0 0 48px" }}>COPIL · CTP · UGPTAN</h2>
+            <h2 className="h2" style={{ margin: "0 0 48px" }}>COPIL · CTP · UGPTN</h2>
           </Reveal>
           <RevealGroup className="grid-3" gap={0.05}>
             {gouvernance.map((g) => (

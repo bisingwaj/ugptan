@@ -1,8 +1,8 @@
 {
-  "name": "ugptan-website",
+  "name": "ugptn-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Site institutionnel public de l'UGPTAN — Projet de Transformation Numérique de la RDC (PTN-RDC · P180495). Refonte Next.js (App Router) de la direction « Carbon ».",
+  "description": "Site institutionnel public de l'UGPTN — Projet de Transformation Numérique de la RDC (PTN-RDC · P180495). Refonte Next.js (App Router) de la direction « Carbon ».",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

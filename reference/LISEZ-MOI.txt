@@ -1,4 +1,4 @@
-UGPTAN — SITE WEB INSTITUTIONNEL
+UGPTN — SITE WEB INSTITUTIONNEL
 Dossier de livraison — prêt à l'implémentation
 ================================================
 
@@ -11,12 +11,12 @@ Les montants, dates, indicateurs et structures sont repris du MEP — ne pas alt
 1. CONTENU DU DOSSIER
 ---------------------
 index.html ........................ Page d'accueil de la livraison (ouvre tous les sites)
-UGPTAN-Site-institutionnel.html .... SITE RETENU, autonome (à ouvrir directement)
+UGPTN-Site-institutionnel.html .... SITE RETENU, autonome (à ouvrir directement)
 alternatives/ ..................... Les 4 directions visuelles explorées (autonomes)
-    UGPTAN-1-Carbon-Sobre.html
-    UGPTAN-2-Editorial.html
-    UGPTAN-3-Data.html
-    UGPTAN-4-Humaniste.html
+    UGPTN-1-Carbon-Sobre.html
+    UGPTN-2-Editorial.html
+    UGPTN-3-Data.html
+    UGPTN-4-Humaniste.html
 sources/ .......................... Fichiers sources éditables (.dc.html + données)
 LISEZ-MOI.txt ..................... Ce fichier
 
@@ -24,7 +24,7 @@ LISEZ-MOI.txt ..................... Ce fichier
 2. UTILISATION IMMÉDIATE
 ------------------------
 - Décompressez le ZIP.
-- Ouvrez « index.html » (ou directement « UGPTAN-Site-institutionnel.html »)
+- Ouvrez « index.html » (ou directement « UGPTN-Site-institutionnel.html »)
   dans un navigateur récent (Chrome, Edge, Firefox, Safari).
 - Tout fonctionne HORS-LIGNE : les fichiers .html sont autonomes
   (HTML/CSS/JS + photographies intégrées).
@@ -33,27 +33,27 @@ LISEZ-MOI.txt ..................... Ce fichier
 3. CE QU'IL FAUT REMPLACER POUR LA PRODUCTION
 ---------------------------------------------
 Les éléments suivants sont des PLACEHOLDERS soignés, à remplacer par vos visuels officiels :
-- Logo UGPTAN officiel (actuellement un monogramme « U »).
+- Logo UGPTN officiel (actuellement un monogramme « U »).
 - Vidéo du héro : un LECTEUR INTÉGRÉ (lightbox) s'ouvre via « Voir le film du
   projet ». La vidéo actuelle est provisoire (film institutionnel Banque mondiale,
   2023) — à remplacer par le film officiel du Projet (champ D.media.videoYt dans
-  ugptan-data.js : il suffit d'y mettre l'identifiant YouTube de votre vidéo).
+  ugptn-data.js : il suffit d'y mettre l'identifiant YouTube de votre vidéo).
 - Photographies (citoyens, fibre, data center…) : ce sont de VRAIES photos
   art-dirigées (duotone bleu), intégrées au fichier et donc visibles hors-ligne
   — à remplacer par vos clichés sous licence. Sur le site retenu, elles sont
-  centralisées dans ugptan-data.js (objet D.media.img) et listées en haut du
+  centralisées dans ugptn-data.js (objet D.media.img) et listées en haut du
   fichier source via des balises <link rel="preload"> (mettre à jour les deux).
 - Noms et portraits de l'équipe (les rôles et pôles, eux, sont conformes au MEP).
 - Numéro vert MGP (affiché « XXX »), e-mail et adresse du siège.
 
 NE PAS MODIFIER (conformité MEP) : 510 M USD ; IDA 400 / AFD 110 ; 79 % / 21 % ;
 les 5 composantes et leurs montants ; les indicateurs ODP 2029 ; les 26 provinces
-(10 prioritaires) ; l'architecture COPIL · CTP · UGPTAN ; les 21 sous-rôles / 5 pôles.
+(10 prioritaires) ; l'architecture COPIL · CTP · UGPTN ; les 21 sous-rôles / 5 pôles.
 
 
 4. PAGES LIVRÉES (SITE RETENU)
 ------------------------------
-Accueil · Le Projet · L'UGPTAN · Gouvernance · Marchés publics (avis + candidature)
+Accueil · Le Projet · L'UGPTN · Gouvernance · Marchés publics (avis + candidature)
 Transparence documentaire · Résultats · Actualités · MGP (formulaire + suivi +
 canal confidentiel EAS/HS) · Contact + carte des provinces · Connexion (8 profils).
 
@@ -84,9 +84,9 @@ Fonctionnalités interactives :
 - Les versions « .html » (racine et alternatives/) sont des fichiers AUTONOMES,
   idéaux pour démonstration et revue.
 - Le dossier « sources/ » contient les composants éditables (.dc.html) et le
-  fichier de données unique « ugptan-data.js » (montants, indicateurs, provinces,
+  fichier de données unique « ugptn-data.js » (montants, indicateurs, provinces,
   composantes, marchés, documents…). Pour une refonte en stack web standard,
-  « ugptan-data.js » constitue le schéma de contenu de référence.
+  « ugptn-data.js » constitue le schéma de contenu de référence.
 
 ================================================
-UGPTAN · MPTN · IDA (Banque mondiale) + AFD · Kinshasa, 2026
+UGPTN · MPTN · IDA (Banque mondiale) + AFD · Kinshasa, 2026

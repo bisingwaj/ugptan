@@ -11,22 +11,22 @@ Site institutionnel public de l'**UGPATN** (Unité de Gestion du Projet de Trans
 
 Quatre directions visuelles ont été produites + un « site retenu ». Ce guide documente en priorité la version **« Carbon »** (sobre, IBM-Carbon), qui est la plus complète et sert de référence fonctionnelle. Les autres directions partagent **le même fichier de données**.
 
-Pages du site : `accueil`, `projet`, `ugptan`, `gouvernance`, `marches`, `transparence`, `actualites`, `resultats`, `ressources`, `evenements`, `connexion` (espace soumissionnaire), `mgp` (plaintes), `contact`.
+Pages du site : `accueil`, `projet`, `ugptn`, `gouvernance`, `marches`, `transparence`, `actualites`, `resultats`, `ressources`, `evenements`, `connexion` (espace soumissionnaire), `mgp` (plaintes), `contact`.
 
 ---
 
 ## 2. Architecture technique
 
 - **Format** : chaque site est un fichier `*.dc.html` (« Design Component ») — un seul fichier autonome qui s'ouvre dans un navigateur. Rendu type React (classe `Component`) : un **template** (markup avec des trous `{{ … }}`) + une **classe logique** (`renderVals()` qui calcule toutes les valeurs).
-- **Source de contenu** : un fichier JS commun **`ugptan-data.js`** qui expose `window.UGPTAN_DATA` (objet `D`). C'est le **CMS de fait** : presque tout le contenu y vit, en **bilingue FR/EN** (`{ fr: "…", en: "…" }`).
+- **Source de contenu** : un fichier JS commun **`ugptn-data.js`** qui expose `window.UGPTN_DATA` (objet `D`). C'est le **CMS de fait** : presque tout le contenu y vit, en **bilingue FR/EN** (`{ fr: "…", en: "…" }`).
 - **Bilingue** : la plupart des textes sont des objets `{fr, en}`. La langue active est lue par `pick()` dans la logique. 6 langues prévues, FR/EN opérationnelles.
 - **Export** : un « bundle » HTML autonome est généré pour chaque direction (`UGPATN-Carbon-PROD.html`, etc.) — tout est inliné, ouvrable hors-ligne.
 
 ### ⚠️ Important — deux endroits où vit le contenu
-1. **`ugptan-data.js`** → contenu partagé par toutes les directions (marchés, actualités, documents, gouvernance, composantes, médias, MGP…).
+1. **`ugptn-data.js`** → contenu partagé par toutes les directions (marchés, actualités, documents, gouvernance, composantes, médias, MGP…).
 2. **À l'intérieur de `Proposition 1 - Carbon.dc.html`**, dans `renderVals()` → du contenu **spécifique à Carbon** a été ajouté en dur (histoires, vidéos par composante, dialogues, événements, FAQ, glossaire, partenaires, etc.).
 
-> **Recommandation forte** pour le back-office : **migrer tout le contenu hardcodé de la section 6 vers `ugptan-data.js`** (ou vers l'API), afin d'avoir **une seule source de vérité** éditable. Voir §8.
+> **Recommandation forte** pour le back-office : **migrer tout le contenu hardcodé de la section 6 vers `ugptn-data.js`** (ou vers l'API), afin d'avoir **une seule source de vérité** éditable. Voir §8.
 
 ---
 
@@ -42,18 +42,18 @@ livraison/
 │   ├─ Proposition 2 - Editorial.dc.html
 │   ├─ Proposition 3 - Data.dc.html
 │   ├─ Proposition 4 - Humaniste.dc.html
-│   ├─ UGPTAN - Site institutionnel.dc.html
-│   └─ ugptan-data.js              ← LA source de contenu commune
+│   ├─ UGPTN - Site institutionnel.dc.html
+│   └─ ugptn-data.js              ← LA source de contenu commune
 └─ UGPATN-GUIDE-DEV.md            ← ce document
 ```
 
-Pour modifier le contenu : éditer **`sources/ugptan-data.js`** (et, pour Carbon, certaines valeurs dans `sources/Proposition 1 - Carbon.dc.html` — voir §6/§8), puis régénérer le build.
+Pour modifier le contenu : éditer **`sources/ugptn-data.js`** (et, pour Carbon, certaines valeurs dans `sources/Proposition 1 - Carbon.dc.html` — voir §6/§8), puis régénérer le build.
 
 ---
 
-## 4. `ugptan-data.js` — schéma du contenu dynamique partagé
+## 4. `ugptn-data.js` — schéma du contenu dynamique partagé
 
-`window.UGPTAN_DATA = D`. Champs principaux (les textes notés `{fr,en}` sont bilingues) :
+`window.UGPTN_DATA = D`. Champs principaux (les textes notés `{fr,en}` sont bilingues) :
 
 ### 4.1 Méta & i18n
 - `D.meta` : `{ code, ville, projetLong, tutelle, tutelleLong, bailleurs, unite, uniteLong, arrete, arreteDate }`
@@ -152,7 +152,7 @@ D.media = {
 
 ### 5.2 Mettre les vraies images
 Deux options :
-1. **Rapide (statique)** — remplacer, dans `D.media.img` (fichier `ugptan-data.js`), chaque clé par l'URL de votre image hébergée :
+1. **Rapide (statique)** — remplacer, dans `D.media.img` (fichier `ugptn-data.js`), chaque clé par l'URL de votre image hébergée :
    ```js
    img: {
      hero:       "https://cdn.ugpatn.cd/img/hero.jpg",
@@ -180,7 +180,7 @@ Deux options :
 
 ## 6. Contenu spécifique à Carbon (actuellement codé en dur dans `renderVals()`)
 
-Ces blocs ont été ajoutés directement dans `Proposition 1 - Carbon.dc.html` (objet retourné par `renderVals()`), **et ne sont pas encore dans `ugptan-data.js`**. À migrer vers la donnée/API (voir §8). Chacun est un tableau bilingue d'objets :
+Ces blocs ont été ajoutés directement dans `Proposition 1 - Carbon.dc.html` (objet retourné par `renderVals()`), **et ne sont pas encore dans `ugptn-data.js`**. À migrer vers la donnée/API (voir §8). Chacun est un tableau bilingue d'objets :
 
 | Clé (variable) | Page | Contenu | Champs |
 |---|---|---|---|
@@ -191,12 +191,12 @@ Ces blocs ont été ajoutés directement dans `Proposition 1 - Carbon.dc.html` (
 | `events` | Événements (+ teaser accueil) | Forums/ateliers/consultations/webinaires | `{ id, date, type, lieu, color, statut(avenir/passe), img(clé), titre, desc, places }` |
 | `gouvActivites` | Gouvernance | Activités/décisions COPIL·CTP·Coordination | `{ date, org, color, titre, note }` |
 | `gouvLeads` | Gouvernance | Rôles de coordination mis en avant | `{ role, pole, color, mandate }` |
-| `ugptanMission` | UGPATN | Coordonner/Exécuter/Rendre compte | `{ t, d }` |
+| `ugptnMission` | UGPATN | Coordonner/Exécuter/Rendre compte | `{ t, d }` |
 | `polesAction` | UGPATN | Mission + activité en cours par pôle | `{ pole, color, mission, act }` |
 | `methode` | UGPATN | « Du financement aux résultats » (5 étapes) | `{ t, d }` |
 | `engagementsList` | UGPATN | Engagements/standards | `{ t, d, c(color) }` |
 | `glossaire` | UGPATN | Sigles expliqués | `{ s, d }` |
-| `ugptanFaq` | UGPATN | FAQ sur l'Unité | `{ q, r }` |
+| `ugptnFaq` | UGPATN | FAQ sur l'Unité | `{ q, r }` |
 | `partners` | Accueil | Logos partenaires (placeholders nommés) | `{ name, kind }` |
 | `ressources` | Ressources | Rapports/analyses/notes d'orientation | `{ k(type), c(color), pole, date, titre, meta }` |
 | `uniteStats` | UGPATN | Chiffres de l'Unité | `{ v, u, l }` |
@@ -234,7 +234,7 @@ Coordonnées officielles actuelles (déjà intégrées) :
 
 ## 8. Spécification du back-office / Dashboard d'administration (A→Z)
 
-Objectif : une interface d'administration pour gérer **tout le contenu dynamique**. Modèle recommandé : **API REST/JSON** + base de données, le site lisant un JSON équivalent à `UGPTAN_DATA` (générer `ugptan-data.js` ou servir l'API).
+Objectif : une interface d'administration pour gérer **tout le contenu dynamique**. Modèle recommandé : **API REST/JSON** + base de données, le site lisant un JSON équivalent à `UGPTN_DATA` (générer `ugptn-data.js` ou servir l'API).
 
 ### 8.1 Authentification & rôles (RBAC)
 Refléter le cloisonnement du projet :
@@ -265,7 +265,7 @@ Refléter le cloisonnement du projet :
 - **Workflow de publication** : brouillon → publié (+ horodatage) ; les avis et communiqués sont datés et traçables.
 - **Médias** : valider le poids/format ; générer des variantes responsives ; conserver l'URL stable (clé).
 - **Cohérence couleur** : `comp` (C1…C5) → couleur de l'avis ; types de ressources → couleur.
-- **Export** : le back-office produit le JSON consommé par le site (ou l'API live). Prévoir un endpoint `GET /content` renvoyant l'équivalent de `UGPTAN_DATA`.
+- **Export** : le back-office produit le JSON consommé par le site (ou l'API live). Prévoir un endpoint `GET /content` renvoyant l'équivalent de `UGPTN_DATA`.
 
 ### 8.4 Schéma d'API suggéré (extrait)
 ```
@@ -285,7 +285,7 @@ POST  /api/soumissionnaires (inscription), /api/auth
 ---
 
 ## 9. Régénérer le site après modification
-1. Éditer `sources/ugptan-data.js` (et/ou le bloc §6 dans `sources/Proposition 1 - Carbon.dc.html`).
+1. Éditer `sources/ugptn-data.js` (et/ou le bloc §6 dans `sources/Proposition 1 - Carbon.dc.html`).
 2. Régénérer le bundle autonome (inline de tous les assets) → `UGPATN-Carbon-PROD.html`.
 3. Vérifier la console (objectif : **zéro erreur**). Les images doivent être soit embarquées, soit servies en ligne pour éviter les erreurs de chargement hors-ligne.
 

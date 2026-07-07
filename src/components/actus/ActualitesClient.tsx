@@ -80,7 +80,7 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
               )}
               <div style={{ marginTop: 30, paddingTop: 24, borderTop: "1px solid var(--c-20)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
                 <button onClick={() => setSel(null)} className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 9, fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>← {t.allNews}</button>
-                <span className="mono" style={{ fontSize: 11, color: "var(--c-50)" }}>UGPTAN · {article.date}</span>
+                <span className="mono" style={{ fontSize: 11, color: "var(--c-50)" }}>UGPTN · {article.date}</span>
               </div>
             </div>
           </div>

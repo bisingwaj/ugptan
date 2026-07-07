@@ -30,16 +30,16 @@ export const viewport: Viewport = {
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
   const lang = asLang(params.lang);
   const t = dict(lang);
-  const title = `UGPTAN — ${meta.projetLong}`;
+  const title = `UGPTN — ${meta.projetLong}`;
   const description = t.home.heroLead;
   return {
     metadataBase: new URL(SITE_URL),
-    title: { default: title, template: "%s · UGPTAN" },
+    title: { default: title, template: "%s · UGPTN" },
     description,
-    applicationName: "UGPTAN",
+    applicationName: "UGPTN",
     authors: [{ name: meta.uniteLong }],
-    keywords: ["UGPTAN", "PTN-RDC", "transformation numérique", "RDC", "Banque mondiale", "AFD", meta.code],
-    openGraph: { title, description, url: `/${lang}`, siteName: "UGPTAN", locale: lang === "en" ? "en_US" : "fr_FR", type: "website" },
+    keywords: ["UGPTN", "PTN-RDC", "transformation numérique", "RDC", "Banque mondiale", "AFD", meta.code],
+    openGraph: { title, description, url: `/${lang}`, siteName: "UGPTN", locale: lang === "en" ? "en_US" : "fr_FR", type: "website" },
     twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `/${lang}`, languages: { fr: "/fr", en: "/en" } },
     robots: { index: true, follow: true },

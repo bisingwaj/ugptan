@@ -13,7 +13,7 @@ export function dict(lang: Lang) {
     nav: {
       accueil: t("Accueil", "Home"),
       projet: t("Le Projet", "The Project"),
-      ugptan: t("L'UGPTAN", "The UGPTAN"),
+      ugptn: t("L'UGPTN", "The UGPTN"),
       gouvernance: t("Gouvernance", "Governance"),
       marches: t("Marchés", "Tenders"),
       transparence: t("Transparence", "Transparency"),
@@ -234,9 +234,9 @@ export function dict(lang: Lang) {
       ),
     },
 
-    /* --- L'UGPTAN ---------------------------------------------------------- */
-    ugptan: {
-      titre: t("L'UGPTAN", "The UGPTAN"),
+    /* --- L'UGPTN ---------------------------------------------------------- */
+    ugptn: {
+      titre: t("L'UGPTN", "The UGPTN"),
       lead: t(
         "Le bras opérationnel permanent du projet : elle prépare, exécute et supervise — sans jamais se substituer aux bailleurs ni aux responsables habilités à décider.",
         "The project's permanent operational arm: it prepares, delivers and supervises — without ever standing in for the donors or the officials empowered to decide.",

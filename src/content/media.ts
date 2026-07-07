@@ -11,7 +11,7 @@ export const media: Media = {
   /** Film du projet hébergé localement (fond + lightbox du héros). */
   heroFilm: "/videos/hero-film.mp4",
   videoTitre: { fr: "Film du projet", en: "Project film" },
-  videoSource: { fr: "UGPTAN · PTN-RDC", en: "UGPTAN · PTN-RDC" },
+  videoSource: { fr: "UGPTN · PTN-RDC", en: "UGPTN · PTN-RDC" },
   videoNote: { fr: "Aperçu du Projet de Transformation Numérique de la RDC — accès, fondations numériques, compétences et inclusion.", en: "Overview of the Digital Transformation Project of the DRC — access, digital foundations, skills and inclusion." },
   /* Photographies africaines vérifiées visuellement (Unsplash) : mettent en
      avant des Africains dans des contextes numériques, en RDC/Afrique. */

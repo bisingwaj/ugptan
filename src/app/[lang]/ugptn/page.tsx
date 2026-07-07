@@ -3,7 +3,7 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { meta, mandat, principes, poles, equipe, question, engagement } from "@/content/data";
-import { ugptanMission, polesAction, uniteStats, methode, engagementsList, glossaire, ugptanFaq } from "@/content/carbon";
+import { ugptnMission, polesAction, uniteStats, methode, engagementsList, glossaire, ugptnFaq } from "@/content/carbon";
 import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
 import { Accordion } from "@/components/ui/Accordion";
@@ -12,19 +12,19 @@ import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
-  return { title: dict(asLang(params.lang)).ugptan.titre };
+  return { title: dict(asLang(params.lang)).ugptn.titre };
 }
 
-export default function UgptanPage({ params }: { params: { lang: string } }) {
+export default function UgptnPage({ params }: { params: { lang: string } }) {
   const lang = asLang(params.lang);
   const t = dict(lang);
-  const u = t.ugptan;
-  const faq = ugptanFaq.map((f) => ({ q: pick(f.q, lang), r: pick(f.r, lang) }));
+  const u = t.ugptn;
+  const faq = ugptnFaq.map((f) => ({ q: pick(f.q, lang), r: pick(f.r, lang) }));
   const n2 = (i: number) => String(i + 1).padStart(2, "0");
 
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${u.titre}`} title={u.titre} lead={u.lead} />
+      <PageHero crumb={`UGPTN / ${u.titre}`} title={u.titre} lead={u.lead} />
 
       {/* Question */}
       <section className="section section--dark">
@@ -145,7 +145,7 @@ export default function UgptanPage({ params }: { params: { lang: string } }) {
             <p style={{ margin: "0 0 46px", fontSize: "clamp(16px,1.6vw,19px)", lineHeight: 1.62, color: "var(--c-70)", maxWidth: 760 }}>{u.objLead}</p>
           </Reveal>
           <RevealGroup className="grid-3 celled--top" gap={0.05}>
-            {ugptanMission.map((m, i) => (
+            {ugptnMission.map((m, i) => (
               <RevealItem key={i} className="cell" style={{ padding: "32px clamp(22px,2.4vw,30px)", display: "flex", flexDirection: "column" }}>
                 <div className="mono" style={{ fontSize: 30, fontWeight: 600, color: "var(--ac)" }}>{n2(i)}</div>
                 <h3 style={{ margin: "18px 0 0", fontSize: "clamp(20px,2.2vw,26px)", fontWeight: 600, letterSpacing: "-0.01em" }}>{pick(m.t, lang)}</h3>

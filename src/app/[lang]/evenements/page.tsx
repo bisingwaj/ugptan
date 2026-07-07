@@ -14,7 +14,7 @@ export default function EvenementsPage({ params }: { params: { lang: string } })
   const t = dict(lang);
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${t.home.evtLabel}`} title={t.home.evtTitle} lead={t.home.evtLead} />
+      <PageHero crumb={`UGPTN / ${t.home.evtLabel}`} title={t.home.evtTitle} lead={t.home.evtLead} />
       <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(64px,8vw,110px)" }}>
         <div className="section__inner">
           <EventsGrid lang={lang} events={events} withImage />

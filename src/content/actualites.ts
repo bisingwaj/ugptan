@@ -18,15 +18,15 @@ export const actualites: Actualite[] = [
   },
   {
     date: "15 avr. 2025", dateISO: "2025-04-15", cat: { fr: "Gouvernance", en: "Governance" }, img: "ville", lieu: "Kinshasa",
-    title: { fr: "Création officielle de l'UGPTAN par arrêté ministériel du MPTN.", en: "Official creation of the UGPTAN by ministerial order of the MPTN." },
+    title: { fr: "Création officielle de l'UGPTN par arrêté ministériel du MPTN.", en: "Official creation of the UGPTN by ministerial order of the MPTN." },
     corps: {
       fr: [
         "Par arrêté ministériel, le Ministre des Postes, Télécommunications et Numérique a institué l'Unité de Gestion du Projet de Transformation Numérique, structure d'exécution dotée de cinq pôles et de vingt-et-un sous-rôles.",
-        "L'arrêté consacre l'articulation COPIL · CTP · UGPTAN et préserve intégralement les prérogatives des bailleurs.",
+        "L'arrêté consacre l'articulation COPIL · CTP · UGPTN et préserve intégralement les prérogatives des bailleurs.",
       ],
       en: [
         "By ministerial order, the Minister of Posts, Telecommunications and Digital established the Digital Transformation Project Management Unit, an execution structure with five clusters and twenty-one sub-roles.",
-        "The order enshrines the COPIL · CTP · UGPTAN articulation and fully preserves donors' prerogatives.",
+        "The order enshrines the COPIL · CTP · UGPTN articulation and fully preserves donors' prerogatives.",
       ],
     },
   },

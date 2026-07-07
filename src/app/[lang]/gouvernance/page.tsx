@@ -21,7 +21,7 @@ export default function GouvernancePage({ params }: { params: { lang: string } }
 
   return (
     <div>
-      <PageHero crumb={`UGPTAN / ${g.titre}`} title={g.titre} lead={g.lead} />
+      <PageHero crumb={`UGPTN / ${g.titre}`} title={g.titre} lead={g.lead} />
 
       {/* Bodies */}
       <section className="section">
