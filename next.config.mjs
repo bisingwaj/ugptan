@@ -20,7 +20,7 @@ const nextConfig = {
     // Photographie de démonstration servie depuis Unsplash ; basculer vers le CDN en production.
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "cdn.ugpatn.cd" },
+      { protocol: "https", hostname: "cdn.ugptn.cd" },
     ],
   },
   async headers() {

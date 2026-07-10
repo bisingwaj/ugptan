@@ -1,13 +1,13 @@
-# UGPATN — Guide d'intégration & de gestion du contenu
+# UGPTN — Guide d'intégration & de gestion du contenu
 
 > Document de référence pour l'équipe de développement / l'IDE.
-> Objet : comprendre l'architecture du site **UGPATN** (version « Carbon »), savoir **où se trouve chaque contenu dynamique**, **où remplacer les images et les vidéos**, et disposer d'une **spécification de back-office** (dashboard d'administration) pour gérer tout le contenu.
+> Objet : comprendre l'architecture du site **UGPTN** (version « Carbon »), savoir **où se trouve chaque contenu dynamique**, **où remplacer les images et les vidéos**, et disposer d'une **spécification de back-office** (dashboard d'administration) pour gérer tout le contenu.
 
 ---
 
 ## 1. Présentation
 
-Site institutionnel public de l'**UGPATN** (Unité de Gestion du Projet de Transformation Numérique de la RDC). Le programme : 510 M USD, cofinancement Banque mondiale (IDA) + AFD, horizon 2029, 26 provinces.
+Site institutionnel public de l'**UGPTN** (Unité de Gestion du Projet de Transformation Numérique de la RDC). Le programme : 510 M USD, cofinancement Banque mondiale (IDA) + AFD, horizon 2029, 26 provinces.
 
 Quatre directions visuelles ont été produites + un « site retenu ». Ce guide documente en priorité la version **« Carbon »** (sobre, IBM-Carbon), qui est la plus complète et sert de référence fonctionnelle. Les autres directions partagent **le même fichier de données**.
 
@@ -20,7 +20,7 @@ Pages du site : `accueil`, `projet`, `ugptn`, `gouvernance`, `marches`, `transpa
 - **Format** : chaque site est un fichier `*.dc.html` (« Design Component ») — un seul fichier autonome qui s'ouvre dans un navigateur. Rendu type React (classe `Component`) : un **template** (markup avec des trous `{{ … }}`) + une **classe logique** (`renderVals()` qui calcule toutes les valeurs).
 - **Source de contenu** : un fichier JS commun **`ugptn-data.js`** qui expose `window.UGPTN_DATA` (objet `D`). C'est le **CMS de fait** : presque tout le contenu y vit, en **bilingue FR/EN** (`{ fr: "…", en: "…" }`).
 - **Bilingue** : la plupart des textes sont des objets `{fr, en}`. La langue active est lue par `pick()` dans la logique. 6 langues prévues, FR/EN opérationnelles.
-- **Export** : un « bundle » HTML autonome est généré pour chaque direction (`UGPATN-Carbon-PROD.html`, etc.) — tout est inliné, ouvrable hors-ligne.
+- **Export** : un « bundle » HTML autonome est généré pour chaque direction (`UGPTN-Carbon-PROD.html`, etc.) — tout est inliné, ouvrable hors-ligne.
 
 ### ⚠️ Important — deux endroits où vit le contenu
 1. **`ugptn-data.js`** → contenu partagé par toutes les directions (marchés, actualités, documents, gouvernance, composantes, médias, MGP…).
@@ -34,8 +34,8 @@ Pages du site : `accueil`, `projet`, `ugptn`, `gouvernance`, `marches`, `transpa
 
 ```
 livraison/
-├─ UGPATN-Carbon-PROD.html        ← build production de la version Carbon (autonome)
-├─ UGPATN-Site-institutionnel.html← build du site retenu
+├─ UGPTN-Carbon-PROD.html        ← build production de la version Carbon (autonome)
+├─ UGPTN-Site-institutionnel.html← build du site retenu
 ├─ alternatives/                  ← builds des 4 directions
 ├─ sources/
 │   ├─ Proposition 1 - Carbon.dc.html   ← SOURCE éditable (Carbon)
@@ -44,7 +44,7 @@ livraison/
 │   ├─ Proposition 4 - Humaniste.dc.html
 │   ├─ UGPTN - Site institutionnel.dc.html
 │   └─ ugptn-data.js              ← LA source de contenu commune
-└─ UGPATN-GUIDE-DEV.md            ← ce document
+└─ UGPTN-GUIDE-DEV.md            ← ce document
 ```
 
 Pour modifier le contenu : éditer **`sources/ugptn-data.js`** (et, pour Carbon, certaines valeurs dans `sources/Proposition 1 - Carbon.dc.html` — voir §6/§8), puis régénérer le build.
@@ -70,7 +70,7 @@ Pour modifier le contenu : éditer **`sources/ugptn-data.js`** (et, pour Carbon,
 - `D.question` : `{fr,en}` ; `D.engagement` : `{fr,en}` — citations institutionnelles.
 
 ### 4.3 Gouvernance & organisation
-- `D.gouvernance` : `[{ sigle, nom{fr,en}, nature{fr,en}, effectif, presidence{fr,en}, decision{fr,en}, frequence{fr,en} }]` — COPIL / CTP / UGPATN.
+- `D.gouvernance` : `[{ sigle, nom{fr,en}, nature{fr,en}, effectif, presidence{fr,en}, decision{fr,en}, frequence{fr,en} }]` — COPIL / CTP / UGPTN.
 - `D.poles` : `[{ nom{fr,en}, role{fr,en}, roles:[ "…" ] }]` — 5 pôles, 21 sous-rôles.
 - `D.mandat` : `[{ n, fr, en, descFr, descEn }]`
 - `D.principes` : `[{ fr, en, descFr, descEn }]`
@@ -155,8 +155,8 @@ Deux options :
 1. **Rapide (statique)** — remplacer, dans `D.media.img` (fichier `ugptn-data.js`), chaque clé par l'URL de votre image hébergée :
    ```js
    img: {
-     hero:       "https://cdn.ugpatn.cd/img/hero.jpg",
-     fibre:      "https://cdn.ugpatn.cd/img/fibre.jpg",
+     hero:       "https://cdn.ugptn.cd/img/hero.jpg",
+     fibre:      "https://cdn.ugptn.cd/img/fibre.jpg",
      // … les 10 clés : hero, citoyens, fibre, datacenter, formation, femmes, tour, ville, hub, data
    }
    ```
@@ -191,22 +191,22 @@ Ces blocs ont été ajoutés directement dans `Proposition 1 - Carbon.dc.html` (
 | `events` | Événements (+ teaser accueil) | Forums/ateliers/consultations/webinaires | `{ id, date, type, lieu, color, statut(avenir/passe), img(clé), titre, desc, places }` |
 | `gouvActivites` | Gouvernance | Activités/décisions COPIL·CTP·Coordination | `{ date, org, color, titre, note }` |
 | `gouvLeads` | Gouvernance | Rôles de coordination mis en avant | `{ role, pole, color, mandate }` |
-| `ugptnMission` | UGPATN | Coordonner/Exécuter/Rendre compte | `{ t, d }` |
-| `polesAction` | UGPATN | Mission + activité en cours par pôle | `{ pole, color, mission, act }` |
-| `methode` | UGPATN | « Du financement aux résultats » (5 étapes) | `{ t, d }` |
-| `engagementsList` | UGPATN | Engagements/standards | `{ t, d, c(color) }` |
-| `glossaire` | UGPATN | Sigles expliqués | `{ s, d }` |
-| `ugptnFaq` | UGPATN | FAQ sur l'Unité | `{ q, r }` |
+| `ugptnMission` | UGPTN | Coordonner/Exécuter/Rendre compte | `{ t, d }` |
+| `polesAction` | UGPTN | Mission + activité en cours par pôle | `{ pole, color, mission, act }` |
+| `methode` | UGPTN | « Du financement aux résultats » (5 étapes) | `{ t, d }` |
+| `engagementsList` | UGPTN | Engagements/standards | `{ t, d, c(color) }` |
+| `glossaire` | UGPTN | Sigles expliqués | `{ s, d }` |
+| `ugptnFaq` | UGPTN | FAQ sur l'Unité | `{ q, r }` |
 | `partners` | Accueil | Logos partenaires (placeholders nommés) | `{ name, kind }` |
 | `ressources` | Ressources | Rapports/analyses/notes d'orientation | `{ k(type), c(color), pole, date, titre, meta }` |
-| `uniteStats` | UGPATN | Chiffres de l'Unité | `{ v, u, l }` |
+| `uniteStats` | UGPTN | Chiffres de l'Unité | `{ v, u, l }` |
 | `galleryProvinces` | Accueil | Galerie par province | `{ nom, img(clé) }` |
 | `contactAdresse`, `contactTel`, `contactEmail`, `contactTutelles` | Contact + footer | Coordonnées officielles | textes |
 
 Coordonnées officielles actuelles (déjà intégrées) :
 - **Adresse** : 15, Avenue Pumbu — Immeuble H, Bâtiment B, 4ᵉ étage, Gombe, Kinshasa, RDC
 - **Téléphone** : +243 810 000 355
-- **E-mail** : info@ugpatn.cd
+- **E-mail** : info@ugptn.cd
 - **Tutelle** : Ministère des Postes et Télécommunications ; Ministère de l'Économie Numérique
 - **Numéro vert MGP** : affiché « XXX » → **à fournir**.
 
@@ -286,7 +286,7 @@ POST  /api/soumissionnaires (inscription), /api/auth
 
 ## 9. Régénérer le site après modification
 1. Éditer `sources/ugptn-data.js` (et/ou le bloc §6 dans `sources/Proposition 1 - Carbon.dc.html`).
-2. Régénérer le bundle autonome (inline de tous les assets) → `UGPATN-Carbon-PROD.html`.
+2. Régénérer le bundle autonome (inline de tous les assets) → `UGPTN-Carbon-PROD.html`.
 3. Vérifier la console (objectif : **zéro erreur**). Les images doivent être soit embarquées, soit servies en ligne pour éviter les erreurs de chargement hors-ligne.
 
 ---
