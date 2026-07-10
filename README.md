@@ -104,7 +104,7 @@ Tout le contenu éditable est dans `src/content/`. Exemples :
 
 - Les **photographies** sont des placeholders art-dirigés servis depuis Unsplash, déclarés dans
   [`content/media.ts`](src/content/media.ts) (`media.img`). En production, remplacer ces URL par
-  vos visuels officiels (un CDN `cdn.ugpatn.cd` est déjà autorisé dans `next.config.mjs`).
+  vos visuels officiels (un CDN `cdn.ugptn.cd` est déjà autorisé dans `next.config.mjs`).
   Le calque **duotone** est appliqué en CSS (`.duo`) ; un repli SVG s'affiche si une image échoue.
 - La **vidéo** par défaut (lightbox) est `media.videoYt` (identifiant YouTube). Une vidéo par
   article : `actualites[].videoYt`. À remplacer par le film institutionnel du Projet.
@@ -140,17 +140,17 @@ Le dépôt est **prêt à déployer**. Le routage de langue est géré par `midd
 
 ### Variable d'environnement (une seule)
 `NEXT_PUBLIC_SITE_URL` — origine publique canonique, utilisée pour les URL absolues
-(sitemap, robots, Open Graph, canonical). Défaut : `https://www.ugpatn.cd`.
+(sitemap, robots, Open Graph, canonical). Défaut : `https://www.ugptn.cd`.
 La définir dans le projet **pour chaque environnement** (et sur l'URL de preview si souhaité).
 
 ### A. Vercel (recommandé pour Next.js — zéro config)
 1. Importer le dépôt Git → Vercel détecte **Next.js** automatiquement.
-2. Environment Variables → ajouter `NEXT_PUBLIC_SITE_URL = https://www.ugpatn.cd`.
-3. **Deploy**. Ajouter le domaine `www.ugpatn.cd` (Settings → Domains) et suivre les instructions DNS.
+2. Environment Variables → ajouter `NEXT_PUBLIC_SITE_URL = https://www.ugptn.cd`.
+3. **Deploy**. Ajouter le domaine `www.ugptn.cd` (Settings → Domains) et suivre les instructions DNS.
 
 ### B. Netlify
 1. Importer le dépôt → Netlify lit `netlify.toml` (build `npm run build`, plugin Next.js, Node 20).
-2. Site settings → Environment → ajouter `NEXT_PUBLIC_SITE_URL = https://www.ugpatn.cd`.
+2. Site settings → Environment → ajouter `NEXT_PUBLIC_SITE_URL = https://www.ugptn.cd`.
 3. **Deploy**. Ajouter le domaine, suivre les instructions DNS.
    *(Le plugin `@netlify/plugin-nextjs` est installé automatiquement.)*
 

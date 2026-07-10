@@ -208,7 +208,7 @@ export const contact: Contact = {
   adresse: "15, Avenue Pumbu — Immeuble H, Bâtiment B, 4ᵉ étage",
   quartier: "Gombe, Kinshasa — République Démocratique du Congo",
   tel: "+243 810 000 355",
-  email: "info@ugpatn.cd",
+  email: "info@ugptn.cd",
   tutelles: ["Ministère des Postes et Télécommunications", "Ministère de l'Économie Numérique"],
   numeroVert: "XXX",
 };
