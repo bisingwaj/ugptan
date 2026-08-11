@@ -1,6 +1,6 @@
 "use server";
 
-import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "@/generated/prisma/client";
 import { neonConfig } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
 import ws from 'ws';
