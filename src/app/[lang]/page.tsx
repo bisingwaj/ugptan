@@ -22,7 +22,8 @@ import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
-export default function Home({ params }: { params: { lang: string } }) {
+export default async function Home(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
   const upcoming = events.filter((e) => e.statut === "avenir").slice(0, 3);

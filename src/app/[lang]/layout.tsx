@@ -27,7 +27,8 @@ export const viewport: Viewport = {
   themeColor: "#161616",
 };
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
   const title = `UGPTN — ${meta.projetLong}`;
@@ -46,7 +47,13 @@ export function generateMetadata({ params }: { params: { lang: string } }): Meta
   };
 }
 
-export default function LangLayout({ children, params }: { children: React.ReactNode; params: { lang: string } }) {
+export default async function LangLayout(props: { children: React.ReactNode; params: Promise<{ lang: string }> }) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const lang = asLang(params.lang);
   return (
     <html lang={lang}>

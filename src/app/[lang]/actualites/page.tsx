@@ -9,11 +9,13 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
   return { title: dict(asLang(params.lang)).nav.actualites };
 }
 
-export default function ActualitesPage({ params }: { params: { lang: string } }) {
+export default async function ActualitesPage(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
   return (

@@ -4,11 +4,13 @@ import { dict } from "@/content/i18n";
 import { TransparenceClient } from "@/components/docs/TransparenceClient";
 import { PageHero } from "@/components/ui/PageHero";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
   return { title: dict(asLang(params.lang)).foot.transparence };
 }
 
-export default function TransparencePage({ params }: { params: { lang: string } }) {
+export default async function TransparencePage(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
   return (

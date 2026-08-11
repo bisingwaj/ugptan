@@ -14,11 +14,13 @@ import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { Histoires } from "@/components/home/Histoires";
 import { ProjVideos } from "@/components/resultats/ProjVideos";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
   return { title: dict(asLang(params.lang)).nav.resultats };
 }
 
-export default function ResultatsPage({ params }: { params: { lang: string } }) {
+export default async function ResultatsPage(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
   const r = t.resultats;

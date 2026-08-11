@@ -8,7 +8,8 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const en = asLang(params.lang) === "en";
   return { title: en ? "Media plan" : "Plan médias", robots: { index: false, follow: false } };
 }
@@ -17,7 +18,8 @@ const ratioBox: Record<Ratio, { w: number; h: number }> = {
   "16:9": { w: 16, h: 9 }, "9:16": { w: 9, h: 16 }, "1:1": { w: 1, h: 1 },
 };
 
-export default function MediasPage({ params }: { params: { lang: string } }) {
+export default async function MediasPage(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const lang = asLang(params.lang);
   const en = lang === "en";
 
