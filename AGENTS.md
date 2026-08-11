@@ -9,3 +9,4 @@
 - Répondre en français
 - Garantir un responsive parfait sur mobile, tablette et desktop
 - Optimiser systématiquement le SEO de chaque page (métadonnées, structure sémantique, titres et descriptions, etc...)
+- Éviter l’utilisation excessive de tirets longs (—) et de formulations typiques générées par les IA dans les textes du site
