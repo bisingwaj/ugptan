@@ -4,7 +4,7 @@ const locales = ["fr", "en"];
 const defaultLocale = "fr";
 
 /** Prefix every public route with a locale; redirect "/" → "/fr". */
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const hasLocale = locales.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
   if (hasLocale) return;

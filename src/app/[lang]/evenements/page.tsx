@@ -5,11 +5,13 @@ import { events } from "@/content/carbon";
 import { EventsGrid } from "@/components/events/EventsGrid";
 import { PageHero } from "@/components/ui/PageHero";
 
-export function generateMetadata({ params }: { params: { lang: string } }): Metadata {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
   return { title: dict(asLang(params.lang)).nav.evenements };
 }
 
-export default function EvenementsPage({ params }: { params: { lang: string } }) {
+export default async function EvenementsPage(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
   return (
