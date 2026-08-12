@@ -6,6 +6,7 @@ import { dict } from "@/content/i18n";
 import { marchesMethodes, candidature } from "@/content/marches";
 import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
+import { Icon, type IconName } from "@/components/ui/Icon";
 import { MarchesClient } from "@/components/marches/MarchesClient";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
@@ -15,6 +16,9 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const params = await props.params;
   return { title: dict(asLang(params.lang)).nav.marches };
 }
+
+/** Une icône par étape du parcours soumissionnaire (ordre de `candidature`). */
+const CANDIDATURE_ICONS: IconName[] = ["compte", "dossier", "depot", "attribution"];
 
 export default async function MarchesPage(props: { params: Promise<{ lang: string }> }) {
   const params = await props.params;
@@ -48,10 +52,13 @@ export default async function MarchesPage(props: { params: Promise<{ lang: strin
           </Reveal>
 
           <RevealGroup className="grid-4" style={{ marginTop: 1 }} gap={0.045}>
-            {candidature.map((c) => (
-              <RevealItem key={c.n} className="cell" style={{ padding: "26px 22px", minHeight: 180, display: "flex", flexDirection: "column" }}>
-                <div className="mono" style={{ fontWeight: 600, fontSize: 26, color: "var(--ac)" }}>{c.n}</div>
-                <h4 style={{ margin: "14px 0 0", fontSize: 16, fontWeight: 600, lineHeight: 1.3 }}>{pick(c.titre, lang)}</h4>
+            {candidature.map((c, i) => (
+              <RevealItem key={c.n} className="cell step-card" style={{ padding: "26px 22px", minHeight: 192, display: "flex", flexDirection: "column" }}>
+                <div className="step-card__head">
+                  <span className="step-card__icon"><Icon name={CANDIDATURE_ICONS[i]} size={26} /></span>
+                  <span className="mono step-card__n">{c.n}</span>
+                </div>
+                <h4 style={{ margin: "16px 0 0", fontSize: 16, fontWeight: 600, lineHeight: 1.3 }}>{pick(c.titre, lang)}</h4>
                 <p style={{ margin: "9px 0 0", fontSize: 12.5, lineHeight: 1.5, color: "var(--c-60)" }}>{pick(c.desc, lang)}</p>
               </RevealItem>
             ))}

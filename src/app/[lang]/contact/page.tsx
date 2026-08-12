@@ -3,6 +3,7 @@ import { asLang } from "@/lib/params";
 import { dict } from "@/content/i18n";
 import { contact } from "@/content/carbon";
 import { Kicker } from "@/components/ui/Kicker";
+import { Icon, type IconName } from "@/components/ui/Icon";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
@@ -12,6 +13,9 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const params = await props.params;
   return { title: dict(asLang(params.lang)).contact.titre };
 }
+
+/** Une icône par mode de saisine (ordre des modes du MGP). */
+const MODE_ICONS: IconName[] = ["formulaire", "sms", "email", "pointfocal"];
 
 export default async function ContactPage(props: { params: Promise<{ lang: string }> }) {
   const params = await props.params;
@@ -64,9 +68,12 @@ export default async function ContactPage(props: { params: Promise<{ lang: strin
             <p style={{ margin: "0 0 40px", fontSize: 15, color: "var(--c-70)" }}>{c.slaText}</p>
           </Reveal>
           <RevealGroup className="grid-4" gap={0.045}>
-            {c.mgpModes.map((m) => (
-              <RevealItem key={m.n} className="cell" style={{ padding: "26px 22px", minHeight: 180, display: "flex", flexDirection: "column" }}>
-                <div className="mono" style={{ fontWeight: 600, fontSize: 24, color: "var(--ac)" }}>{m.n}</div>
+            {c.mgpModes.map((m, i) => (
+              <RevealItem key={m.n} className="cell step-card" style={{ padding: "26px 22px", minHeight: 190, display: "flex", flexDirection: "column" }}>
+                <div className="step-card__head">
+                  <span className="step-card__icon"><Icon name={MODE_ICONS[i]} size={26} /></span>
+                  <span className="mono step-card__n">{m.n}</span>
+                </div>
                 <h3 style={{ margin: "auto 0 0", fontSize: 17, fontWeight: 600 }}>{m.t}</h3>
                 <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--c-70)", lineHeight: 1.5 }}>{m.d}</p>
               </RevealItem>
