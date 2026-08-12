@@ -3,7 +3,7 @@
    Montants, dates, indicateurs et structures IMMUABLES (conformité MEP).
    ========================================================================== */
 import type {
-  Meta, Chiffre, Odp, Intermediaire, Composante, GouvBody, Mandat, Principe,
+  Meta, Chiffre, Repere, Odp, Intermediaire, Composante, GouvBody, Mandat, Principe,
   Pole, Membre, Jalon, Province, Langue, Profil, CompColorMap,
 } from "./types";
 import type { Bilingual } from "@/lib/pick";
@@ -29,24 +29,34 @@ export const chiffres: Chiffre[] = [
   { value: 510, unit: "M USD", label: { fr: "Enveloppe totale", en: "Total envelope" }, sub: { fr: "Investissement structurant", en: "Structuring investment" } },
   { value: 400, unit: "M USD", pct: "79 %", label: { fr: "Financement IDA", en: "IDA financing" }, sub: { fr: "Banque mondiale — chef de file", en: "World Bank — lead" } },
   { value: 110, unit: "M USD", pct: "21 %", label: { fr: "Financement AFD", en: "AFD financing" }, sub: { fr: "soit 100 M EUR", en: "i.e. EUR 100M" } },
-  { value: 165, unit: "M USD", label: { fr: "Capitaux privés (cible)", en: "Private capital (target)" }, sub: { fr: "Partenariats public-privé", en: "Public-private partnerships" } },
+  { value: 165, unit: "M USD", label: { fr: "Capitaux privés (cible)", en: "Private capital (target)" }, sub: { fr: "Partenariats public-privé — mobilisation visée", en: "Public-private partnerships — mobilisation sought" } },
+];
+
+/* Repères mis en avant sur les pages publiques : la portée et le calendrier du
+   projet, plutôt que son enveloppe. Les montants restent disponibles dans
+   `chiffres` pour les usages qui l'exigent (documents, reporting). */
+export const reperes: Repere[] = [
+  { v: "26", label: { fr: "Provinces couvertes", en: "Provinces covered" }, sub: { fr: "déploiement priorisé sur 10 d'entre elles", en: "rollout prioritised across 10 of them" } },
+  { v: "05", label: { fr: "Composantes", en: "Components" }, sub: { fr: "un seul programme national", en: "a single national programme" } },
+  { v: "2029", label: { fr: "Horizon de la transformation", en: "Horizon of the transformation" }, sub: { fr: "achèvement technique visé", en: "targeted technical completion" } },
+  { v: "IDA · AFD", label: { fr: "Cofinancement", en: "Co-financing" }, sub: { fr: "Banque mondiale & Agence Française de Développement", en: "World Bank & French Development Agency" } },
 ];
 
 export const odp: Odp[] = [
-  { code: "ODP-1", value: 30, unit: "millions", baseline: "0", femmes: "15 M femmes", label: { fr: "Personnes utilisant l'internet haut débit", en: "People using broadband internet" } },
+  { code: "ODP-1", value: 30, unit: "millions", baseline: "0", femmes: "dont environ la moitié de femmes", label: { fr: "Personnes utilisant l'internet haut débit", en: "People using broadband internet" } },
   { code: "ODP-2", value: 20, unit: "kbit/s", baseline: "6,56 kbit/s", femmes: null, label: { fr: "Bande passante internationale par habitant", en: "International bandwidth per capita" } },
-  { code: "ODP-3", value: 1, unit: "million", baseline: "0", femmes: "500 000 femmes", label: { fr: "Personnes utilisant des services numériques", en: "People using digital services" } },
-  { code: "ODP-4", value: 3000, unit: "", baseline: "0", femmes: "1 000 femmes", label: { fr: "Diplômés de formations numériques avancées", en: "Graduates of advanced digital training" } },
+  { code: "ODP-3", value: 1, unit: "million", baseline: "0", femmes: "dont environ la moitié de femmes", label: { fr: "Personnes utilisant des services numériques", en: "People using digital services" } },
+  { code: "ODP-4", value: 3000, unit: "", baseline: "0", femmes: "dont environ un tiers de femmes", label: { fr: "Diplômés de formations numériques avancées", en: "Graduates of advanced digital training" } },
 ];
 
 export const intermediaires: Intermediaire[] = [
-  { value: "10 000", unit: "km", text: { fr: "de fibre optique additionnelle déployés", en: "of additional fibre optic deployed" } },
-  { value: "650", unit: "", text: { fr: "nouvelles communautés couvertes en mobile haut débit", en: "new communities covered by mobile broadband" } },
-  { value: "1 000", unit: "", text: { fr: "institutions publiques connectées", en: "public institutions connected" } },
-  { value: "100", unit: "", text: { fr: "startups soutenues (dont 30 dirigées par des femmes)", en: "startups supported (30 women-led)" } },
-  { value: "10", unit: "", text: { fr: "centres d'innovation établis", en: "innovation centres established" } },
-  { value: "6 000", unit: "", text: { fr: "personnes inscrites en formation", en: "people enrolled in training" } },
-  { value: "100 %", unit: "", text: { fr: "des griefs MGP traités en 30 jours ou moins", en: "of grievances handled in 30 days or less" } },
+  { value: "10 000", unit: "km", text: { fr: "de fibre optique additionnelle visés à l'horizon du projet", en: "of additional fibre optic targeted over the project horizon" } },
+  { value: "650", unit: "", text: { fr: "nouvelles communautés à couvrir en mobile haut débit", en: "new communities to be covered by mobile broadband" } },
+  { value: "1 000", unit: "", text: { fr: "institutions publiques à raccorder", en: "public institutions to be connected" } },
+  { value: "100", unit: "", text: { fr: "startups à soutenir, dont environ un tiers dirigées par des femmes", en: "startups to support, around a third of them women-led" } },
+  { value: "10", unit: "", text: { fr: "centres d'innovation à établir", en: "innovation centres to be established" } },
+  { value: "6 000", unit: "", text: { fr: "personnes à inscrire en formation", en: "people to be enrolled in training" } },
+  { value: "30", unit: "jours", text: { fr: "délai visé pour le traitement d'un grief MGP", en: "target time frame for handling a grievance" } },
 ];
 
 export const composantes: Composante[] = [
@@ -103,16 +113,16 @@ export const gouvernance: GouvBody[] = [
 ];
 
 export const mandat: Mandat[] = [
-  { n: "01", titre: { fr: "Coordination", en: "Coordination" }, desc: { fr: "Garantir la cohérence de l'ensemble : articuler les composantes et animer la relation avec les ministères bénéficiaires, les partenaires et les bailleurs.", en: "Ensure the coherence of the whole: articulate the components and steer the relationship with beneficiary ministries, partners and donors." } },
-  { n: "02", titre: { fr: "Exécution", en: "Execution" }, desc: { fr: "Conduire la mise en œuvre : planification opérationnelle (PTBA), passation des marchés, contractualisation et suivi de l'avancement.", en: "Drive implementation: operational planning (AWPB), procurement, contracting and progress monitoring." } },
-  { n: "03", titre: { fr: "Supervision technique", en: "Technical supervision" }, desc: { fr: "Garantir la qualité des livrables et le respect des normes — identité numérique, cybersécurité — jusqu'à l'atteinte des résultats.", en: "Guarantee the quality of deliverables and compliance with standards — digital identity, cybersecurity — through to the achievement of results." } },
-  { n: "04", titre: { fr: "Supervision fiduciaire", en: "Fiduciary supervision" }, desc: { fr: "Sécuriser les flux financiers : compte désigné, décaissements, reporting financier et préparation des audits.", en: "Safeguard financial flows: designated account, disbursements, financial reporting and audit readiness." } },
+  { n: "01", titre: { fr: "Coordination", en: "Coordination" }, desc: { fr: "Faire tenir ensemble des chantiers qui dépendent les uns des autres : arbitrer les séquences entre composantes, tenir le calendrier commun avec les ministères bénéficiaires, et porter une seule version des faits devant les partenaires et les bailleurs.", en: "Holding together workstreams that depend on one another: arbitrating sequences between components, keeping a common schedule with beneficiary ministries, and presenting one single account of the facts to partners and donors." } },
+  { n: "02", titre: { fr: "Exécution", en: "Execution" }, desc: { fr: "Transformer un plan en contrats exécutables : programmation annuelle (PTBA), préparation des dossiers d'appel d'offres, mise en concurrence, attribution après non-objection, puis suivi de l'exécution jusqu'à la réception.", en: "Turning a plan into executable contracts: annual programming (AWPB), preparation of bidding documents, competition, award after no-objection, then monitoring delivery through to acceptance." } },
+  { n: "03", titre: { fr: "Supervision technique", en: "Technical supervision" }, desc: { fr: "Vérifier que ce qui est livré correspond à ce qui a été spécifié, et que les normes structurantes — interopérabilité, identité, cybersécurité — sont respectées avant réception, pas constatées après.", en: "Checking that what is delivered matches what was specified, and that the structuring standards — interoperability, identity, cybersecurity — are met before acceptance, not observed afterwards." } },
+  { n: "04", titre: { fr: "Supervision fiduciaire", en: "Fiduciary supervision" }, desc: { fr: "Tenir la chaîne de la dépense de bout en bout — compte désigné, justification des décaissements, comptabilité, rapports périodiques — de sorte qu'un auditeur externe puisse reconstituer chaque opération sans reconstitution a posteriori.", en: "Holding the expenditure chain end to end — designated account, justification of disbursements, accounting, periodic reports — so that an external auditor can reconstruct every transaction without after-the-fact reconstruction." } },
 ];
 
 export const principes: Principe[] = [
-  { titre: { fr: "Le MEP reste la source de vérité.", en: "The PIM remains the source of truth." }, desc: { fr: "L'Unité applique le Manuel d'Exécution du Projet : elle le met en œuvre, elle ne le réécrit pas.", en: "The Unit applies the Project Implementation Manual: it carries it out, it does not rewrite it." } },
-  { titre: { fr: "Les acteurs restent décisionnaires.", en: "Stakeholders remain the decision-makers." }, desc: { fr: "Les outils proposent, exécutent et tracent. La décision appartient, toujours, aux responsables habilités.", en: "Tools propose, execute and trace. The decision always rests with authorised officials." } },
-  { titre: { fr: "Les bailleurs gardent la main.", en: "Donors keep control." }, desc: { fr: "Les prérogatives de la Banque mondiale et de l'AFD — avis de non-objection, supervision, audit — sont intégralement préservées.", en: "The prerogatives of the World Bank and AFD — no-objection, supervision, audit — are fully preserved." } },
+  { titre: { fr: "Le MEP reste la source de vérité.", en: "The PIM remains the source of truth." }, desc: { fr: "Un manuel validé par les trois parties fixe les règles avant les difficultés. L'Unité l'applique et, si une règle doit évoluer, elle le fait par avenant tracé — jamais par interprétation en cours d'exécution.", en: "A manual validated by the three parties sets the rules before difficulties arise. The Unit applies it and, where a rule must change, does so through a traceable amendment — never by interpretation mid-delivery." } },
+  { titre: { fr: "Les acteurs restent décisionnaires.", en: "Stakeholders remain the decision-makers." }, desc: { fr: "Un système d'information prépare, calcule et journalise ; il ne signe pas. L'attribution d'un marché, la validation d'un livrable ou la clôture d'une plainte relèvent de personnes identifiées et responsables de leur décision.", en: "An information system prepares, computes and logs; it does not sign. Awarding a contract, accepting a deliverable or closing a grievance rests with identified people, accountable for their decision." } },
+  { titre: { fr: "Les bailleurs gardent la main.", en: "Donors keep control." }, desc: { fr: "L'avis de non-objection n'est pas une formalité : c'est un point de passage qui conditionne l'engagement de la dépense. La supervision conjointe et l'audit externe s'exercent en cours de projet, pas seulement à la clôture.", en: "A no-objection is not a formality: it is a checkpoint that conditions the commitment of expenditure. Joint supervision and external audit are exercised during the project, not only at closure." } },
 ];
 
 export const poles: Pole[] = [
@@ -206,8 +216,8 @@ export const question: Bilingual = {
 };
 
 export const engagement: Bilingual = {
-  fr: "Faire du numérique un droit, et non un privilège : 510 millions de dollars pour que chaque Congolaise et chaque Congolais puisse accéder, apprendre et entreprendre.",
-  en: "Making digital a right, not a privilege: 510 million dollars so that every Congolese woman and man can connect, learn and build.",
+  fr: "Faire du numérique un droit, et non un privilège : un investissement structurant pour qu'un nombre croissant de Congolaises et de Congolais puisse accéder, apprendre et entreprendre.",
+  en: "Making digital a right, not a privilege: a structuring investment so that a growing number of Congolese women and men can connect, learn and build.",
 };
 
 /* Component colour code → accent (C1 blue, C2 teal, C3 violet, C4 magenta, C5 grey). */

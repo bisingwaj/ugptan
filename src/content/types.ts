@@ -22,6 +22,10 @@ export type Meta = {
 
 export type Chiffre = { value: number; unit: string; pct?: string; label: Bilingual; sub: Bilingual };
 
+/** Repères institutionnels du projet (portée, calendrier, partenaires) —
+ *  mis en avant à la place des montants sur les pages publiques. */
+export type Repere = { v: string; label: Bilingual; sub: Bilingual };
+
 export type Odp = { code: string; value: number; unit: string; baseline: string; femmes: string | null; label: Bilingual };
 
 export type Intermediaire = { value: string; unit: string; text: Bilingual };
@@ -49,6 +53,8 @@ export type Profil = { label: Bilingual; page: Bilingual };
 export type Actualite = {
   date: string; dateISO: string; cat: Bilingual; img: ImgKey; lieu: string;
   title: Bilingual; corps: { fr: string[]; en: string[] }; videoYt?: string;
+  /** Composante(s) rattachée(s) — alimente « Actualités » des pages composante. */
+  comps?: string[];
 };
 
 export type Addendum = { n: string; date: string; note: Bilingual };
@@ -100,7 +106,7 @@ export type EngagementItem = { t: Bilingual; d: Bilingual; color: string };
 export type GlossaireItem = { s: string; d: Bilingual };
 export type FaqItem = { q: Bilingual; r: Bilingual };
 export type Partner = { name: string; kind: Bilingual; logo?: string };
-export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: string };
+export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: string; comp?: string };
 export type UniteStat = { v: string; u?: string; l: Bilingual };
 export type GalleryItem = { nom: string; img: ImgKey };
 export type HumainPoint = { big: string; u: Bilingual; t: Bilingual };
@@ -114,3 +120,103 @@ export type Contact = {
 
 /* Component colour code → accent (C1..C5). */
 export type CompColorMap = Record<string, string>;
+
+/* ---- Pages dédiées par composante (cf. docs/PAGES-COMPOSANTES.md) ---------
+   Le contenu ÉDITORIAL des composantes. Les données canoniques du MEP
+   (montants, IDA/AFD, sous-composantes) restent lues depuis `composantes`. */
+
+/** Un axe de la problématique : constat, mécanisme, coût de l'inaction. */
+export type CompAxe = { t: Bilingual; d: Bilingual };
+
+/** L'exposé du problème auquel la composante répond, avant la description de
+ *  ce qu'elle fait : constat structurel → mécanisme → coût du statu quo →
+ *  légitimité de l'intervention publique → interconnexions. */
+export type CompProblematique = {
+  titre: Bilingual;
+  lead: Bilingual;
+  axes: CompAxe[];
+  appui: { fr: string[]; en: string[] };
+  /** Interconnexions assumées ; `code` pointe vers une autre composante. */
+  liens: { code?: string; t: Bilingual }[];
+};
+
+/** Un projet phare d'une composante — corps rédigé + puces + chute. */
+export type CompProjet = {
+  n: string;                 // "01"
+  slug: string;              // ancre : "cloud-souverain"
+  sigle?: string;            // "GOVNET", "GOVSOC"…
+  titre: Bilingual;
+  statut?: Bilingual;        // "Infrastructure stratégique"
+  corps: { fr: string[]; en: string[] };
+  points?: Bilingual[];
+  chute?: Bilingual;
+  img?: ImgKey;
+};
+
+/** Responsable de la composante. Sans `nom`, une pastille d'initiales s'affiche. */
+export type CompResponsable = {
+  nom?: string;
+  role: Bilingual;
+  img?: string;
+  bio?: Bilingual;
+  verbatim?: Bilingual;
+  email?: string;
+};
+
+/** Une brique de l'écosystème de la composante (section sombre). */
+export type CompCouche = { t: Bilingual; d: Bilingual };
+
+/** Emplacement vidéo de présentation de la composante. */
+export type CompVideoSlot = {
+  yt?: string;               // id YouTube
+  src?: string;              // ou fichier local (/videos/…)
+  titre: Bilingual;
+  duree?: string;
+  poster: ImgKey;
+};
+
+/* ---------------------------------------------------------------------------
+   Pages légales (confidentialité, conditions d'utilisation) + avis de première
+   visite. Le texte est du contenu éditorial : il vit dans `legal.ts`, jamais
+   dans les composants.
+--------------------------------------------------------------------------- */
+
+/** Un bloc de texte à l'intérieur d'un article. */
+export type LegalBloc =
+  /** Paragraphe courant. */
+  | { k: "p"; texte: Bilingual }
+  /** Énumération simple (obligations, droits, interdits). */
+  | { k: "puces"; items: Bilingual[] }
+  /** Énumération définie : un intitulé, puis ce qu'il recouvre. */
+  | { k: "liste"; items: { t: Bilingual; d: Bilingual }[] }
+  /** Encadré mis en exergue — précision qui engage l'Unité. */
+  | { k: "note"; texte: Bilingual };
+
+/** Un article numéroté du document, cible d'une ancre du sommaire. */
+export type LegalSection = { id: string; titre: Bilingual; blocs: LegalBloc[] };
+
+export type LegalDoc = {
+  slug: "confidentialite" | "conditions";
+  titre: Bilingual;
+  /** Chapô du héros — dit en trois phrases ce que le document règle. */
+  chapeau: Bilingual;
+  maj: Bilingual;
+  sections: LegalSection[];
+};
+
+export type ComposanteDetail = {
+  code: string;              // "C2"
+  slug: string;              // "c2"
+  titreLong: Bilingual;      // H1 éditorial
+  soustitre: Bilingual;      // chapô du héros
+  problematique?: CompProblematique;
+  chapeau: { fr: string[]; en: string[] };
+  objectifs: Bilingual[];
+  projets: CompProjet[];
+  ecosysteme?: { titre: Bilingual; lead: Bilingual; couches: CompCouche[] };
+  finalite?: { titre: Bilingual; lead: Bilingual; points: Bilingual[] };
+  responsable?: CompResponsable;
+  video?: CompVideoSlot;
+  odp?: string[];            // indicateurs ODP rattachés
+  img: ImgKey;               // visuel du héros
+};

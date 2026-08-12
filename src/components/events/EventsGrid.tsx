@@ -76,7 +76,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
 
       {reg && (
         <div className="scrim scrim--center" onClick={close}>
-          <div className="modal" style={{ width: "100%", maxWidth: 480, background: "#fff", border: "1px solid var(--c-80)" }} onClick={(ev) => ev.stopPropagation()}>
+          <div className="modal" data-lenis-prevent style={{ width: "100%", maxWidth: 480, background: "#fff", border: "1px solid var(--c-80)" }} onClick={(ev) => ev.stopPropagation()}>
             <div style={{ background: "var(--c-black)", color: "#fff", padding: "24px 26px", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", inset: 0, background: "radial-gradient(120% 120% at 90% 0%, rgba(15,98,254,.34), transparent 55%)" }} />
               <div style={{ position: "relative", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14 }}>

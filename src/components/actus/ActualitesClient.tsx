@@ -37,7 +37,7 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
         ))}
       </div>
 
-      <RevealGroup style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(358px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }} gap={0.045}>
+      <RevealGroup className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(358px,1fr))" }} gap={0.045}>
         {view.map(({ a, i }) => (
           <RevealItem key={i}>
             <button onClick={() => setSel(i)} style={{ textAlign: "left", background: "#fff", display: "flex", flexDirection: "column", padding: 0, width: "100%" }}>
@@ -57,7 +57,7 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
 
       {article && (
         <div className="scrim scrim--right" onClick={() => setSel(null)}>
-          <div className="drawer" style={{ width: "min(820px,100%)" }} onClick={(e) => e.stopPropagation()}>
+          <div className="drawer" data-lenis-prevent style={{ width: "min(820px,100%)" }} onClick={(e) => e.stopPropagation()}>
             <div className="duo" style={{ aspectRatio: "16/7" }}>
               <Photo src={media.img[article.img]} alt={pick(article.title, lang)} />
               <button onClick={() => setSel(null)} aria-label="Fermer" style={{ position: "absolute", top: 18, right: 18, width: 42, height: 42, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.5)" }}>✕</button>

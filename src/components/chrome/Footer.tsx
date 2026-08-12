@@ -3,7 +3,7 @@ import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { meta } from "@/content/data";
 import { contact } from "@/content/carbon";
-import { NAV, NAV_FOOTER, route } from "@/lib/routes";
+import { NAV, NAV_FOOTER, NAV_LEGAL, route } from "@/lib/routes";
 
 const colLabel: React.CSSProperties = {
   fontFamily: "var(--font-mono)", fontSize: 11, textTransform: "uppercase",
@@ -25,6 +25,7 @@ export function Footer({ lang }: { lang: Lang }) {
           </div>
           <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "var(--c-50)", maxWidth: 300 }}>{meta.uniteLong}</p>
           <p className="mono" style={{ margin: "16px 0 0", fontSize: 11.5, color: "var(--c-60)", lineHeight: 1.7 }}>{meta.tutelleLong}<br />{meta.bailleurs}</p>
+          <p className="mono" style={{ margin: "12px 0 0", fontSize: 11, color: "var(--c-50)", lineHeight: 1.6, maxWidth: 320 }}>{t.foot.source}</p>
           <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 7, fontSize: 13, color: "var(--c-30)", lineHeight: 1.5 }}>
             <span>{contact.adresse}</span>
             <span style={{ color: "var(--c-50)" }}>{contact.quartier}</span>
@@ -60,7 +61,13 @@ export function Footer({ lang }: { lang: Lang }) {
       <div style={{ borderTop: "1px solid var(--c-80)" }}>
         <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "18px var(--pad-x)", display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--c-60)" }}>
           <span>© {t.words.year} UGPTN · {meta.code} · {meta.ville}</span>
-          <span style={{ maxWidth: 680, textAlign: "right", lineHeight: 1.5 }}>{t.foot.legal}</span>
+          <nav className="footer-legal" aria-label={t.foot.legalLabel}>
+            {NAV_LEGAL.map((item) => (
+              <Link key={item.key} href={route(lang, item.slug)} className="footer-legal__link">
+                {t.nav[item.key]}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

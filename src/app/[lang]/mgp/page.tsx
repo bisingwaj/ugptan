@@ -4,6 +4,7 @@ import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { mgpFaq } from "@/content/mgp";
 import { Kicker } from "@/components/ui/Kicker";
+import { Icon, type IconName } from "@/components/ui/Icon";
 import { Accordion } from "@/components/ui/Accordion";
 import { MgpForm } from "@/components/mgp/MgpForm";
 import { MgpTracker } from "@/components/mgp/MgpTracker";
@@ -15,6 +16,9 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const params = await props.params;
   return { title: dict(asLang(params.lang)).cta.mgp };
 }
+
+/** Une icône par mode de saisine (ordre des modes du MGP). */
+const MODE_ICONS: IconName[] = ["formulaire", "sms", "email", "pointfocal"];
 
 export default async function MgpPage(props: { params: Promise<{ lang: string }> }) {
   const params = await props.params;
@@ -35,10 +39,13 @@ export default async function MgpPage(props: { params: Promise<{ lang: string }>
         <div className="section__inner">
           {/* Modes */}
           <RevealGroup className="grid-4" style={{ marginBottom: "clamp(40px,5vw,60px)" }} gap={0.045}>
-            {t.modes.map((m) => (
-              <RevealItem key={m.n} className="cell" style={{ padding: 22, minHeight: 170, display: "flex", flexDirection: "column" }}>
-                <div className="mono" style={{ fontWeight: 600, fontSize: 22, color: "var(--ac)" }}>{m.n}</div>
-                <div style={{ fontSize: 15, fontWeight: 600, marginTop: 13 }}>{m.t}</div>
+            {t.modes.map((m, i) => (
+              <RevealItem key={m.n} className="cell step-card" style={{ padding: 22, minHeight: 182, display: "flex", flexDirection: "column" }}>
+                <div className="step-card__head">
+                  <span className="step-card__icon"><Icon name={MODE_ICONS[i]} size={24} /></span>
+                  <span className="mono step-card__n">{m.n}</span>
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 600, marginTop: 15 }}>{m.t}</div>
                 <p style={{ margin: "6px 0 0", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.5 }}>{m.d}</p>
               </RevealItem>
             ))}
