@@ -118,16 +118,28 @@
   }
 
   /* --- Coquille ----------------------------------------------------------- */
-  .adm { @apply grid grid-cols-[264px_1fr] min-h-[100svh]; }
+  /* Deux largeurs, et deux seulement : dépliée, puis le rail d'icônes une fois
+     `data-collapsed` posé par AdminChrome. La transition porte sur la colonne
+     de la grille, ce qui anime le repli sans toucher au contenu. */
+  .adm {
+    @apply grid min-h-[100svh];
+    grid-template-columns: 264px 1fr;
+    transition: grid-template-columns 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .adm[data-collapsed] { grid-template-columns: 62px 1fr; }
+
   .adm__side {
-    @apply sticky top-0 h-[100svh] overflow-auto bg-c-black text-white flex flex-col;
+    /* `overflow-hidden` et non `auto` : le défilement appartient à `.adm__nav`,
+       pour que la marque et le pied de barre restent en place. */
+    @apply sticky top-0 h-[100svh] overflow-hidden bg-c-black text-white flex flex-col;
   }
   .adm__brand {
     @apply flex items-center gap-[11px] px-5 py-[22px] border-b border-c-90;
   }
   .adm__mark { @apply w-[26px] h-[26px] flex-none bg-ac relative; }
   .adm__mark::after { content: ""; position: absolute; right: 4px; bottom: 4px; width: 9px; height: 9px; background: #fff; }
-  .adm__nav { @apply py-2.5; }
+  /* Seul le bloc des modules défile : la marque et le pied restent visibles. */
+  .adm__nav { @apply flex-1 overflow-y-auto overflow-x-hidden py-2.5; }
   /* Sections : à quatorze modules, une liste plate se relit intégralement à
      chaque coup d'œil. Le groupe porte l'espacement, le libellé sert de repère. */
   .adm__nav-group { @apply py-1.5 border-b border-c-90; }
@@ -136,14 +148,56 @@
     @apply font-mono text-[10px] tracking-[0.12em] uppercase text-c-60 px-5 pt-2.5 pb-1.5;
   }
   .adm__nav-item {
-    @apply flex items-center justify-between gap-2.5 px-5 py-[11px] text-[14px] text-c-30 border-l-2 border-transparent;
+    @apply flex items-center gap-3 px-5 py-[11px] text-[14px] text-c-30 border-l-2 border-transparent;
     transition: background 0.16s, color 0.16s;
   }
+  /* L'icône se tient un ton en dessous du libellé : elle repère, elle n'appelle
+     pas. Elle rejoint la couleur du texte au survol et passe à l'accent une fois
+     le module actif. */
+  .adm__nav-ico {
+    @apply inline-flex flex-none items-center justify-center w-[18px] h-[18px] text-c-50;
+    transition: color 0.16s;
+  }
+  /* Le libellé prend la place restante et se tronque plutôt que de déborder :
+     c'est ce qui rend la barre étroite lisible. */
+  .adm__nav-text { @apply min-w-0 flex-1 truncate; }
   a.adm__nav-item:hover { @apply bg-c-90 text-white; }
+  a.adm__nav-item:hover .adm__nav-ico { @apply text-white; }
   .adm__nav-item.is-active { @apply bg-c-90 text-white border-l-ac; }
+  .adm__nav-item.is-active .adm__nav-ico { @apply text-ac-light; }
   .adm__nav-item.is-soon { @apply text-c-60 cursor-default; }
+  .adm__nav-item.is-soon .adm__nav-ico { @apply text-c-70; }
   .adm__soon {
-    @apply font-mono text-[10px] tracking-[0.06em] uppercase text-c-70 border border-c-80 px-1.5 py-0.5;
+    @apply flex-none font-mono text-[10px] tracking-[0.06em] uppercase text-c-70 border border-c-80 px-1.5 py-0.5;
+  }
+
+  /* Pied de la barre : la bascule de repli, à distance constante du bas. */
+  .adm__side-foot { @apply flex-none border-t border-c-90 p-2.5; }
+  .adm__collapse {
+    @apply flex w-full items-center gap-3 px-[10px] py-2.5 text-[13px] text-c-50 border border-transparent;
+    transition: background 0.16s, color 0.16s, border-color 0.16s;
+  }
+  .adm__collapse:hover { @apply bg-c-90 text-white border-c-80; }
+  .adm__collapse:hover .adm__nav-ico { @apply text-white; }
+
+  /* --- Barre repliée en rail d'icônes -------------------------------------
+     Cantonné au-dessus de 900px : en dessous, la barre est déjà un ruban
+     horizontal et le repli n'a plus d'objet. */
+  @media (min-width: 901px) {
+    /* Escamotage visuel, PAS `display:none` : le nom du module doit rester
+       lisible par un lecteur d'écran quand seule l'icône est affichée. */
+    .adm[data-collapsed] .adm__nav-text {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+    }
+    /* Le libellé de section est déjà porté par `aria-label` sur le groupe :
+       le retirer du flux ne coûte rien à l'accessibilité. */
+    .adm[data-collapsed] .adm__nav-label,
+    .adm[data-collapsed] .adm__soon { @apply hidden; }
+
+    .adm[data-collapsed] .adm__nav-item,
+    .adm[data-collapsed] .adm__collapse,
+    .adm[data-collapsed] .adm__brand { @apply justify-center gap-0 px-0; }
   }
   .adm__main { @apply min-w-0 flex flex-col; }
   .adm__top {
@@ -224,19 +278,24 @@
 
   /* --- Responsive --------------------------------------------------------- */
   @media (max-width: 900px) {
-    .adm { @apply grid-cols-[1fr]; }
+    /* Une seule colonne : ni largeur latérale, ni repli à animer. */
+    .adm, .adm[data-collapsed] { grid-template-columns: 1fr; }
     .adm__side { @apply static h-auto; }
     /* La barre latérale devient un ruban horizontal : les sections restent des
        groupes, mais leur libellé disparaît faute de hauteur. */
-    .adm__nav { @apply flex overflow-x-auto p-0; }
-    .adm__nav-group { @apply flex py-0 border-b-0 border-r border-c-90; }
+    .adm__nav { @apply flex flex-none overflow-x-auto overflow-y-hidden p-0; }
+    .adm__nav-group { @apply flex flex-none py-0 border-b-0 border-r border-c-90; }
     .adm__nav-group:last-child { @apply border-r-0; }
     .adm__nav-label { @apply hidden; }
     .adm__nav-item {
-      @apply flex-none whitespace-nowrap border-l-0 border-b-2 border-b-transparent px-4 py-[13px];
+      @apply flex-none gap-2 whitespace-nowrap border-l-0 border-b-2 border-b-transparent px-4 py-[13px];
     }
+    /* Le libellé cesse de se tronquer : le ruban défile, la place ne manque pas. */
+    .adm__nav-text { @apply flex-none overflow-visible; }
     .adm__nav-item.is-active { @apply border-l-transparent border-b-ac; }
     .adm__soon { @apply hidden; }
+    /* Rien à replier sur un ruban horizontal. */
+    .adm__side-foot { @apply hidden; }
   }
 
   @media (max-width: 760px) {
