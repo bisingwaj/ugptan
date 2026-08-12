@@ -15,6 +15,10 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Pastille de développement de Next masquée : elle se superpose au coin de
+  // l'écran et gêne la relecture des maquettes. Sans effet sur la production,
+  // où l'indicateur n'apparaît jamais.
+  devIndicators: false,
   // Laissés hors du bundle serveur, et non bundlés par Turbopack.
   // `src/lib/db.ts` fait `neonConfig.webSocketConstructor = ws` : si le bundler
   // duplique @neondatabase/serverless, l'adaptateur Prisma en obtient une autre

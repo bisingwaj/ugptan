@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ADMIN, ADMIN_NAV_SECTIONS } from "@/content/admin";
@@ -44,10 +45,13 @@ export function AdminSidebar({
   granted,
   collapsed,
   onToggle,
+  footer,
 }: {
   granted: Permission[];
   collapsed: boolean;
   onToggle: () => void;
+  /** Actions de pied de barre — la déconnexion, servie du serveur. */
+  footer?: ReactNode;
 }) {
   const pathname = usePathname();
   const allowed = new Set<string>(granted);
@@ -117,6 +121,7 @@ export function AdminSidebar({
       </nav>
 
       <div className="adm__side-foot">
+        {footer}
         <button
           type="button"
           onClick={onToggle}

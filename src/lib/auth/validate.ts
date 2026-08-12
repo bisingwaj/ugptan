@@ -6,12 +6,18 @@
  * sinon un compte créé « Admin@Gmail.com » resterait introuvable à la connexion.
  *
  * ⚠️ Aucun import : les formulaires de la console sont des composants clients et
- * lisent `PASSWORD_MIN_LENGTH` d'ici. Tirer `lib/auth/password.ts` amènerait
- * `node:crypto` dans le paquet navigateur.
+ * lisent `PASSWORD_MIN_LENGTH` d'ici. Tirer `lib/auth/server.ts` amènerait
+ * Better Auth et Prisma dans le paquet navigateur.
  */
 
-/** Longueur minimale imposée à la création comme à la modification. */
+/**
+ * Longueurs de mot de passe. Déclarées ici et lues par la configuration Better
+ * Auth (`emailAndPassword.minPasswordLength`), qui les fait respecter côté
+ * serveur : le formulaire et le moteur d'authentification annoncent donc la
+ * même règle, sans risque de divergence.
+ */
 export const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_MAX_LENGTH = 200;
 
 /** Casse et espaces retirés. La contrainte d'unicité porte sur cette forme. */
 export const normalizeEmail = (value: FormDataEntryValue | null | undefined): string =>
@@ -30,7 +36,9 @@ export function passwordIssue(password: string): string | null {
   if (password.length < PASSWORD_MIN_LENGTH) {
     return `Le mot de passe doit comporter au moins ${PASSWORD_MIN_LENGTH} caractères.`;
   }
-  if (password.length > 200) return "Le mot de passe est trop long (200 caractères maximum).";
+  if (password.length > PASSWORD_MAX_LENGTH) {
+    return `Le mot de passe est trop long (${PASSWORD_MAX_LENGTH} caractères maximum).`;
+  }
   return null;
 }
 

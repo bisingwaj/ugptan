@@ -75,7 +75,7 @@ const readText = (formData: FormData, field: string, max: number): string =>
  */
 async function assignableUserIds(): Promise<Set<string>> {
   const users = await db().user.findMany({
-    where: { isActive: true },
+    where: { banned: false },
     select: { id: true, role: true, permissions: true },
   });
   return new Set(

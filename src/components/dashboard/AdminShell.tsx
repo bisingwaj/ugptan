@@ -19,22 +19,26 @@ export async function AdminShell({ user, children }: { user: AdminUser; children
   const granted = grantedPermissions(user);
   const collapsed = parseSidebarCollapsed((await cookies()).get(SIDEBAR_COOKIE)?.value);
 
+  // La barre du haut porte l'identité ; la déconnexion vit au pied de la barre
+  // latérale, avec la navigation qu'elle referme.
   const topbar = (
-    <>
-      <span style={{ minWidth: 0 }}>
-        <span className="mono" style={{ display: "block", fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--c-50)" }}>
-          {ADMIN.shell.signedInAs} · {ROLE_LABEL[user.role]}
-        </span>
-        <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13.5 }}>
-          {user.name ?? user.email}
-        </span>
+    <span style={{ minWidth: 0 }}>
+      <span className="mono" style={{ display: "block", fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--c-50)" }}>
+        {ADMIN.shell.signedInAs} · {ROLE_LABEL[user.role]}
       </span>
-      <LogoutButton />
-    </>
+      <span style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13.5 }}>
+        {user.name ?? user.email}
+      </span>
+    </span>
   );
 
   return (
-    <AdminChrome granted={granted} initialCollapsed={collapsed} topbar={topbar}>
+    <AdminChrome
+      granted={granted}
+      initialCollapsed={collapsed}
+      topbar={topbar}
+      sidebarFooter={<LogoutButton />}
+    >
       {children}
     </AdminChrome>
   );

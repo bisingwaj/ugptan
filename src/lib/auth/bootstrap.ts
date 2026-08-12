@@ -3,21 +3,32 @@
  *
  * La console n'expose aucune inscription : sans un premier compte, personne ne
  * peut jamais entrer. Cette amorce crée ce compte à la volée, la première fois
- * que la page de connexion est servie sur une base encore vide. Elle rend
- * l'installation autonome — aucune commande à lancer après un déploiement.
+ * que la page de connexion est servie. Elle rend l'installation autonome —
+ * aucune commande à lancer après un déploiement.
  *
- * ⚠️ Elle ne s'exécute QUE si la table `User` est vide. Elle ne réactive rien,
- * ne réinitialise aucun mot de passe et ne recrée pas un compte supprimé.
- * Pour remettre à zéro l'accès administrateur, cf. `pnpm db:seed`.
+ * Le mot de passe est confié à `auth.api.createUser` (plugin admin de Better
+ * Auth), qui le hache et l'écrit dans `Account.password`. Aucun hachage n'est
+ * calculé ici, et le mot de passe en clair n'atteint jamais la base.
+ *
+ * Appelée sans en-têtes, `createUser` s'exécute hors session : c'est le mode
+ * serveur prévu par Better Auth, et la seule façon d'amorcer un système où la
+ * création de compte exige déjà d'être administrateur.
+ *
+ * IDEMPOTENCE, les trois cas possibles :
+ *   1. aucun compte à cette adresse → création complète ;
+ *   2. compte présent avec un moyen de connexion → on ne touche à rien ;
+ *   3. compte présent SANS moyen de connexion (cas d'une base antérieure à
+ *      Better Auth) → on lui en attache un, sinon le compte serait inaccessible.
  *
  * ⚠️ Production : définir ADMIN_EMAIL et ADMIN_PASSWORD. Les valeurs de repli
  * ci-dessous sont celles de la spécification de recette, publiques par nature.
  */
 import { db } from "@/lib/db";
-import { hashPassword } from "@/lib/auth/password";
+import { auth } from "@/lib/auth/server";
 
 export const DEFAULT_ADMIN_EMAIL = "admin@gmail.com";
 const DEFAULT_ADMIN_PASSWORD = "12345678";
+const DEFAULT_ADMIN_NAME = "Administrateur";
 
 export const initialAdminEmail = () =>
   (process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL).trim().toLowerCase();
@@ -26,7 +37,7 @@ const initialAdminPassword = () => process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_P
 
 /**
  * Mémo par instance : sans lui, chaque affichage de la page de connexion
- * paierait un `count()`. Positionné uniquement sur une exécution aboutie, pour
+ * paierait deux requêtes. Positionné uniquement sur une exécution aboutie, pour
  * qu'une base momentanément injoignable soit retentée.
  */
 let provisioned = false;
@@ -35,26 +46,46 @@ let provisioned = false;
 export async function ensureInitialAdmin(): Promise<void> {
   if (provisioned) return;
 
+  const email = initialAdminEmail();
+  const password = initialAdminPassword();
+
   try {
-    if ((await db().user.count()) > 0) {
+    const existing = await db().user.findUnique({
+      where: { email },
+      select: { id: true, accounts: { select: { id: true }, take: 1 } },
+    });
+
+    if (existing) {
+      // Cas 3 : le compte survit à une base antérieure, mais son ancien mot de
+      // passe n'est pas exploitable par Better Auth. On lui attache un moyen de
+      // connexion, avec le hachage de Better Auth, faute de quoi la console
+      // n'aurait plus aucune porte d'entrée.
+      if (existing.accounts.length === 0) {
+        const ctx = await auth().$context;
+        await ctx.internalAdapter.createAccount({
+          userId: existing.id,
+          providerId: "credential",
+          accountId: existing.id,
+          password: await ctx.password.hash(password),
+        });
+        console.warn(
+          `[admin] Moyen de connexion Better Auth attaché au compte existant ${email}. ` +
+            "Changez ce mot de passe depuis la console.",
+        );
+      }
+
       provisioned = true;
       return;
     }
 
-    const email = initialAdminEmail();
-    const password = initialAdminPassword();
-
-    // upsert plutôt que create : deux requêtes concurrentes sur une base vide
-    // entreraient toutes deux ici, et la seconde violerait l'unicité d'email.
-    await db().user.upsert({
-      where: { email },
-      update: {},
-      create: {
+    // Cas 1. `createUser` sans en-têtes : exécution serveur, hors session.
+    await auth().api.createUser({
+      body: {
         email,
-        name: "Administrateur",
+        password,
+        name: DEFAULT_ADMIN_NAME,
         role: "ADMIN",
-        isActive: true,
-        passwordHash: await hashPassword(password),
+        data: { permissions: [] },
       },
     });
 

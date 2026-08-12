@@ -1,15 +1,24 @@
 /**
  * Destinations hébergées hors de notre périmètre.
  *
- * L'espace des soumissionnaires est un back-office tiers : le bouton
- * « Connexion » du site public y renvoie, et la console de l'UGPTN reste, elle,
- * sans lien visible nulle part.
+ * L'espace des soumissionnaires est un back-office tiers, avec sa propre
+ * authentification : le bouton « Connexion » du site public s'y contente d'une
+ * redirection. Aucune adresse n'est écrite ici — seulement lue de
+ * l'environnement. La console de l'UGPTN reste, elle, sans lien visible nulle
+ * part sur le site public.
+ *
+ * Deux noms sont acceptés pour la même chose : `NEXT_PUBLIC_BIDDERS_PORTAL_URL`,
+ * en place dans les déploiements existants, et `NEXT_PUBLIC_SUBMITTERS_ADMIN_LOGIN_URL`,
+ * nommé d'après la spécification. Le premier renseigné l'emporte.
  *
  * ⚠️ `process.env.NEXT_PUBLIC_*` doit être écrit en toutes lettres : la valeur
  * est remplacée textuellement au build. Un accès dynamique
  * (`process.env[nom]`) renverrait `undefined` côté navigateur.
  */
-const RAW_BIDDERS_PORTAL_URL = process.env.NEXT_PUBLIC_BIDDERS_PORTAL_URL ?? "";
+const RAW_BIDDERS_PORTAL_URL =
+  process.env.NEXT_PUBLIC_BIDDERS_PORTAL_URL ||
+  process.env.NEXT_PUBLIC_SUBMITTERS_ADMIN_LOGIN_URL ||
+  "";
 
 /**
  * URL de connexion au portail des soumissionnaires, ou `null` si la variable

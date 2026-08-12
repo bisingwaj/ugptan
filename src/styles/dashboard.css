@@ -171,14 +171,24 @@
     @apply flex-none font-mono text-[10px] tracking-[0.06em] uppercase text-c-70 border border-c-80 px-1.5 py-0.5;
   }
 
-  /* Pied de la barre : la bascule de repli, à distance constante du bas. */
-  .adm__side-foot { @apply flex-none border-t border-c-90 p-2.5; }
-  .adm__collapse {
+  /* Pied de la barre : déconnexion puis bascule de repli, à distance constante
+     du bas. La déconnexion y est plutôt que dans la barre du haut parce qu'elle
+     referme la navigation : elle appartient au même bloc qu'elle. */
+  .adm__side-foot { @apply flex-none flex flex-col gap-1 border-t border-c-90 p-2.5; }
+  .adm__collapse,
+  .adm__signout {
     @apply flex w-full items-center gap-3 px-[10px] py-2.5 text-[13px] text-c-50 border border-transparent;
     transition: background 0.16s, color 0.16s, border-color 0.16s;
   }
-  .adm__collapse:hover { @apply bg-c-90 text-white border-c-80; }
-  .adm__collapse:hover .adm__nav-ico { @apply text-white; }
+  .adm__collapse:hover,
+  .adm__signout:hover { @apply bg-c-90 text-white border-c-80; }
+  .adm__collapse:hover .adm__nav-ico,
+  .adm__signout:hover .adm__nav-ico { @apply text-white; }
+  /* La sortie se distingue du repli : l'une quitte la console, l'autre range
+     une barre. Le survol la porte à l'accent d'alerte. */
+  .adm__signout { @apply text-c-40; }
+  .adm__signout:hover { @apply bg-red border-red text-white; }
+  .adm__side-foot form { @apply w-full; }
 
   /* --- Barre repliée en rail d'icônes -------------------------------------
      Cantonné au-dessus de 900px : en dessous, la barre est déjà un ruban
@@ -197,6 +207,7 @@
 
     .adm[data-collapsed] .adm__nav-item,
     .adm[data-collapsed] .adm__collapse,
+    .adm[data-collapsed] .adm__signout,
     .adm[data-collapsed] .adm__brand { @apply justify-center gap-0 px-0; }
   }
   .adm__main { @apply min-w-0 flex flex-col; }
@@ -350,8 +361,11 @@
     .adm__nav-text { @apply flex-none overflow-visible; }
     .adm__nav-item.is-active { @apply border-l-transparent border-b-ac; }
     .adm__soon { @apply hidden; }
-    /* Rien à replier sur un ruban horizontal. */
-    .adm__side-foot { @apply hidden; }
+    /* Rien à replier sur un ruban horizontal — mais la déconnexion doit rester
+       atteignable, elle passe donc sous le ruban plutôt que de disparaître. */
+    .adm__collapse { @apply hidden; }
+    .adm__side-foot { @apply p-2; }
+    .adm__signout { @apply justify-center min-h-11; }
   }
 
   @media (max-width: 760px) {

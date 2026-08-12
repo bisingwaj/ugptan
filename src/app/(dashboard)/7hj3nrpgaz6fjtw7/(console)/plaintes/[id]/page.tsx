@@ -97,7 +97,7 @@ export default async function PlaintePage({ params }: { params: Promise<{ id: st
   // Comptes à qui le dossier peut être confié. Le filtrage est refait dans la
   // server action : cette liste est une commodité de saisie, pas un droit.
   const candidates = await db().user.findMany({
-    where: { isActive: true },
+    where: { banned: false },
     select: { id: true, name: true, email: true, role: true, permissions: true },
     orderBy: [{ role: "asc" }, { email: "asc" }],
   });
