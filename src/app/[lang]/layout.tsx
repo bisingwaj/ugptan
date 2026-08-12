@@ -56,7 +56,13 @@ export default async function LangLayout(props: { children: React.ReactNode; par
 
   const lang = asLang(params.lang);
   return (
-    <html lang={lang}>
+    // suppressHydrationWarning : les extensions de navigateur (gestionnaires de
+    // mots de passe, pipettes à couleurs, traducteurs) posent leurs propres
+    // attributs sur <html> et <body> AVANT l'hydratation. React signalait alors
+    // un écart serveur/client qui ne vient pas de nous et qu'on ne peut pas
+    // corriger. L'attribut ne porte QUE sur cet élément-ci, jamais sur ses
+    // descendants : un vrai écart dans l'application resterait signalé.
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -69,7 +75,7 @@ export default async function LangLayout(props: { children: React.ReactNode; par
           <style dangerouslySetInnerHTML={{ __html: "[data-mo]{opacity:1!important;transform:none!important;clip-path:none!important}" }} />
         </noscript>
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <MotionProvider>
           <SmoothScroll />
           <Cursor />

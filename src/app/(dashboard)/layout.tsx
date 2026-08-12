@@ -26,7 +26,10 @@ export const viewport: Viewport = {
 
 export default function DashboardRootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
+    // suppressHydrationWarning : cf. le même garde dans app/[lang]/layout.tsx.
+    // Les extensions de navigateur écrivent sur <html> et <body> avant
+    // l'hydratation ; l'attribut ne couvre que ces deux éléments, pas la console.
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -35,7 +38,7 @@ export default function DashboardRootLayout({ children }: { children: React.Reac
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
