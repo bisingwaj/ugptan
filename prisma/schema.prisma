@@ -18,39 +18,57 @@ model TestConnection {
   message   String
 }
 
-/// Rôles de la console. Le rôle porte le socle de droits ; `User.permissions`
-/// ajoute des modules au cas par cas (cf. src/lib/auth/permissions.ts).
-/// ADMIN est le seul rôle habilité à gérer les comptes.
-enum Role {
-  ADMIN
-  EDITOR
-  VIEWER
-}
+/// ===========================================================================
+/// Better Auth — modèles `user`, `session`, `account`, `verification`.
+///
+/// ⚠️ Ces quatre modèles appartiennent à Better Auth : leurs champs reproduisent
+/// exactement le schéma attendu par son adaptateur Prisma (cf.
+/// src/lib/auth/server.ts). Renommer ou retirer un champ casse l'authentification.
+/// Ce qui nous appartient en propre est signalé au cas par cas ci-dessous.
+///
+/// L'authentification (identité, mot de passe, session) est intégralement gérée
+/// par Better Auth. L'autorisation (qui a le droit de faire quoi) reste au
+/// projet : `role` et `permissions`, lus par src/lib/auth/permissions.ts.
+/// ===========================================================================
 
 /// Compte de la console d'administration.
 ///
-/// Aucune inscription publique : les comptes sont créés exclusivement depuis le
-/// module « Utilisateurs » par un ADMIN, et le premier compte par le seed
-/// (prisma/seed.ts). `passwordHash` est un scrypt au format `selHex:hashHex`,
-/// jamais un mot de passe en clair (cf. src/lib/auth/password.ts).
+/// Aucune inscription publique n'existe : `emailAndPassword.disableSignUp` est
+/// actif, et les comptes sont créés depuis le module « Utilisateurs » via
+/// `auth.api.createUser`. Le mot de passe n'est jamais stocké ici — il vit dans
+/// `Account.password`, haché par Better Auth.
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  passwordHash String
-  name         String?
-  role         Role      @default(EDITOR)
+  id            String   @id @default(cuid())
+  /// Requis par Better Auth. À défaut de nom saisi, l'adresse en tient lieu.
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  /// --- Plugin `admin` de Better Auth --------------------------------------
+  /// `role` est une CHAÎNE et non une enum Prisma : le plugin la traite comme
+  /// telle et l'écrit lui-même (bannissement, changement de rôle). Une enum
+  /// ferait échouer l'écriture sur une valeur inattendue au lieu de la refuser
+  /// proprement. Les valeurs admises sont contrôlées par `isRole()`
+  /// (src/lib/auth/permissions.ts), unique source de vérité des rôles.
+  role       String    @default("EDITOR")
+  /// Désactivation d'un compte. Better Auth révoque les sessions au bannissement
+  /// et refuse la connexion tant qu'il dure : l'accès se ferme immédiatement.
+  banned     Boolean   @default(false)
+  banReason  String?
+  banExpires DateTime?
+
+  /// --- Autorisation propre au projet --------------------------------------
   /// Modules autorisés en plus du socle du rôle. Vide pour un ADMIN, qui a tout.
-  permissions  String[]  @default([])
-  /// Désactivation : conserve le compte et son historique, coupe l'accès.
-  /// Contrôlé à chaque requête par `requireAdmin()`, donc les sessions déjà
-  /// ouvertes tombent au prochain chargement de page.
-  isActive     Boolean   @default(true)
-  /// Repère de révocation : tout jeton émis avant cette date est refusé.
-  /// Changer un mot de passe ferme donc les sessions ouvertes ailleurs.
-  passwordChangedAt DateTime @default(now())
-  lastLoginAt  DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  permissions String[] @default([])
+  /// Dernière connexion, alimentée par un `databaseHook` Better Auth à la
+  /// création de session (cf. src/lib/auth/server.ts).
+  lastLoginAt DateTime?
+
+  sessions Session[]
+  accounts Account[]
 
   /// Dossiers MGP dont ce compte est responsable.
   grievances      Grievance[]      @relation("GrievanceAssignee")
@@ -58,6 +76,64 @@ model User {
   grievanceEvents GrievanceEvent[] @relation("GrievanceEventAuthor")
 
   @@index([role])
+}
+
+/// Session Better Auth. `token` est la valeur portée par le cookie.
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Plugin `admin` : trace d'une session ouverte par usurpation d'identité.
+  impersonatedBy String?
+
+  @@index([userId])
+}
+
+/// Moyen d'authentification rattaché à un compte. Pour ce projet, un seul type :
+/// `providerId = "credential"`, dont `password` porte l'empreinte calculée par
+/// Better Auth (scrypt). Aucun mot de passe en clair n'existe nulle part.
+model Account {
+  id         String @id @default(cuid())
+  accountId  String
+  providerId String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+/// Jetons à durée de vie courte de Better Auth. Inutilisé en pratique ici (ni
+/// vérification d'adresse, ni réinitialisation en libre-service), mais la table
+/// fait partie du schéma attendu par l'adaptateur.
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
 }
 
 /// Étape du dossier dans la pipeline de traitement, celle-là même qui est

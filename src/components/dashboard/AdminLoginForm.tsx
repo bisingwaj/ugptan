@@ -1,20 +1,20 @@
 "use client";
 
 import { useActionState } from "react";
-import { loginAction } from "@/actions/admin-auth";
+import { loginAction, type LoginState } from "@/actions/admin-auth";
 import { ADMIN } from "@/content/admin";
 import { BIDDERS_PORTAL_URL } from "@/lib/external";
-import type { LoginState } from "@/lib/auth/session";
 
 const initialState: LoginState = { error: null };
 
 /**
  * Écran de connexion de la console : adresse électronique + mot de passe,
- * vérifiés contre la table `User` (cf. actions/admin-auth.ts).
+ * vérifiés par Better Auth (cf. actions/admin-auth.ts).
  *
- * Aucun lien « créer un compte », aucun « mot de passe oublié » : les comptes
- * naissent et se réparent depuis le module « Utilisateurs », par un
- * administrateur. C'est l'exigence, pas un manque.
+ * Unique page publique du sous-arbre, et unique moyen d'entrer. Aucun lien
+ * « créer un compte », aucun « mot de passe oublié » : les comptes naissent et
+ * se réparent depuis le module « Utilisateurs », par un administrateur. C'est
+ * l'exigence, pas un manque.
  */
 export function AdminLoginForm({ next }: { next?: string | null }) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);

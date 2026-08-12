@@ -1,22 +1,27 @@
 /**
  * Gardes serveur de la console.
  *
- * Deuxième couche, indispensable : `src/proxy.ts` ne s'exécute pas sur les
- * chemins contenant un point (cf. son `matcher`), et une middleware n'est de
- * toute façon jamais une frontière d'autorisation pour les server actions.
+ * Répartition assumée avec `src/proxy.ts` : le proxy fait un tri OPTIMISTE sur
+ * la simple présence du cookie de session, sans toucher la base — c'est ce que
+ * recommande Better Auth pour une middleware. La vérification qui fait foi est
+ * ici, et nulle part ailleurs : `auth.api.getSession` valide le jeton en base
+ * et renvoie le compte tel qu'il existe à l'instant de la requête.
  *
- * Différence avec le proxy : ici le compte est RELU EN BASE à chaque requête.
- * Le jeton prouve l'identité, la base décide des droits. Un compte désactivé,
- * rétrogradé ou supprimé perd donc l'accès au chargement suivant, sans qu'on
- * ait à attendre l'expiration de sa session.
+ * Deux conséquences de cette lecture en base à chaque requête, toutes deux
+ * voulues : un compte désactivé, rétrogradé ou supprimé perd l'accès au
+ * chargement suivant, sans attendre l'expiration de sa session ; et le cache de
+ * session en cookie reste désactivé côté Better Auth (cf. lib/auth/server.ts).
+ *
+ * ⚠️ Ces fonctions décident de l'AUTORISATION à partir d'une identité établie
+ * par Better Auth. Elles ne vérifient aucun mot de passe et ne posent aucun
+ * cookie : tout cela appartient à Better Auth.
  */
 import { cache } from "react";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ADMIN_HOME, ADMIN_LOGIN } from "@/lib/admin";
-import { db } from "@/lib/db";
-import { can, type AdminRole, type Permission } from "@/lib/auth/permissions";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth/session";
+import { auth } from "@/lib/auth/server";
+import { can, isRole, type AdminRole, type Permission } from "@/lib/auth/permissions";
 
 /** Compte connecté, tel qu'il existe en base à l'instant de la requête. */
 export type AdminUser = {
@@ -28,40 +33,33 @@ export type AdminUser = {
 };
 
 /**
- * `cache()` : une seule vérification HMAC et une seule lecture en base par
- * requête, quel que soit le nombre de gardes traversés (layout + page + action).
+ * `cache()` : une seule vérification de session par requête, quel que soit le
+ * nombre de gardes traversés (layout + page + action).
  */
 export const getCurrentUser = cache(async (): Promise<AdminUser | null> => {
-  const token = (await cookies()).get(SESSION_COOKIE)?.value;
-  if (!token) return null;
+  const session = await auth()
+    .api.getSession({ headers: await headers() })
+    .catch(() => null);
 
-  const payload = await verifySessionToken(token);
-  if (!payload) return null;
+  if (!session) return null;
 
-  const user = await db().user.findUnique({
-    where: { id: payload.sub },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      permissions: true,
-      isActive: true,
-      passwordChangedAt: true,
-    },
-  });
+  const user = session.user;
 
-  if (!user || !user.isActive) return null;
+  // Better Auth révoque déjà les sessions d'un compte banni et refuse sa
+  // connexion. Le contrôle est répété ici pour que la fenêtre entre le
+  // bannissement et la fin de la requête en cours soit nulle.
+  if (user.banned && (!user.banExpires || user.banExpires > new Date())) return null;
 
-  // Jeton antérieur au dernier changement de mot de passe : session révoquée.
-  if (payload.iat < user.passwordChangedAt.getTime()) return null;
+  // Un rôle inconnu de `permissions.ts` n'ouvre rien : refus plutôt que
+  // repli silencieux sur un rôle par défaut.
+  if (!isRole(user.role ?? "")) return null;
 
   return {
     id: user.id,
     email: user.email,
-    name: user.name,
+    name: user.name || null,
     role: user.role as AdminRole,
-    permissions: user.permissions,
+    permissions: Array.isArray(user.permissions) ? user.permissions : [],
   };
 });
 

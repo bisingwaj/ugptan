@@ -25,7 +25,7 @@ export default async function UtilisateurPage({ params }: { params: Promise<{ id
       name: true,
       role: true,
       permissions: true,
-      isActive: true,
+      banned: true,
       lastLoginAt: true,
       createdAt: true,
     },
@@ -34,6 +34,9 @@ export default async function UtilisateurPage({ params }: { params: Promise<{ id
   if (!user) notFound();
 
   const isSelf = user.id === actor.id;
+  // « Actif » se lit sur le bannissement Better Auth : c'est lui qui coupe
+  // réellement l'accès (cf. actions/admin-users.ts).
+  const isActive = !user.banned;
 
   return (
     <>
@@ -41,7 +44,7 @@ export default async function UtilisateurPage({ params }: { params: Promise<{ id
 
       <h1 className="adm__title" style={{ marginTop: 14 }}>{user.name ?? user.email}</h1>
       <p className="adm__lead">
-        {ROLE_LABEL[user.role as AdminRole]} · {user.isActive ? t.statusActive : t.statusInactive} ·{" "}
+        {ROLE_LABEL[user.role as AdminRole]} · {isActive ? t.statusActive : t.statusInactive} ·{" "}
         <span className="mono">{t.colLastLogin.toLowerCase()} : {formatDateTime(user.lastLoginAt) ?? t.neverConnected}</span>
       </p>
 
@@ -62,7 +65,7 @@ export default async function UtilisateurPage({ params }: { params: Promise<{ id
 
       <div className="adm__section-title">Accès du compte</div>
       <div className="adm-panel">
-        <UserActions id={user.id} isActive={user.isActive} isSelf={isSelf} />
+        <UserActions id={user.id} isActive={isActive} isSelf={isSelf} />
       </div>
     </>
   );
