@@ -45,17 +45,28 @@ export function ProvinceMap({ lang }: { lang: Lang }) {
         RDC · {t.words.provinces}
       </div>
 
-      {/* Single SVG containing provinces + dots */}
-      <svg
-        viewBox={MAP_VIEWBOX}
+      {/* Container perfectly matching SVG aspect ratio for accurate HTML overlays */}
+      <div
         style={{
           position: "absolute",
-          inset: 0,
-          width: "100%",
+          top: 0,
+          bottom: 0,
+          left: "50%",
+          transform: "translateX(-50%)",
           height: "100%",
+          aspectRatio: "1009.5 / 1000",
         }}
       >
-        {/* Province shapes */}
+        <svg
+          viewBox={MAP_VIEWBOX}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          {/* Province shapes */}
         {Object.entries(provincePaths).map(([name, { path }]) => {
           const isHovered = hover === name;
           const isClicked = clicked === name;
@@ -116,28 +127,30 @@ export function ProvinceMap({ lang }: { lang: Lang }) {
             />
           );
         })}
-      </svg>
+        </svg>
 
-      {activeName && (
-        <div
-          className="mono"
-          style={{
-            position: "absolute",
-            left: "50%",
-            bottom: 14,
-            transform: "translateX(-50%)",
-            background: "var(--c-black)",
-            color: "#fff",
-            fontSize: 12,
-            padding: "8px 14px",
-            whiteSpace: "nowrap",
-            letterSpacing: "0.04em",
-            zIndex: 40,
-          }}
-        >
-          {activeName}
-        </div>
-      )}
+        {activeName && (
+          <div
+            className="mono"
+            style={{
+              position: "absolute",
+              left: `${(provincePaths[activeName].cx / 1009.5) * 100}%`,
+              top: `${(provincePaths[activeName].cy / 1000) * 100}%`,
+              transform: "translate(15px, -50%)",
+              background: "var(--c-black)",
+              color: "#fff",
+              fontSize: 12,
+              padding: "8px 14px",
+              whiteSpace: "nowrap",
+              letterSpacing: "0.04em",
+              zIndex: 40,
+              pointerEvents: "none",
+            }}
+          >
+            {activeName}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
