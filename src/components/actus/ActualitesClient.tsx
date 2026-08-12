@@ -58,10 +58,12 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
       {article && (
         <div className="scrim scrim--right" onClick={() => setSel(null)}>
           <div className="drawer" style={{ width: "min(820px,100%)" }} onClick={(e) => e.stopPropagation()} data-lenis-prevent>
-            <div className="duo" style={{ aspectRatio: "16/7" }}>
+            <div className="duo" style={{ minHeight: "clamp(240px,35vw,360px)", display: "flex", flexDirection: "column" }}>
               <Photo src={media.img[article.img]} alt={pick(article.title, lang)} />
-              <button onClick={() => setSel(null)} aria-label="Fermer" style={{ position: "absolute", top: 18, right: 18, width: 42, height: 42, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.5)" }}>✕</button>
-              <div style={{ position: "absolute", left: "clamp(24px,3.2vw,40px)", right: "clamp(24px,3.2vw,40px)", bottom: "clamp(22px,3vw,34px)" }}>
+              <div style={{ position: "relative", zIndex: 10, padding: "18px 18px 0", display: "flex", justifyContent: "flex-end" }}>
+                <button onClick={() => setSel(null)} aria-label="Fermer" style={{ width: 42, height: 42, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.5)" }}>✕</button>
+              </div>
+              <div style={{ position: "relative", zIndex: 5, marginTop: "auto", padding: "32px clamp(24px,3.2vw,40px) clamp(22px,3vw,34px)" }}>
                 <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, marginBottom: 14 }}>
                   <span className="mono" style={{ fontSize: 10.5, color: "#fff", background: "var(--ac)", padding: "5px 11px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{pick(article.cat, lang)}</span>
                   <span className="mono" style={{ fontSize: 12, color: "rgba(255,255,255,.85)" }}>{article.date} · {article.lieu}</span>
