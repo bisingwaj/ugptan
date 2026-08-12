@@ -25,10 +25,29 @@ Deux façons :
 | Héros de page — intro courte (optionnel) | Toutes | 16:9 | 15–30 s | Optionnel |
 | Cartes « Histoires & impact » (×4) | Accueil + Résultats | 16:9 | 60–90 s | À fournir |
 | « Le projet en vidéos » (×5, par composante) | Résultats | 16:9 | 2–5 min | À fournir |
+| Vidéo de présentation d'une composante (×5) | Composantes (C1 → C5) | 16:9 | 2–4 min | À fournir |
 | Bannière de la fiche d'avis | Marchés | 16:9 | 30–90 s | Optionnel |
 | Vidéo associée à un article | Actualités | 16:9 | variable | Optionnel |
 
-## 3. Brancher une vidéo
+## 3. Vidéos de composante
+
+Chaque page `/[lang]/composantes/<code>` réserve une bande 16:9 pleine largeur
+pour un film de présentation. Pour la brancher, renseigner dans
+`src/content/composantes-detail.ts`, sur la composante concernée :
+
+```ts
+video: {
+  yt: "IDENTIFIANT_YOUTUBE",   // ou : src: "/videos/composante-2.mp4"
+  titre: { fr: "…", en: "…" },
+  duree: "3:38",
+  poster: "datacenter",         // clé d'image (content/media.ts)
+},
+```
+
+Tant qu'aucune source n'est renseignée, l'emplacement affiche un état
+« à venir » assumé (affiche + format attendu) plutôt qu'une zone vide.
+
+## 4. Brancher une vidéo
 
 - **Film par défaut** (héros, témoignages, vidéos par composante, bannière d'avis) :
   `src/content/media.ts → media.videoYt` (identifiant YouTube).
@@ -36,7 +55,7 @@ Deux façons :
 - **Témoignages individuels** : ajouter `videoYt` à chaque entrée de `histoires` dans
   `src/content/carbon.ts`.
 
-## 4. Créer des animations en code (Remotion)
+## 5. Créer des animations en code (Remotion)
 
 ```bash
 npm run remotion:studio                 # ouvre Remotion Studio (preview live)
