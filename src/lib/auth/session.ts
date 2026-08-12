@@ -3,21 +3,36 @@
  *
  * ⚠️ Web Crypto UNIQUEMENT — aucun import `node:` ici. Ce module est évalué par
  * `src/proxy.ts` (qui tourne en Node sous Next 16, mais qu'on garde agnostique)
- * autant que par les server actions. Le scrypt du mot de passe vit à part, dans
- * `lib/auth/password.ts`, importé seulement par l'action de connexion.
+ * autant que par les server actions. Le scrypt des mots de passe vit à part,
+ * dans `lib/auth/password.ts`, importé seulement côté serveur.
+ *
+ * Le jeton porte l'identité, jamais les droits effectifs : le rôle qu'il
+ * contient sert à l'affichage et au filtrage grossier du proxy, mais toute
+ * décision d'autorisation relit le compte en base (cf. lib/auth/guard.ts).
+ * C'est ce qui permet à une désactivation de compte de prendre effet
+ * immédiatement, sans attendre l'expiration du jeton.
  */
 import { ADMIN_BASE } from "@/lib/admin";
+import { isRole, type AdminRole } from "@/lib/auth/permissions";
 
 export const SESSION_COOKIE = "ugptn_sess";
 export const SESSION_MAX_AGE = 60 * 60 * 8; // 8 h
 
-export type AdminRole = "admin";
-
 export type SessionPayload = {
-  /** Identifiant du compte. Deviendra `User.id` quand la table arrivera. */
+  /** `User.id`. */
   sub: string;
+  email: string;
   role: AdminRole;
-  /** Expiration absolue, en secondes epoch. */
+  /**
+   * Émission, en MILLISECONDES epoch — comme `exp`.
+   *
+   * La milliseconde n'est pas de la coquetterie : `iat` est comparé à
+   * `User.passwordChangedAt` pour révoquer les sessions au changement de mot
+   * de passe. À la seconde près, un jeton réémis dans la même seconde que le
+   * changement serait indistinguable d'un jeton antérieur.
+   */
+  iat: number;
+  /** Expiration absolue, en millisecondes epoch. */
   exp: number;
 };
 
@@ -108,8 +123,11 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
     if (!valid) return null;
 
     const payload = JSON.parse(decoder.decode(bodyBytes)) as SessionPayload;
-    if (payload?.role !== "admin" || typeof payload.sub !== "string") return null;
-    if (typeof payload.exp !== "number" || payload.exp <= Math.floor(Date.now() / 1000)) return null;
+    if (typeof payload?.sub !== "string" || payload.sub.length === 0) return null;
+    if (typeof payload.email !== "string") return null;
+    if (typeof payload.role !== "string" || !isRole(payload.role)) return null;
+    if (typeof payload.iat !== "number") return null;
+    if (typeof payload.exp !== "number" || payload.exp <= Date.now()) return null;
 
     return payload;
   } catch {
@@ -117,7 +135,14 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
   }
 }
 
-/** Payload d'une session neuve, expiration comprise. */
-export function newSession(sub: string): SessionPayload {
-  return { sub, role: "admin", exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE };
+/** Payload d'une session neuve, horodatages compris. */
+export function newSession(user: { id: string; email: string; role: AdminRole }): SessionPayload {
+  const now = Date.now();
+  return {
+    sub: user.id,
+    email: user.email,
+    role: user.role,
+    iat: now,
+    exp: now + SESSION_MAX_AGE * 1000,
+  };
 }

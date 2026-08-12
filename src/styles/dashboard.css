@@ -69,14 +69,32 @@
   .btn--outline:hover { @apply bg-c-black text-white; }
   .btn--on-dark { @apply border-c-70 text-white bg-transparent; }
   .btn--on-dark:hover { @apply border-white; }
+  .btn--danger { @apply border-red text-red bg-white; }
+  .btn--danger:hover { @apply bg-red text-white; }
   .btn--sm { @apply px-[18px] py-[11px] text-[14px]; }
+  .btn:disabled { @apply cursor-not-allowed opacity-55; }
 
   .field {
     @apply w-full text-[14px] text-c-black bg-white border border-c-20 px-[14px] py-[13px] outline-none;
   }
   .field:focus { @apply border-ac outline-2 outline-ac-line -outline-offset-1; }
+  /* Un `select` natif garde sa flèche système, incohérente d'un OS à l'autre :
+     on la remplace par un chevron dessiné, aligné sur la grille du reste. */
+  select.field {
+    @apply appearance-none pr-9 bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23525252' d='M0 0h10L5 6z'/%3E%3C/svg%3E");
+    background-position: right 14px center;
+  }
+  select.field:disabled { @apply text-c-60 bg-c-10 cursor-not-allowed; }
   .label-mono {
     @apply block font-mono text-[11px] text-c-50 mb-2 uppercase tracking-[0.06em];
+  }
+  .adm-hint { @apply text-[12.5px] leading-[1.5] text-c-60; }
+
+  /* Étiquette réservée aux lecteurs d'écran (en-tête de colonne d'actions). */
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
   }
 
   /* --- Écran de connexion ------------------------------------------------- */
@@ -110,6 +128,13 @@
   .adm__mark { @apply w-[26px] h-[26px] flex-none bg-ac relative; }
   .adm__mark::after { content: ""; position: absolute; right: 4px; bottom: 4px; width: 9px; height: 9px; background: #fff; }
   .adm__nav { @apply py-2.5; }
+  /* Sections : à quatorze modules, une liste plate se relit intégralement à
+     chaque coup d'œil. Le groupe porte l'espacement, le libellé sert de repère. */
+  .adm__nav-group { @apply py-1.5 border-b border-c-90; }
+  .adm__nav-group:last-child { @apply border-b-0; }
+  .adm__nav-label {
+    @apply font-mono text-[10px] tracking-[0.12em] uppercase text-c-60 px-5 pt-2.5 pb-1.5;
+  }
   .adm__nav-item {
     @apply flex items-center justify-between gap-2.5 px-5 py-[11px] text-[14px] text-c-30 border-l-2 border-transparent;
     transition: background 0.16s, color 0.16s;
@@ -145,11 +170,68 @@
   }
   .adm-list__row:last-child { @apply border-b-0; }
 
+  /* --- Panneaux & formulaires --------------------------------------------- */
+  .adm-panel { @apply border border-c-20 bg-white; padding: clamp(18px, 2.4vw, 26px); }
+  .adm-form { @apply flex flex-col gap-[22px]; }
+  /* auto-fit + minmax : deux colonnes quand la place existe, une seule sinon,
+     sans point de rupture à maintenir. */
+  .adm-form__row {
+    @apply grid gap-[18px];
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .adm-form__field { @apply min-w-0; }
+  .adm-fieldset { @apply border border-c-20 bg-c-10 p-[18px]; }
+  .adm-fieldset legend { @apply px-1.5; }
+  .adm-checks {
+    @apply grid gap-2.5;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  }
+  .adm-check { @apply flex items-center gap-2.5 text-[13.5px] text-c-80 cursor-pointer; }
+  .adm-check input { @apply w-4 h-4 flex-none accent-ac cursor-pointer; }
+  .adm-ok {
+    @apply border border-ok-bd border-l-[3px] bg-ok-bg text-ok-fg px-[14px] py-3 text-[13.5px];
+  }
+
+  /* --- Tableaux ------------------------------------------------------------ */
+  /* Le conteneur porte le défilement horizontal : sur mobile, c'est le tableau
+     qui glisse, jamais la page. */
+  .adm-table-wrap { @apply w-full overflow-x-auto border border-c-20 bg-white; }
+  .adm-table { @apply w-full border-collapse text-[14px]; min-width: 720px; }
+  .adm-table th {
+    @apply text-left font-mono text-[10.5px] tracking-[0.08em] uppercase text-c-60 font-normal
+           border-b border-c-20 px-[18px] py-3 whitespace-nowrap;
+  }
+  .adm-table td { @apply align-middle border-b border-c-20 px-[18px] py-[13px]; }
+  .adm-table tr:last-child td { @apply border-b-0; }
+  .adm-table__sub { @apply block text-[12.5px] text-c-60; }
+  .adm-table__meta { @apply text-[12.5px] text-c-60 whitespace-nowrap; }
+
+  .adm-link { @apply font-medium text-ac; }
+  .adm-link:hover { @apply underline underline-offset-2; }
+  .adm-back { @apply inline-block font-mono text-[12px] text-c-60; }
+  .adm-back:hover { @apply text-ac; }
+
+  .adm-badge {
+    @apply inline-block font-mono text-[10.5px] tracking-[0.06em] uppercase px-2 py-1 border;
+  }
+  .adm-badge--on { @apply border-ok-bd bg-ok-bg text-ok-fg; }
+  .adm-badge--off { @apply border-c-30 bg-c-10 text-c-60; }
+  .adm-badge--self { @apply ml-2 border-ac-line bg-ac-pale text-ac; }
+
+  .adm-actions { @apply flex flex-col gap-2; }
+  .adm-actions__row { @apply flex flex-wrap items-center gap-2; }
+  .adm-actions__error { @apply text-[12.5px] leading-[1.45] text-red max-w-[42ch]; }
+
   /* --- Responsive --------------------------------------------------------- */
   @media (max-width: 900px) {
     .adm { @apply grid-cols-[1fr]; }
     .adm__side { @apply static h-auto; }
+    /* La barre latérale devient un ruban horizontal : les sections restent des
+       groupes, mais leur libellé disparaît faute de hauteur. */
     .adm__nav { @apply flex overflow-x-auto p-0; }
+    .adm__nav-group { @apply flex py-0 border-b-0 border-r border-c-90; }
+    .adm__nav-group:last-child { @apply border-r-0; }
+    .adm__nav-label { @apply hidden; }
     .adm__nav-item {
       @apply flex-none whitespace-nowrap border-l-0 border-b-2 border-b-transparent px-4 py-[13px];
     }
@@ -164,6 +246,9 @@
     .field, input, textarea, select { @apply text-[16px]; }
     .btn { @apply min-h-12; }
     .btn--sm { @apply min-h-[42px]; }
+    /* Les boutons d'action occupent la largeur : cibles tactiles franches. */
+    .adm-actions__row > form { @apply flex-1; }
+    .adm-actions__row .btn { @apply w-full justify-center; }
   }
 }
 

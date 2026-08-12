@@ -35,6 +35,14 @@ export function dict(lang: Lang) {
       more: t("En savoir plus", "Learn more"),
       all: t("Tout voir", "View all"),
       report: t("Déposer une plainte", "File a grievance"),
+      /* Renvoie au portail des soumissionnaires, hébergé par un tiers
+         (cf. lib/external.ts). Aucun lien du site public ne mène à la console
+         d'administration de l'UGPTN. */
+      login: t("Connexion", "Sign in"),
+      loginHint: t(
+        "Espace des soumissionnaires — plateforme partenaire, ouverture dans un nouvel onglet",
+        "Bidders' space — partner platform, opens in a new tab",
+      ),
     },
     sec: {
       chiffres: t("Le projet en bref", "The project at a glance"),

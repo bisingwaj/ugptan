@@ -7,6 +7,7 @@ import type { Lang } from "@/lib/pick";
 import { cn } from "@/lib/cn";
 import { dict } from "@/content/i18n";
 import { langues } from "@/content/data";
+import { BIDDERS_PORTAL_URL } from "@/lib/external";
 import { NAV, NAV_PRIMARY, NAV_DRAWER, route } from "@/lib/routes";
 
 const Logo = ({ dark = false }: { dark?: boolean }) => (
@@ -91,6 +92,24 @@ export function Header({ lang }: { lang: Lang }) {
               )}
             </div>
 
+            {/* Bouton de connexion : il pointe vers le portail des
+                soumissionnaires, une plateforme tierce (cf. lib/external.ts).
+                La console d'administration de l'UGPTN, elle, n'est liée nulle
+                part. Réservé au desktop comme la navigation principale : en
+                deçà de 1120px, le lien vit dans le tiroir. */}
+            {BIDDERS_PORTAL_URL && (
+              <a
+                href={BIDDERS_PORTAL_URL}
+                target="_blank"
+                rel="noopener noreferrer external"
+                title={t.cta.loginHint}
+                className="nav-desktop items-center gap-2 border border-c-black px-[14px] py-2.5 text-[13.5px] font-semibold text-c-black"
+              >
+                {t.cta.login}
+                <span className="font-mono text-[11px] opacity-70">↗</span>
+              </a>
+            )}
+
             {/* `.nav-burger` porte le display et sa bascule au-delà de 1120px. */}
             <button
               onClick={() => setNavOpen(true)}
@@ -144,6 +163,18 @@ export function Header({ lang }: { lang: Lang }) {
                   </Link>
                 ))}
               </div>
+              {BIDDERS_PORTAL_URL && (
+                <a
+                  href={BIDDERS_PORTAL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer external"
+                  onClick={() => setNavOpen(false)}
+                  className="btn btn--primary justify-center"
+                >
+                  {t.cta.login}
+                  <span className="arrow">↗</span>
+                </a>
+              )}
               <Link href={route(lang, NAV.mgp)} onClick={() => setNavOpen(false)} className="btn btn--on-dark justify-center">{t.cta.mgp}</Link>
             </div>
           </div>

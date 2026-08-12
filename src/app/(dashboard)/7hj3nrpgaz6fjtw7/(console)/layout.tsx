@@ -7,10 +7,10 @@ import { AdminShell } from "@/components/dashboard/AdminShell";
  * une middleware n'est jamais une frontière d'autorisation fiable.
  *
  * ⚠️ Ce garde protège la COQUILLE, pas les pages : l'App Router les rend en
- * parallèle. Chaque page de la console doit appeler `requireAdmin()` elle-même
- * (cf. lib/auth/guard.ts).
+ * parallèle. Chaque page de la console doit appeler `requireAdmin()` ou
+ * `requirePermission()` elle-même (cf. lib/auth/guard.ts).
  */
 export default async function ConsoleLayout({ children }: { children: React.ReactNode }) {
-  const session = await requireAdmin();
-  return <AdminShell session={session}>{children}</AdminShell>;
+  const user = await requireAdmin();
+  return <AdminShell user={user}>{children}</AdminShell>;
 }
