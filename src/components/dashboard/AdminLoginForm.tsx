@@ -3,16 +3,20 @@
 import { useActionState } from "react";
 import { loginAction } from "@/actions/admin-auth";
 import { ADMIN } from "@/content/admin";
+import { BIDDERS_PORTAL_URL } from "@/lib/external";
 import type { LoginState } from "@/lib/auth/session";
 
 const initialState: LoginState = { error: null };
 
 /**
- * Écran de connexion de la console — reprend la mise en page split-screen de
- * l'ancienne page publique /connexion, branchée cette fois sur une vraie
- * vérification serveur (cf. actions/admin-auth.ts).
+ * Écran de connexion de la console : adresse électronique + mot de passe,
+ * vérifiés contre la table `User` (cf. actions/admin-auth.ts).
+ *
+ * Aucun lien « créer un compte », aucun « mot de passe oublié » : les comptes
+ * naissent et se réparent depuis le module « Utilisateurs », par un
+ * administrateur. C'est l'exigence, pas un manque.
  */
-export function AdminLoginForm() {
+export function AdminLoginForm({ next }: { next?: string | null }) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
   const t = ADMIN.login;
 
@@ -56,6 +60,25 @@ export function AdminLoginForm() {
           )}
 
           <form action={formAction}>
+            {/* Destination demandée avant le renvoi vers cet écran. Refiltrée
+                côté serveur par `safeAdminRedirect` : ce champ est une commodité,
+                jamais une autorisation. */}
+            {next && <input type="hidden" name="next" value={next} />}
+
+            <label className="label-mono" htmlFor="admin-email">{t.emailLabel}</label>
+            <input
+              id="admin-email"
+              name="email"
+              type="email"
+              autoComplete="username"
+              required
+              autoFocus
+              spellCheck={false}
+              placeholder="prenom.nom@ugptn.cd"
+              className="field"
+              style={{ background: "var(--c-10)", marginBottom: 18 }}
+            />
+
             <label className="label-mono" htmlFor="admin-password">{t.passwordLabel}</label>
             <input
               id="admin-password"
@@ -63,16 +86,34 @@ export function AdminLoginForm() {
               type="password"
               autoComplete="current-password"
               required
-              autoFocus
               placeholder="••••••••"
               className="field"
               style={{ background: "var(--c-10)", marginBottom: 22 }}
             />
+
             <button type="submit" disabled={pending} className="btn btn--primary" style={{ width: "100%", justifyContent: "center", padding: 15 }}>
               {pending ? t.submitting : t.submit}
               {!pending && <span className="arrow">→</span>}
             </button>
           </form>
+
+          <p style={{ margin: "22px 0 0", fontSize: 12.5, lineHeight: 1.5, color: "var(--c-50)" }}>{t.noSignup}</p>
+
+          {/* Le portail des soumissionnaires est une plateforme tierce : lien
+              sortant, jamais une route de ce site. */}
+          {BIDDERS_PORTAL_URL && (
+            <p style={{ margin: "14px 0 0", fontSize: 12.5, lineHeight: 1.5, color: "var(--c-50)" }}>
+              {t.biddersPrompt}{" "}
+              <a
+                href={BIDDERS_PORTAL_URL}
+                target="_blank"
+                rel="noopener noreferrer external"
+                style={{ color: "var(--ac)", textDecoration: "underline", textUnderlineOffset: 3 }}
+              >
+                {t.biddersLink} ↗
+              </a>
+            </p>
+          )}
         </div>
       </div>
     </section>

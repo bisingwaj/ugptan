@@ -28,6 +28,22 @@ export const initials = (s: string): string =>
     .map((w) => w[0].toUpperCase())
     .join("");
 
+/**
+ * Date et heure pour les écrans internes de la console.
+ *
+ * Fuseau figé sur Kinshasa : rendu côté serveur, un horodatage laissé au
+ * fuseau de la machine afficherait l'heure de l'hébergeur, pas celle de
+ * l'équipe qui lit l'écran.
+ */
+const dateTimeFr = new Intl.DateTimeFormat("fr-FR", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "Africa/Kinshasa",
+});
+
+export const formatDateTime = (date: Date | null | undefined): string | null =>
+  date ? dateTimeFr.format(date) : null;
+
 export type Countdown = {
   expired: boolean;
   urgent: boolean;
