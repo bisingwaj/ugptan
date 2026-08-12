@@ -5,17 +5,22 @@ export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 
 export type NavKey =
   | "accueil" | "projet" | "composantes" | "ugptn" | "gouvernance" | "marches" | "transparence"
-  | "actualites" | "resultats" | "ressources" | "evenements" | "contact" | "mgp" | "connexion"
+  | "actualites" | "resultats" | "ressources" | "evenements" | "contact" | "mgp"
   | "confidentialite" | "conditions";
 
 export type NavItem = { slug: string; key: NavKey };
 
+/**
+ * Source unique des chemins publics : `lib/site.ts` en dérive ALL_PATHS, que
+ * `app/sitemap.ts` publie tel quel. Toute entrée ici DOIT correspondre à une
+ * route existante, sinon le sitemap annonce des 404.
+ */
 export const NAV: Record<NavKey, string> = {
   accueil: "", projet: "/projet", composantes: "/composantes", ugptn: "/ugptn",
   gouvernance: "/gouvernance",
   marches: "/marches", transparence: "/transparence", actualites: "/actualites",
   resultats: "/resultats", ressources: "/ressources", evenements: "/evenements",
-  contact: "/contact", mgp: "/mgp", connexion: "/connexion",
+  contact: "/contact", mgp: "/mgp",
   confidentialite: "/confidentialite", conditions: "/conditions",
 };
 

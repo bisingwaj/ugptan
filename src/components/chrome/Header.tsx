@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Lang } from "@/lib/pick";
+import { cn } from "@/lib/cn";
 import { dict } from "@/content/i18n";
 import { langues } from "@/content/data";
 import { NAV, NAV_PRIMARY, NAV_DRAWER, route } from "@/lib/routes";
 
 const Logo = ({ dark = false }: { dark?: boolean }) => (
-  <span style={{ width: 30, height: 30, background: "var(--ac)", position: "relative", display: "inline-flex", flex: "0 0 auto" }}>
-    <span style={{ position: "absolute", right: 5, bottom: 5, width: 11, height: 11, background: dark ? "var(--c-black)" : "#fff" }} />
+  <span className="relative inline-flex size-[30px] flex-none bg-ac">
+    <span className={cn("absolute right-[5px] bottom-[5px] size-[11px]", dark ? "bg-c-black" : "bg-white")} />
   </span>
 );
 
@@ -30,56 +31,74 @@ export function Header({ lang }: { lang: Lang }) {
   const isActive = (slug: string) => pathname === route(lang, slug);
 
   return (
-    <div style={{ position: "sticky", top: 0, zIndex: 50 }}>
+    <div className="sticky top-0 z-50">
       {/* Header bar */}
-      <header className="blur-sm" style={{ background: "rgba(255,255,255,0.96)", borderBottom: "1px solid var(--c-20)", backdropFilter: "blur(6px)" }}>
-        <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "var(--sa-t) max(var(--pad-x), var(--sa-r)) 0 max(var(--pad-x), var(--sa-l))", height: "calc(64px + var(--sa-t))", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 18 }}>
-          <Link href={route(lang)} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <header className="border-b border-c-20 bg-[rgba(255,255,255,0.96)] backdrop-blur-[6px] max-[760px]:backdrop-blur-none">
+        {/* Les marges latérales composent le gabarit et la zone sûre : max() garde
+            le contenu hors de l'encoche en paysage. */}
+        <div className="mx-auto flex h-[calc(64px+var(--sa-t))] max-w-(--maxw) items-center justify-between gap-[18px] pt-(--sa-t) pr-[max(var(--pad-x),var(--sa-r))] pb-0 pl-[max(var(--pad-x),var(--sa-l))]">
+          <Link href={route(lang)} className="flex items-center gap-3">
             <Logo />
-            <span style={{ fontWeight: 700, fontSize: 19, letterSpacing: "0.02em" }}>UGPTN</span>
+            <span className="text-[19px] font-bold tracking-[0.02em]">UGPTN</span>
           </Link>
 
-          <nav className="nav-desktop" style={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <nav className="nav-desktop flex items-center gap-0.5">
             {NAV_PRIMARY.map((item) => (
-              <Link key={item.key} href={route(lang, item.slug)} style={{ padding: "9px 15px", fontSize: 14.5, fontWeight: 500, color: isActive(item.slug) ? "var(--ac)" : "var(--c-80)", borderBottom: `2px solid ${isActive(item.slug) ? "var(--ac)" : "transparent"}` }}>
+              <Link
+                key={item.key}
+                href={route(lang, item.slug)}
+                className={cn(
+                  "border-b-2 px-[15px] py-[9px] text-[14.5px] font-medium",
+                  isActive(item.slug) ? "border-ac text-ac" : "border-transparent text-c-80",
+                )}
+              >
                 {t.nav[item.key]}
               </Link>
             ))}
           </nav>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ position: "relative" }}>
-              <button onClick={() => setLangOpen((v) => !v)} aria-haspopup="listbox" aria-expanded={langOpen} style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 11px", border: "1px solid var(--c-20)", fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--c-80)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <div className="flex items-center gap-2.5">
+            <div className="relative">
+              <button
+                onClick={() => setLangOpen((v) => !v)}
+                aria-haspopup="listbox"
+                aria-expanded={langOpen}
+                className="flex items-center gap-[7px] border border-c-20 px-[11px] py-2 font-mono text-[12px] uppercase tracking-[0.06em] text-c-80"
+              >
                 {lang}
-                <span style={{ fontSize: 9, opacity: 0.6 }}>▼</span>
+                <span className="text-[9px] opacity-60">▼</span>
               </button>
               {langOpen && (
-                <div role="listbox" style={{ position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff", border: "1px solid var(--c-20)", boxShadow: "0 12px 40px rgba(0,0,0,0.13)", minWidth: 172, zIndex: 60 }}>
+                <div
+                  role="listbox"
+                  className="absolute top-[calc(100%+6px)] right-0 z-[60] min-w-[172px] border border-c-20 bg-white shadow-[0_12px_40px_rgba(0,0,0,0.13)]"
+                >
                   {langues.map((lg) => {
                     const active = lg.code === "fr" || lg.code === "en";
                     const inner = (
-                      <span style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "11px 14px", fontSize: 13.5 }}>
+                      <span className="flex w-full items-center justify-between gap-3 px-[14px] py-[11px] text-[13.5px]">
                         {lg.label}
-                        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--c-50)", textTransform: "uppercase" }}>{lg.code}</span>
+                        <span className="font-mono text-[11px] uppercase text-c-50">{lg.code}</span>
                       </span>
                     );
                     return active ? (
-                      <Link key={lg.code} href={localePath(lg.code as Lang)} style={{ display: "block", borderBottom: "1px solid var(--c-10)", color: "var(--c-black)" }}>{inner}</Link>
+                      <Link key={lg.code} href={localePath(lg.code as Lang)} className="block border-b border-c-10 text-c-black">{inner}</Link>
                     ) : (
-                      <div key={lg.code} title="À venir" style={{ borderBottom: "1px solid var(--c-10)", color: "var(--c-40)", cursor: "default" }}>{inner}</div>
+                      <div key={lg.code} title="À venir" className="cursor-default border-b border-c-10 text-c-40">{inner}</div>
                     );
                   })}
                 </div>
               )}
             </div>
 
-            <Link href={route(lang, NAV.connexion)} className="btn btn--primary btn--sm hide-sm">
-              {t.cta.connect}<span className="arrow">→</span>
-            </Link>
-
-            <button onClick={() => setNavOpen(true)} aria-label="Menu" className="nav-burger" style={{ alignItems: "center", gap: 10, padding: "10px 14px", border: "1px solid var(--c-black)", background: "var(--c-black)", color: "#fff", fontSize: 13.5, fontWeight: 600 }}>
-              <span style={{ display: "inline-flex", flexDirection: "column", gap: 3 }}>
-                {[0, 1, 2].map((i) => <span key={i} style={{ width: 16, height: 1.5, background: "#fff", display: "block" }} />)}
+            {/* `.nav-burger` porte le display et sa bascule au-delà de 1120px. */}
+            <button
+              onClick={() => setNavOpen(true)}
+              aria-label="Menu"
+              className="nav-burger items-center gap-2.5 border border-c-black bg-c-black px-[14px] py-2.5 text-[13.5px] font-semibold text-white"
+            >
+              <span className="inline-flex flex-col gap-[3px]">
+                {[0, 1, 2].map((i) => <span key={i} className="block h-[1.5px] w-4 bg-white" />)}
               </span>
               <span className="hide-xs">Menu</span>
             </button>
@@ -90,28 +109,42 @@ export function Header({ lang }: { lang: Lang }) {
       {/* Drawer */}
       {navOpen && (
         <>
-          <div onClick={() => setNavOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 210, background: "rgba(22,22,22,0.5)", animation: "ovF .2s both" }} />
-          <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 211, width: "min(444px,100%)", background: "var(--c-black)", color: "#fff", display: "flex", flexDirection: "column", animation: "revSlideR .32s cubic-bezier(.16,1,.3,1) both" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "calc(20px + var(--sa-t)) var(--pad-x) 20px", borderBottom: "1px solid var(--c-80)", flex: "0 0 auto" }}>
-              <span className="mono" style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ac-light)" }}>Navigation</span>
-              <button onClick={() => setNavOpen(false)} aria-label="Fermer" style={{ width: 40, height: 40, border: "1px solid var(--c-80)", color: "#fff", fontSize: 16, background: "var(--c-90)" }}>✕</button>
+          <div onClick={() => setNavOpen(false)} className="fixed inset-0 z-[210] animate-[ovF_.2s_both] bg-[rgba(22,22,22,0.5)]" />
+          <div className="fixed top-0 right-0 bottom-0 z-[211] flex w-[min(444px,100%)] animate-[revSlideR_.32s_cubic-bezier(.16,1,.3,1)_both] flex-col bg-c-black text-white">
+            <div className="flex flex-none items-center justify-between border-b border-c-80 px-(--pad-x) pt-[calc(20px+var(--sa-t))] pb-5">
+              <span className="font-mono text-[12px] uppercase tracking-[0.12em] text-ac-light">Navigation</span>
+              <button onClick={() => setNavOpen(false)} aria-label="Fermer" className="size-10 border border-c-80 bg-c-90 text-[16px] text-white">✕</button>
             </div>
-            <div style={{ flex: 1, overflow: "auto" }}>
+            <div className="flex-1 overflow-auto">
               {NAV_DRAWER.map((item) => (
-                <Link key={item.key} href={route(lang, item.slug)} onClick={() => setNavOpen(false)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "15px var(--pad-x)", fontSize: 16.5, fontWeight: 500, color: "#fff", borderBottom: "1px solid #232323" }}>
+                <Link
+                  key={item.key}
+                  href={route(lang, item.slug)}
+                  onClick={() => setNavOpen(false)}
+                  className="flex w-full items-center justify-between gap-3 border-b border-[#232323] px-(--pad-x) py-[15px] text-[16.5px] font-medium text-white"
+                >
                   <span>{t.nav[item.key]}</span>
-                  <span className="mono" style={{ fontSize: 13, color: "var(--c-70)" }}>→</span>
+                  <span className="font-mono text-[13px] text-c-70">→</span>
                 </Link>
               ))}
             </div>
-            <div style={{ flex: "0 0 auto", padding: "18px var(--pad-x) calc(18px + var(--sa-b))", borderTop: "1px solid var(--c-80)", display: "flex", flexDirection: "column", gap: 10 }}>
-              <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+            <div className="flex flex-none flex-col gap-2.5 border-t border-c-80 px-(--pad-x) pt-[18px] pb-[calc(18px+var(--sa-b))]">
+              <div className="mb-1 flex gap-2">
                 {(["fr", "en"] as Lang[]).map((l) => (
-                  <Link key={l} href={localePath(l)} onClick={() => setNavOpen(false)} className="mono" style={{ flex: 1, minHeight: 48, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--c-80)", background: lang === l ? "var(--ac)" : "transparent", color: lang === l ? "#fff" : "var(--c-30)", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.08em" }}>{l}</Link>
+                  <Link
+                    key={l}
+                    href={localePath(l)}
+                    onClick={() => setNavOpen(false)}
+                    className={cn(
+                      "flex min-h-12 flex-1 items-center justify-center border border-c-80 font-mono text-[14px] uppercase tracking-[0.08em]",
+                      lang === l ? "bg-ac text-white" : "bg-transparent text-c-30",
+                    )}
+                  >
+                    {l}
+                  </Link>
                 ))}
               </div>
-              <Link href={route(lang, NAV.connexion)} onClick={() => setNavOpen(false)} className="btn btn--primary" style={{ justifyContent: "center" }}>{t.cta.connect}<span className="arrow">→</span></Link>
-              <Link href={route(lang, NAV.mgp)} onClick={() => setNavOpen(false)} className="btn btn--on-dark" style={{ justifyContent: "center" }}>{t.cta.mgp}</Link>
+              <Link href={route(lang, NAV.mgp)} onClick={() => setNavOpen(false)} className="btn btn--on-dark justify-center">{t.cta.mgp}</Link>
             </div>
           </div>
         </>

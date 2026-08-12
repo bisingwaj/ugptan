@@ -26,6 +26,12 @@ const nextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
+      // Console d'administration : le <meta robots> du layout ne couvre que le
+      // HTML — cet en-tête couvre aussi les réponses non-HTML du sous-arbre.
+      {
+        source: "/7hj3nrpgaz6fjtw7/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+      },
       // Médias volumineux (vidéo du héros) : cache long côté navigateur/CDN.
       // Non-immutable → un fichier de même nom mis à jour se propage sous 30 j
       // (préférer un nom versionné, ex. hero-film-v2.mp4, pour un bust immédiat).
