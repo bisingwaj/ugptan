@@ -13,6 +13,7 @@ export function dict(lang: Lang) {
     nav: {
       accueil: t("Accueil", "Home"),
       projet: t("Le Projet", "The Project"),
+      composantes: t("Composantes", "Components"),
       ugptn: t("L'UGPTN", "The UGPTN"),
       gouvernance: t("Gouvernance", "Governance"),
       marches: t("Marchés", "Tenders"),
@@ -24,6 +25,8 @@ export function dict(lang: Lang) {
       contact: t("Contact", "Contact"),
       mgp: t("Plaintes (MGP)", "Grievances"),
       connexion: t("Se connecter", "Sign in"),
+      confidentialite: t("Politique de confidentialité", "Privacy policy"),
+      conditions: t("Conditions d'utilisation", "Terms of use"),
     },
     cta: {
       connect: t("Se connecter", "Sign in"),
@@ -36,9 +39,9 @@ export function dict(lang: Lang) {
       report: t("Déposer une plainte", "File a grievance"),
     },
     sec: {
-      chiffres: t("Le projet en chiffres", "The project in figures"),
+      chiffres: t("Le projet en bref", "The project at a glance"),
       composantes: t("Les cinq composantes", "The five components"),
-      resultats: t("Cadre de résultats — cibles 2029", "Results framework — 2029 targets"),
+      resultats: t("Cadre de résultats — ambitions à l'horizon 2029", "Results framework — ambitions towards 2029"),
       couverture: t("Couverture géographique", "Geographic coverage"),
       gouvernance: t("Architecture de gouvernance", "Governance architecture"),
       equipe: t("L'équipe de l'Unité", "The Unit's team"),
@@ -46,22 +49,48 @@ export function dict(lang: Lang) {
       plateforme: t("La plateforme métier — 8 espaces", "The business platform — 8 spaces"),
     },
     lbl: {
-      baseline: t("Référence", "Baseline"),
-      cible: t("Cible 2029", "2029 target"),
+      baseline: t("Point de départ", "Starting point"),
+      cible: t("Ambition à l'horizon 2029", "Ambition towards 2029"),
       dont: t("dont", "incl."),
       prio: t("Provinces prioritaires", "Priority provinces"),
       autres: t("Autres provinces", "Other provinces"),
       total: t("Total", "Total"),
       ida: "IDA",
       afd: "AFD",
+      /* Marqueur d'ordre de grandeur, apposé aux valeurs prospectives. */
+      approx: "≈",
+      /* Mention affichée sous tout bloc d'indicateurs prospectifs. */
+      indicatif: t(
+        "Ordres de grandeur issus du cadre de résultats du projet. Ces ambitions orientent l'exécution ; elles sont revues périodiquement avec les partenaires et ne constituent pas un engagement de résultat.",
+        "Orders of magnitude drawn from the project's results framework. These ambitions guide implementation; they are reviewed periodically with partners and do not constitute a guarantee of results.",
+      ),
     },
     foot: {
       transparence: t("Transparence", "Transparency"),
-      legal: t(
+      /* Provenance des données chiffrées, déplacée sous l'identité de l'Unité. */
+      source: t(
         "Source de vérité : MEP du 23 juin 2025. Montants, dates et indicateurs conformes aux documents officiels du projet.",
         "Source of truth: PIM of 23 June 2025. Amounts, dates and indicators per the project's official documents.",
       ),
+      legalLabel: t("Informations légales", "Legal information"),
     },
+    /* --- Pages légales ----------------------------------------------------- */
+    legal: {
+      crumb: t("Informations légales", "Legal information"),
+      sommaire: t("Sommaire", "Contents"),
+      maj: t("Dernière mise à jour", "Last updated"),
+      voirAussi: t("À lire également", "Also to be read"),
+      code: t(
+        "Ordonnance-loi n° 23/010 du 13 mars 2023 portant Code du numérique",
+        "Ordinance-Law No. 23/010 of 13 March 2023 enacting the Digital Code",
+      ),
+      contactTitre: t("Une question sur ce document ?", "A question about this document?"),
+      contactLead: t(
+        "Écrivez au responsable du traitement, ou saisissez le mécanisme de gestion des plaintes si votre demande porte sur une décision du projet.",
+        "Write to the data controller, or refer the matter to the grievance mechanism if your request concerns a project decision.",
+      ),
+    },
+
     tagPublic: t("Site institutionnel public", "Public institutional website"),
     langNote: t("Contenu en cours de localisation — disponible au lancement.", "Content being localised — available at launch."),
 
@@ -92,33 +121,33 @@ export function dict(lang: Lang) {
       heroKicker: t("Projet de Transformation Numérique · RDC", "Digital Transformation Project · DRC"),
       heroTitle: t("Transformer la RDC, une connexion à la fois.", "Transforming the DRC, one connection at a time."),
       heroLead: t(
-        "L'Unité qui pilote la transformation numérique de la RDC — 510 millions de dollars, cofinancés par la Banque mondiale et l'AFD, pour relier les 26 provinces et ouvrir l'accès, les services et les compétences au plus grand nombre.",
-        "The Unit steering the DRC's digital transformation — 510 million dollars, co-financed by the World Bank and AFD, to connect all 26 provinces and open up access, services and skills for the many.",
+        "L'Unité qui pilote la transformation numérique de la RDC — un programme cofinancé par la Banque mondiale et l'AFD, engagé sur les 26 provinces pour élargir progressivement l'accès, les services et les compétences numériques.",
+        "The Unit steering the DRC's digital transformation — a programme co-financed by the World Bank and AFD, engaged across all 26 provinces to progressively widen access, services and digital skills.",
       ),
       introKicker: t("Notre ambition", "Our ambition"),
       introLead: t(
-        "Relier les territoires, moderniser les services publics, former une génération : le Projet met le numérique au service du quotidien — de la salle de classe au centre de santé, du champ au guichet de l'administration.",
-        "Connecting territories, modernising public services, training a generation: the Project puts digital at the service of everyday life — from the classroom to the health centre, from the field to the public-service counter.",
+        "Trois chantiers, et une seule logique : un réseau qui atteint les territoires, un socle numérique commun à l'État, et les compétences pour faire vivre l'un et l'autre. Pris séparément, aucun ne produit d'effet durable ; c'est leur enchaînement qui compte.",
+        "Three efforts, one logic: a network that reaches the territories, a digital foundation shared across the State, and the skills to keep both running. Taken separately, none produces lasting effects; it is their sequence that matters.",
       ),
       statusEffective: t("Entrée en vigueur 31.10.2025", "Effectiveness 31.10.2025"),
       statusCompletion: t("Achèvement technique 31.12.2029", "Technical completion 31.12.2029"),
       resultatsTitle: t(
-        "Des cibles mesurables à l'horizon 2029 — l'impact et l'inclusion au cœur.",
-        "Measurable targets for 2029 — impact and inclusion at the core.",
+        "Des ambitions mesurables à l'horizon 2029 — l'impact et l'inclusion au cœur.",
+        "Measurable ambitions towards 2029 — impact and inclusion at the core.",
       ),
       couvertureLead: t(
-        "Une couverture nationale des 26 provinces, avec un déploiement priorisé sur les 10 provinces du Cadre de Partenariat-Pays.",
-        "Nationwide coverage of all 26 provinces, with a prioritised rollout across the 10 provinces of the Country Partnership Framework.",
+        "Le projet couvre les 26 provinces, mais pas au même rythme : dix d'entre elles, retenues dans le Cadre de Partenariat-Pays, sont traitées en priorité. Cet ordre est publié — c'est ce qui permet à chacun de savoir où en est son territoire.",
+        "The project covers all 26 provinces, but not at the same pace: ten of them, identified in the Country Partnership Framework, are treated first. That order is published — which is what allows each territory to know where it stands.",
       ),
       equipeLead: t(
         "Une équipe d'exécution organisée en cinq pôles — Direction, Composantes, Fiduciaire, Passation, Sauvegardes & transversal — et vingt-et-un sous-rôles, du pilotage national à la liaison avec les provinces.",
         "An execution team organised into five clusters — Management, Components, Fiduciary, Procurement, Safeguards & cross-cutting — and twenty-one sub-roles, from national steering to provincial liaison.",
       ),
       humainLabel: t("Impact humain", "Human impact"),
-      humainTitle: t("Derrière les chiffres, des vies.", "Behind the figures, real lives."),
+      humainTitle: t("Ce que ces ambitions représentent, une fois traduites.", "What these ambitions mean, once translated."),
       humainLead: t(
-        "Les cibles 2029 ne sont pas des abstractions — ce sont des écoles en ligne, des femmes dans les métiers du numérique et des villages raccordés.",
-        "The 2029 targets are not abstractions — they are schools online, women in digital careers and villages brought onto the network.",
+        "Ces ambitions ne sont pas des abstractions — ce sont des écoles en ligne, des femmes dans les métiers du numérique et des villages raccordés.",
+        "These ambitions are not abstractions — they are schools online, women in digital careers and villages brought onto the network.",
       ),
       storiesLabel: t("Histoires & impact", "Stories & impact"),
       storiesTitle: t("Au-delà des chiffres, des vies qui changent.", "Beyond the numbers, lives that change."),
@@ -131,8 +160,8 @@ export function dict(lang: Lang) {
       evtLabel: t("Événements & activités", "Events & activities"),
       evtTitle: t("Échanger, participer, contribuer.", "Exchange, take part, contribute."),
       evtLead: t(
-        "Forums, ateliers, consultations publiques et webinaires organisés par ou avec l'Unité. Inscrivez-vous pour participer.",
-        "Forums, workshops, public consultations and webinars organised by or with the Unit. Register to take part.",
+        "Les consultations publiques ne sont pas des séances d'information : ce qui s'y dit est consigné et doit être pris en compte avant que les travaux ne démarrent. Les forums, ateliers et webinaires suivent la même règle — on y vient pour contribuer, pas pour assister.",
+        "Public consultations are not briefing sessions: what is said there is recorded and must be taken into account before works begin. Forums, workshops and webinars follow the same rule — you come to contribute, not to attend.",
       ),
       evtUpcoming: t("À venir", "Upcoming"),
       galleryLabel: t("En images", "In pictures"),
@@ -144,13 +173,13 @@ export function dict(lang: Lang) {
       partenairesLabel: t("Partenaires & institutions", "Partners & institutions"),
       partenairesTitle: t("Construit avec ceux qui le rendent possible.", "Built with those who make it possible."),
       partenairesLead: t(
-        "Bailleurs, ministère de tutelle, régulateurs et institutions bénéficiaires du Projet.",
-        "Donors, the supervising ministry, regulators and beneficiary institutions of the Project.",
+        "Un projet de cette nature ne se conduit pas depuis une seule institution : le régulateur, les ministères sectoriels, l'agence du numérique et l'organisme d'identification portent chacun une part du résultat.",
+        "A project of this kind cannot be run from a single institution: the regulator, sector ministries, the digital agency and the identification body each carry part of the result.",
       ),
       plateformeTitle: t("Une plateforme, huit espaces sur mesure.", "One platform, eight tailored spaces."),
       plateformeLead: t(
-        "Au-delà de l'information publique, une plateforme métier donne à chacun des 8 profils son espace, son parcours et ses outils — un seul produit cohérent, du citoyen au bailleur.",
-        "Beyond public information, a single business platform gives each of the 8 profiles its own space, journey and tools — one coherent product, from citizen to donor.",
+        "Un soumissionnaire, un auditeur et un ministère bénéficiaire n'ont ni les mêmes droits d'accès ni les mêmes besoins. La plateforme métier attribue à chaque profil son espace et ses outils, sur une base de données commune et cloisonnée.",
+        "A bidder, an auditor and a beneficiary ministry have neither the same access rights nor the same needs. The business platform gives each profile its own space and tools, on a shared and compartmentalised data foundation.",
       ),
     },
 
@@ -190,17 +219,17 @@ export function dict(lang: Lang) {
     projet: {
       titre: t("Le Projet", "The Project"),
       lead: t(
-        "Un programme de 510 millions de dollars pour élargir l'accès, bâtir les fondations numériques de l'État et développer les compétences de la RDC à l'horizon 2029.",
-        "A 510 million dollar programme to widen access, build the State's digital foundations and grow the skills of the DRC by 2029.",
+        "Trois chantiers menés ensemble parce qu'aucun ne produit d'effet seul : élargir l'accès au réseau, doter l'État d'un socle numérique commun, et former les compétences qui feront vivre l'un et l'autre. Horizon 2029.",
+        "Three efforts pursued together because none works alone: widening access to the network, giving the State a common digital foundation, and building the skills that will keep both running. Horizon 2029.",
       ),
       ctxLabel: t("Contexte & raison d'être", "Context & rationale"),
       ctxTitle: t(
-        "L'une des fractures numériques les plus marquées du continent.",
-        "One of the most marked digital divides on the continent.",
+        "Le retard n'est pas technologique. Il est géographique, énergétique et institutionnel.",
+        "The gap is not technological. It is geographic, energy-related and institutional.",
       ),
       ctxLead: t(
-        "Sur un territoire à l'échelle continentale et une population dispersée, la RDC porte l'un des plus larges déficits d'infrastructures d'Afrique. Le projet s'ancre dans l'approche régionale APM IDEA, qui mutualise l'intégration numérique de la région.",
-        "Across a continental territory with a widely dispersed population, the DRC carries one of Africa's widest infrastructure gaps. The project is anchored in the regional APM IDEA approach, which pools the region's digital integration.",
+        "Les technologies de réseau sont disponibles et éprouvées ; ce qui manque, ce sont les conditions qui les rendent rentables à déployer. Un territoire de 2,3 millions de kilomètres carrés, une population dispersée, une électrification partielle et des systèmes publics conçus séparément les uns des autres : chacun de ces facteurs renchérit l'accès ou empêche l'usage. Le projet s'ancre dans l'approche régionale APM IDEA, qui mutualise l'intégration numérique de l'Afrique orientale et australe — parce que la capacité internationale et les corridors de transit se négocient à l'échelle de la région, pas d'un pays isolé.",
+        "Network technologies are available and proven; what is missing are the conditions that make them viable to deploy. A territory of 2.3 million square kilometres, a dispersed population, partial electrification, and public systems designed independently of one another: each of these factors raises the cost of access or prevents its use. The project is anchored in the regional APM IDEA approach, which pools digital integration across Eastern and Southern Africa — because international capacity and transit corridors are negotiated at regional, not national, scale.",
       ),
       ctxStats: [
         { v: "6,56", u: "kbit/s", t: t("Bande passante intl./hab. au démarrage", "Intl. bandwidth per capita at start") },
@@ -208,29 +237,109 @@ export function dict(lang: Lang) {
         { v: "2029", u: "", t: t("horizon de la transformation", "horizon of the transformation") },
       ],
       engLabel: t("Engagements fondateurs", "Founding commitments"),
-      engTitle: t("Une structure de cofinancement à deux guichets.", "A two-window co-financing structure."),
+      engTitle: t("Deux partenaires, un même engagement.", "Two partners, one shared commitment."),
       eng: [
-        { d: "25.11.2024", t: t("Signature de l'accord de financement avec la Banque mondiale — IDA, 400 M USD.", "Financing agreement signed with the World Bank — IDA, 400 M USD.") },
-        { d: "14.03.2025", t: t("Signature de la convention de financement avec l'AFD — 110 M USD / 100 M EUR.", "Financing convention signed with AFD — 110 M USD / 100 M EUR.") },
+        { d: "25.11.2024", t: t("Signature de l'accord de financement avec la Banque mondiale (IDA).", "Financing agreement signed with the World Bank (IDA).") },
+        { d: "14.03.2025", t: t("Signature de la convention de financement avec l'Agence Française de Développement.", "Financing convention signed with the French Development Agency.") },
       ],
       jalonsLabel: t("Calendrier & jalons", "Timeline & milestones"),
       changeLabel: t("Ce que ça change pour vous", "What it changes for you"),
       changeTitle: t(
-        "Un pays connecté, c'est d'abord le quotidien rendu plus simple.",
-        "A connected country is, first of all, daily life made simpler.",
+        "Ce qui change vraiment tient souvent à une seule chose : ne plus avoir à se déplacer pour prouver ce que l'administration sait déjà.",
+        "What really changes often comes down to one thing: no longer travelling to prove what the administration already knows.",
       ),
       changeLead: t(
-        "Derrière les budgets et les composantes, le projet doit se mesurer dans la vie des citoyens, des étudiants, des entrepreneurs et des communautés rurales.",
-        "Behind the budgets and the components, the project is meant to be felt in the lives of citizens, students, entrepreneurs and rural communities.",
+        "Un projet d'infrastructure ne se juge pas à ce qu'il installe, mais à ce qu'il rend possible — et à ce qu'il cesse d'imposer. Voici, secteur par secteur, la contrainte d'aujourd'hui et le mécanisme précis qui la lève.",
+        "An infrastructure project is judged not by what it installs, but by what it makes possible — and by what it stops imposing. Here, sector by sector, is today's constraint and the precise mechanism that lifts it.",
       ),
       whoLabel: t("Pour qui ?", "Who benefits"),
-      whoTitle: t("Un projet pour tout le pays.", "A project for the whole country."),
+      whoTitle: t("À qui cela profite, et à quelle condition.", "Who benefits, and on what condition."),
       cfaqLabel: t("Le projet & vous", "The project & you"),
-      cfaqTitle: t("Des réponses claires.", "Straightforward answers."),
+      cfaqTitle: t("Les questions qu'on nous pose, et nos réponses.", "The questions we are asked, and our answers."),
       ctaTitle: t("Prenez part à la transformation.", "Take part in the transformation."),
       ctaLead: t(
-        "Suivez les appels d'offres, l'actualité, ou signalez une préoccupation.",
-        "Track the calls for tender, follow the news, or report a concern.",
+        "Candidater à un marché, suivre l'avancement province par province, ou signaler une difficulté : chacune de ces portes est ouverte et tracée.",
+        "Bid for a contract, follow progress province by province, or report a difficulty: each of these doors is open and traceable.",
+      ),
+    },
+
+    /* --- Composantes (index + pages dédiées) ------------------------------ */
+    comp: {
+      titre: t("Les composantes", "The components"),
+      indexTitle: t("Cinq composantes, un seul projet.", "Five components, one project."),
+      indexLead: t(
+        "Cinq volets complémentaires : l'accès et l'inclusion, les fondations numériques de l'État, les compétences et l'innovation, l'exécution du projet et la réserve d'intervention. Chacun a sa page, ses projets phares et son responsable.",
+        "Five complementary strands: access and inclusion, the State's digital foundations, skills and innovation, project delivery and the response reserve. Each has its own page, flagship projects and lead.",
+      ),
+      one: t("Composante", "Component"),
+      rowsNote: t(
+        "Cinq volets complémentaires : chacun a sa page, ses projets phares et son responsable.",
+        "Five complementary strands: each has its own page, flagship projects and lead.",
+      ),
+      see: t("Voir la composante", "View the component"),
+      seeAll: t("Découvrir les 5 composantes", "Explore the 5 components"),
+      prev: t("Composante précédente", "Previous component"),
+      next: t("Composante suivante", "Next component"),
+      budget: t("Périmètre de la composante", "Component scope"),
+      share: t("chantiers structurants", "structuring workstreams"),
+      sousTitle: t("Sous-composantes", "Sub-components"),
+      horizon: t("Horizon", "Horizon"),
+      statutExec: t("En exécution", "Under implementation"),
+      statutReserve: t("Réserve contingente", "Contingent reserve"),
+      statut: t("Statut", "Status"),
+      noSous: t("Composante conduite sans découpage en sous-composantes.", "Component run without a breakdown into sub-components."),
+      noDotation: t("Mécanisme de réserve", "Reserve mechanism"),
+      /* Sections */
+      secProblematique: t("La problématique", "The problem"),
+      pbAppui: t("Pourquoi une intervention publique", "Why public action"),
+      pbLiens: t("Ce que cela suppose ailleurs", "What this requires elsewhere"),
+      aProblematique: t("Problématique", "Problem"),
+      secContexte: t("Contexte & périmètre", "Context & scope"),
+      secObjectifs: t("Objectifs de la composante", "Component objectives"),
+      secProjets: t("Projets phares", "Flagship projects"),
+      secProjetsLead: t(
+        "Les chantiers structurants portés par la composante.",
+        "The structuring workstreams carried by the component.",
+      ),
+      secEcosysteme: t("Vue d'ensemble", "The bigger picture"),
+      secFinalite: t("Finalité", "Purpose"),
+      secResponsable: t("Responsable de la composante", "Component lead"),
+      secLies: t("Rattachés à cette composante", "Attached to this component"),
+      secIndicateurs: t("Indicateurs rattachés", "Attached indicators"),
+      /* Libellés courts — barre d'ancres collante (place contrainte) */
+      aContexte: t("Contexte", "Context"),
+      aVideo: t("Vidéo", "Video"),
+      aObjectifs: t("Objectifs", "Objectives"),
+      aProjets: t("Projets phares", "Flagship projects"),
+      aEcosysteme: t("Vue d'ensemble", "Bigger picture"),
+      aFinalite: t("Finalité", "Purpose"),
+      aResponsable: t("Responsable", "Lead"),
+      /* Vidéo */
+      videoLabel: t("Vidéo de présentation", "Presentation video"),
+      videoPlay: t("Regarder la présentation", "Watch the presentation"),
+      videoSoon: t("Vidéo de présentation — à venir", "Presentation video — coming soon"),
+      videoSoonNote: t(
+        "Cet emplacement est prévu pour le film de présentation de la composante. Format 16:9, sous-titres FR/EN.",
+        "This slot is reserved for the component's presentation film. 16:9 format, FR/EN subtitles.",
+      ),
+      /* Responsable */
+      respRole: t("Fonction", "Role"),
+      respPerimetre: t("Périmètre", "Scope"),
+      respContact: t("Contacter la composante", "Contact the component"),
+      respSoon: t("Nomination en cours de publication.", "Appointment to be published."),
+      /* Blocs liés */
+      liesActus: t("Actualités de la composante", "Component news"),
+      liesMarches: t("Marchés en cours", "Live tenders"),
+      liesRessources: t("Rapports & publications", "Reports & publications"),
+      liesActusVide: t("Aucune actualité rattachée pour l'instant.", "No news attached yet."),
+      liesMarchesVide: t("Aucun avis en cours pour cette composante.", "No live notice for this component."),
+      /* Divers */
+      projets: t("projets phares", "flagship projects"),
+      objectifsCount: t("objectifs", "objectives"),
+      sommaire: t("Sommaire", "Contents"),
+      toValidate: t(
+        "Contenu éditorial en cours de validation par l'Unité.",
+        "Editorial content pending validation by the Unit.",
       ),
     },
 
@@ -238,43 +347,43 @@ export function dict(lang: Lang) {
     ugptn: {
       titre: t("L'UGPTN", "The UGPTN"),
       lead: t(
-        "Le bras opérationnel permanent du projet : elle prépare, exécute et supervise — sans jamais se substituer aux bailleurs ni aux responsables habilités à décider.",
-        "The project's permanent operational arm: it prepares, delivers and supervises — without ever standing in for the donors or the officials empowered to decide.",
+        "Une unité d'exécution, pas une administration de plus. Elle prépare, passe les marchés, supervise et rend compte, dans un cadre où la décision appartient aux autorités de tutelle et où les prérogatives des cofinanceurs restent entières.",
+        "A delivery unit, not another administration. It prepares, procures, supervises and accounts, within a framework where decisions belong to the supervising authorities and where co-financiers' prerogatives remain intact.",
       ),
       mandatLabel: t("Mandat", "Mandate"),
-      mandatTitle: t("Quatre fonctions sur tout le cycle de vie du projet.", "Four functions across the project life-cycle."),
+      mandatTitle: t("Quatre fonctions, exercées en continu et jamais séparément.", "Four functions, exercised continuously and never in isolation."),
       principesLabel: t("Principes directeurs", "Guiding principles"),
-      principesTitle: t("Trois principes intangibles.", "Three intangible principles."),
+      principesTitle: t("Trois règles qui bornent ce que l'Unité peut décider.", "Three rules that bound what the Unit may decide."),
       polesLabel: t("Organisation interne", "Internal organisation"),
       polesTitle: t("21 sous-rôles, 5 pôles.", "21 sub-roles, 5 clusters."),
       arrete: t("Créée par arrêté ministériel", "Created by ministerial order"),
       objLabel: t("Objectif & rôle", "Objective & role"),
-      objTitle: t("Exécuter, mesurer, rendre compte.", "Deliver, measure, account."),
+      objTitle: t("La capacité d'exécution est un actif. Elle se construit, elle ne se décrète pas.", "Delivery capacity is an asset. It is built, not decreed."),
       objLead: t(
-        "Derrière un nom technique, une mission simple : transformer 510 millions de dollars de financement en connectivité, en services et en compétences — proprement, et dans les délais.",
-        "Behind a technical name, a simple mission: to turn 510 million dollars of financing into connectivity, services and skills — cleanly, and on time.",
+        "Un financement international n'est utile qu'à proportion de ce qu'une équipe sait en faire : préparer des dossiers qui passent la revue du bailleur, mettre en concurrence sans contentieux, superviser des chantiers dispersés sur un territoire immense, et rendre compte de chaque étape. C'est ce métier-là que l'Unité exerce.",
+        "International financing is only as useful as a team's ability to use it: preparing files that pass donor review, competing contracts without litigation, supervising sites scattered across a vast territory, and accounting for every step. That is the trade the Unit practises.",
       ),
       polesActLabel: t("Les pôles en action", "The clusters in action"),
-      polesActTitle: t("Cinq pôles, un seul moteur opérationnel.", "Five clusters, one operational engine."),
+      polesActTitle: t("Cinq pôles, et ce sur quoi chacun travaille en ce moment.", "Five clusters, and what each is working on right now."),
       polesActLead: t(
-        "Ce que fait concrètement chaque pôle — et ce sur quoi il travaille en ce moment.",
-        "What each cluster concretely does — and what it is working on right now.",
+        "Un pôle se juge à ses livrables datés, pas à son organigramme. Chacun porte une responsabilité distincte, et un dossier en cours dont l'avancement est vérifiable.",
+        "A cluster is judged by its dated deliverables, not by its org chart. Each carries a distinct responsibility, and a live file whose progress can be checked.",
       ),
       uniteBrefLabel: t("L'Unité en bref", "The Unit at a glance"),
       uniteBrefTitle: t("Une structure resserrée pour un grand mandat.", "A lean structure for a large mandate."),
       methodeLabel: t("Notre méthode", "How we work"),
-      methodeTitle: t("Du financement aux résultats, en cinq temps.", "From financing to results, in five moves."),
+      methodeTitle: t("Du financement aux résultats : un cycle, répété marché après marché.", "From financing to results: one cycle, repeated contract after contract."),
       methodeLead: t(
-        "L'Unité transforme un accord en connectivité, services et compétences — par un cycle discipliné et reproductible.",
-        "The Unit turns an agreement into connectivity, services and skills — through a disciplined, repeatable cycle.",
+        "Le même enchaînement s'applique à un chantier de fibre, à une plateforme informatique ou à un programme de formation. C'est sa répétabilité qui permet de conduire des dizaines de marchés en parallèle sans improviser à chaque fois.",
+        "The same sequence applies to a fibre worksite, an IT platform or a training programme. It is its repeatability that makes it possible to run dozens of contracts in parallel without improvising each time.",
       ),
       engLabel: t("Nos engagements", "Our commitments"),
-      engTitle: t("Ce à quoi nous nous engageons.", "How we hold ourselves accountable."),
+      engTitle: t("Des engagements vérifiables, pas des intentions.", "Verifiable commitments, not intentions."),
       glossaireLabel: t("Comprendre les sigles", "Understanding the acronyms"),
-      glossaireTitle: t("Le langage du projet, en clair.", "The project's language, in plain words."),
+      glossaireTitle: t("Les sigles que vous rencontrerez, et ce qu'ils recouvrent.", "The acronyms you will meet, and what they cover."),
       glossaireLead: t(
-        "Un petit glossaire pour que chacun suive — aucun jargon laissé sans explication.",
-        "A small glossary so everyone can follow — no jargon left unexplained.",
+        "Le vocabulaire des projets financés par les bailleurs est technique par nécessité : chaque terme renvoie à une procédure précise. En voici la traduction.",
+        "The vocabulary of donor-financed projects is technical out of necessity: each term refers to a precise procedure. Here is the translation.",
       ),
       faqLabel: t("À propos de l'Unité", "About the Unit"),
       faqTitle: t("Questions fréquentes.", "Frequently asked questions."),
@@ -284,32 +393,32 @@ export function dict(lang: Lang) {
     gouv: {
       titre: t("Gouvernance", "Governance"),
       lead: t(
-        "Trois niveaux complémentaires — stratégique, technique et exécution — chacun doté d'un mandat distinct, jamais confondu.",
-        "Three complementary levels — strategic, technical and execution — each with a distinct mandate, never to be confused.",
+        "Trois niveaux, et une règle : celui qui oriente ne met pas en œuvre, et celui qui met en œuvre ne s'auto-évalue pas. Cette séparation est ce qui rend les décisions contrôlables.",
+        "Three levels, and one rule: whoever sets direction does not implement, and whoever implements does not assess themselves. That separation is what makes decisions controllable.",
       ),
       copilComp: t("Composition — 8 membres", "Composition — 8 members"),
       ctpComp: t("Composition — 12 représentants", "Composition — 12 representatives"),
       copilDesc: t(
-        "Comité de Pilotage — orientation stratégique, validation des grandes décisions, arbitrage politique.",
-        "Steering Committee — strategic orientation, validation of major decisions, political arbitration.",
+        "Comité de Pilotage — il fixe le cap, valide la programmation annuelle et tranche les arbitrages qui dépassent le mandat technique : priorités entre composantes, réallocations, conflits entre institutions bénéficiaires.",
+        "Steering Committee — it sets the course, approves annual programming and settles the arbitrations that exceed the technical mandate: priorities between components, reallocations, disputes between beneficiary institutions.",
       ),
       ctpDesc: t(
-        "Comité Technique du Projet — préparation des travaux du COPIL, suivi technique, coordination opérationnelle.",
-        "Project Technical Committee — preparing the COPIL's work, technical follow-up, operational coordination.",
+        "Comité Technique du Projet — il instruit les dossiers avant qu'ils ne remontent : c'est là que les objections techniques des institutions concernées doivent être levées, pour que le Comité de Pilotage décide sur une base assainie.",
+        "Project Technical Committee — it prepares files before they move up: this is where the technical objections of the institutions concerned must be resolved, so that the Steering Committee decides on a clean basis.",
       ),
       copilMembers: ["MPTN — Président", "Présidence / ADN", "Primature", "Min. Finances", "MIS", "MESU", "MEPME", "+1 désigné"],
       ctpMembers: ["MPTN (préside) +3", "ARPTC", "FDSU", "MIS ×2", "ONIP", "MESU", "MEPME", "MINFIN-CSPP", "ADN", "SOCOF", "Primature"],
       actLabel: t("La coordination en action", "Coordination in action"),
-      actTitle: t("La gouvernance à l'œuvre.", "Governance at work."),
+      actTitle: t("Ce que la gouvernance a effectivement décidé.", "What governance has actually decided."),
       actLead: t(
-        "La trace datée des décisions de pilotage et du travail de coordination — le COPIL, le CTP et l'Unité à l'œuvre.",
-        "The dated trace of steering decisions and coordination work — the COPIL, the CTP and the Unit at work.",
+        "Une gouvernance ne se juge pas à sa composition mais à ses décisions et à leur date. Voici la trace de celles qui engagent l'exécution.",
+        "Governance is judged not by its composition but by its decisions and their dates. Here is the record of those that commit delivery.",
       ),
       leadsLabel: t("L'équipe de coordination", "The coordination team"),
-      leadsTitle: t("Les femmes et les hommes qui portent le mandat.", "The people who carry the mandate."),
+      leadsTitle: t("Qui répond de quoi.", "Who answers for what."),
       leadsLead: t(
-        "Les rôles clés de l'Unité : la coordination nationale, l'appui technique et les normes, la passation des marchés et le suivi-évaluation — chacun responsable d'un volet de l'exécution sur les 26 provinces.",
-        "The Unit's key roles: national coordination, technical support and standards, procurement, and monitoring & evaluation — each accountable for one strand of delivery across the 26 provinces.",
+        "Dans un projet à plusieurs bailleurs et plusieurs ministères, l'ambiguïté sur la responsabilité coûte des mois. Chaque rôle ci-dessous porte un périmètre défini et répond de ses livrables devant la coordination.",
+        "In a project with several donors and several ministries, ambiguity about responsibility costs months. Each role below carries a defined scope and answers for its deliverables to the coordination.",
       ),
       bodyLabels: {
         nature: t("Nature", "Nature"),
@@ -323,8 +432,8 @@ export function dict(lang: Lang) {
     contact: {
       titre: t("Contact", "Contact"),
       lead: t(
-        "Joindre le bon interlocuteur — y compris en province — et signaler via un mécanisme de gestion des plaintes accessible, multilingue et entièrement traçable.",
-        "Reach the right contact — including in the provinces — and report through a grievance mechanism that is accessible, multilingual and fully traceable.",
+        "Une question sur un marché, une difficulté sur un chantier, une demande institutionnelle : chaque objet a son canal, et le bon canal est celui qui laisse une trace. Les points focaux provinciaux permettent de saisir l'Unité sans passer par Kinshasa.",
+        "A question about a contract, a difficulty on a worksite, an institutional request: each matter has its channel, and the right channel is the one that leaves a record. Provincial focal points make it possible to reach the Unit without going through Kinshasa.",
       ),
       lblAddress: t("Siège", "Head office"),
       lblPhone: t("Téléphone", "Phone"),
@@ -341,11 +450,11 @@ export function dict(lang: Lang) {
         { n: "03", t: "E-mail", d: t("Saisine écrite avec numéro de référence.", "Written referral with reference number.") },
         { n: "04", t: t("Point focal physique", "Physical focal point"), d: t("Annuaire provincial sur 26 provinces.", "Provincial directory across 26 provinces.") },
       ],
-      slaText: t("100 % des griefs traités en 30 jours ou moins.", "100% of grievances handled in 30 days or less."),
+      slaText: t("Objectif : traiter chaque grief dans un délai de 30 jours.", "Objective: handle every grievance within 30 days."),
       generalTitle: t("Canal général MGP", "General GRM channel"),
       generalDesc: t(
-        "Réception → Classification → Instruction → Décision → Clôture. Numéro de référence horodaté, retour systématique au plaignant.",
-        "Receipt → Classification → Investigation → Decision → Closure. Timestamped reference number, systematic feedback to the complainant.",
+        "Réception → Classification → Instruction → Décision → Clôture. Le classement détermine qui instruit : une plainte technique, fiduciaire ou sociale ne suit pas le même circuit. Numéro de référence horodaté, retour au plaignant à chaque étape clé.",
+        "Receipt → Classification → Investigation → Decision → Closure. Classification determines who investigates: a technical, fiduciary or social grievance does not follow the same route. Timestamped reference number, feedback to the complainant at each key stage.",
       ),
       easLabel: t("Canal confidentiel MGP-EAS/HS", "Confidential GBV/SEA-SH channel"),
       easText: t(
@@ -362,10 +471,10 @@ export function dict(lang: Lang) {
 
     /* --- Marchés publics -------------------------------------------------- */
     marches: {
-      heroTitle: t("La commande publique, ouverte et tracée.", "Public procurement, open and traceable."),
+      heroTitle: t("Tout ce qu'il faut pour décider si vous candidatez.", "Everything you need to decide whether to bid."),
       heroLead: t(
-        "La porte d'entrée des entreprises vers les marchés du Projet. Tous les avis, conformes aux Règlements de Passation de la Banque mondiale (2025) : concurrence ouverte, méthodes affichées, résultats publiés.",
-        "The gateway for businesses to the Project's contracts. Every notice, compliant with the World Bank Procurement Regulations (2025): open competition, published methods, published results.",
+        "Chaque avis indique la méthode de passation retenue, le calendrier prévisionnel, les pièces exigées et la date limite. Les Règlements de Passation de la Banque mondiale (2025) s'appliquent : les critères d'évaluation sont annoncés à l'avance et ne changent pas en cours de procédure, et le résultat est publié. Une entreprise doit pouvoir estimer son effort de réponse avant de l'engager.",
+        "Each notice states the procurement method used, the indicative schedule, the documents required and the deadline. The World Bank Procurement Regulations (2025) apply: evaluation criteria are announced in advance, do not change mid-process, and the outcome is published. A company must be able to gauge the effort of responding before committing to it.",
       ),
       search: t("Rechercher un avis, une référence, un lieu…", "Search a notice, reference, location…"),
       results: t("avis", "notice(s)"),
@@ -388,19 +497,19 @@ export function dict(lang: Lang) {
       submitBid: t("Soumettre une offre", "Submit a bid"),
       filtersAll: t("Tous", "All"),
       filterOpen: t("Ouverts", "Open"),
-      bidderTitle: t("Devenez soumissionnaire", "Become a bidder"),
+      bidderTitle: t("Candidater : ce que cela suppose", "Bidding: what it involves"),
       bidderLead: t(
-        "Créez un compte vérifié (KYC), accédez aux dossiers (DAO/RFP) et déposez vos offres en ligne, en lien avec STEP.",
-        "Create a verified account (KYC), access the documents (DAO/RFP) and submit your bids online, linked to STEP.",
+        "La vérification d'identité de l'entreprise se fait une fois et sert pour tous les avis. Ensuite, le dossier complet est téléchargeable, les addenda vous sont notifiés, et le dépôt est horodaté — c'est cet horodatage qui fait foi en cas de contestation sur la recevabilité.",
+        "Company identity verification is done once and serves for every notice. After that, the full file is downloadable, addenda are notified to you, and submission is timestamped — that timestamp is what counts if admissibility is disputed.",
       ),
     },
 
     /* --- Transparence documentaire --------------------------------------- */
     docs: {
-      heroTitle: t("Tout document divulgable, accessible et daté.", "Every disclosable document, accessible and dated."),
+      heroTitle: t("Ce que nous publions, et pourquoi certaines pièces ne le sont pas.", "What we publish, and why some documents are not published."),
       heroLead: t(
-        "L'information publique du Projet, en accès libre. Le dépôt officiel des documents divulgables, en application de l'obligation de divulgation (NES 10) et de la politique d'accès à l'information de la Banque mondiale.",
-        "The Project's public information, freely accessible. The official repository of disclosable documents, under the disclosure obligation (ESS 10) and the World Bank's access-to-information policy.",
+        "Le dépôt officiel des documents divulgables du Projet, en application de la norme environnementale et sociale n°10 et de la politique d'accès à l'information de la Banque mondiale. Le versionnage est explicite : une version remplacée reste identifiable. Ne sont pas publiés les documents contenant des données personnelles, des informations commercialement sensibles avant attribution, ou des éléments couverts par une obligation de confidentialité.",
+        "The official repository of the Project's disclosable documents, under Environmental and Social Standard 10 and the World Bank's access-to-information policy. Versioning is explicit: a superseded version remains identifiable. Not published are documents containing personal data, commercially sensitive information ahead of award, or material covered by a confidentiality obligation.",
       ),
       search: t("Rechercher un document…", "Search a document…"),
       sortBy: t("Trier par", "Sort by"),
@@ -433,46 +542,46 @@ export function dict(lang: Lang) {
 
     /* --- Résultats -------------------------------------------------------- */
     resultats: {
-      heroTitle: t("Des cibles claires, des résultats publics.", "Clear targets, public results."),
+      heroTitle: t("Ce que nous mesurons, comment, et ce que la mesure ne dit pas.", "What we measure, how, and what measurement does not say."),
       heroLead: t(
-        "Ce que le Projet vise, et comment on le mesure. Les indicateurs d'objectif (l'impact) côtoient les indicateurs intermédiaires (les réalisations), suivis sur les 26 provinces via les outils SIG / GEMS.",
-        "What the Project aims for, and how it's measured. Development-objective indicators (the impact) sit alongside intermediate indicators (the outputs), tracked across all 26 provinces via MIS / GEMS tools.",
+        "Un cadre de résultats distingue deux ordres de grandeur qu'il ne faut pas confondre. Les indicateurs d'objectif mesurent l'effet recherché sur la société — des personnes connectées, des services utilisés — et bougent lentement. Les indicateurs intermédiaires mesurent ce que le projet livre — des kilomètres, des sites, des inscrits — et répondent plus vite. Les seconds ne garantissent pas les premiers : c'est précisément pourquoi les deux sont suivis, province par province, et pourquoi ces ambitions sont revues au fil de l'exécution.",
+        "A results framework distinguishes two orders of magnitude that should not be confused. Objective indicators measure the intended effect on society — people connected, services used — and move slowly. Intermediate indicators measure what the project delivers — kilometres, sites, enrolments — and respond faster. The latter do not guarantee the former: that is precisely why both are tracked, province by province, and why these ambitions are reviewed as implementation proceeds.",
       ),
-      odpLabel: t("ODP · cibles 2029", "PDO · 2029 targets"),
-      interLabel: t("Indicateurs intermédiaires", "Intermediate indicators"),
+      odpLabel: t("ODP · ambitions à l'horizon 2029", "PDO · ambitions towards 2029"),
+      interLabel: t("Indicateurs intermédiaires — ce que le projet livre", "Intermediate indicators — what the project delivers"),
       projVideosLabel: t("Le projet en vidéos", "The project in videos"),
       projVideosTitle: t("Chaque composante, racontée en images.", "Each component, told in pictures."),
       projVideosLead: t(
-        "De courts films pour mettre en avant chaque volet du Projet.",
-        "Short films to highlight each part of the Project.",
+        "Un film par composante, présenté par son responsable : le périmètre, les chantiers en cours et ce que l'on attend d'eux.",
+        "One film per component, presented by its lead: the scope, the workstreams under way and what is expected of them.",
       ),
       dialoguesLabel: t("Dialogues sectoriels", "Sector dialogues"),
-      dialoguesTitle: t("Un espace d'échange avec chaque secteur.", "A space for exchange with every sector."),
+      dialoguesTitle: t("Le numérique n'est utile qu'appliqué à un métier.", "Digital is only useful when applied to a trade."),
       dialoguesLead: t(
-        "La transformation numérique touche tous les secteurs — voici comment, et avec qui nous travaillons.",
-        "Digital transformation touches every sector — here is how, and with whom we work.",
+        "Une infrastructure ne produit d'effet qu'à travers les politiques sectorielles qui s'en saisissent. Ces dialogues servent à identifier, avec chaque ministère et chaque profession, l'usage précis qui justifie l'investissement.",
+        "Infrastructure only produces effects through the sector policies that take hold of it. These dialogues serve to identify, with each ministry and each profession, the precise use that justifies the investment.",
       ),
     },
 
     /* --- Ressources ------------------------------------------------------- */
     ressources: {
       titre: t("Rapports & publications", "Reports & publications"),
-      hero: t("Rapports, analyses et notes d'orientation sectorielles.", "Reports, analyses and sector orientation notes."),
+      hero: t("La production analytique qui précède les décisions.", "The analytical work that precedes decisions."),
       lead: t(
-        "Produits par les pôles de l'Unité — la production analytique qui éclaire les décisions du Projet.",
-        "Produced by the Unit's clusters — the analytical output that informs the Project's decisions.",
+        "Avant d'arbitrer un tracé, de calibrer un programme de formation ou de retenir une architecture, il faut avoir instruit la question. Ces notes, rapports et analyses sont les pièces sur lesquelles les décisions du Projet s'appuient — publiées pour être discutées.",
+        "Before choosing a route, calibrating a training programme or settling on an architecture, the question has to be worked through. These notes, reports and analyses are the material on which the Project's decisions rest — published so they can be debated.",
       ),
       download: t("Télécharger", "Download"),
     },
 
     /* --- MGP -------------------------------------------------------------- */
     mgp: {
-      heroTitle: t("Votre voix compte. Et elle est tracée.", "Your voice matters. And it is traced."),
+      heroTitle: t("Signaler une difficulté ne vous expose à rien.", "Reporting a difficulty exposes you to nothing."),
       heroLead: t(
-        "Le Mécanisme de Gestion des Plaintes recueille, classe, instruit et clôture chaque doléance — avec un engagement public : 100 % des griefs traités en 30 jours ou moins.",
-        "The Grievance Mechanism collects, classifies, investigates and closes every complaint — with a public commitment: 100% of grievances handled in 30 days or less.",
+        "Le dépôt est gratuit, possible en plusieurs langues, et peut rester anonyme. Vous recevez un numéro de référence qui permet de suivre l'instruction sans avoir à vous déplacer. Aucune représaille n'est tolérée, et un canal strictement séparé traite les cas de violences basées sur le genre. L'Unité vise un traitement dans un délai de 30 jours.",
+        "Filing is free, available in several languages, and may remain anonymous. You receive a reference number that lets you follow the case without travelling. No retaliation is tolerated, and a strictly separate channel handles gender-based violence cases. The Unit aims to handle cases within 30 days.",
       ),
-      slaBadge: t("SLA public · 30 jours · 6 langues · numéro vert 24/7", "Public SLA · 30 days · 6 languages · 24/7 toll-free"),
+      slaBadge: t("Objectif 30 jours · 6 langues · numéro vert 24/7", "30-day objective · 6 languages · 24/7 toll-free"),
       formTitle: t("Déposer une plainte", "File a grievance"),
       step: t("Étape", "Step"),
       stepLabels: [
@@ -507,8 +616,8 @@ export function dict(lang: Lang) {
       submittedTitle: t("Plainte enregistrée", "Grievance registered"),
       refIntro: t("Votre numéro de référence horodaté :", "Your timestamped reference number:"),
       refKeep: t(
-        "Conservez-le pour suivre votre dossier. Retour systématique à la clôture, sous 30 jours maximum.",
-        "Keep it to track your case. Systematic feedback at closure, within 30 days maximum.",
+        "Conservez-le pour suivre votre dossier. Un retour vous est adressé à la clôture, dans un délai visé de 30 jours.",
+        "Keep it to track your case. Feedback is provided at closure, within a target of 30 days.",
       ),
       newGrievance: t("Déposer une autre plainte", "File another grievance"),
       formFootnote: t(
@@ -532,8 +641,8 @@ export function dict(lang: Lang) {
       ],
       generalTitle: t("Canal général MGP", "General GRM channel"),
       generalDesc: t(
-        "Réception → Classification → Instruction → Décision → Clôture. Numéro de référence horodaté, retour systématique au plaignant.",
-        "Receipt → Classification → Investigation → Decision → Closure. Timestamped reference number, systematic feedback to the complainant.",
+        "Réception → Classification → Instruction → Décision → Clôture. Numéro de référence horodaté, retour au plaignant à chaque étape clé.",
+        "Receipt → Classification → Investigation → Decision → Closure. Timestamped reference number, feedback to the complainant at each key stage.",
       ),
       easTitle: t("Canal confidentiel MGP-EAS/HS", "Confidential GBV/SEA-SH channel"),
       easSub: t(
@@ -541,15 +650,15 @@ export function dict(lang: Lang) {
         "Gender-based violence · sexual exploitation and abuse · harassment",
       ),
       easBody: t(
-        "Strictement séparé du MGP général et centré sur la survivante : identité optionnelle, consentement éclairé, aucune donnée visible ailleurs. Référencement vers les services (médical, psychosocial, juridique) sous 24 heures. Aucun export, aucune copie.",
-        "Strictly separate from the general GRM and survivor-centred: optional identity, informed consent, no data visible elsewhere. Referral to services (medical, psychosocial, legal) within 24 hours. No export, no copy.",
+        "Ce canal ne suit pas la procédure ordinaire, et c'est délibéré. La survivante décide de ce qui est partagé et avec qui : rien n'est transmis sans son consentement éclairé, l'identité est facultative, et aucune donnée n'apparaît dans les statistiques ni ailleurs sur ce site. La priorité n'est pas l'instruction du dossier mais l'orientation vers les services — médical, psychosocial, juridique — sous 24 heures. Aucun export, aucune copie.",
+        "This channel does not follow the ordinary procedure, and that is deliberate. The survivor decides what is shared and with whom: nothing is passed on without their informed consent, identity is optional, and no data appears in statistics or anywhere else on this site. The priority is not case investigation but referral to services — medical, psychosocial, legal — within 24 hours. No export, no copy.",
       ),
       easCta: t("Accéder au canal confidentiel", "Access the confidential channel"),
       faqLabel: "FAQ · MGP",
       faqTitle: t("Questions fréquentes.", "Frequently asked questions."),
       faqLead: t(
-        "L'essentiel sur le fonctionnement du mécanisme de gestion des plaintes.",
-        "The essentials about how the grievance mechanism works.",
+        "Les questions que se posent le plus souvent les personnes qui hésitent à saisir le mécanisme.",
+        "The questions most often asked by people hesitating to use the mechanism.",
       ),
     },
 

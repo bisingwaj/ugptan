@@ -39,7 +39,7 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
               <RevealItem fade key={o.code} className="cell cell--fx" style={{ display: "flex", flexDirection: "column", minHeight: 236 }}>
                 <FlowLines variant={i} />
                 <div className="mono" style={{ fontSize: 12, color: "var(--ac-light)" }}>{o.code}</div>
-                <div style={{ marginTop: "auto" }}><div className="mono" style={{ fontWeight: 600, fontSize: "clamp(34px,4.4vw,56px)", lineHeight: 1, letterSpacing: "-0.03em" }}><Counter to={o.value} dur={1300} /><span style={{ fontSize: 16, color: "var(--c-40)", marginLeft: 7 }}>{o.unit}</span></div></div>
+                <div style={{ marginTop: "auto" }}><div className="mono" style={{ fontWeight: 600, fontSize: "clamp(34px,4.4vw,56px)", lineHeight: 1, letterSpacing: "-0.03em" }}><span className="stat__approx">{t.lbl.approx}</span><Counter to={o.value} dur={1300} /><span style={{ fontSize: 16, color: "var(--c-40)", marginLeft: 7 }}>{o.unit}</span></div></div>
                 <div style={{ marginTop: 14, fontSize: 14, lineHeight: 1.45, color: "var(--c-20)" }}>{pick(o.label, lang)}</div>
                 <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 6 }}>
                   <span className="mono" style={{ fontSize: 10.5, color: "var(--c-50)", border: "1px solid var(--c-80)", padding: "3px 7px" }}>{t.lbl.baseline}: {o.baseline}</span>
@@ -48,6 +48,7 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
               </RevealItem>
             ))}
           </RevealGroup>
+          <p className="stat__note stat__note--dark">{t.lbl.indicatif}</p>
         </div>
       </section>
 
@@ -57,7 +58,7 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
           <Reveal><Kicker>{r.interLabel}</Kicker></Reveal>
           <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", marginTop: 16 }}>
             {intermediaires.map((x, i) => (
-              <RevealItem fade key={i} className="cell cell--fx cell--light" style={{ padding: "22px" }}><FlowLines variant={i} /><div className="mono" style={{ fontWeight: 600, fontSize: 24, color: "var(--cell-fg)" }}>{x.value}<span style={{ fontSize: 13, color: "var(--cell-acc)", marginLeft: 4 }}>{x.unit}</span></div><div style={{ fontSize: 12.5, color: "var(--cell-mut)", marginTop: 8, lineHeight: 1.45 }}>{pick(x.text, lang)}</div></RevealItem>
+              <RevealItem fade key={i} className="cell cell--fx cell--light" style={{ padding: "22px" }}><FlowLines variant={i} /><div className="mono" style={{ fontWeight: 600, fontSize: 24, color: "var(--cell-fg)" }}><span className="stat__approx">{t.lbl.approx}</span>{x.value}<span style={{ fontSize: 13, color: "var(--cell-acc)", marginLeft: 4 }}>{x.unit}</span></div><div style={{ fontSize: 12.5, color: "var(--cell-mut)", marginTop: 8, lineHeight: 1.45 }}>{pick(x.text, lang)}</div></RevealItem>
             ))}
           </RevealGroup>
         </div>

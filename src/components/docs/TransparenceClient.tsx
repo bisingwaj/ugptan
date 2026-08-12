@@ -90,7 +90,7 @@ export function TransparenceClient({ lang }: { lang: Lang }) {
 
       {sel && (
         <div className="scrim scrim--center" onClick={() => setSel(null)}>
-          <div className="modal" style={{ width: "100%", maxWidth: 560, background: "#fff", border: "1px solid var(--c-80)" }} onClick={(e) => e.stopPropagation()}>
+          <div className="modal" data-lenis-prevent style={{ width: "100%", maxWidth: 560, background: "#fff", border: "1px solid var(--c-80)" }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, padding: "24px 26px", borderBottom: "1px solid var(--c-20)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <span style={{ width: 46, height: 46, background: "var(--ac-pale)", color: "var(--ac)", fontFamily: "var(--font-mono)", fontWeight: 600, fontSize: 13, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{sel.sigle}</span>
