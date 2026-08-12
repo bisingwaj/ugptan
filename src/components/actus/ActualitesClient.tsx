@@ -57,7 +57,7 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
 
       {article && (
         <div className="scrim scrim--right" onClick={() => setSel(null)}>
-          <div className="drawer" style={{ width: "min(820px,100%)" }} onClick={(e) => e.stopPropagation()}>
+          <div className="drawer" style={{ width: "min(820px,100%)" }} onClick={(e) => e.stopPropagation()} data-lenis-prevent>
             <div className="duo" style={{ aspectRatio: "16/7" }}>
               <Photo src={media.img[article.img]} alt={pick(article.title, lang)} />
               <button onClick={() => setSel(null)} aria-label="Fermer" style={{ position: "absolute", top: 18, right: 18, width: 42, height: 42, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.5)" }}>✕</button>

@@ -141,7 +141,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
 
   return (
     <div className="scrim scrim--right" onClick={onClose}>
-      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+      <div className="drawer" onClick={(e) => e.stopPropagation()} data-lenis-prevent>
         <div className="duo" data-video-slot="Bannière de l'avis (vidéo)" data-slot-ratio="16:9" style={{ aspectRatio: "16/6.6", ["--duo" as string]: cc }}>
           <Photo src={media.img[compImg[m.comp] || "fibre"]} alt={pick(m.objet, lang)} />
           <button onClick={onClose} aria-label="Fermer" className="blur-sm" style={{ position: "absolute", top: "calc(16px + var(--sa-t))", right: 16, width: 44, height: 44, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.55)", backdropFilter: "blur(6px)" }}>✕</button>

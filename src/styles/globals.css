@@ -10,8 +10,13 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
 .lenis.lenis-smooth iframe { pointer-events: none; }
-/* Verrou de défilement quand un overlay est ouvert (mode reduced-motion). */
+/* Verrou de défilement quand un overlay est ouvert (mode reduced-motion / mobile). */
 html.scroll-locked, html.scroll-locked body { overflow: hidden; }
+html.scroll-locked body {
+  position: fixed;
+  top: calc(-1 * var(--scroll-y, 0px));
+  width: 100%;
+}
 body {
   background: var(--c-white);
   color: var(--c-black);
