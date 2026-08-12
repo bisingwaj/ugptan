@@ -3,7 +3,7 @@
    angles vifs (aucun arrondi), trait de 1,5 px, grille 24×24, `currentColor`
    pour hériter de la couleur du contexte. Chaque icône décrit une action
    concrète du parcours, pas une métaphore générique. */
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactElement } from "react";
 
 export type IconName =
   /* Parcours soumissionnaire */
@@ -11,7 +11,7 @@ export type IconName =
   /* Modes de saisine du mécanisme de plaintes */
   | "formulaire" | "sms" | "email" | "pointfocal";
 
-const PATHS: Record<IconName, JSX.Element> = {
+const PATHS: Record<IconName, ReactElement> = {
   /* Compte vérifié : carte d'identification d'entreprise + coche de vérification */
   compte: (
     <>
