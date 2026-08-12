@@ -35,6 +35,7 @@ export function SmoothScroll() {
 
     // Verrou de défilement tant qu'un overlay (.scrim) est présent dans le DOM.
     let locked = false;
+    let scrollY = 0;
     const sync = () => {
       const open = !!document.querySelector(".scrim");
       if (open === locked) return;
@@ -43,7 +44,14 @@ export function SmoothScroll() {
         if (open) lenis.stop();
         else lenis.start();
       } else {
-        document.documentElement.classList.toggle("scroll-locked", open);
+        if (open) {
+          scrollY = window.scrollY;
+          document.documentElement.style.setProperty("--scroll-y", `${scrollY}px`);
+          document.documentElement.classList.add("scroll-locked");
+        } else {
+          document.documentElement.classList.remove("scroll-locked");
+          window.scrollTo(0, scrollY);
+        }
       }
     };
     const mo = new MutationObserver(sync);

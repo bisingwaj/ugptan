@@ -141,14 +141,16 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
 
   return (
     <div className="scrim scrim--right" onClick={onClose}>
-      <div className="drawer" data-lenis-prevent onClick={(e) => e.stopPropagation()}>
-        <div className="duo" data-video-slot="Bannière de l'avis (vidéo)" data-slot-ratio="16:9" style={{ aspectRatio: "16/6.6", ["--duo" as string]: cc }}>
+      <div className="drawer" onClick={(e) => e.stopPropagation()} data-lenis-prevent>
+        <div className="duo" data-video-slot="Bannière de l'avis (vidéo)" data-slot-ratio="16:9" style={{ minHeight: "clamp(260px,35vw,360px)", display: "flex", flexDirection: "column", ["--duo" as string]: cc }}>
           <Photo src={media.img[compImg[m.comp] || "fibre"]} alt={pick(m.objet, lang)} />
-          <button onClick={onClose} aria-label="Fermer" className="blur-sm" style={{ position: "absolute", top: "calc(16px + var(--sa-t))", right: 16, width: 44, height: 44, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.55)", backdropFilter: "blur(6px)" }}>✕</button>
-          <button onClick={() => openVideo()} style={{ position: "absolute", top: 16, left: 16, display: "inline-flex", alignItems: "center", gap: 9, padding: "8px 14px 8px 8px", background: "rgba(255,255,255,.92)", color: "var(--c-black)", fontSize: 12.5, fontWeight: 600 }}>
-            <span style={{ width: 26, height: 26, background: cc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, paddingLeft: 1 }}>▶</span>{dict(lang).video.watch}
-          </button>
-          <div style={{ position: "absolute", left: "clamp(20px,3vw,34px)", right: "clamp(20px,3vw,34px)", bottom: "clamp(18px,2.6vw,28px)" }}>
+          <div style={{ position: "relative", zIndex: 10, padding: "calc(16px + var(--sa-t, 0px)) 16px 0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
+            <button onClick={() => openVideo()} style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "8px 14px 8px 8px", background: "rgba(255,255,255,.92)", color: "var(--c-black)", fontSize: 12.5, fontWeight: 600 }}>
+              <span style={{ width: 26, height: 26, background: cc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, paddingLeft: 1 }}>▶</span>{dict(lang).video.watch}
+            </button>
+            <button onClick={onClose} aria-label="Fermer" className="backdrop-blur-[6px] max-[760px]:backdrop-blur-none" style={{ flex: "0 0 auto", width: 44, height: 44, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.55)" }}>✕</button>
+          </div>
+          <div style={{ position: "relative", zIndex: 5, marginTop: "auto", padding: "32px clamp(20px,3vw,34px) clamp(18px,2.6vw,28px)" }}>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 9, marginBottom: 12 }}>
               <span className="mono" style={{ fontSize: 11.5, fontWeight: 600, color: "#fff", background: cc, padding: "5px 11px" }}>{m.type}</span>
               <span className="mono" style={{ fontSize: 11, color: "#fff", border: "1px solid rgba(255,255,255,.4)", padding: "5px 10px" }}>{m.comp}</span>
@@ -242,8 +244,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
           </div>
 
           <div className="stack-sm" style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <Link href={route(lang, NAV.connexion)} className="btn" style={{ flex: 1, minWidth: 200, justifyContent: "center", background: cc, color: "#fff" }}>{t.submitBid} <span className="arrow">→</span></Link>
-            <Link href={route(lang, NAV.contact)} className="btn btn--outline">{w.askQuestion}</Link>
+            <Link href={route(lang, NAV.contact)} className="btn" style={{ flex: 1, minWidth: 200, justifyContent: "center", background: cc, color: "#fff" }}>{w.askQuestion} <span className="arrow">→</span></Link>
           </div>
         </div>
       </div>

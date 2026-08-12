@@ -1,0 +1,175 @@
+/* ===========================================================================
+   Console d'administration — feuille de style isolée.
+
+   Importée UNIQUEMENT par src/app/(dashboard)/layout.tsx, jamais par le site
+   public. La console ne charge donc pas globals.css (Lenis, curseur custom,
+   effets de cellules, héros…) dont elle n'a aucun usage. C'est pourquoi elle
+   constitue sa PROPRE entrée Tailwind : deux layouts racine, deux feuilles,
+   jamais chargées ensemble.
+
+   Les ~30 lignes de composants ci-dessous (.btn, .field, .label-mono, .mono)
+   sont un DOUBLON ASSUMÉ de globals.css : factoriser imposerait un refactor de
+   la feuille publique, et le CSS de la console (tables, formulaires, modales
+   des 14 modules) va de toute façon diverger. Les variables, elles, restent
+   partagées via tokens.css.
+
+   Même parti que la feuille publique : Preflight n'est pas importé (la base
+   ci-dessous fait déjà le travail), et le design system vit dans la couche
+   `components` pour qu'un utilitaire Tailwind posé dans le JSX l'emporte.
+=========================================================================== */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "./tokens.css";
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+/* Même cadrage que la feuille publique : cf. le commentaire de globals.css. */
+@source "../app";
+@source "../components";
+@source "../content";
+@source "../lib";
+
+@layer base {
+  /* --- Base -------------------------------------------------------------- */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Reprise ciblée de Preflight : sans la largeur nulle, poser
+     `border-style: solid` donnerait à tout élément une bordure `medium`. */
+  *, ::before, ::after { border-width: 0; border-style: solid; }
+  body {
+    background: var(--c-10);
+    color: var(--c-black);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, textarea, select { font-family: inherit; }
+  img { display: block; max-width: 100%; }
+  ::selection { background: var(--ac); color: #fff; }
+  ::-webkit-scrollbar { width: 11px; height: 11px; }
+  ::-webkit-scrollbar-thumb { background: var(--c-30); }
+  ::-webkit-scrollbar-track { background: var(--c-10); }
+  :focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
+}
+
+@layer components {
+  /* --- Composants repris du site public ---------------------------------- */
+  .mono { @apply font-mono; }
+
+  .btn {
+    @apply inline-flex items-center gap-2.5 px-6 py-[15px] text-[15px] font-medium border border-transparent;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .btn .arrow { @apply font-mono; }
+  .btn--primary { @apply bg-ac text-white; }
+  .btn--primary:hover { @apply bg-acd; }
+  .btn--primary:disabled { @apply bg-c-40 cursor-progress; }
+  .btn--outline { @apply border-c-black text-c-black bg-white; }
+  .btn--outline:hover { @apply bg-c-black text-white; }
+  .btn--on-dark { @apply border-c-70 text-white bg-transparent; }
+  .btn--on-dark:hover { @apply border-white; }
+  .btn--sm { @apply px-[18px] py-[11px] text-[14px]; }
+
+  .field {
+    @apply w-full text-[14px] text-c-black bg-white border border-c-20 px-[14px] py-[13px] outline-none;
+  }
+  .field:focus { @apply border-ac outline-2 outline-ac-line -outline-offset-1; }
+  .label-mono {
+    @apply block font-mono text-[11px] text-c-50 mb-2 uppercase tracking-[0.06em];
+  }
+
+  /* --- Écran de connexion ------------------------------------------------- */
+  .auth-split { @apply grid grid-cols-2 min-h-[100svh]; }
+  .auth-brand {
+    @apply relative overflow-hidden bg-c-black text-white flex flex-col justify-between;
+    padding: clamp(28px, 4vw, 56px);
+  }
+  /* Halo d'accent : dégradé radial, hors de portée des utilitaires. */
+  .auth-brand::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(120% 120% at 88% 8%, rgba(15, 98, 254, 0.34), transparent 55%);
+  }
+  .auth-brand > * { @apply relative; }
+  .auth-form {
+    @apply bg-white flex flex-col justify-center overflow-auto;
+    padding: clamp(26px, 4vw, 52px);
+  }
+  .auth-error {
+    @apply border border-red border-l-[3px] bg-[#fff1f1] text-[#a2191f] px-[14px] py-3 text-[13.5px] mb-[18px];
+  }
+
+  /* --- Coquille ----------------------------------------------------------- */
+  .adm { @apply grid grid-cols-[264px_1fr] min-h-[100svh]; }
+  .adm__side {
+    @apply sticky top-0 h-[100svh] overflow-auto bg-c-black text-white flex flex-col;
+  }
+  .adm__brand {
+    @apply flex items-center gap-[11px] px-5 py-[22px] border-b border-c-90;
+  }
+  .adm__mark { @apply w-[26px] h-[26px] flex-none bg-ac relative; }
+  .adm__mark::after { content: ""; position: absolute; right: 4px; bottom: 4px; width: 9px; height: 9px; background: #fff; }
+  .adm__nav { @apply py-2.5; }
+  .adm__nav-item {
+    @apply flex items-center justify-between gap-2.5 px-5 py-[11px] text-[14px] text-c-30 border-l-2 border-transparent;
+    transition: background 0.16s, color 0.16s;
+  }
+  a.adm__nav-item:hover { @apply bg-c-90 text-white; }
+  .adm__nav-item.is-active { @apply bg-c-90 text-white border-l-ac; }
+  .adm__nav-item.is-soon { @apply text-c-60 cursor-default; }
+  .adm__soon {
+    @apply font-mono text-[10px] tracking-[0.06em] uppercase text-c-70 border border-c-80 px-1.5 py-0.5;
+  }
+  .adm__main { @apply min-w-0 flex flex-col; }
+  .adm__top {
+    @apply sticky top-0 z-[5] flex items-center justify-between gap-4 bg-c-black text-white border-b border-c-90;
+    padding: 14px clamp(20px, 3vw, 40px);
+  }
+  .adm__body { flex: 1; padding: clamp(24px, 3vw, 40px) clamp(20px, 3vw, 40px) 64px; }
+  .adm__title { @apply font-semibold tracking-[-0.02em] text-[clamp(24px,2.6vw,32px)]; }
+  .adm__lead { @apply mt-2.5 max-w-[68ch] text-[14.5px] leading-[1.55] text-c-70; }
+  .adm__section-title {
+    @apply font-mono text-[11.5px] tracking-[0.1em] uppercase text-c-50 mt-9 mb-3.5;
+  }
+
+  /* --- Cartes / KPI ------------------------------------------------------- */
+  .adm-grid {
+    @apply grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-px bg-c-20 border border-c-20;
+  }
+  .adm-card { @apply bg-white p-[22px]; }
+  .adm-kpi__num { @apply font-mono font-semibold text-4xl leading-none text-c-30; }
+  .adm-kpi__label { @apply mt-2 text-[13px] text-c-70; }
+  .adm-list { @apply border border-c-20 bg-white; }
+  .adm-list__row {
+    @apply flex items-center justify-between gap-3 px-[18px] py-[13px] border-b border-c-20 text-[14px];
+  }
+  .adm-list__row:last-child { @apply border-b-0; }
+
+  /* --- Responsive --------------------------------------------------------- */
+  @media (max-width: 900px) {
+    .adm { @apply grid-cols-[1fr]; }
+    .adm__side { @apply static h-auto; }
+    .adm__nav { @apply flex overflow-x-auto p-0; }
+    .adm__nav-item {
+      @apply flex-none whitespace-nowrap border-l-0 border-b-2 border-b-transparent px-4 py-[13px];
+    }
+    .adm__nav-item.is-active { @apply border-l-transparent border-b-ac; }
+    .adm__soon { @apply hidden; }
+  }
+
+  @media (max-width: 760px) {
+    .auth-split { @apply grid-cols-[1fr]; }
+    .auth-brand { @apply hidden; }
+    /* 16px : empêche le zoom automatique iOS au focus. */
+    .field, input, textarea, select { @apply text-[16px]; }
+    .btn { @apply min-h-12; }
+    .btn--sm { @apply min-h-[42px]; }
+  }
+}
+
+@keyframes revFade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Hors couche : doit primer sur toute animation, d'où qu'elle vienne. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
