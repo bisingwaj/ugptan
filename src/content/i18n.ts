@@ -25,6 +25,8 @@ export function dict(lang: Lang) {
       contact: t("Contact", "Contact"),
       mgp: t("Plaintes (MGP)", "Grievances"),
       connexion: t("Se connecter", "Sign in"),
+      confidentialite: t("Politique de confidentialité", "Privacy policy"),
+      conditions: t("Conditions d'utilisation", "Terms of use"),
     },
     cta: {
       connect: t("Se connecter", "Sign in"),
@@ -65,11 +67,30 @@ export function dict(lang: Lang) {
     },
     foot: {
       transparence: t("Transparence", "Transparency"),
-      legal: t(
+      /* Provenance des données chiffrées, déplacée sous l'identité de l'Unité. */
+      source: t(
         "Source de vérité : MEP du 23 juin 2025. Montants, dates et indicateurs conformes aux documents officiels du projet.",
         "Source of truth: PIM of 23 June 2025. Amounts, dates and indicators per the project's official documents.",
       ),
+      legalLabel: t("Informations légales", "Legal information"),
     },
+    /* --- Pages légales ----------------------------------------------------- */
+    legal: {
+      crumb: t("Informations légales", "Legal information"),
+      sommaire: t("Sommaire", "Contents"),
+      maj: t("Dernière mise à jour", "Last updated"),
+      voirAussi: t("À lire également", "Also to be read"),
+      code: t(
+        "Ordonnance-loi n° 23/010 du 13 mars 2023 portant Code du numérique",
+        "Ordinance-Law No. 23/010 of 13 March 2023 enacting the Digital Code",
+      ),
+      contactTitre: t("Une question sur ce document ?", "A question about this document?"),
+      contactLead: t(
+        "Écrivez au responsable du traitement, ou saisissez le mécanisme de gestion des plaintes si votre demande porte sur une décision du projet.",
+        "Write to the data controller, or refer the matter to the grievance mechanism if your request concerns a project decision.",
+      ),
+    },
+
     tagPublic: t("Site institutionnel public", "Public institutional website"),
     langNote: t("Contenu en cours de localisation — disponible au lancement.", "Content being localised — available at launch."),
 

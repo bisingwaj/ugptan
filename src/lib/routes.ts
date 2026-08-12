@@ -5,7 +5,8 @@ export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 
 export type NavKey =
   | "accueil" | "projet" | "composantes" | "ugptn" | "gouvernance" | "marches" | "transparence"
-  | "actualites" | "resultats" | "ressources" | "evenements" | "contact" | "mgp" | "connexion";
+  | "actualites" | "resultats" | "ressources" | "evenements" | "contact" | "mgp" | "connexion"
+  | "confidentialite" | "conditions";
 
 export type NavItem = { slug: string; key: NavKey };
 
@@ -15,7 +16,14 @@ export const NAV: Record<NavKey, string> = {
   marches: "/marches", transparence: "/transparence", actualites: "/actualites",
   resultats: "/resultats", ressources: "/ressources", evenements: "/evenements",
   contact: "/contact", mgp: "/mgp", connexion: "/connexion",
+  confidentialite: "/confidentialite", conditions: "/conditions",
 };
+
+/** Pages légales — reléguées au bandeau bas du pied de page, hors navigation. */
+export const NAV_LEGAL: NavItem[] = [
+  { slug: NAV.confidentialite, key: "confidentialite" },
+  { slug: NAV.conditions, key: "conditions" },
+];
 
 /** Page dédiée d'une composante — accepte « C2 » comme « c2 ». */
 export const compRoute = (lang: Lang, code: string) =>

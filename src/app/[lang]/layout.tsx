@@ -9,6 +9,7 @@ import { VideoProvider } from "@/components/video/VideoProvider";
 import { Header } from "@/components/chrome/Header";
 import { Footer } from "@/components/chrome/Footer";
 import { Newsletter } from "@/components/chrome/Newsletter";
+import { AvisNavigation } from "@/components/legal/AvisNavigation";
 import { SlotsOverlay } from "@/components/dev/SlotsOverlay";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
@@ -78,6 +79,7 @@ export default async function LangLayout(props: { children: React.ReactNode; par
             <main>{children}</main>
             <Newsletter lang={lang} />
             <Footer lang={lang} />
+            <AvisNavigation lang={lang} />
             <SlotsOverlay />
           </VideoProvider>
         </MotionProvider>
