@@ -272,6 +272,62 @@
   .adm-badge--off { @apply border-c-30 bg-c-10 text-c-60; }
   .adm-badge--self { @apply ml-2 border-ac-line bg-ac-pale text-ac; }
 
+  /* Tonalités d'état des dossiers MGP (cf. STATUS_TONE, lib/mgp/model.ts).
+     `new` se distingue de `info` par le trait plein : une plainte qui n'a pas
+     encore été qualifiée doit sauter aux yeux dans une liste de cent lignes. */
+  .adm-badge--new { @apply border-ac bg-ac text-white; }
+  .adm-badge--info { @apply border-ac-line bg-ac-pale text-ac; }
+  .adm-badge--warn { @apply border-orange bg-[#fff2e8] text-[#8a3800]; }
+  .adm-badge--ok { @apply border-ok-bd bg-ok-bg text-ok-fg; }
+
+  /* Dépassement de l'engagement de 30 jours : signalé partout de la même façon. */
+  .adm-late { @apply text-red font-medium; }
+
+  /* --- Filtres de liste ---------------------------------------------------- */
+  /* Des liens, et non des boutons : le filtre vit dans l'URL, donc il se
+     partage, se met en favori et survit à l'aller-retour vers une fiche. */
+  .adm-filters { @apply flex flex-wrap gap-2 mb-3.5; }
+  .adm-filter {
+    @apply inline-flex items-center border border-c-20 bg-white px-[15px] py-2.5 text-[13.5px] text-c-70;
+    transition: background 0.16s, color 0.16s, border-color 0.16s;
+  }
+  .adm-filter:hover { @apply border-c-black text-c-black; }
+  .adm-filter.is-active { @apply border-ac bg-ac text-white; }
+
+  /* --- Listes de définitions (fiche d'un dossier) -------------------------- */
+  .adm-defs { @apply flex flex-col; }
+  .adm-defs__row {
+    @apply grid gap-1 py-3 border-b border-c-20;
+    grid-template-columns: minmax(160px, 220px) 1fr;
+  }
+  .adm-defs__row:first-child { @apply pt-0; }
+  .adm-defs__row:last-child { @apply border-b-0 pb-0; }
+  .adm-defs__val { @apply flex flex-wrap items-center gap-3 m-0 text-[14px]; }
+
+  /* --- Historique d'un dossier -------------------------------------------- */
+  /* Le filet vertical porte la chronologie ; chaque entrée pose sa pastille
+     dessus. Aucune entrée n'est modifiable : rien ici n'est cliquable. */
+  .adm-timeline {
+    @apply list-none flex flex-col gap-0 border border-c-20 bg-white;
+    padding: clamp(18px, 2.4vw, 26px);
+  }
+  .adm-timeline__item {
+    @apply relative border-l border-c-20 pl-[22px] pb-[18px];
+  }
+  .adm-timeline__item:last-child { @apply border-l-transparent pb-0; }
+  .adm-timeline__item::before {
+    content: ""; position: absolute; left: -4px; top: 5px;
+    width: 7px; height: 7px; background: var(--ac);
+  }
+  .adm-timeline__head { @apply flex flex-wrap items-center gap-2.5; }
+  .adm-timeline__type { @apply text-[13.5px] font-semibold; }
+  .adm-timeline__meta { @apply text-[11.5px] text-c-60; }
+  .adm-timeline__change { @apply mt-1.5 text-[13.5px]; }
+  .adm-timeline__from { @apply text-c-60 line-through; }
+  .adm-timeline__msg {
+    @apply mt-2 text-[13.5px] leading-[1.65] text-c-80 whitespace-pre-wrap border-l-2 border-c-20 pl-3;
+  }
+
   .adm-actions { @apply flex flex-col gap-2; }
   .adm-actions__row { @apply flex flex-wrap items-center gap-2; }
   .adm-actions__error { @apply text-[12.5px] leading-[1.45] text-red max-w-[42ch]; }
@@ -308,6 +364,10 @@
     /* Les boutons d'action occupent la largeur : cibles tactiles franches. */
     .adm-actions__row > form { @apply flex-1; }
     .adm-actions__row .btn { @apply w-full justify-center; }
+    /* Deux colonnes de 160 px minimum ne tiennent plus : l'étiquette passe
+       au-dessus de sa valeur. */
+    .adm-defs__row { grid-template-columns: 1fr; }
+    .adm-filter { @apply min-h-11; }
   }
 }
 

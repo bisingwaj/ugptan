@@ -44,6 +44,12 @@ const dateTimeFr = new Intl.DateTimeFormat("fr-FR", {
 export const formatDateTime = (date: Date | null | undefined): string | null =>
   date ? dateTimeFr.format(date) : null;
 
+/** Même fuseau, sans l'heure : listes et échéances, où la minute n'apporte rien. */
+const dateFr = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeZone: "Africa/Kinshasa" });
+
+export const formatDate = (date: Date | null | undefined): string | null =>
+  date ? dateFr.format(date) : null;
+
 export type Countdown = {
   expired: boolean;
   urgent: boolean;

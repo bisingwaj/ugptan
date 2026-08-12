@@ -96,6 +96,93 @@ export const ADMIN = {
     activatedOk: "Compte réactivé.",
     deactivatedOk: "Compte désactivé.",
   },
+
+  grievances: {
+    title: "Plaintes (MGP)",
+    lead: "Dossiers déposés par le formulaire public du mécanisme de gestion des plaintes. Chaque dossier porte un numéro de référence communiqué au plaignant, qui lui sert à suivre son avancement depuis le site.",
+    listTitle: "Dossiers",
+    empty: "Aucune plainte reçue pour le moment.",
+    emptyFiltered: "Aucun dossier ne correspond à ce filtre.",
+    back: "Retour aux plaintes",
+
+    filterAll: "Tous",
+    filterOpen: "En cours",
+    filterUnassigned: "Non affectés",
+    filterOverdue: "Hors délai",
+    filterLabel: "Filtrer",
+
+    colRef: "Référence",
+    colSubmitted: "Reçue le",
+    colCategory: "Catégorie",
+    colStatus: "Statut",
+    colStage: "Étape",
+    colAssignee: "Responsable",
+    colDeadline: "Échéance",
+
+    closedOn: "Clôturé le",
+    unassigned: "Non affecté",
+    anonymous: "Anonyme",
+    named: "Nominative",
+    overdue: "Hors délai",
+    dueIn: "j restants",
+    lateBy: "j de retard",
+
+    kpiTotal: "Dossiers",
+    kpiNew: "Nouvelles",
+    kpiOpen: "En cours",
+    kpiOverdue: "Hors délai",
+
+    identityTitle: "Plaignant",
+    identityAnonymous: "Dépôt anonyme : aucun nom n'a été communiqué. Les coordonnées éventuellement laissées permettent malgré tout de recontacter la personne.",
+    identityNone: "Aucune coordonnée : cette personne ne peut pas être recontactée. Le suivi public par numéro de référence est son seul retour.",
+    fieldName: "Nom complet",
+    fieldEmail: "Adresse électronique",
+    fieldPhone: "Téléphone",
+    fieldProvince: "Province",
+    fieldLang: "Langue de dépôt",
+    write: "Écrire",
+    call: "Appeler",
+
+    caseTitle: "Plainte",
+    descriptionTitle: "Faits rapportés",
+    attachmentsTitle: "Pièces annoncées",
+    attachmentsNote: "Le formulaire enregistre le nom et le poids des pièces annoncées par le plaignant ; les fichiers eux-mêmes ne sont pas hébergés à ce stade. Redemandez-les par le canal de contact du dossier.",
+    attachmentsEmpty: "Aucune pièce annoncée.",
+
+    workflowTitle: "Qualification & traitement",
+    workflowLead: "Statut, étape, priorité et responsable. Chaque changement est inscrit à l'historique, avec son auteur et son horodatage.",
+    fieldStatus: "Statut",
+    fieldStage: "Étape de la pipeline",
+    fieldPriority: "Priorité",
+    fieldAssignee: "Responsable du dossier",
+    assigneeHint: "Comptes actifs disposant du module Plaintes.",
+    save: "Enregistrer",
+    saving: "Enregistrement…",
+
+    noteTitle: "Note interne",
+    noteLead: "Observations de travail. Ces notes ne quittent jamais la console : elles n'apparaissent ni dans le suivi public, ni dans les échanges avec le plaignant.",
+    noteField: "Note",
+    noteSubmit: "Ajouter la note",
+
+    messageTitle: "Message au plaignant",
+    messageLead: "Ce texte s'affiche tel quel dans le suivi public du dossier, dès son enregistrement. Rédigez-le pour être lu par la personne concernée, sans donnée relative à un tiers.",
+    messageField: "Message publié",
+    messageSubmit: "Publier dans le suivi",
+    messageSubmitting: "Publication…",
+
+    contactTitle: "Journaliser un contact",
+    contactLead: "L'échange a lieu par téléphone, courriel ou en présentiel ; le dossier en garde la trace.",
+    contactChannel: "Canal",
+    contactSummary: "Ce qu'il en ressort",
+    contactSubmit: "Enregistrer l'échange",
+    contactChannels: ["Téléphone", "Courriel", "Entretien", "Point focal", "Courrier"],
+
+    historyTitle: "Historique du dossier",
+    historyLead: "Toutes les actions, dans l'ordre. Rien n'y est modifiable.",
+    historyPublic: "publié",
+    historyEmpty: "Aucune action enregistrée.",
+    by: "par",
+  },
 } as const;
 
 /** Un module de la console. `key` est aussi la permission qui l'ouvre. */
@@ -133,7 +220,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     items: [
       { key: "marches", label: "Appels d'offres", soon: true },
       { key: "soumissionnaires", label: "Soumissionnaires", soon: true },
-      { key: "mgp", label: "Plaintes (MGP)", soon: true },
+      { key: "mgp", label: "Plaintes (MGP)", slug: "/plaintes" },
     ],
   },
   {
