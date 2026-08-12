@@ -40,7 +40,6 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             <Reveal variant="up" delay={0.1}><p style={{ margin: "28px 0 0", maxWidth: 560, fontSize: "clamp(16px,1.5vw,19px)", lineHeight: 1.6, color: "#c6c6c6" }}>{t.home.heroLead}</p></Reveal>
             <Reveal variant="up" delay={0.18} className="stack-sm" style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 38 }}>
               <Link href={route(lang, NAV.projet)} className="btn btn--primary">{t.cta.discover}<span className="arrow">→</span></Link>
-              <Link href={route(lang, NAV.connexion)} className="btn btn--on-dark">{t.cta.connect}</Link>
               <VideoButton id={media.heroFilm} className="btn blur-sm" style={{ paddingLeft: 15, background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.28)", color: "#fff", backdropFilter: "blur(4px)" }} dataSlot="Film du projet (lecture avec son)" dataRatio="16:9">
                 <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--ac)", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, paddingLeft: 1 }}>▶</span>
                 {t.video.watch}
