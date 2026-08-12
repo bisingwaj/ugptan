@@ -290,9 +290,16 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
   .grid-4 { grid-template-columns: 1fr; }
   .hide-sm { display: none !important; }
 }
+.nav-desktop { display: inline-flex; }
 @media (max-width: 1120px) { .nav-desktop { display: none !important; } }
 @media (max-width: 420px) { .hide-xs { display: none !important; } }
-@media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr !important; } }
+/* Pied de page : identité + quatre colonnes de navigation. Sous 1180px,
+   l'identité repasse sur toute la largeur et les colonnes se resserrent. */
+@media (max-width: 1180px) {
+  .footer-grid { grid-template-columns: repeat(4, 1fr) !important; }
+  .footer-brand { grid-column: 1 / -1; }
+}
+@media (max-width: 900px) { .footer-grid { grid-template-columns: repeat(2, 1fr) !important; } }
 @media (max-width: 560px) { .footer-grid { grid-template-columns: 1fr !important; } }
 @media (max-width: 760px) {
   .pole-row { grid-template-columns: 1fr !important; }
