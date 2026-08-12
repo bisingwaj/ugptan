@@ -15,6 +15,18 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Laissés hors du bundle serveur, et non bundlés par Turbopack.
+  // `src/lib/db.ts` fait `neonConfig.webSocketConstructor = ws` : si le bundler
+  // duplique @neondatabase/serverless, l'adaptateur Prisma en obtient une autre
+  // instance, l'affectation n'atteint pas celle qui ouvre la socket, et toute
+  // requête échoue instantanément sur un ErrorEvent WebSocket. `ws` s'appuie en
+  // outre sur des internes Node qui ne survivent pas au bundling.
+  serverExternalPackages: [
+    "@prisma/client",
+    "@prisma/adapter-neon",
+    "@neondatabase/serverless",
+    "ws",
+  ],
   images: {
     formats: ["image/avif", "image/webp"],
     // Photographie de démonstration servie depuis Unsplash ; basculer vers le CDN en production.
