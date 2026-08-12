@@ -36,6 +36,8 @@ export const ADMIN = {
     logout: "Déconnexion",
     soon: "bientôt",
     console: "Console",
+    collapse: "Replier la barre",
+    expand: "Déplier la barre",
   },
 
   home: {
