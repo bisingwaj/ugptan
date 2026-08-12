@@ -4,7 +4,9 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { media, ytEmbed } from "@/content/media";
 import { pick, type Lang } from "@/lib/pick";
 
-type OpenVideo = (src?: string) => void;
+/** Métadonnées affichées dans l'entête de la lightbox (sinon : film du projet). */
+export type VideoMeta = { titre?: string; source?: string; note?: string };
+type OpenVideo = (src?: string, meta?: VideoMeta) => void;
 const VideoCtx = createContext<OpenVideo>(() => {});
 
 export const useVideo = () => useContext(VideoCtx);
@@ -14,8 +16,15 @@ const isFileSrc = (s: string) => s.startsWith("/") || s.startsWith("blob:") || /
 
 export function VideoProvider({ lang, children }: { lang: Lang; children: ReactNode }) {
   const [src, setSrc] = useState<string | null>(null);
-  const open = useCallback<OpenVideo>((value) => setSrc(value || media.videoYt), []);
-  const close = useCallback(() => setSrc(null), []);
+  const [meta, setMeta] = useState<VideoMeta | null>(null);
+  const open = useCallback<OpenVideo>((value, m) => {
+    setSrc(value || media.videoYt);
+    setMeta(m ?? null);
+  }, []);
+  const close = useCallback(() => {
+    setSrc(null);
+    setMeta(null);
+  }, []);
 
   useEffect(() => {
     if (!src) return;
@@ -25,17 +34,20 @@ export function VideoProvider({ lang, children }: { lang: Lang; children: ReactN
   }, [src, close]);
 
   const file = src ? isFileSrc(src) : false;
+  const titre = meta?.titre || pick(media.videoTitre, lang);
+  const source = meta?.source || pick(media.videoSource, lang);
+  const note = meta?.note || pick(media.videoNote, lang);
 
   return (
     <VideoCtx.Provider value={open}>
       {children}
       {src && (
         <div className="scrim scrim--center blur-sm" style={{ backdropFilter: "blur(8px)", background: "rgba(22,22,22,0.86)" }} onClick={close}>
-          <div className="modal" style={{ width: "100%", maxWidth: 1080 }} onClick={(e) => e.stopPropagation()}>
+          <div className="modal" data-lenis-prevent style={{ width: "100%", maxWidth: 1080 }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginBottom: 14 }}>
               <div>
-                <div style={{ fontWeight: 600, fontSize: "clamp(16px,2vw,22px)", color: "#fff" }}>{pick(media.videoTitre, lang)}</div>
-                <div className="mono" style={{ fontSize: 11, letterSpacing: "0.06em", color: "#a8a8a8", marginTop: 6, textTransform: "uppercase" }}>{pick(media.videoSource, lang)}</div>
+                <div style={{ fontWeight: 600, fontSize: "clamp(16px,2vw,22px)", color: "#fff" }}>{titre}</div>
+                <div className="mono" style={{ fontSize: 11, letterSpacing: "0.06em", color: "#a8a8a8", marginTop: 6, textTransform: "uppercase" }}>{source}</div>
               </div>
               <button onClick={close} aria-label="Fermer" style={{ width: 46, height: 46, flex: "0 0 auto", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontSize: 17, background: "rgba(255,255,255,0.08)" }}>✕</button>
             </div>
@@ -46,14 +58,14 @@ export function VideoProvider({ lang, children }: { lang: Lang; children: ReactN
               ) : (
                 <iframe
                   src={ytEmbed(src!)}
-                  title={pick(media.videoTitre, lang)}
+                  title={titre}
                   allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                   allowFullScreen
                   style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
                 />
               )}
             </div>
-            <div className="mono" style={{ fontSize: 11, color: "#8d8d8d", marginTop: 12, textAlign: "center" }}>{pick(media.videoNote, lang)}</div>
+            <div className="mono" style={{ fontSize: 11, color: "#8d8d8d", marginTop: 12, textAlign: "center" }}>{note}</div>
           </div>
         </div>
       )}

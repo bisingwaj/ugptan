@@ -20,6 +20,10 @@ export function SmoothScroll() {
     const coarse = window.matchMedia("(pointer: coarse)").matches;
     const lenis = reduce || coarse ? null : new Lenis({ lerp: 0.09, wheelMultiplier: 1, smoothWheel: true });
 
+    // Exposé pour les ancres internes (cf. composantes/CompSubNav) : un saut de
+    // hash natif se ferait écraser par la boucle Lenis — on passe par son API.
+    (window as Window & { __lenis?: unknown }).__lenis = lenis ?? undefined;
+
     let raf = 0;
     if (lenis) {
       const loop = (time: number) => {
@@ -50,6 +54,7 @@ export function SmoothScroll() {
       mo.disconnect();
       if (raf) cancelAnimationFrame(raf);
       lenis?.destroy();
+      delete (window as Window & { __lenis?: unknown }).__lenis;
       document.documentElement.classList.remove("scroll-locked");
     };
   }, [reduce]);
