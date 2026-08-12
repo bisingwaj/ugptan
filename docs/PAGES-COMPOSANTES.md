@@ -62,8 +62,9 @@ oblige à maintenir deux slugs (FR/EN). Décision réversible : le mapping
 3. **Résultats** — les cartes « Le projet en vidéos » pointent vers l'ancre
    `#video` de la page de composante (au lieu d'ouvrir directement la lightbox).
 4. **Marchés** — le filtre par composante affiche un lien « Voir la composante ».
-5. **Navigation** — `Composantes` ajouté au tiroir (`NAV_DRAWER`, juste après
-   « Le Projet ») et au pied de page. L'en-tête desktop reste à 4 entrées.
+5. **Navigation** — `Composantes` figure dans le groupe « Le Projet » de
+   `NAV_TREE` (`lib/routes.ts`), dont l'en-tête desktop, le tiroir mobile et le
+   pied de page dérivent tous les trois.
 6. **Entre composantes** — pager « ← C1 · C3 → » en bas de chaque page + barre
    d'onglets C1…C5 collante en haut de page.
 

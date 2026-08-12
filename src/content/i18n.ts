@@ -3,6 +3,7 @@
    `dict(lang)` renvoie toutes les chaînes déjà résolues pour la langue active.
    ========================================================================== */
 import type { Lang } from "@/lib/pick";
+import type { NavKey } from "@/lib/routes";
 
 export function dict(lang: Lang) {
   const en = lang === "en";
@@ -28,6 +29,68 @@ export function dict(lang: Lang) {
       confidentialite: t("Politique de confidentialité", "Privacy policy"),
       conditions: t("Conditions d'utilisation", "Terms of use"),
     },
+
+    /* Libellé abrégé dans un sous-menu, là où reprendre le libellé de la page
+       répéterait l'intitulé du groupe qui l'ouvre. */
+    navSub: {
+      projet: t("Vue d'ensemble", "Overview"),
+      ugptn: t("L'Unité", "The Unit"),
+      transparence: t("Documents publiés", "Published documents"),
+      actualites: t("Communiqués", "Releases"),
+    } as Partial<Record<NavKey, string>>,
+
+    /* Une ligne par destination, affichée sous le lien dans les sous-menus :
+       le lecteur choisit sans avoir à ouvrir la page pour comprendre. */
+    navDesc: {
+      projet: t(
+        "Objectifs, financement et calendrier d'exécution jusqu'en 2029.",
+        "Objectives, financing and implementation schedule to 2029.",
+      ),
+      composantes: t(
+        "Les cinq composantes, leur périmètre et leurs projets phares.",
+        "The five components, their scope and flagship projects.",
+      ),
+      resultats: t(
+        "Indicateurs d'objectif et intermédiaires, suivis province par province.",
+        "Objective and intermediate indicators, tracked province by province.",
+      ),
+      ugptn: t(
+        "Mandat, principes directeurs et organisation en cinq pôles.",
+        "Mandate, guiding principles and organisation into five clusters.",
+      ),
+      gouvernance: t(
+        "Comité de pilotage, comité technique et séparation des rôles.",
+        "Steering committee, technical committee and separation of roles.",
+      ),
+      marches: t(
+        "Avis en cours, méthode de passation, pièces exigées et délais.",
+        "Open notices, procurement method, required documents and deadlines.",
+      ),
+      transparence: t(
+        "Dépôt officiel des documents divulgables, versionnés et datés.",
+        "Official repository of disclosable documents, versioned and dated.",
+      ),
+      ressources: t(
+        "Notes, études et rapports sur lesquels reposent les arbitrages.",
+        "Notes, studies and reports on which trade-offs rest.",
+      ),
+      mgp: t(
+        "Déposer une plainte, suivre son traitement, canal confidentiel EAS/HS.",
+        "File a grievance, track its handling, confidential SEA/SH channel.",
+      ),
+      actualites: t(
+        "Décisions, jalons et communiqués publiés au fil de l'exécution.",
+        "Decisions, milestones and releases published as implementation proceeds.",
+      ),
+      evenements: t(
+        "Consultations publiques, ateliers et webinaires ouverts à contribution.",
+        "Public consultations, workshops and webinars open for contribution.",
+      ),
+      contact: t(
+        "Siège à Kinshasa, points focaux provinciaux et numéro vert.",
+        "Head office in Kinshasa, provincial focal points and toll-free number.",
+      ),
+    } as Partial<Record<NavKey, string>>,
     cta: {
       docs: t("Documents", "Documents"),
       marches: t("Marchés", "Tenders"),
