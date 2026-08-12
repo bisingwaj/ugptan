@@ -10,34 +10,40 @@ export function Newsletter({ lang }: { lang: Lang }) {
   const [done, setDone] = useState(false);
 
   return (
-    <section className="section--dark" style={{ padding: "clamp(56px,7vw,96px) var(--pad-x)" }}>
-      <div className="cols2 cols2--center" style={{ maxWidth: "var(--maxw)", margin: "0 auto", gap: "clamp(28px,5vw,64px)" }}>
+    <section className="section--dark px-(--pad-x) py-[clamp(56px,7vw,96px)]">
+      <div className="cols2 cols2--center mx-auto max-w-(--maxw) gap-[clamp(28px,5vw,64px)]">
         <div>
           <div className="kicker kicker--light">{t.label}</div>
-          <h2 className="h2--sm" style={{ marginBottom: 12 }}>{t.title}</h2>
-          <p style={{ fontSize: 15.5, lineHeight: 1.6, color: "var(--c-40)", maxWidth: 480 }}>{t.lead}</p>
+          <h2 className="h2--sm mb-3">{t.title}</h2>
+          <p className="max-w-[480px] text-[15.5px] leading-[1.6] text-c-40">{t.lead}</p>
         </div>
         <div>
           {!done ? (
             <>
+              {/* `.stack-sm` bascule le formulaire en colonne pleine largeur ≤ 760px. */}
               <form
                 onSubmit={(e) => { e.preventDefault(); if (email.includes("@")) setDone(true); }}
-                className="stack-sm"
-                style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
+                className="stack-sm flex flex-wrap gap-2.5"
               >
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t.placeholder} aria-label={t.label} className="field field--dark" style={{ flex: 1, minWidth: 200, fontSize: 15, padding: "15px 16px" }} />
-                <button type="submit" className="btn btn--primary" style={{ whiteSpace: "nowrap" }}>{t.btn}<span className="arrow">→</span></button>
+                <input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t.placeholder}
+                  aria-label={t.label}
+                  className="field field--dark min-w-[200px] flex-1 px-4 py-[15px] text-[15px]"
+                />
+                <button type="submit" className="btn btn--primary whitespace-nowrap">{t.btn}<span className="arrow">→</span></button>
               </form>
-              <p className="mono" style={{ margin: "14px 0 0", fontSize: 11, color: "var(--c-60)" }}>
+              <p className="mt-3.5 font-mono text-[11px] text-c-60">
                 {lang === "en" ? "No spam · one-click unsubscribe." : "Pas de spam · désinscription en un clic."}
               </p>
             </>
           ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: 14, background: "#0a2e16", border: "1px solid #0e6027", padding: "20px 22px", animation: "revFade .3s both" }}>
-              <span style={{ width: 38, height: 38, flex: "0 0 auto", background: "var(--green-soft)", color: "var(--c-black)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>✓</span>
+            <div className="flex animate-[revFade_.3s_both] items-center gap-3.5 border border-[#0e6027] bg-[#0a2e16] px-[22px] py-5">
+              <span className="flex size-[38px] flex-none items-center justify-center bg-green-soft text-[18px] text-c-black">✓</span>
               <div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: "#fff" }}>{t.doneTitle}</div>
-                <div style={{ fontSize: 13.5, color: "var(--c-40)", marginTop: 4 }}>{t.doneText}</div>
+                <div className="text-[16px] font-semibold text-white">{t.doneTitle}</div>
+                <div className="mt-1 text-[13.5px] text-c-40">{t.doneText}</div>
               </div>
             </div>
           )}

@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import "@/styles/tokens.css";
 import "@/styles/globals.css";
 import { asLang, LOCALES } from "@/lib/params";
 import { SITE_URL } from "@/lib/site";

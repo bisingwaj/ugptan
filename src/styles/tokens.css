@@ -1,3 +1,18 @@
+/* ===========================================================================
+   Jetons de conception — source unique des variables partagées.
+
+   Importée par les deux feuilles d'entrée : globals.css (site public) et
+   dashboard.css (console). Les valeurs restent des variables CSS : c'est le
+   contrat qui permet aux pages composantes de redéfinir l'accent à l'exécution
+   (cf. lib/comp.ts et le bloc « PAGES DÉDIÉES PAR COMPOSANTE » de globals.css).
+
+   Le bloc `@theme inline` expose ces jetons à Tailwind. « inline » est
+   déterminant : les utilitaires générés (bg-ac, text-c-70, border-c-20…)
+   portent alors littéralement `var(--ac)` plutôt qu'une copie figée de la
+   valeur. Sans lui, `bg-ac` resterait bleu Carbon sur une page composante
+   verte, là où `.btn--primary` suivrait la couleur.
+=========================================================================== */
+
 :root {
   /* Accent (overridable per deployment) */
   --ac: #0f62fe;
@@ -47,10 +62,51 @@
   --sa-b: env(safe-area-inset-bottom, 0px);
   --sa-l: env(safe-area-inset-left, 0px);
 
-  /* Type — IBM Plex (chargé via lien feuille de style dans le layout racine) */
-  --font-sans: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
-
   /* Motion */
   --rev: revUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Exposition à Tailwind ------------------------------------------------
+   Les noms d'utilitaires reprennent ceux des variables (--c-70 → text-c-70)
+   pour éviter toute traduction mentale entre la feuille et le JSX. */
+@theme inline {
+  --color-ac: var(--ac);
+  --color-acd: var(--acd);
+  --color-ac-light: var(--ac-light);
+  --color-ac-pale: var(--ac-pale);
+  --color-ac-line: var(--ac-line);
+
+  --color-c-black: var(--c-black);
+  --color-c-90: var(--c-90);
+  --color-c-80: var(--c-80);
+  --color-c-70: var(--c-70);
+  --color-c-60: var(--c-60);
+  --color-c-50: var(--c-50);
+  --color-c-40: var(--c-40);
+  --color-c-30: var(--c-30);
+  --color-c-20: var(--c-20);
+  --color-c-10: var(--c-10);
+  --color-c-white: var(--c-white);
+
+  --color-teal: var(--teal);
+  --color-violet: var(--violet);
+  --color-magenta: var(--magenta);
+  --color-green: var(--green);
+  --color-green-bright: var(--green-bright);
+  --color-green-soft: var(--green-soft);
+  --color-orange: var(--orange);
+  --color-red: var(--red);
+
+  --color-ok-bg: var(--ok-bg);
+  --color-ok-bd: var(--ok-bd);
+  --color-ok-fg: var(--ok-fg);
+}
+
+/* Type — IBM Plex (chargé via lien feuille de style dans le layout racine).
+   Déclarée dans `@theme` et non dans `:root` : Tailwind émet la variable ET
+   génère les utilitaires font-sans / font-mono. `var(--font-sans)` continue
+   donc de résoudre pour le CSS existant. */
+@theme {
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 }

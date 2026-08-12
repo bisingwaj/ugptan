@@ -41,7 +41,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             <Reveal variant="up" delay={0.1}><p style={{ margin: "28px 0 0", maxWidth: 560, fontSize: "clamp(16px,1.5vw,19px)", lineHeight: 1.6, color: "#c6c6c6" }}>{t.home.heroLead}</p></Reveal>
             <Reveal variant="up" delay={0.18} className="stack-sm" style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 38 }}>
               <Link href={route(lang, NAV.projet)} className="btn btn--primary">{t.cta.discover}<span className="arrow">→</span></Link>
-              <VideoButton id={media.heroFilm} className="btn blur-sm" style={{ paddingLeft: 15, background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.28)", color: "#fff", backdropFilter: "blur(4px)" }} dataSlot="Film du projet (lecture avec son)" dataRatio="16:9">
+              <VideoButton id={media.heroFilm} className="btn backdrop-blur-[4px] max-[760px]:backdrop-blur-none" style={{ paddingLeft: 15, background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.28)", color: "#fff" }} dataSlot="Film du projet (lecture avec son)" dataRatio="16:9">
                 <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--ac)", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, paddingLeft: 1 }}>▶</span>
                 {t.video.watch}
               </VideoButton>
@@ -54,7 +54,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
               ))}
             </div>
           </div>
-          <div className="hero-figures blur-sm" style={{ border: "1px solid rgba(255,255,255,.14)", background: "rgba(13,17,26,.55)", backdropFilter: "blur(8px)", marginBottom: "clamp(48px,7vw,96px)", color: "#fff" }}>
+          <div className="hero-figures backdrop-blur-[8px] max-[760px]:backdrop-blur-none" style={{ border: "1px solid rgba(255,255,255,.14)", background: "rgba(13,17,26,.55)", marginBottom: "clamp(48px,7vw,96px)", color: "#fff" }}>
             <div className="mono" style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,.12)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a8a8a8", display: "flex", justifyContent: "space-between" }}>
               <span>{t.sec.chiffres}</span><span style={{ color: "var(--ac-light)" }}>{meta.code}</span>
             </div>
@@ -71,7 +71,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             ))}
           </div>
         </div>
-        <div className="blur-sm" style={{ position: "relative", borderTop: "1px solid #1f2430", background: "rgba(11,15,26,.6)", backdropFilter: "blur(4px)", fontFamily: "var(--font-mono)", fontSize: 11.5, color: "#a8a8a8", overflow: "hidden" }}>
+        <div className="backdrop-blur-[4px] max-[760px]:backdrop-blur-none" style={{ position: "relative", borderTop: "1px solid #1f2430", background: "rgba(11,15,26,.6)", fontFamily: "var(--font-mono)", fontSize: 11.5, color: "#a8a8a8", overflow: "hidden" }}>
           <div className="hero-status" style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "11px var(--pad-x)", display: "flex", flexWrap: "wrap", gap: "8px 28px" }}>
             <span><span style={{ color: "var(--ac-light)" }}>●</span> {t.home.statusEffective}</span>
             <span><span style={{ color: "var(--ac-light)" }}>●</span> {t.home.statusCompletion}</span>
