@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import "@/styles/tokens.css";
 import "@/styles/dashboard.css";
 
 /**

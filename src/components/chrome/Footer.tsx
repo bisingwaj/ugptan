@@ -5,61 +5,63 @@ import { meta } from "@/content/data";
 import { contact } from "@/content/carbon";
 import { NAV, NAV_FOOTER, NAV_LEGAL, route } from "@/lib/routes";
 
-const colLabel: React.CSSProperties = {
-  fontFamily: "var(--font-mono)", fontSize: 11, textTransform: "uppercase",
-  letterSpacing: "0.1em", color: "var(--c-60)", marginBottom: 16,
-};
-const colLink: React.CSSProperties = { display: "block", padding: "7px 0", fontSize: 14, color: "var(--c-30)" };
+/* Classes partagées des colonnes. Volontairement déclinées en variantes
+   complètes plutôt que composées par surcharge : deux utilitaires de même
+   propriété (block/flex, text-c-30/text-ac-light) sont départagés par l'ordre
+   de la feuille compilée, pas par l'ordre dans la chaîne de classes. */
+const colLabel = "mb-4 font-mono text-[11px] uppercase tracking-[0.1em] text-c-60";
+const colLink = "block py-[7px] text-[14px] text-c-30";
+const colLinkAccent = "flex items-center gap-2 py-[7px] text-[14px] text-ac-light";
 
 export function Footer({ lang }: { lang: Lang }) {
   const t = dict(lang);
   return (
-    <footer style={{ background: "var(--c-black)", color: "var(--c-30)" }}>
-      <div className="footer-grid" style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "clamp(54px,7vw,88px) var(--pad-x) 40px", display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", gap: "clamp(28px,4vw,56px)" }}>
+    <footer className="bg-c-black text-c-30">
+      <div className="footer-grid mx-auto grid max-w-(--maxw) grid-cols-[1.5fr_1fr_1fr_1fr] gap-[clamp(28px,4vw,56px)] px-(--pad-x) pt-[clamp(54px,7vw,88px)] pb-10">
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-            <span style={{ width: 30, height: 30, background: "var(--ac)", position: "relative", display: "inline-flex" }}>
-              <span style={{ position: "absolute", right: 5, bottom: 5, width: 11, height: 11, background: "var(--c-black)" }} />
+          <div className="mb-[18px] flex items-center gap-3">
+            <span className="relative inline-flex size-[30px] bg-ac">
+              <span className="absolute right-[5px] bottom-[5px] size-[11px] bg-c-black" />
             </span>
-            <span style={{ fontWeight: 700, fontSize: 19, color: "#fff" }}>UGPTN</span>
+            <span className="text-[19px] font-bold text-white">UGPTN</span>
           </div>
-          <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "var(--c-50)", maxWidth: 300 }}>{meta.uniteLong}</p>
-          <p className="mono" style={{ margin: "16px 0 0", fontSize: 11.5, color: "var(--c-60)", lineHeight: 1.7 }}>{meta.tutelleLong}<br />{meta.bailleurs}</p>
-          <p className="mono" style={{ margin: "12px 0 0", fontSize: 11, color: "var(--c-50)", lineHeight: 1.6, maxWidth: 320 }}>{t.foot.source}</p>
-          <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 7, fontSize: 13, color: "var(--c-30)", lineHeight: 1.5 }}>
+          <p className="max-w-[300px] text-[13.5px] leading-[1.6] text-c-50">{meta.uniteLong}</p>
+          <p className="mt-4 font-mono text-[11.5px] leading-[1.7] text-c-60">{meta.tutelleLong}<br />{meta.bailleurs}</p>
+          <p className="mt-3 max-w-[320px] font-mono text-[11px] leading-[1.6] text-c-50">{t.foot.source}</p>
+          <div className="mt-5 flex flex-col gap-[7px] text-[13px] leading-[1.5] text-c-30">
             <span>{contact.adresse}</span>
-            <span style={{ color: "var(--c-50)" }}>{contact.quartier}</span>
-            <a href={`tel:${contact.tel.replace(/\s/g, "")}`} style={{ color: "var(--c-30)" }}>{contact.tel}</a>
-            <a href={`mailto:${contact.email}`} style={{ color: "var(--ac-light)" }}>{contact.email}</a>
+            <span className="text-c-50">{contact.quartier}</span>
+            <a href={`tel:${contact.tel.replace(/\s/g, "")}`} className="text-c-30">{contact.tel}</a>
+            <a href={`mailto:${contact.email}`} className="text-ac-light">{contact.email}</a>
           </div>
         </div>
 
         <div>
-          <div style={colLabel}>{t.words.navigation}</div>
+          <div className={colLabel}>{t.words.navigation}</div>
           {NAV_FOOTER.map((item) => (
-            <Link key={item.key} href={route(lang, item.slug)} style={colLink}>{t.nav[item.key]}</Link>
+            <Link key={item.key} href={route(lang, item.slug)} className={colLink}>{t.nav[item.key]}</Link>
           ))}
         </div>
 
         <div>
-          <div style={colLabel}>{t.foot.transparence}</div>
-          <Link href={route(lang, NAV.transparence)} style={colLink}>{t.cta.docs}</Link>
-          <Link href={route(lang, NAV.marches)} style={colLink}>{t.cta.marches}</Link>
-          <Link href={route(lang, NAV.ressources)} style={colLink}>{t.words.ressources}</Link>
+          <div className={colLabel}>{t.foot.transparence}</div>
+          <Link href={route(lang, NAV.transparence)} className={colLink}>{t.cta.docs}</Link>
+          <Link href={route(lang, NAV.marches)} className={colLink}>{t.cta.marches}</Link>
+          <Link href={route(lang, NAV.ressources)} className={colLink}>{t.words.ressources}</Link>
         </div>
 
         <div>
-          <div style={colLabel}>{t.words.redevabilite}</div>
-          <Link href={route(lang, NAV.mgp)} style={colLink}>{t.cta.mgp}</Link>
-          <Link href={route(lang, NAV.mgp)} style={colLink}>MGP-EAS/HS</Link>
-          <Link href={route(lang, NAV.contact)} style={{ ...colLink, color: "var(--ac-light)", display: "flex", alignItems: "center", gap: 8 }}>
-            <span className="blink" style={{ width: 7, height: 7, background: "var(--green-bright)", borderRadius: "50%" }} />{t.contact.numeroVert}
+          <div className={colLabel}>{t.words.redevabilite}</div>
+          <Link href={route(lang, NAV.mgp)} className={colLink}>{t.cta.mgp}</Link>
+          <Link href={route(lang, NAV.mgp)} className={colLink}>MGP-EAS/HS</Link>
+          <Link href={route(lang, NAV.contact)} className={colLinkAccent}>
+            <span className="blink size-[7px] rounded-full bg-green-bright" />{t.contact.numeroVert}
           </Link>
         </div>
       </div>
 
-      <div style={{ borderTop: "1px solid var(--c-80)" }}>
-        <div style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "18px var(--pad-x)", display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--c-60)" }}>
+      <div className="border-t border-c-80">
+        <div className="mx-auto flex max-w-(--maxw) flex-wrap justify-between gap-3 px-(--pad-x) py-[18px] font-mono text-[11px] text-c-60">
           <span>© {t.words.year} UGPTN · {meta.code} · {meta.ville}</span>
           <nav className="footer-legal" aria-label={t.foot.legalLabel}>
             {NAV_LEGAL.map((item) => (

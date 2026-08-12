@@ -1,10 +1,67 @@
- 
 /* ===========================================================================
-   Base
+   Feuille d'entrée du site public (la console a la sienne : dashboard.css).
+
+   ORDRE DES COUCHES — c'est la pièce maîtresse de la standardisation Tailwind.
+   Le design system vit dans `components`, les utilitaires dans `utilities` :
+   une classe posée dans le JSX l'emporte donc sur `.btn` ou `.cell`, ce qui
+   remplace exactement le rôle que tenaient les styles inline. Les surcharges
+   mobiles marquées `!important` continuent de primer sur tout (pour les
+   déclarations importantes, l'ordre des couches s'inverse).
+
+   PREFLIGHT VOLONTAIREMENT ABSENT : la remise à zéro de Tailwind n'est pas
+   importée. Cette feuille possède déjà sa propre base, et empiler les deux
+   aurait déplacé titres, listes et champs — le rendu devait rester identique.
+   Seules les deux déclarations de bordure dont dépendent les utilitaires
+   `border-*` sont reprises dans la couche `base`.
 =========================================================================== */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-/* Smooth scroll géré par Lenis (cf. components/motion/SmoothScroll.tsx) — pas
-   de scroll-behavior natif qui se battrait avec l'inertie. CSS requis par Lenis : */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "./tokens.css";
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+/* Détection de sources cadrée sur le code applicatif. Laissée automatique,
+   Tailwind balaie tout le dépôt — documentation des agents, lockfile — et
+   génère des utilitaires que rien n'emploie : `.container` apparaissait ainsi
+   dans la feuille, prêt à écraser une classe maison du même nom.
+   `src/generated` (client Prisma) est volontairement hors périmètre. */
+@source "../app";
+@source "../components";
+@source "../content";
+@source "../lib";
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Reprise ciblée de Preflight : les utilitaires de bordure ne posent que la
+     largeur et le style, jamais la remise à zéro. Sans `border-width: 0`,
+     déclarer `border-style: solid` donnerait à tout élément une bordure
+     `medium`. Aucun élément du site ne s'appuie sur une bordure native : tous
+     les champs passent par `.field`. */
+  *, ::before, ::after { border-width: 0; border-style: solid; }
+  body {
+    background: var(--c-white);
+    color: var(--c-black);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, textarea, select { font-family: inherit; }
+  img { display: block; max-width: 100%; }
+  ::selection { background: var(--ac); color: #fff; }
+  ::-webkit-scrollbar { width: 11px; height: 11px; }
+  ::-webkit-scrollbar-thumb { background: var(--c-30); }
+  ::-webkit-scrollbar-track { background: var(--c-10); }
+  :focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
+}
+
+/* Contrats de la librairie Lenis et verrou de défilement : hors couche, donc
+   au-dessus de tout utilitaire. Ces règles pilotent le document, pas un
+   composant, et ne doivent jamais être arbitrées par une classe du JSX.
+   Smooth scroll géré par Lenis (cf. components/motion/SmoothScroll.tsx) — pas
+   de scroll-behavior natif qui se battrait avec l'inertie. */
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
@@ -17,28 +74,22 @@ html.scroll-locked body {
   top: calc(-1 * var(--scroll-y, 0px));
   width: 100%;
 }
-body {
-  background: var(--c-white);
-  color: var(--c-black);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  overflow-x: hidden;
-}
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-input, textarea, select { font-family: inherit; }
-img { display: block; max-width: 100%; }
-::selection { background: var(--ac); color: #fff; }
-::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-thumb { background: var(--c-30); }
-::-webkit-scrollbar-track { background: var(--c-10); }
-:focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
+
+/* ===========================================================================
+   DESIGN SYSTEM — couche `components`
+   Le contenu ci-dessous n'est volontairement pas réindenté : il est repris tel
+   quel, pour que la revue porte sur la structure en couches et non sur 870
+   lignes de décalage. Les classes converties en `@apply` sont signalées.
+=========================================================================== */
+@layer components {
 
 /* ===========================================================================
    Layout
 =========================================================================== */
-.container { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--pad-x); }
+/* `.container` a été retirée : inutilisée dans tout le dépôt, et Tailwind génère
+   un utilitaire du même nom qui l'aurait écrasée (max-width par point de rupture
+   au lieu de var(--maxw)). Pour centrer une colonne, utiliser directement
+   `max-w-(--maxw) mx-auto px-(--pad-x)`. */
 .section { padding-block: var(--pad-y); padding-inline: max(var(--pad-x), var(--sa-l)) max(var(--pad-x), var(--sa-r)); border-bottom: 1px solid var(--c-20); }
 .section--sm { padding-block: var(--pad-y-sm); }
 .section--grey { background: var(--c-10); }
@@ -249,8 +300,11 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 @media (max-width: 640px) { .comp-head { grid-template-columns: 1fr !important; } }
 @media (max-width: 680px) { .gov-act { grid-template-columns: 1fr !important; } }
 
-/* Utilitaires partagés (base) — le flou et le hamburger sont pilotés en mobile */
-.blur-sm { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+/* `.blur-sm` a été retirée : Tailwind génère un utilitaire du même nom, mais
+   qui applique `filter: blur()` (le contenu) au lieu de `backdrop-filter`
+   (l'arrière-plan) — les éléments concernés se seraient retrouvés flous.
+   Les six usages sont passés à `backdrop-blur-[Npx]`, assorti de
+   `max-[760px]:backdrop-blur-none` qui reprend la coupure mobile ci-dessous. */
 .nav-burger { display: inline-flex; }
 @media (min-width: 1121px) { .nav-burger { display: none !important; } }
 
@@ -269,7 +323,6 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
   .stack-sm { flex-direction: column !important; align-items: stretch !important; }
   .stack-sm > .btn, .stack-sm > a.btn, .stack-sm > button { width: 100% !important; justify-content: center; }
   .card-sm { grid-template-columns: 1fr !important; gap: 10px !important; }
-  .blur-sm { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   a.btn, button.btn, .chip { min-height: 44px; }
   .drawer { width: 100% !important; }
   .modal { width: 100% !important; max-width: 100% !important; max-height: calc(100dvh - var(--sa-t) - var(--sa-b)); overflow: auto; }
@@ -913,3 +966,5 @@ a.avis__lien:hover { color: #fff; border-bottom-color: var(--ac-light); }
   .avis__actions { gap: 12px 16px; }
   .avis__btn { width: 100%; justify-content: center; }
 }
+
+} /* fin @layer components */
