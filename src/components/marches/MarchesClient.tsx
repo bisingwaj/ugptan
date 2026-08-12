@@ -244,8 +244,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
           </div>
 
           <div className="stack-sm" style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <Link href={route(lang, NAV.connexion)} className="btn" style={{ flex: 1, minWidth: 200, justifyContent: "center", background: cc, color: "#fff" }}>{t.submitBid} <span className="arrow">→</span></Link>
-            <Link href={route(lang, NAV.contact)} className="btn btn--outline">{w.askQuestion}</Link>
+            <Link href={route(lang, NAV.contact)} className="btn" style={{ flex: 1, minWidth: 200, justifyContent: "center", background: cc, color: "#fff" }}>{w.askQuestion} <span className="arrow">→</span></Link>
           </div>
         </div>
       </div>

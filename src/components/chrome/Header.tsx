@@ -73,10 +73,6 @@ export function Header({ lang }: { lang: Lang }) {
               )}
             </div>
 
-            <Link href={route(lang, NAV.connexion)} className="btn btn--primary btn--sm hide-sm">
-              {t.cta.connect}<span className="arrow">→</span>
-            </Link>
-
             <button onClick={() => setNavOpen(true)} aria-label="Menu" className="nav-burger" style={{ alignItems: "center", gap: 10, padding: "10px 14px", border: "1px solid var(--c-black)", background: "var(--c-black)", color: "#fff", fontSize: 13.5, fontWeight: 600 }}>
               <span style={{ display: "inline-flex", flexDirection: "column", gap: 3 }}>
                 {[0, 1, 2].map((i) => <span key={i} style={{ width: 16, height: 1.5, background: "#fff", display: "block" }} />)}
@@ -110,7 +106,6 @@ export function Header({ lang }: { lang: Lang }) {
                   <Link key={l} href={localePath(l)} onClick={() => setNavOpen(false)} className="mono" style={{ flex: 1, minHeight: 48, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--c-80)", background: lang === l ? "var(--ac)" : "transparent", color: lang === l ? "#fff" : "var(--c-30)", fontSize: 14, textTransform: "uppercase", letterSpacing: "0.08em" }}>{l}</Link>
                 ))}
               </div>
-              <Link href={route(lang, NAV.connexion)} onClick={() => setNavOpen(false)} className="btn btn--primary" style={{ justifyContent: "center" }}>{t.cta.connect}<span className="arrow">→</span></Link>
               <Link href={route(lang, NAV.mgp)} onClick={() => setNavOpen(false)} className="btn btn--on-dark" style={{ justifyContent: "center" }}>{t.cta.mgp}</Link>
             </div>
           </div>
