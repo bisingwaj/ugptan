@@ -5,8 +5,9 @@
   "description": "Site institutionnel public de l'UGPTN — Projet de Transformation Numérique de la RDC (PTN-RDC · P180495). Refonte Next.js (App Router) de la direction « Carbon ».",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
+    "postinstall": "prisma generate",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
