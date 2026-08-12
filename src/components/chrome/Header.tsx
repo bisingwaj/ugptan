@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Lang } from "@/lib/pick";
 import { cn } from "@/lib/cn";
 import { dict } from "@/content/i18n";
 import { langues } from "@/content/data";
 import { BIDDERS_PORTAL_URL } from "@/lib/external";
-import { NAV, NAV_PRIMARY, NAV_DRAWER, route } from "@/lib/routes";
+import { NAV, NAV_TREE, NAV_DRAWER, isGroup, route, type NavKey } from "@/lib/routes";
 
 const Logo = ({ dark = false }: { dark?: boolean }) => (
   <span className="relative inline-flex size-[30px] flex-none bg-ac">
@@ -16,20 +16,53 @@ const Logo = ({ dark = false }: { dark?: boolean }) => (
   </span>
 );
 
+/* Entrées de la barre desktop — liens et boutons de groupe partagent le même
+   gabarit pour que le soulignement actif reste aligné d'une entrée à l'autre.
+   Entre 1121 et 1280px, la barre doit loger six entrées, le sélecteur de langue
+   et le bouton de connexion : les marges internes se resserrent d'autant. */
+const navTop =
+  "border-b-2 px-[13px] max-[1280px]:px-[9px] py-[9px] text-[14.5px] font-medium whitespace-nowrap";
+const navTopOn = "border-ac text-ac";
+const navTopOff = "border-transparent text-c-80";
+
 export function Header({ lang }: { lang: Lang }) {
   const t = dict(lang);
   const pathname = usePathname();
   const [langOpen, setLangOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+  /* Sous-menu desktop ouvert (clé du groupe), ou null. */
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setNavOpen(false);
     setLangOpen(false);
+    setOpenGroup(null);
   }, [pathname]);
+
+  /* Un sous-menu ouvert au clavier ou au clic se referme sur Échap et sur un
+     clic hors de la barre : le survol seul ne suffit pas à le rendre. */
+  useEffect(() => {
+    if (!openGroup) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenGroup(null);
+    };
+    const onDown = (e: MouseEvent) => {
+      if (!navRef.current?.contains(e.target as Node)) setOpenGroup(null);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onDown);
+    };
+  }, [openGroup]);
 
   const rest = pathname.replace(/^\/(fr|en)/, "");
   const localePath = (l: Lang) => `/${l}${rest || ""}`;
   const isActive = (slug: string) => pathname === route(lang, slug);
+  /* Le libellé abrégé prime dans les sous-menus, sinon celui de la page. */
+  const subLabel = (key: NavKey) => t.navSub[key] ?? t.nav[key];
 
   return (
     <div className="sticky top-0 z-50">
@@ -43,19 +76,90 @@ export function Header({ lang }: { lang: Lang }) {
             <span className="text-[19px] font-bold tracking-[0.02em]">UGPTN</span>
           </Link>
 
-          <nav className="nav-desktop flex items-center gap-0.5">
-            {NAV_PRIMARY.map((item) => (
-              <Link
-                key={item.key}
-                href={route(lang, item.slug)}
-                className={cn(
-                  "border-b-2 px-[15px] py-[9px] text-[14.5px] font-medium",
-                  isActive(item.slug) ? "border-ac text-ac" : "border-transparent text-c-80",
-                )}
-              >
-                {t.nav[item.key]}
-              </Link>
-            ))}
+          <nav ref={navRef} className="nav-desktop flex items-center gap-0.5" aria-label={t.words.navigation}>
+            {NAV_TREE.map((node) => {
+              if (!isGroup(node)) {
+                return (
+                  <Link
+                    key={node.key}
+                    href={route(lang, node.slug)}
+                    className={cn(navTop, isActive(node.slug) ? navTopOn : navTopOff)}
+                  >
+                    {t.nav[node.key]}
+                  </Link>
+                );
+              }
+              const open = openGroup === node.key;
+              const groupActive = node.children.some((c) => isActive(c.slug));
+              return (
+                <div
+                  key={node.key}
+                  className="relative"
+                  onMouseEnter={() => setOpenGroup(node.key)}
+                  onMouseLeave={() => setOpenGroup(null)}
+                >
+                  <button
+                    type="button"
+                    aria-haspopup="true"
+                    aria-expanded={open}
+                    onClick={() => setOpenGroup(open ? null : node.key)}
+                    className={cn(
+                      navTop,
+                      "inline-flex items-center gap-[6px]",
+                      groupActive || open ? navTopOn : navTopOff,
+                    )}
+                  >
+                    {t.nav[node.labelKey]}
+                    <span
+                      aria-hidden
+                      className={cn("text-[8px] opacity-60 transition-transform duration-200", open && "rotate-180")}
+                    >
+                      ▼
+                    </span>
+                  </button>
+                  {/* Le panneau reste dans le DOM et bascule en visibilité :
+                      les liens sont ainsi explorables par les moteurs, tout en
+                      restant hors du parcours de tabulation une fois fermés. */}
+                  <div
+                    className={cn(
+                      "absolute top-full left-0 z-[60] w-[336px] border border-c-20 bg-white shadow-[0_16px_44px_rgba(0,0,0,0.13)]",
+                      "transition-[opacity,transform,visibility] duration-200 ease-out",
+                      open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-[6px] opacity-0",
+                    )}
+                  >
+                    {node.children.map((child) => (
+                      <Link
+                        key={child.key}
+                        href={route(lang, child.slug)}
+                        onClick={() => setOpenGroup(null)}
+                        aria-current={isActive(child.slug) ? "page" : undefined}
+                        className={cn(
+                          "group block border-b border-c-10 px-[18px] py-[13px] last:border-b-0",
+                          isActive(child.slug) ? "bg-ac-pale" : "hover:bg-c-10",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "flex items-center justify-between gap-3 text-[14.5px] font-semibold",
+                            isActive(child.slug) ? "text-ac" : "text-c-black",
+                          )}
+                        >
+                          {subLabel(child.key)}
+                          <span className="font-mono text-[12px] text-c-40 transition-transform duration-200 group-hover:translate-x-[3px]">
+                            →
+                          </span>
+                        </span>
+                        {t.navDesc[child.key] && (
+                          <span className="mt-[5px] block text-[12.5px] leading-[1.45] text-c-60">
+                            {t.navDesc[child.key]}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2.5">
@@ -125,28 +229,73 @@ export function Header({ lang }: { lang: Lang }) {
         </div>
       </header>
 
-      {/* Drawer */}
+      {/* Tiroir — il reprend le motif d'overlay du projet : la classe `.scrim`
+          est ce que guette SmoothScroll pour arrêter Lenis et verrouiller le
+          fond, faute de quoi le geste de défilement part dans la page derrière
+          au lieu de la liste. */}
       {navOpen && (
-        <>
-          <div onClick={() => setNavOpen(false)} className="fixed inset-0 z-[210] animate-[ovF_.2s_both] bg-[rgba(22,22,22,0.5)]" />
-          <div className="fixed top-0 right-0 bottom-0 z-[211] flex w-[min(444px,100%)] animate-[revSlideR_.32s_cubic-bezier(.16,1,.3,1)_both] flex-col bg-c-black text-white">
+        <div className="scrim scrim--right" onClick={() => setNavOpen(false)}>
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex h-full w-[min(444px,100%)] animate-[revSlideR_.32s_cubic-bezier(.16,1,.3,1)_both] flex-col bg-c-black text-white"
+          >
             <div className="flex flex-none items-center justify-between border-b border-c-80 px-(--pad-x) pt-[calc(20px+var(--sa-t))] pb-5">
               <span className="font-mono text-[12px] uppercase tracking-[0.12em] text-ac-light">Navigation</span>
               <button onClick={() => setNavOpen(false)} aria-label="Fermer" className="size-10 border border-c-80 bg-c-90 text-[16px] text-white">✕</button>
             </div>
-            <div className="flex-1 overflow-auto">
-              {NAV_DRAWER.map((item) => (
-                <Link
-                  key={item.key}
-                  href={route(lang, item.slug)}
-                  onClick={() => setNavOpen(false)}
-                  className="flex w-full items-center justify-between gap-3 border-b border-[#232323] px-(--pad-x) py-[15px] text-[16.5px] font-medium text-white"
-                >
-                  <span>{t.nav[item.key]}</span>
-                  <span className="font-mono text-[13px] text-c-70">→</span>
-                </Link>
-              ))}
-            </div>
+            {/* Le tiroir reprend l'arbre desktop : les groupes deviennent des
+                sections déroulées, sans clic supplémentaire pour atteindre une
+                page. Les cibles gardent une hauteur tactile confortable, et les
+                intitulés de section restent des div — le tiroir n'a pas à
+                injecter de titres dans le plan sémantique de la page. */}
+            {/* `min-h-0` est indispensable : sans lui, un élément flexible garde
+                `min-height: auto` et refuse de se contracter sous la hauteur de
+                son contenu — la liste déborde du tiroir au lieu de défiler. */}
+            <nav
+              aria-label={t.words.navigation}
+              data-lenis-prevent
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+            >
+              {NAV_DRAWER.map((node) =>
+                !isGroup(node) ? (
+                  <Link
+                    key={node.key}
+                    href={route(lang, node.slug)}
+                    onClick={() => setNavOpen(false)}
+                    aria-current={isActive(node.slug) ? "page" : undefined}
+                    className={cn(
+                      "flex w-full items-center justify-between gap-3 border-b border-[#232323] px-(--pad-x) py-[15px] text-[16.5px] font-medium",
+                      isActive(node.slug) ? "text-ac-light" : "text-white",
+                    )}
+                  >
+                    <span>{t.nav[node.key]}</span>
+                    <span className="font-mono text-[13px] text-c-70">→</span>
+                  </Link>
+                ) : (
+                  <section key={node.key} aria-label={t.nav[node.labelKey]} className="border-b border-[#232323]">
+                    <div className="px-(--pad-x) pt-[18px] pb-[6px] font-mono text-[11px] uppercase tracking-[0.12em] text-c-60">
+                      {t.nav[node.labelKey]}
+                    </div>
+                    {node.children.map((child) => (
+                      <Link
+                        key={child.key}
+                        href={route(lang, child.slug)}
+                        onClick={() => setNavOpen(false)}
+                        aria-current={isActive(child.slug) ? "page" : undefined}
+                        className={cn(
+                          "flex w-full items-center justify-between gap-3 px-(--pad-x) py-[13px] text-[16.5px] font-medium",
+                          isActive(child.slug) ? "text-ac-light" : "text-white",
+                        )}
+                      >
+                        <span>{subLabel(child.key)}</span>
+                        <span className="font-mono text-[13px] text-c-70">→</span>
+                      </Link>
+                    ))}
+                    <div className="h-[10px]" />
+                  </section>
+                ),
+              )}
+            </nav>
             <div className="flex flex-none flex-col gap-2.5 border-t border-c-80 px-(--pad-x) pt-[18px] pb-[calc(18px+var(--sa-b))]">
               <div className="mb-1 flex gap-2">
                 {(["fr", "en"] as Lang[]).map((l) => (
@@ -178,7 +327,7 @@ export function Header({ lang }: { lang: Lang }) {
               <Link href={route(lang, NAV.mgp)} onClick={() => setNavOpen(false)} className="btn btn--on-dark justify-center">{t.cta.mgp}</Link>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

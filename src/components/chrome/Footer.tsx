@@ -17,8 +17,8 @@ export function Footer({ lang }: { lang: Lang }) {
   const t = dict(lang);
   return (
     <footer className="bg-c-black text-c-30">
-      <div className="footer-grid mx-auto grid max-w-(--maxw) grid-cols-[1.5fr_1fr_1fr_1fr] gap-[clamp(28px,4vw,56px)] px-(--pad-x) pt-[clamp(54px,7vw,88px)] pb-10">
-        <div>
+      <div className="footer-grid mx-auto grid max-w-(--maxw) grid-cols-[1.6fr_repeat(4,1fr)] gap-x-[clamp(24px,3vw,48px)] gap-y-[clamp(32px,4vw,44px)] px-(--pad-x) pt-[clamp(54px,7vw,88px)] pb-10">
+        <div className="footer-brand">
           <div className="mb-[18px] flex items-center gap-3">
             <span className="relative inline-flex size-[30px] bg-ac">
               <span className="absolute right-[5px] bottom-[5px] size-[11px] bg-c-black" />
@@ -36,28 +36,25 @@ export function Footer({ lang }: { lang: Lang }) {
           </div>
         </div>
 
-        <div>
-          <div className={colLabel}>{t.words.navigation}</div>
-          {NAV_FOOTER.map((item) => (
-            <Link key={item.key} href={route(lang, item.slug)} className={colLink}>{t.nav[item.key]}</Link>
-          ))}
-        </div>
-
-        <div>
-          <div className={colLabel}>{t.foot.transparence}</div>
-          <Link href={route(lang, NAV.transparence)} className={colLink}>{t.cta.docs}</Link>
-          <Link href={route(lang, NAV.marches)} className={colLink}>{t.cta.marches}</Link>
-          <Link href={route(lang, NAV.ressources)} className={colLink}>{t.words.ressources}</Link>
-        </div>
-
-        <div>
-          <div className={colLabel}>{t.words.redevabilite}</div>
-          <Link href={route(lang, NAV.mgp)} className={colLink}>{t.cta.mgp}</Link>
-          <Link href={route(lang, NAV.mgp)} className={colLink}>MGP-EAS/HS</Link>
-          <Link href={route(lang, NAV.contact)} className={colLinkAccent}>
-            <span className="blink size-[7px] rounded-full bg-green-bright" />{t.contact.numeroVert}
-          </Link>
-        </div>
+        {/* Une colonne par groupe de la navigation : le pied de page expose
+            l'arbre complet, y compris les pages absentes de la barre. */}
+        {NAV_FOOTER.map((group) => (
+          <nav key={group.key} aria-label={t.nav[group.labelKey]}>
+            <div className={colLabel}>{t.nav[group.labelKey]}</div>
+            {group.children.map((item) => (
+              <Link key={item.key} href={route(lang, item.slug)} className={colLink}>
+                {t.navSub[item.key] ?? t.nav[item.key]}
+              </Link>
+            ))}
+            {/* Le numéro vert accompagne le mécanisme de gestion des plaintes,
+                seul canal du pied de page ouvert 24h/24. */}
+            {group.key === "gtransparence" && (
+              <Link href={route(lang, NAV.mgp)} className={colLinkAccent}>
+                <span className="blink size-[7px] rounded-full bg-green-bright" />{t.contact.numeroVert}
+              </Link>
+            )}
+          </nav>
+        ))}
       </div>
 
       <div className="border-t border-c-80">
