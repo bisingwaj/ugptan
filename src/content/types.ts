@@ -175,6 +175,35 @@ export type CompVideoSlot = {
   poster: ImgKey;
 };
 
+/* ---------------------------------------------------------------------------
+   Pages légales (confidentialité, conditions d'utilisation) + avis de première
+   visite. Le texte est du contenu éditorial : il vit dans `legal.ts`, jamais
+   dans les composants.
+--------------------------------------------------------------------------- */
+
+/** Un bloc de texte à l'intérieur d'un article. */
+export type LegalBloc =
+  /** Paragraphe courant. */
+  | { k: "p"; texte: Bilingual }
+  /** Énumération simple (obligations, droits, interdits). */
+  | { k: "puces"; items: Bilingual[] }
+  /** Énumération définie : un intitulé, puis ce qu'il recouvre. */
+  | { k: "liste"; items: { t: Bilingual; d: Bilingual }[] }
+  /** Encadré mis en exergue — précision qui engage l'Unité. */
+  | { k: "note"; texte: Bilingual };
+
+/** Un article numéroté du document, cible d'une ancre du sommaire. */
+export type LegalSection = { id: string; titre: Bilingual; blocs: LegalBloc[] };
+
+export type LegalDoc = {
+  slug: "confidentialite" | "conditions";
+  titre: Bilingual;
+  /** Chapô du héros — dit en trois phrases ce que le document règle. */
+  chapeau: Bilingual;
+  maj: Bilingual;
+  sections: LegalSection[];
+};
+
 export type ComposanteDetail = {
   code: string;              // "C2"
   slug: string;              // "c2"
