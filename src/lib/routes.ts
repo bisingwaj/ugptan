@@ -6,7 +6,7 @@ export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 export type NavKey =
   | "accueil" | "projet" | "composantes" | "ugptn" | "gouvernance" | "marches" | "transparence"
   | "actualites" | "resultats" | "ressources" | "evenements" | "contact" | "mgp"
-  | "confidentialite" | "conditions";
+  | "mgpSuivi" | "confidentialite" | "conditions";
 
 export type NavItem = { slug: string; key: NavKey };
 
@@ -20,7 +20,7 @@ export const NAV: Record<NavKey, string> = {
   gouvernance: "/gouvernance",
   marches: "/marches", transparence: "/transparence", actualites: "/actualites",
   resultats: "/resultats", ressources: "/ressources", evenements: "/evenements",
-  contact: "/contact", mgp: "/mgp",
+  contact: "/contact", mgp: "/mgp", mgpSuivi: "/mgp/suivi",
   confidentialite: "/confidentialite", conditions: "/conditions",
 };
 

@@ -52,5 +52,144 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  /// Dossiers MGP dont ce compte est responsable.
+  grievances      Grievance[]      @relation("GrievanceAssignee")
+  /// Actions journalisées sur les dossiers MGP.
+  grievanceEvents GrievanceEvent[] @relation("GrievanceEventAuthor")
+
   @@index([role])
+}
+
+/// Étape du dossier dans la pipeline de traitement, celle-là même qui est
+/// publiée sur le site (cf. `mgpPipeline` dans src/content/mgp.ts).
+/// L'étape dit OÙ en est l'instruction ; le statut dit DANS QUEL ÉTAT elle est.
+enum GrievanceStage {
+  RECEPTION
+  CLASSIFICATION
+  INSTRUCTION
+  DECISION
+  CLOTURE
+}
+
+/// Statut de gestion du dossier. Séparé de l'étape parce que les deux
+/// répondent à des questions différentes : une plainte peut être « en attente »
+/// (du plaignant) alors qu'elle est à l'étape « Instruction ».
+enum GrievanceStatus {
+  NOUVELLE
+  RECEVABLE
+  IRRECEVABLE
+  EN_TRAITEMENT
+  EN_ATTENTE
+  RESOLUE
+  CLOTUREE
+}
+
+enum GrievancePriority {
+  BASSE
+  NORMALE
+  HAUTE
+  CRITIQUE
+}
+
+/// Nature d'une entrée de l'historique. `MESSAGE` est le seul type destiné à
+/// être lu par le plaignant ; tous les autres restent internes.
+enum GrievanceEventType {
+  DEPOT
+  STATUT
+  ETAPE
+  PRIORITE
+  AFFECTATION
+  NOTE
+  MESSAGE
+  CONTACT
+}
+
+/// Une plainte déposée par le formulaire public du MGP.
+///
+/// ⚠️ Le seul identifiant communiqué au plaignant est `reference` : il sert de
+/// justificatif au suivi public, donc il est TIRÉ AU SORT (cf.
+/// src/lib/mgp/reference.ts) et ne dérive d'aucune donnée personnelle. `id`
+/// (cuid, séquentiel dans le temps) ne sort jamais de la console.
+///
+/// L'anonymat se lit sur `isAnonymous`, dérivé du seul champ « Nom complet » :
+/// une personne peut laisser un moyen de contact sans se nommer.
+model Grievance {
+  id          String  @id @default(cuid())
+  reference   String  @unique
+  /// Code de la catégorie choisie à l'étape 1 (cf. src/content/mgp.ts). Un code
+  /// et non un libellé : le formulaire est bilingue, le dossier ne l'est pas.
+  category    String
+  description String
+
+  /// Identité et coordonnées : toutes facultatives, jamais exposées au public.
+  fullName    String?
+  email       String?
+  phone       String?
+  province    String?
+  /// Langue de dépôt — détermine celle dans laquelle recontacter la personne.
+  lang        String  @default("fr")
+  isAnonymous Boolean @default(true)
+
+  status   GrievanceStatus   @default(NOUVELLE)
+  stage    GrievanceStage    @default(RECEPTION)
+  priority GrievancePriority @default(NORMALE)
+
+  assigneeId String?
+  /// `SetNull` : supprimer un compte ne doit jamais emporter un dossier.
+  assignee   User?   @relation("GrievanceAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  submittedAt DateTime  @default(now())
+  /// Échéance de l'engagement public de 30 jours, figée au dépôt.
+  dueAt       DateTime
+  closedAt    DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  attachments GrievanceAttachment[]
+  events      GrievanceEvent[]
+
+  @@index([status, submittedAt])
+  @@index([stage])
+  @@index([assigneeId])
+}
+
+/// Pièce annoncée par le plaignant à l'étape 3.
+///
+/// ⚠️ Seules les MÉTADONNÉES sont conservées : aucun service de stockage de
+/// fichiers n'est raccordé au projet à ce stade. L'agent voit ce que la personne
+/// a voulu joindre et le lui redemande par le canal de contact.
+model GrievanceAttachment {
+  id          String    @id @default(cuid())
+  grievanceId String
+  grievance   Grievance @relation(fields: [grievanceId], references: [id], onDelete: Cascade)
+  name        String
+  sizeKb      Int
+  createdAt   DateTime  @default(now())
+
+  @@index([grievanceId])
+}
+
+/// Journal d'un dossier : dépôt, changements d'état, affectations, notes
+/// internes et messages adressés au plaignant. Rien n'est modifiable ni
+/// supprimable — l'historique est la mémoire du traitement.
+model GrievanceEvent {
+  id          String             @id @default(cuid())
+  grievanceId String
+  grievance   Grievance          @relation(fields: [grievanceId], references: [id], onDelete: Cascade)
+  type        GrievanceEventType
+  /// `true` uniquement pour les messages publiés dans le suivi public.
+  isPublic    Boolean            @default(false)
+  message     String?
+  /// Valeurs d'avant et d'après, pour les changements d'état.
+  fromValue   String?
+  toValue     String?
+
+  authorId String?
+  author   User?   @relation("GrievanceEventAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  /// Nom de l'auteur figé à l'écriture : l'historique doit rester lisible même
+  /// après la suppression du compte qui a agi.
+  authorLabel String?
+
+  createdAt DateTime @default(now())
+
+  @@index([grievanceId, createdAt])
 }

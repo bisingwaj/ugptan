@@ -1,22 +1,36 @@
 /* Mécanisme de Gestion des Plaintes (MGP) — catégories, pipeline, FAQ. */
 import type { Bilingual } from "@/lib/pick";
-import type { MgpFaqItem } from "./types";
+import { GRIEVANCE_STAGES, STAGE_LABEL } from "@/lib/mgp/model";
+import type { MgpCategory, MgpFaqItem } from "./types";
 
-export const mgpCategories: Bilingual[] = [
-  { fr: "Technique", en: "Technical" },
-  { fr: "Fiduciaire", en: "Fiduciary" },
-  { fr: "Environnementale & sociale", en: "Environmental & social" },
-  { fr: "Conduite du personnel", en: "Staff conduct" },
-  { fr: "Autre", en: "Other" },
+/**
+ * Catégories proposées à l'étape 1 du formulaire.
+ *
+ * ⚠️ `code` est écrit en base et cité dans l'historique des dossiers : ces
+ * valeurs sont stables. Renommer un libellé FR ou EN est sans conséquence,
+ * changer un code réécrirait le passé.
+ */
+export const mgpCategories: MgpCategory[] = [
+  { code: "technique", fr: "Technique", en: "Technical" },
+  { code: "fiduciaire", fr: "Fiduciaire", en: "Fiduciary" },
+  { code: "environnementale-sociale", fr: "Environnementale & sociale", en: "Environmental & social" },
+  { code: "conduite-personnel", fr: "Conduite du personnel", en: "Staff conduct" },
+  { code: "autre", fr: "Autre", en: "Other" },
 ];
 
-export const mgpPipeline: Bilingual[] = [
-  { fr: "Réception", en: "Receipt" },
-  { fr: "Classification", en: "Classification" },
-  { fr: "Instruction", en: "Investigation" },
-  { fr: "Décision", en: "Decision" },
-  { fr: "Clôture", en: "Closure" },
-];
+export const mgpCategory = (code: string): MgpCategory | undefined =>
+  mgpCategories.find((c) => c.code === code);
+
+/** Libellé d'une catégorie, code inconnu compris (dossier ancien, import). */
+export const mgpCategoryLabel = (code: string): Bilingual =>
+  mgpCategory(code) ?? { fr: code, en: code };
+
+/**
+ * Étapes affichées au public. Dérivées des étapes du schéma plutôt que
+ * recopiées : la pipeline montrée au plaignant et celle que pilote la console
+ * sont la même chose, et doivent le rester.
+ */
+export const mgpPipeline: Bilingual[] = GRIEVANCE_STAGES.map((stage) => STAGE_LABEL[stage]);
 
 export const mgpFaq: MgpFaqItem[] = [
   { q: { fr: "Qui peut déposer une plainte ?", en: "Who can file a grievance?" }, r: { fr: "Toute personne, communauté ou organisation concernée par une activité du Projet : riverain d'un chantier, usager d'un service, employé d'un prestataire, entreprise candidate. Il n'y a ni condition de nationalité, ni frais, ni obligation de passer par un intermédiaire.", en: "Anyone affected by a Project activity: a neighbour of a worksite, a service user, a contractor's employee, a bidding company. There is no nationality requirement, no fee, and no obligation to go through an intermediary." } },
