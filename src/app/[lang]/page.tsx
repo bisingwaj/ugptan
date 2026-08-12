@@ -3,13 +3,14 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import {
-  meta, chiffres, composantes, composanteMax, odp, intermediaires, gouvernance,
+  meta, reperes, composantes, odp, intermediaires, gouvernance,
   equipe, profils, question,
 } from "@/content/data";
 import { actualites } from "@/content/actualites";
 import { humainPoints, galleryProvinces, partners, events } from "@/content/carbon";
 import { media } from "@/content/media";
-import { NAV, route } from "@/lib/routes";
+import { NAV, route, compRoute } from "@/lib/routes";
+import { compVar } from "@/lib/comp";
 import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
@@ -55,18 +56,16 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           </div>
           <div className="hero-figures blur-sm" style={{ border: "1px solid rgba(255,255,255,.14)", background: "rgba(13,17,26,.55)", backdropFilter: "blur(8px)", marginBottom: "clamp(48px,7vw,96px)", color: "#fff" }}>
             <div className="mono" style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,.12)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a8a8a8", display: "flex", justifyContent: "space-between" }}>
-              <span>{t.sec.chiffres}</span><span style={{ color: "var(--ac-light)" }}>USD</span>
+              <span>{t.sec.chiffres}</span><span style={{ color: "var(--ac-light)" }}>{meta.code}</span>
             </div>
-            {chiffres.map((c) => (
-              <div key={c.label.fr} style={{ padding: "18px 20px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
+            {reperes.map((r) => (
+              <div key={r.label.fr} style={{ padding: "18px 20px", borderBottom: "1px solid rgba(255,255,255,.08)", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 13, color: "#e0e0e0", lineHeight: 1.3 }}>{pick(c.label, lang)}</div>
-                  <div className="mono" style={{ fontSize: 10.5, color: "#8d8d8d", marginTop: 3 }}>{pick(c.sub, lang)}</div>
+                  <div style={{ fontSize: 13, color: "#e0e0e0", lineHeight: 1.3 }}>{pick(r.label, lang)}</div>
+                  <div className="mono" style={{ fontSize: 10.5, color: "#8d8d8d", marginTop: 3, lineHeight: 1.35 }}>{pick(r.sub, lang)}</div>
                 </div>
                 <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                  <span className="stat__num" style={{ fontSize: "clamp(24px,2.4vw,32px)", color: "#fff" }}><Counter to={c.value} dur={1300} /></span>
-                  <span className="mono" style={{ fontSize: 12, color: "#a8a8a8", marginLeft: 5 }}>{c.unit}</span>
-                  {c.pct && <div className="mono" style={{ fontSize: 12, color: "var(--ac-light)", marginTop: 2 }}>{c.pct}</div>}
+                  <span className="stat__num" style={{ fontSize: /^\d+$/.test(r.v) ? "clamp(24px,2.4vw,32px)" : 15, color: "#fff", letterSpacing: /^\d+$/.test(r.v) ? "-0.02em" : "0.04em" }}>{r.v}</span>
                 </div>
               </div>
             ))}
@@ -100,35 +99,35 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 48 }}>
             <div>
               <Kicker n="02">{t.sec.composantes}</Kicker>
-              <h2 className="h2">510 M USD · 5 {t.words.composantes}</h2>
+              <h2 className="h2">{t.comp.indexTitle}</h2>
             </div>
-            <div className="mono" style={{ fontSize: 12, color: "var(--c-60)", textAlign: "right" }}>{t.lbl.ida} 400 · {t.lbl.afd} 110<br /><span style={{ color: "var(--c-50)" }}>M USD</span></div>
+            <p className="mono" style={{ fontSize: 12, color: "var(--c-60)", textAlign: "right", maxWidth: 260, lineHeight: 1.6, margin: 0 }}>{t.comp.rowsNote}</p>
           </Reveal>
           <RevealGroup style={{ borderTop: "1px solid var(--c-black)" }} gap={0.05}>
             {composantes.map((comp) => (
-              <RevealItem key={comp.code} className="comp-row" style={{ borderBottom: "1px solid var(--c-20)", display: "grid", gridTemplateColumns: "88px 1fr 1.1fr 200px", gap: "clamp(14px,2vw,32px)", padding: "26px 0", alignItems: "start" }}>
-                <div className="mono" style={{ fontWeight: 600, fontSize: 22, color: "var(--ac)" }}>{comp.code}</div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: "clamp(18px,1.9vw,23px)", fontWeight: 600, letterSpacing: "-0.01em" }}>{pick(comp.titre, lang)}</h3>
-                  <p style={{ margin: "9px 0 0", fontSize: 14.5, lineHeight: 1.55, color: "var(--c-70)", maxWidth: 440 }}>{pick(comp.desc, lang)}</p>
-                </div>
-                <div>
-                  {comp.sous.map((s) => (
-                    <div key={s.ref} style={{ display: "flex", gap: 10, padding: "6px 0", fontSize: 13, color: "var(--c-80)", borderBottom: "1px dotted var(--c-20)" }}>
-                      <span className="mono" style={{ color: "var(--c-50)", flex: "0 0 28px" }}>{s.ref}</span>
-                      <span style={{ flex: 1 }}>{pick(s.text, lang)}</span>
-                      <span className="mono" style={{ color: "var(--c-black)", whiteSpace: "nowrap" }}>{s.montant} M</span>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div className="stat__num" style={{ fontSize: "clamp(22px,2.4vw,30px)" }}><Counter to={comp.montant} dur={1200} /><span style={{ fontSize: 12, color: "var(--c-60)", marginLeft: 5, fontWeight: 400 }}>M USD</span></div>
-                  <div className="bar"><div className="bar__fill" style={{ width: `${Math.round((comp.montant / composanteMax) * 100)}%` }} /></div>
-                  <div className="mono" style={{ fontSize: 10.5, color: "var(--c-50)", marginTop: 7 }}>IDA {comp.ida} · AFD {comp.afd}</div>
-                </div>
+              <RevealItem key={comp.code}>
+                <Link href={compRoute(lang, comp.code)} className="comp-row comp-row--link" style={{ ...compVar(comp.code), borderBottom: "1px solid var(--c-20)", display: "grid", gridTemplateColumns: "88px 1.15fr 1fr 34px", gap: "clamp(14px,2vw,32px)", padding: "26px 0", alignItems: "start" }}>
+                  <div className="mono" style={{ fontWeight: 600, fontSize: 22, color: "var(--comp)" }}>{comp.code}</div>
+                  <div>
+                    <h3 className="comp-row__titre" style={{ margin: 0, fontSize: "clamp(18px,1.9vw,23px)", fontWeight: 600, letterSpacing: "-0.01em" }}>{pick(comp.titre, lang)}</h3>
+                    <p style={{ margin: "9px 0 0", fontSize: 14.5, lineHeight: 1.55, color: "var(--c-70)", maxWidth: 440 }}>{pick(comp.desc, lang)}</p>
+                  </div>
+                  <div>
+                    {comp.sous.map((s) => (
+                      <div key={s.ref} style={{ display: "flex", gap: 10, padding: "6px 0", fontSize: 13, color: "var(--c-80)", borderBottom: "1px dotted var(--c-20)" }}>
+                        <span className="mono" style={{ color: "var(--comp)", flex: "0 0 28px" }}>{s.ref}</span>
+                        <span style={{ flex: 1 }}>{pick(s.text, lang)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <span className="comp-row__go" aria-hidden>→</span>
+                </Link>
               </RevealItem>
             ))}
           </RevealGroup>
+          <div style={{ marginTop: 22, textAlign: "right" }}>
+            <Link href={route(lang, NAV.composantes)} className="mono" style={{ fontSize: 13, color: "var(--ac)", display: "inline-flex", alignItems: "center", gap: 8 }}>{t.comp.seeAll} →</Link>
+          </div>
         </div>
       </section>
 
@@ -144,7 +143,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
               <RevealItem key={o.code} className="cell" style={{ display: "flex", flexDirection: "column", minHeight: 230 }}>
                 <div className="mono" style={{ fontSize: 12, color: "var(--ac-light)", letterSpacing: "0.08em" }}>{o.code}</div>
                 <div style={{ marginTop: "auto" }}>
-                  <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}><Counter to={o.value} dur={1300} /><span style={{ fontSize: 16, color: "var(--c-40)", marginLeft: 7, letterSpacing: 0 }}>{o.unit}</span></div>
+                  <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}><span className="stat__approx">{t.lbl.approx}</span><Counter to={o.value} dur={1300} /><span style={{ fontSize: 16, color: "var(--c-40)", marginLeft: 7, letterSpacing: 0 }}>{o.unit}</span></div>
                 </div>
                 <div style={{ marginTop: 14, fontSize: 14, lineHeight: 1.45, color: "var(--c-20)" }}>{pick(o.label, lang)}</div>
                 <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 6 }}>
@@ -157,11 +156,12 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           <RevealGroup gap={0.05} style={{ marginTop: 1, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 1, background: "var(--c-80)", border: "1px solid var(--c-80)", borderTop: "none" }}>
             {intermediaires.map((x, i) => (
               <RevealItem key={i} style={{ background: "var(--c-black)", padding: "20px 22px" }}>
-                <div className="mono" style={{ fontWeight: 600, fontSize: 24 }}>{x.value}<span style={{ fontSize: 13, color: "var(--ac-light)", marginLeft: 4 }}>{x.unit}</span></div>
+                <div className="mono" style={{ fontWeight: 600, fontSize: 24 }}><span className="stat__approx">{t.lbl.approx}</span>{x.value}<span style={{ fontSize: 13, color: "var(--ac-light)", marginLeft: 4 }}>{x.unit}</span></div>
                 <div style={{ fontSize: 12.5, color: "var(--c-40)", marginTop: 7, lineHeight: 1.45 }}>{pick(x.text, lang)}</div>
               </RevealItem>
             ))}
           </RevealGroup>
+          <p className="stat__note stat__note--dark">{t.lbl.indicatif}</p>
         </div>
       </section>
 
@@ -179,7 +179,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           <RevealGroup className="grid-4 celled--top" gap={0.05} style={{ background: "var(--c-black)", borderColor: "var(--c-black)" }}>
             {humainPoints.map((h, i) => (
               <RevealItem key={i} className="cell" style={{ padding: "32px 28px", display: "flex", flexDirection: "column", minHeight: 200 }}>
-                <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,52px)" }}>{h.big}</div>
+                <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,52px)" }}><span className="stat__approx">{t.lbl.approx}</span>{h.big}</div>
                 <div className="mono" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ac)", marginTop: 10 }}>{pick(h.u, lang)}</div>
                 <p style={{ margin: "auto 0 0", paddingTop: 20, fontSize: 14.5, lineHeight: 1.55, color: "var(--c-70)" }}>{pick(h.t, lang)}</p>
               </RevealItem>
@@ -244,7 +244,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             <div><Kicker n="06">{t.sec.equipe}</Kicker><h2 className="h2">21 {t.words.roles} · 5 {t.words.poles}</h2></div>
             <p style={{ maxWidth: 340, fontSize: 14.5, lineHeight: 1.55, color: "var(--c-60)", margin: 0 }}>{t.home.equipeLead}</p>
           </Reveal>
-          <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(212px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+          <RevealGroup gap={0.05} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(212px,1fr))" }}>
             {equipe.map((m, i) => (
               <RevealItem key={i} style={{ background: "#fff" }}>
                 <div style={{ aspectRatio: "1/1", backgroundColor: m.img ? "#e8ebf0" : "#eef1f7", position: "relative", overflow: "hidden", display: "flex", alignItems: m.img ? "flex-end" : "center", justifyContent: "center", padding: 14 }}>
@@ -316,7 +316,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             <h2 className="h2--sm" style={{ marginBottom: 14 }}>{t.home.galleryTitle}</h2>
             <p style={{ margin: "0 0 40px", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 680 }}>{t.home.galleryLead}</p>
           </Reveal>
-          <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(216px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+          <RevealGroup gap={0.05} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(216px,1fr))" }}>
             {galleryProvinces.map((g) => (
               <RevealItem key={g.nom} className="duo" style={{ aspectRatio: "4/3" }}>
                 <Photo src={media.img[g.img]} alt={g.nom} />

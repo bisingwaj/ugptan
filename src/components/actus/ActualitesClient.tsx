@@ -37,7 +37,7 @@ export function ActualitesClient({ lang }: { lang: Lang }) {
         ))}
       </div>
 
-      <RevealGroup style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(358px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }} gap={0.045}>
+      <RevealGroup className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(358px,1fr))" }} gap={0.045}>
         {view.map(({ a, i }) => (
           <RevealItem key={i}>
             <button onClick={() => setSel(i)} style={{ textAlign: "left", background: "#fff", display: "flex", flexDirection: "column", padding: 0, width: "100%" }}>

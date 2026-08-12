@@ -50,7 +50,7 @@ export const marches: Marche[] = [
     lieu: { fr: "Kinshasa, Lubumbashi, Goma (hubs)", en: "Kinshasa, Lubumbashi, Goma (hubs)" }, lots: 1,
     soum: 18, vues: 963, questions: 16,
     objet: { fr: "Conception du programme de compétences numériques avancées (EESU & hubs)", en: "Design of the advanced digital skills programme (HEIs & hubs)" },
-    resume: { fr: "Conception et appui au déploiement d'un programme de compétences numériques avancées avec les établissements d'enseignement supérieur et universitaire et les hubs d'innovation, ciblant 6 000 inscrits dont 1 000 femmes diplômées.", en: "Design and rollout support of an advanced digital skills programme with higher-education institutions and innovation hubs, targeting 6,000 enrolments including 1,000 women graduates." },
+    resume: { fr: "Conception et appui au déploiement d'un programme de compétences numériques avancées avec les établissements d'enseignement supérieur et universitaire et les hubs d'innovation, avec une cible d'inscrits de plusieurs milliers, dont une part importante de femmes.", en: "Design and rollout support of an advanced digital skills programme with higher-education institutions and innovation hubs, with an enrolment target of several thousand, a large share of them women." },
     addenda: [{ n: "01", date: "3 juil. 2026", note: { fr: "Précision sur les exigences d'expérience en Afrique subsaharienne.", en: "Clarification of Sub-Saharan Africa experience requirements." } }],
     pieces: [
       { nom: { fr: "Demande de Propositions (DP)", en: "Request for Proposals" }, taille: "2,6 Mo" },
@@ -125,10 +125,10 @@ export const marchesMethodes: MethodePassation[] = [
 ];
 
 export const candidature: EtapeCandidature[] = [
-  { n: "01", titre: { fr: "Créer un compte soumissionnaire", en: "Create a bidder account" }, desc: { fr: "Inscription en ligne et vérification d'identité de l'entreprise (KYC).", en: "Online registration and company identity verification (KYC)." } },
-  { n: "02", titre: { fr: "Télécharger le dossier (DAO/RFP)", en: "Download the bidding documents" }, desc: { fr: "Accès aux pièces, addenda et calendrier prévisionnel issus du PPM.", en: "Access documents, addenda and the indicative schedule from the PPM." } },
-  { n: "03", titre: { fr: "Préparer et déposer l'offre", en: "Prepare and submit the bid" }, desc: { fr: "Soumission électronique sécurisée, horodatée, conforme aux Règlements BM 2025.", en: "Secure, timestamped electronic submission, per WB 2025 Regulations." } },
-  { n: "04", titre: { fr: "Suivi & attribution", en: "Tracking & award" }, desc: { fr: "Évaluation tracée, ANO du bailleur, publication transparente du résultat.", en: "Traceable evaluation, donor NOL, transparent publication of the result." } },
+  { n: "01", titre: { fr: "Créer un compte soumissionnaire", en: "Create a bidder account" }, desc: { fr: "Vérification d'identité de l'entreprise (KYC), faite une seule fois et valable pour tous les avis suivants.", en: "Company identity verification (KYC), done once and valid for every subsequent notice." } },
+  { n: "02", titre: { fr: "Télécharger le dossier (DAO/RFP)", en: "Download the bidding documents" }, desc: { fr: "Pièces, calendrier et addenda. Un addendum peut modifier la date limite ou les exigences : il fait partie du dossier, pas du commentaire.", en: "Documents, schedule and addenda. An addendum may change the deadline or the requirements: it is part of the file, not a side note." } },
+  { n: "03", titre: { fr: "Préparer et déposer l'offre", en: "Prepare and submit the bid" }, desc: { fr: "Dépôt électronique horodaté. Une pièce manquante à l'heure limite rend l'offre irrecevable, quelle qu'en soit la qualité technique.", en: "Timestamped electronic submission. A document missing at the deadline makes the bid inadmissible, whatever its technical quality." } },
+  { n: "04", titre: { fr: "Suivi & attribution", en: "Tracking & award" }, desc: { fr: "Évaluation selon les critères annoncés, avis de non-objection du bailleur, puis publication du résultat — y compris le nom de l'attributaire.", en: "Evaluation against the announced criteria, donor no-objection, then publication of the result — including the awardee's name." } },
 ];
 
 export const documents: Document[] = [

@@ -83,7 +83,7 @@ export function MarchesClient({ lang }: { lang: Lang }) {
           <button onClick={() => { setFilter("tous"); setQ(""); }} className="mono" style={{ fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>↺ {t.reset}</button>
         </div>
       ) : (
-        <RevealGroup style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(400px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }} gap={0.045}>
+        <RevealGroup className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,400px),1fr))" }} gap={0.045}>
           {view.map((m) => {
             const cc = compColors[m.comp] || "#0f62fe";
             const st = statut(m);
