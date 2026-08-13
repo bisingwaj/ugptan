@@ -8,44 +8,67 @@
  * passer les POST — rediriger un POST de server action casserait le protocole
  * Flight — donc la barrière est ici, et nulle part ailleurs.
  *
- * Trois garde-fous structurent le module, tous vérifiés côté serveur :
+ * Toute écriture touchant à l'identité passe par le plugin `admin` de Better
+ * Auth : création, mot de passe, rôle, adresse, désactivation, suppression.
+ * Rien n'est écrit à la main dans les tables d'authentification, et les
+ * sessions du compte visé sont révoquées par Better Auth quand elles doivent
+ * l'être (désactivation, suppression).
+ *
+ * Les appels portent les en-têtes de la requête : Better Auth revérifie donc
+ * de son côté que l'appelant est bien administrateur. Double contrôle assumé —
+ * notre garde décide de l'accès au module, le sien de l'accès à l'API.
+ *
+ * Trois garde-fous propres au projet s'ajoutent aux siens :
  *   1. personne ne se retire à soi-même son propre accès (rôle, désactivation,
  *      suppression) — la console se refermerait sur son unique occupant ;
  *   2. le dernier administrateur actif est intouchable, pour la même raison ;
- *   3. un mot de passe n'est jamais stocké ni renvoyé en clair.
+ *   3. un mot de passe n'est jamais lu, stocké ni renvoyé en clair.
  */
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { APIError } from "better-auth/api";
 import { ADMIN_USERS, adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { assertPermission } from "@/lib/auth/guard";
-import { hashPassword } from "@/lib/auth/password";
-import {
-  assignablePermissions,
-  isRole,
-  type AdminRole,
-} from "@/lib/auth/permissions";
-import {
-  newSession,
-  sessionCookieOptions,
-  signSession,
-  SESSION_COOKIE,
-} from "@/lib/auth/session";
+import { auth } from "@/lib/auth/server";
+import { assignablePermissions, isRole, type AdminRole } from "@/lib/auth/permissions";
 import { isValidEmail, normalizeEmail, normalizeName, passwordIssue } from "@/lib/auth/validate";
 
 /** État partagé par les formulaires de création et de modification. */
 export type UserFormState = { error: string | null; ok: string | null };
 
 const EMAIL_TAKEN = "Cette adresse est déjà associée à un compte.";
+const NOT_FOUND = "Compte introuvable.";
 
-/** Code Prisma d'une violation de contrainte d'unicité. */
-const UNIQUE_VIOLATION = "P2002";
+/** Codes Better Auth signalant une adresse déjà prise. */
+const TAKEN_CODES = new Set([
+  "USER_ALREADY_EXISTS",
+  "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
+]);
 
-const isUniqueViolation = (error: unknown): boolean =>
-  typeof error === "object" && error !== null && (error as { code?: string }).code === UNIQUE_VIOLATION;
+/**
+ * Traduit l'erreur d'un appel Better Auth en message affichable.
+ *
+ * Les refus attendus (adresse prise, compte absent) deviennent des messages ;
+ * tout le reste est journalisé et présenté comme une panne, sans exposer le
+ * détail technique dans l'interface.
+ */
+function apiMessage(error: unknown, fallback: string): string {
+  if (error instanceof APIError) {
+    const code = (error.body as { code?: string } | undefined)?.code;
+    if (code && TAKEN_CODES.has(code)) return EMAIL_TAKEN;
+    if (code === "USER_NOT_FOUND") return NOT_FOUND;
+    if (code === "PASSWORD_TOO_SHORT" || code === "PASSWORD_TOO_LONG") {
+      return "Le mot de passe ne respecte pas la longueur exigée.";
+    }
+  }
 
-/** Rôle soumis, ou `null` si la valeur ne fait pas partie de l'enum. */
+  console.error("[admin] échec d'une opération sur un compte", error);
+  return fallback;
+}
+
+/** Rôle soumis, ou `null` si la valeur ne fait pas partie des rôles connus. */
 function readRole(formData: FormData): AdminRole | null {
   const raw = String(formData.get("role") ?? "");
   return isRole(raw) ? raw : null;
@@ -66,7 +89,7 @@ function readPermissions(formData: FormData, role: AdminRole): string[] {
 
 /** Nombre d'administrateurs actifs, hors compte désigné. */
 async function otherActiveAdmins(exceptId: string): Promise<number> {
-  return db().user.count({ where: { role: "ADMIN", isActive: true, id: { not: exceptId } } });
+  return db().user.count({ where: { role: "ADMIN", banned: false, id: { not: exceptId } } });
 }
 
 export async function createUserAction(
@@ -87,18 +110,21 @@ export async function createUserAction(
   if (issue) return { error: issue, ok: null };
 
   try {
-    await db().user.create({
-      data: {
+    // C'est Better Auth qui hache le mot de passe et crée le moyen de connexion.
+    // `name` est requis de son côté : l'adresse en tient lieu si le champ est
+    // laissé vide, plutôt que d'imposer une saisie de plus.
+    await auth().api.createUser({
+      body: {
         email,
-        name,
+        password,
+        name: name ?? email,
         role,
-        permissions: readPermissions(formData, role),
-        passwordHash: await hashPassword(password),
+        data: { permissions: readPermissions(formData, role) },
       },
+      headers: await headers(),
     });
   } catch (error) {
-    if (isUniqueViolation(error)) return { error: EMAIL_TAKEN, ok: null };
-    throw error;
+    return { error: apiMessage(error, "La création du compte a échoué."), ok: null };
   }
 
   revalidatePath(ADMIN_USERS);
@@ -117,15 +143,15 @@ export async function updateUserAction(
   const name = normalizeName(formData.get("name"));
   const role = readRole(formData);
 
-  if (!id) return { error: "Compte introuvable.", ok: null };
+  if (!id) return { error: NOT_FOUND, ok: null };
   if (!isValidEmail(email)) return { error: "Adresse électronique invalide.", ok: null };
   if (!role) return { error: "Rôle invalide.", ok: null };
 
   const target = await db().user.findUnique({
     where: { id },
-    select: { id: true, role: true, isActive: true },
+    select: { id: true, role: true, banned: true },
   });
-  if (!target) return { error: "Compte introuvable.", ok: null };
+  if (!target) return { error: NOT_FOUND, ok: null };
 
   const isSelf = target.id === actor.id;
 
@@ -134,7 +160,7 @@ export async function updateUserAction(
   }
 
   // Rétrograder le dernier administrateur actif fermerait la console à tous.
-  if (target.role === "ADMIN" && role !== "ADMIN" && target.isActive) {
+  if (target.role === "ADMIN" && role !== "ADMIN" && !target.banned) {
     if ((await otherActiveAdmins(target.id)) === 0) {
       return { error: "Ce compte est le dernier administrateur actif : son rôle ne peut pas être abaissé.", ok: null };
     }
@@ -148,25 +174,27 @@ export async function updateUserAction(
     if (issue) return { error: issue, ok: null };
   }
 
-  const passwordFields = changingPassword
-    ? { passwordHash: await hashPassword(password), passwordChangedAt: new Date() }
-    : {};
+  const requestHeaders = await headers();
 
   try {
-    await db().user.update({
-      where: { id },
-      data: { email, name, role, permissions: readPermissions(formData, role), ...passwordFields },
+    await auth().api.adminUpdateUser({
+      body: {
+        userId: id,
+        data: { name: name ?? email, email, role, permissions: readPermissions(formData, role) },
+      },
+      headers: requestHeaders,
     });
-  } catch (error) {
-    if (isUniqueViolation(error)) return { error: EMAIL_TAKEN, ok: null };
-    throw error;
-  }
 
-  // Changer son propre mot de passe révoque les jetons antérieurs, y compris
-  // celui de la requête en cours : sans réémission, on se déconnecterait soi-même.
-  if (isSelf && changingPassword) {
-    const token = await signSession(newSession({ id: target.id, email, role }));
-    (await cookies()).set(SESSION_COOKIE, token, sessionCookieOptions);
+    if (changingPassword) {
+      // Better Auth remplace l'empreinte du moyen de connexion « credential »,
+      // ou en crée un s'il n'en existait pas encore.
+      await auth().api.setUserPassword({
+        body: { userId: id, newPassword: password },
+        headers: requestHeaders,
+      });
+    }
+  } catch (error) {
+    return { error: apiMessage(error, "La mise à jour du compte a échoué."), ok: null };
   }
 
   revalidatePath(ADMIN_USERS);
@@ -175,8 +203,9 @@ export async function updateUserAction(
 }
 
 /**
- * Bascule actif / désactivé. Le compte et son historique sont conservés :
- * seule la porte se ferme, à la requête suivante (cf. lib/auth/guard.ts).
+ * Bascule actif / désactivé, portée par le bannissement de Better Auth : le
+ * compte et son historique sont conservés, ses sessions sont révoquées sur-le-
+ * champ et toute nouvelle connexion est refusée tant que la mesure dure.
  *
  * Renvoie l'erreur au lieu de la lever : un garde-fou franchi est un refus
  * ordinaire, à afficher dans la page, pas une panne à confier à la frontière
@@ -190,20 +219,30 @@ export async function setUserActiveAction(
 
   const id = String(formData.get("id") ?? "");
   const active = String(formData.get("active") ?? "") === "1";
-  if (!id) return { error: "Compte introuvable.", ok: null };
+  if (!id) return { error: NOT_FOUND, ok: null };
 
   if (id === actor.id && !active) {
     return { error: "Vous ne pouvez pas désactiver votre propre compte.", ok: null };
   }
 
   const target = await db().user.findUnique({ where: { id }, select: { role: true } });
-  if (!target) return { error: "Compte introuvable.", ok: null };
+  if (!target) return { error: NOT_FOUND, ok: null };
 
   if (!active && target.role === "ADMIN" && (await otherActiveAdmins(id)) === 0) {
     return { error: "Ce compte est le dernier administrateur actif : il ne peut pas être désactivé.", ok: null };
   }
 
-  await db().user.update({ where: { id }, data: { isActive: active } });
+  const requestHeaders = await headers();
+
+  try {
+    if (active) {
+      await auth().api.unbanUser({ body: { userId: id }, headers: requestHeaders });
+    } else {
+      await auth().api.banUser({ body: { userId: id }, headers: requestHeaders });
+    }
+  } catch (error) {
+    return { error: apiMessage(error, "Le changement d'état du compte a échoué."), ok: null };
+  }
 
   revalidatePath(ADMIN_USERS);
   revalidatePath(adminPath(`/utilisateurs/${id}`));
@@ -217,17 +256,24 @@ export async function deleteUserAction(
   const actor = await assertPermission("utilisateurs");
 
   const id = String(formData.get("id") ?? "");
-  if (!id) return { error: "Compte introuvable.", ok: null };
+  if (!id) return { error: NOT_FOUND, ok: null };
   if (id === actor.id) return { error: "Vous ne pouvez pas supprimer votre propre compte.", ok: null };
 
-  const target = await db().user.findUnique({ where: { id }, select: { role: true, isActive: true } });
-  if (!target) return { error: "Compte introuvable.", ok: null };
+  const target = await db().user.findUnique({ where: { id }, select: { role: true, banned: true } });
+  if (!target) return { error: NOT_FOUND, ok: null };
 
-  if (target.role === "ADMIN" && target.isActive && (await otherActiveAdmins(id)) === 0) {
+  if (target.role === "ADMIN" && !target.banned && (await otherActiveAdmins(id)) === 0) {
     return { error: "Ce compte est le dernier administrateur actif : il ne peut pas être supprimé.", ok: null };
   }
 
-  await db().user.delete({ where: { id } });
+  try {
+    // Supprime le compte, ses sessions et ses moyens de connexion. Les dossiers
+    // MGP qu'il portait ne sont pas emportés (relation en `SetNull`), et
+    // l'historique conserve son nom (cf. GrievanceEvent.authorLabel).
+    await auth().api.removeUser({ body: { userId: id }, headers: await headers() });
+  } catch (error) {
+    return { error: apiMessage(error, "La suppression du compte a échoué."), ok: null };
+  }
 
   revalidatePath(ADMIN_USERS);
   // redirect() lève NEXT_REDIRECT : appelé en dernier, hors de tout try/catch.

@@ -11,7 +11,6 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
-    "db:seed": "node prisma/seed.mjs",
     "remotion:studio": "remotion studio remotion/index.ts",
     "remotion:render": "remotion render remotion/index.ts"
   },
@@ -21,6 +20,7 @@
     "@prisma/client": "^7.9.1",
     "@prisma/client-runtime-utils": "7.9.1",
     "@remotion/cli": "^4.0.507",
+    "better-auth": "^1.6.27",
     "clsx": "^2.1.1",
     "framer-motion": "^13.0.0",
     "lenis": "^1.3.26",

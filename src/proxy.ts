@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 import { ADMIN_BASE, ADMIN_HOME, ADMIN_LOGIN, NEXT_PARAM } from "@/lib/admin";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/auth/session";
 
 const locales = ["fr", "en"];
 const defaultLocale = "fr";
@@ -18,12 +18,19 @@ export async function proxy(req: NextRequest) {
     // Chaque action porte son propre garde — cf. lib/auth/guard.ts.
     if (req.method !== "GET" && req.method !== "HEAD") return;
 
-    const token = req.cookies.get(SESSION_COOKIE)?.value;
-    const session = token ? await verifySessionToken(token) : null;
+    /* Tri OPTIMISTE, tel que le recommande Better Auth pour une middleware :
+       on regarde si le cookie de session existe, sans le valider ni toucher la
+       base. Il évite l'aller-retour inutile vers une page qui redirigerait de
+       toute façon ; il ne PROUVE rien. La vérification qui fait autorité est
+       `getSession`, appelée par les gardes de chaque layout, page et action
+       (cf. lib/auth/guard.ts) — indispensable, d'autant que tout chemin
+       contenant un point échappe au matcher ci-dessous. */
+    const hasSessionCookie = Boolean(getSessionCookie(req));
     const isLogin = pathname === ADMIN_LOGIN || pathname === `${ADMIN_LOGIN}/`;
 
-    // Session valide sur l'écran de connexion : on renvoie au tableau de bord.
-    if (session) return isLogin ? redirectTo(req, ADMIN_HOME) : undefined;
+    // Cookie présent sur l'écran de connexion : on tente le tableau de bord,
+    // qui renverra ici si la session s'avère invalide.
+    if (hasSessionCookie) return isLogin ? redirectTo(req, ADMIN_HOME) : undefined;
 
     // Seule page du sous-arbre ouverte sans session.
     if (isLogin) return;

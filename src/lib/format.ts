@@ -88,6 +88,12 @@ export function fromDateTimeLocal(value: string): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+/** Même fuseau, sans l'heure : listes et échéances, où la minute n'apporte rien. */
+const dateFr = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeZone: "Africa/Kinshasa" });
+
+export const formatDate = (date: Date | null | undefined): string | null =>
+  date ? dateFr.format(date) : null;
+
 export type Countdown = {
   expired: boolean;
   urgent: boolean;

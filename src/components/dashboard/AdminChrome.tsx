@@ -20,11 +20,13 @@ export function AdminChrome({
   granted,
   initialCollapsed,
   topbar,
+  sidebarFooter,
   children,
 }: {
   granted: Permission[];
   initialCollapsed: boolean;
   topbar: ReactNode;
+  sidebarFooter: ReactNode;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed);
@@ -41,7 +43,7 @@ export function AdminChrome({
     // Les deux largeurs sont dans la feuille de style : `data-collapsed` bascule
     // la colonne de la grille, aucun style inline à calculer ici.
     <div className="adm" data-collapsed={collapsed ? "true" : undefined}>
-      <AdminSidebar granted={granted} collapsed={collapsed} onToggle={toggle} />
+      <AdminSidebar granted={granted} collapsed={collapsed} onToggle={toggle} footer={sidebarFooter} />
       <div className="adm__main">
         <header className="adm__top">{topbar}</header>
         <main className="adm__body">{children}</main>

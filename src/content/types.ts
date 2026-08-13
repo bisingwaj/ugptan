@@ -81,6 +81,10 @@ export type DocumentCategorie = { code: DocCat; label: Bilingual };
 
 export type MgpFaqItem = { q: Bilingual; r: Bilingual };
 
+/** Catégorie du formulaire de plainte. `code` est ce qui part en base : le
+ *  formulaire est bilingue, le dossier ne l'est pas. */
+export type MgpCategory = { code: string } & Bilingual;
+
 export type Media = {
   videoYt: string; heroFilm: string;
   videoTitre: Bilingual; videoSource: Bilingual; videoNote: Bilingual;

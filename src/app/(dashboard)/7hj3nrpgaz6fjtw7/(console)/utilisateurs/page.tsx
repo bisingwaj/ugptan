@@ -24,11 +24,11 @@ export default async function UtilisateursPage() {
       email: true,
       name: true,
       role: true,
-      isActive: true,
+      banned: true,
       lastLoginAt: true,
     },
-    // L'enum Postgres se trie dans l'ordre de sa déclaration : les
-    // administrateurs remontent donc naturellement en tête de liste.
+    // Tri alphabétique du rôle : ADMIN, EDITOR, VIEWER — les administrateurs
+    // remontent donc en tête de liste, dans l'ordre attendu.
     orderBy: [{ role: "asc" }, { email: "asc" }],
   });
 
@@ -58,6 +58,9 @@ export default async function UtilisateursPage() {
             <tbody>
               {users.map((user) => {
                 const isSelf = user.id === actor.id;
+                // « Actif » se lit sur le bannissement Better Auth : c'est lui
+                // qui coupe réellement l'accès (cf. actions/admin-users.ts).
+                const isActive = !user.banned;
                 return (
                   <tr key={user.id}>
                     <td>
@@ -69,15 +72,15 @@ export default async function UtilisateursPage() {
                     </td>
                     <td>{ROLE_LABEL[user.role as AdminRole]}</td>
                     <td>
-                      <span className={`adm-badge ${user.isActive ? "adm-badge--on" : "adm-badge--off"}`}>
-                        {user.isActive ? t.statusActive : t.statusInactive}
+                      <span className={`adm-badge ${isActive ? "adm-badge--on" : "adm-badge--off"}`}>
+                        {isActive ? t.statusActive : t.statusInactive}
                       </span>
                     </td>
                     <td className="mono adm-table__meta">
                       {formatDateTime(user.lastLoginAt) ?? t.neverConnected}
                     </td>
                     <td>
-                      <UserActions id={user.id} isActive={user.isActive} isSelf={isSelf} />
+                      <UserActions id={user.id} isActive={isActive} isSelf={isSelf} />
                     </td>
                   </tr>
                 );
