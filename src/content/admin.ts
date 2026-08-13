@@ -54,6 +54,7 @@ export const ADMIN = {
   shell: {
     signedInAs: "Connecté",
     logout: "Déconnexion",
+    loggingOut: "Déconnexion…",
     soon: "bientôt",
     console: "Console",
     collapse: "Replier la barre",
@@ -102,10 +103,13 @@ export const ADMIN = {
     save: "Enregistrer",
     saving: "Enregistrement…",
     deactivate: "Désactiver",
+    deactivating: "Désactivation…",
     activate: "Réactiver",
+    activating: "Réactivation…",
     resendInvite: "Renvoyer l'invitation",
     resendingInvite: "Envoi…",
     remove: "Supprimer",
+    removing: "Suppression…",
     removeConfirm: "Supprimer définitivement ce compte ? Cette action est irréversible.",
     back: "Retour à la liste",
 
@@ -213,6 +217,63 @@ export const ADMIN = {
     historyEmpty: "Aucune action enregistrée.",
     by: "par",
   },
+
+  newsletter: {
+    title: "Newsletter",
+    lead: "Adresses collectées par le formulaire d'inscription du site public. Une adresse désabonnée reste dans la liste, marquée comme telle : c'est ce qui garantit qu'elle ne sera pas réabonnée par erreur lors d'un import ou d'une nouvelle saisie.",
+    listTitle: "Abonnés",
+    empty: "Aucun abonné pour le moment.",
+    emptyFiltered: "Aucun abonné ne correspond à ce filtre.",
+
+    kpiTotal: "Adresses",
+    kpiActive: "Abonnés actifs",
+    kpiUnsub: "Désabonnés",
+    kpiMonth: "Inscrits sur 30 jours",
+
+    rechercher: "Rechercher une adresse…",
+    filtrer: "Filtrer",
+    reinitialiser: "Tout afficher",
+    tousStatuts: "Tous les statuts",
+    toutesLangues: "Toutes les langues",
+    toutesSources: "Toutes les provenances",
+
+    colEmail: "Adresse",
+    colStatut: "Statut",
+    colDate: "Inscription",
+    colLangue: "Langue",
+    colSource: "Provenance",
+    colActions: "",
+
+    desabonneLe: "Désabonné le",
+
+    exportTitle: "Exporter",
+    exportCsv: "Export CSV",
+    exportXlsx: "Export Excel",
+    exportAide:
+      "L'export reprend la sélection affichée : adresse, date d'inscription, statut, langue et provenance. Le fichier CSV est encodé en UTF-8 avec point-virgule, format attendu par Excel en configuration française.",
+
+    desabonner: "Désabonner",
+    desabonnement: "Désabonnement…",
+    desabonnerConfirm:
+      "Marquer cette adresse comme désabonnée ? Elle ne recevra plus aucun envoi et ne pourra revenir sur la liste que par une action de son titulaire.",
+    reabonner: "Réabonner",
+    reabonnement: "Réabonnement…",
+    reabonnerConfirm:
+      "Remettre cette adresse sur la liste ? Ne le faites que si son titulaire vous l'a expressément demandé : la loi comme les filtres anti-pourriel s'appuient sur ce consentement.",
+    supprimer: "Supprimer",
+    suppression: "Suppression…",
+    supprimerConfirm:
+      "Supprimer définitivement cette adresse ? La trace du désabonnement disparaît avec elle : rien n'empêchera plus qu'elle soit réinscrite par un import. Préférez le désabonnement, sauf demande d'effacement.",
+
+    desabonneOk: "Adresse désabonnée.",
+    reabonneOk: "Adresse remise sur la liste.",
+    supprimeOk: "Adresse supprimée.",
+    introuvable: "Cette adresse n'existe plus dans la liste.",
+
+    envoiTitle: "Envoi des lettres",
+    envoiLead:
+      "L'envoi se fait hors de la console : exportez la liste, puis chargez le fichier dans l'outil d'emailing retenu. Chaque abonné exporté porte sa langue et son statut de consentement, les deux informations dont cet outil a besoin pour ne diffuser qu'aux personnes qui l'ont accepté.",
+  },
 } as const;
 
 /**
@@ -248,9 +309,13 @@ export const ADMIN_ACTUS = {
   une: "À la une",
 
   publier: "Publier",
+  publication: "Publication…",
   depublier: "Dépublier",
+  depublication: "Dépublication…",
   dupliquer: "Dupliquer",
+  duplication: "Duplication…",
   supprimer: "Supprimer",
+  suppression: "Suppression…",
   supprimerConfirm: "Supprimer définitivement cet article et toutes ses traductions ? Cette action est irréversible.",
   modifier: "Modifier",
   retourListe: "Retour aux actualités",
@@ -273,6 +338,7 @@ export const ADMIN_ACTUS = {
   enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
   enregistrerFiche: "Enregistrer les réglages",
   supprimerTraduction: "Supprimer cette traduction",
+  suppressionTraduction: "Suppression…",
   supprimerTraductionConfirm:
     "Supprimer cette version linguistique ? L'article restera en ligne dans les autres langues.",
   majLe: "Modifié le",
@@ -421,6 +487,11 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { key: "videos", label: "Vidéos & galerie", soon: true },
       { key: "ressources", label: "Ressources & publications", soon: true },
     ],
+  },
+  {
+    key: "diffusion",
+    label: "Diffusion",
+    items: [{ key: "newsletter", label: "Newsletter", slug: "/newsletter" }],
   },
   {
     key: "institution",
