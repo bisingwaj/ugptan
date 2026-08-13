@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ADMIN_EVTS } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
+import { lectureConsole } from "@/lib/lecture";
 import { requirePermission } from "@/lib/auth/guard";
 import { EvtCategorieForm } from "@/components/dashboard/events/EvtCategorieForm";
 
@@ -21,13 +22,17 @@ export default async function CategoriesEvenementsPage() {
   await requirePermission("evenements");
   const t = ADMIN_EVTS;
 
-  const categories = await db().evenementCategory.findMany({
-    select: {
-      id: true, slug: true, nomFr: true, nomEn: true, color: true, position: true,
-      _count: { select: { evenements: true } },
-    },
-    orderBy: [{ position: "asc" }, { nomFr: "asc" }],
-  });
+  // Reprise sur panne de liaison (cf. lib/lecture.ts).
+  const categories = await lectureConsole(
+    () => db().evenementCategory.findMany({
+      select: {
+        id: true, slug: true, nomFr: true, nomEn: true, color: true, position: true,
+        _count: { select: { evenements: true } },
+      },
+      orderBy: [{ position: "asc" }, { nomFr: "asc" }],
+    }),
+    "catégories d'événements (console)",
+  );
 
   return (
     <>

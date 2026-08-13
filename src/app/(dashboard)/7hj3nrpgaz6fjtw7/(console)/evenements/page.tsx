@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ADMIN_EVTS } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
+import { lectureConsole } from "@/lib/lecture";
 import { requirePermission } from "@/lib/auth/guard";
 import { LOCALES } from "@/lib/params";
 import { intervalleDates, plageHoraire } from "@/lib/events/dates";
@@ -70,34 +71,39 @@ export default async function EvenementsAdminPage(props: { searchParams: Promise
     ...(phase ? clausePhase(phase, now) : {}),
   };
 
-  const [total, evenements, categories] = await Promise.all([
-    db().evenement.count({ where }),
-    db().evenement.findMany({
-      where,
-      select: {
-        id: true,
-        status: true,
-        startAt: true,
-        endAt: true,
-        allDay: true,
-        featured: true,
-        category: { select: { nomFr: true, color: true } },
-        // `contentHtml` n'est pas chargé : la liste n'affiche que la présence
-        // d'une traduction, et la description pèse plusieurs kilo-octets.
-        translations: { select: { locale: true, title: true, lieu: true } },
-        // Un simple décompte : la liste n'affiche jamais l'identité des
-        // personnes inscrites, qui appartient à l'écran dédié.
-        _count: { select: { inscriptions: true } },
-      },
-      orderBy: [{ startAt: "desc" }],
-      skip: (page - 1) * PAR_PAGE,
-      take: PAR_PAGE,
-    }),
-    db().evenementCategory.findMany({
-      select: { id: true, nomFr: true },
-      orderBy: [{ position: "asc" }, { nomFr: "asc" }],
-    }),
-  ]);
+  // Reprise sur panne de liaison (cf. lib/lecture.ts) : le transport vers Neon
+  // échoue par salves, et la liste du module ne doit pas en dépendre.
+  const [total, evenements, categories] = await lectureConsole(
+    () => Promise.all([
+      db().evenement.count({ where }),
+      db().evenement.findMany({
+        where,
+        select: {
+          id: true,
+          status: true,
+          startAt: true,
+          endAt: true,
+          allDay: true,
+          featured: true,
+          category: { select: { nomFr: true, color: true } },
+          // `contentHtml` n'est pas chargé : la liste n'affiche que la présence
+          // d'une traduction, et la description pèse plusieurs kilo-octets.
+          translations: { select: { locale: true, title: true, lieu: true } },
+          // Un simple décompte : la liste n'affiche jamais l'identité des
+          // personnes inscrites, qui appartient à l'écran dédié.
+          _count: { select: { inscriptions: true } },
+        },
+        orderBy: [{ startAt: "desc" }],
+        skip: (page - 1) * PAR_PAGE,
+        take: PAR_PAGE,
+      }),
+      db().evenementCategory.findMany({
+        select: { id: true, nomFr: true },
+        orderBy: [{ position: "asc" }, { nomFr: "asc" }],
+      }),
+    ]),
+    "liste des événements (console)",
+  );
 
   const pages = Math.max(1, Math.ceil(total / PAR_PAGE));
   const filtre = Boolean(statut || phase || categorie || q);

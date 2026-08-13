@@ -52,40 +52,86 @@ const REPRISES_MS = [300, 900, 2000];
 const enCompilation = () => process.env.NEXT_PHASE === "phase-production-build";
 
 /**
- * Fabrique la fonction de lecture d'un module. `module` n'est qu'un préfixe de
- * journal (« actus », « events ») : il rend les traces attribuables sans que
- * chaque appelant ait à le répéter.
+ * Cœur commun : rejoue `faire` tant que la panne est une panne de LIAISON et
+ * qu'il reste un palier. Rend la main à `surEchec` quand la reprise n'a plus de
+ * sens — paliers épuisés, ou panne que rejouer ne guérira pas.
  *
  * ⚠️ `faire` est une FONCTION, pas une promesse : une promesse déjà rejetée ne
  * se rejoue pas, la reprise n'aurait servi à rien.
  */
-export function lecteur(module: string) {
-  return async function lecture<T>(
-    faire: () => Promise<T>,
-    repli: T,
-    contexte: string,
-  ): Promise<T> {
-    for (let tentative = 0; ; tentative++) {
-      try {
-        return await faire();
-      } catch (error) {
-        const attente = REPRISES_MS[tentative];
+async function avecReprises<T>(
+  faire: () => Promise<T>,
+  module: string,
+  contexte: string,
+  surEchec: (error: unknown) => T,
+  paliers: readonly number[] = REPRISES_MS,
+): Promise<T> {
+  for (let tentative = 0; ; tentative++) {
+    try {
+      return await faire();
+    } catch (error) {
+      const attente = paliers[tentative];
+      if (attente === undefined || !estPanneDeLiaison(error)) return surEchec(error);
 
-        // Deux sorties, une seule conduite : on abandonne dès que la reprise
-        // n'a plus de sens — paliers épuisés, ou panne qui n'est pas de liaison.
-        if (attente === undefined || !estPanneDeLiaison(error)) {
-          if (!enCompilation()) throw error;
-          console.warn(
-            `[${module}] ${contexte} : base injoignable pendant la compilation, bloc laissé vide. ${describeError(error)}`,
-          );
-          return repli;
-        }
-
-        console.warn(
-          `[${module}] ${contexte} : liaison perdue, reprise ${tentative + 1}/${REPRISES_MS.length} dans ${attente} ms. ${describeError(error)}`,
-        );
-        await new Promise((resoudre) => setTimeout(resoudre, attente));
-      }
+      console.warn(
+        `[${module}] ${contexte} : liaison perdue, reprise ${tentative + 1}/${paliers.length} dans ${attente} ms. ${describeError(error)}`,
+      );
+      await new Promise((resoudre) => setTimeout(resoudre, attente));
     }
+  }
+}
+
+/**
+ * Fabrique la fonction de lecture PUBLIQUE d'un module. `module` n'est qu'un
+ * préfixe de journal (« actus », « events ») : il rend les traces attribuables
+ * sans que chaque appelant ait à le répéter.
+ *
+ * Le repli ne sert qu'à la COMPILATION, jamais à l'exécution (cf. l'en-tête).
+ */
+export function lecteur(module: string) {
+  return function lecture<T>(faire: () => Promise<T>, repli: T, contexte: string): Promise<T> {
+    return avecReprises(faire, module, contexte, (error) => {
+      if (!enCompilation()) throw error;
+      console.warn(
+        `[${module}] ${contexte} : base injoignable pendant la compilation, bloc laissé vide. ${describeError(error)}`,
+      );
+      return repli;
+    });
   };
+}
+
+/**
+ * Lecture d'un écran de la CONSOLE. Mêmes reprises, et AUCUN repli.
+ *
+ * La différence avec `lecteur` n'est pas un oubli. Une page publique amputée
+ * d'un bloc reste lisible ; un écran d'administration qui afficherait un
+ * formulaire vide au lieu d'une fiche ferait écraser la fiche au premier
+ * enregistrement. Ici, une panne qui survit aux reprises doit se voir — c'est
+ * `(console)/error.tsx` qui la recueille, avec sa référence d'incident.
+ *
+ * Ce chemin existe parce que le transport WebSocket vers Neon échoue par
+ * salves (cf. `REPRISES_MS`) : sans lui, une salve d'une demi-seconde suffisait
+ * à faire tomber la fiche qu'un rédacteur venait d'ouvrir.
+ */
+/**
+ * Paliers de la console, plus généreux que ceux du site public.
+ *
+ * Mesuré sur trente chargements d'affilée : avec le budget public (~3,2 s), une
+ * salve sur dix survivait encore aux reprises et sortait en 500. La différence
+ * de traitement se justifie par ce que coûte chaque issue. Une page publique
+ * lente dessert un visiteur qui a d'autres pages ; un écran d'administration
+ * qui tombe interrompt un travail en cours, et sa page d'erreur coûte de toute
+ * façon un rechargement manuel. Attendre huit secondes de plus, sur la seule
+ * requête qui a déjà échoué trois fois, est le moindre mal.
+ */
+const REPRISES_CONSOLE_MS = [300, 900, 2000, 3500, 5000];
+
+export function lectureConsole<T>(faire: () => Promise<T>, contexte: string): Promise<T> {
+  return avecReprises(
+    faire,
+    "console",
+    contexte,
+    (error) => { throw error; },
+    REPRISES_CONSOLE_MS,
+  );
 }

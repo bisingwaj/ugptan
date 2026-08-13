@@ -22,6 +22,8 @@ import { redirect } from "next/navigation";
 import { ADMIN_HOME, ADMIN_LOGIN, EXPIRED_PARAM } from "@/lib/admin";
 import { auth } from "@/lib/auth/server";
 import { can, isRole, type AdminRole, type Permission } from "@/lib/auth/permissions";
+import { estPanneDeLiaison } from "@/lib/errors";
+import { lectureConsole } from "@/lib/lecture";
 
 /** Compte connecté, tel qu'il existe en base à l'instant de la requête. */
 export type AdminUser = {
@@ -37,9 +39,30 @@ export type AdminUser = {
  * nombre de gardes traversés (layout + page + action).
  */
 export const getCurrentUser = cache(async (): Promise<AdminUser | null> => {
-  const session = await auth()
-    .api.getSession({ headers: await headers() })
-    .catch(() => null);
+  /**
+   * ⚠️ Une PANNE DE BASE n'est pas une absence de session.
+   *
+   * Cette lecture avalait autrefois toute erreur (`.catch(() => null)`), ce qui
+   * revenait à déconnecter la personne dès que le transport vers Neon flanchait.
+   * Or il flanche par salves (cf. lib/lecture.ts) : une rédactrice au milieu
+   * d'une fiche se retrouvait sur l'écran de connexion, sans rien avoir fait.
+   *
+   * D'où la distinction, désormais tenue :
+   *   · panne de LIAISON  → reprises, puis l'erreur remonte à la frontière de
+   *     la console, qui l'affiche avec un bouton « Réessayer ». La session est
+   *     intacte, et le dire vaut mieux que de la nier ;
+   *   · toute autre erreur → `null`, comme avant. Un cookie illisible ou un
+   *     jeton corrompu ne se rejouent pas : la personne n'est pas connectée, et
+   *     l'écran de connexion est la bonne destination.
+   */
+  const entetes = await headers();
+  const session = await lectureConsole(
+    () => auth().api.getSession({ headers: entetes }),
+    "session de la console",
+  ).catch((error) => {
+    if (estPanneDeLiaison(error)) throw error;
+    return null;
+  });
 
   if (!session) return null;
 
