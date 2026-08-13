@@ -1,3 +1,6 @@
+"use client";
+
+import { useFormStatus } from "react-dom";
 import { logoutAction } from "@/actions/admin-auth";
 import { ADMIN } from "@/content/admin";
 
@@ -25,9 +28,28 @@ const SignOutIcon = () => (
 );
 
 /**
+ * Corps du bouton. Séparé du `<form>` parce que `useFormStatus` ne rapporte
+ * l'état que d'un formulaire ANCESTRAL : appelé dans le composant qui rend le
+ * `<form>`, il renverrait toujours « au repos ».
+ *
+ * La déconnexion révoque la session en base puis redirige : sur une connexion
+ * lente, l'attente est perceptible et sans retour, on clique deux fois. Le
+ * libellé bascule, comme partout ailleurs dans la console.
+ */
+function SignOutContent() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button type="submit" className="adm__signout" disabled={pending} title={ADMIN.shell.logout}>
+      <span className="adm__nav-ico"><SignOutIcon /></span>
+      <span className="adm__nav-text">{pending ? ADMIN.shell.loggingOut : ADMIN.shell.logout}</span>
+    </button>
+  );
+}
+
+/**
  * Déconnexion, logée au pied de la barre latérale.
  *
- * Composant serveur : un `<form action={…}>` suffit, pas besoin de client.
  * L'action délègue à Better Auth, qui révoque la session en base et expire le
  * cookie (cf. actions/admin-auth.ts).
  *
@@ -38,10 +60,7 @@ const SignOutIcon = () => (
 export function LogoutButton() {
   return (
     <form action={logoutAction}>
-      <button type="submit" className="adm__signout" title={ADMIN.shell.logout}>
-        <span className="adm__nav-ico"><SignOutIcon /></span>
-        <span className="adm__nav-text">{ADMIN.shell.logout}</span>
-      </button>
+      <SignOutContent />
     </form>
   );
 }
