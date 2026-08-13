@@ -285,7 +285,23 @@ export function dict(lang: Lang) {
         "Thank you. The team will confirm your participation by email.",
       ),
       fullName: t("Nom complet", "Full name"),
+      email: t("Adresse électronique", "Email address"),
       orgOptional: t("Organisation (optionnel)", "Organisation (optional)"),
+      phoneOptional: t("Téléphone (optionnel)", "Phone (optional)"),
+      messageOptional: t("Message (optionnel)", "Message (optional)"),
+      messagePlaceholder: t(
+        "Une question, un besoin d'accessibilité, une précision à signaler.",
+        "A question, an accessibility need, anything we should know.",
+      ),
+      regSending: t("Envoi…", "Sending…"),
+      fermer: t("Fermer", "Close"),
+      /* Mention de collecte : le formulaire recueille une identité et des
+         coordonnées sans compte. Le dire au moment de la saisie, et non dans
+         une politique qu'il faudrait aller chercher. */
+      regPrivacy: t(
+        "Ces informations servent uniquement à organiser votre participation et ne sont transmises à personne d'autre.",
+        "This information is used solely to organise your attendance and is not shared with anyone else.",
+      ),
 
       /* --- Sections du calendrier ---------------------------------------- */
       sectionAVenir: t("Prochaines rencontres", "Upcoming events"),

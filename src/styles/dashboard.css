@@ -570,6 +570,30 @@
   .adm-media-card__form { display: flex; flex-direction: column; gap: 12px; }
 
   /* --- Catégories & étiquettes ----------------------------------------------- */
+  /* --- Demandes de participation -----------------------------------------
+     Une carte par demande, et non une ligne de tableau : chacune porte une
+     identité, un message libre, un état et une note. Comprimé en colonnes, le
+     message serait tronqué là où il est précisément ce qu'il faut lire. */
+  .adm-inscr__tete { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 20px; }
+  .adm-inscr__message {
+    margin: 12px 0 0; padding: 12px 14px; border-left: 2px solid var(--c-20);
+    background: var(--c-10); font-size: 13.5px; line-height: 1.6; color: var(--c-70);
+    white-space: pre-line;
+  }
+  .adm-inscr__form { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 14px; align-items: end; margin-top: 14px; }
+  .adm-inscr__form .adm-actions__row { grid-column: 1 / -1; }
+
+  /* Pastille d'état, posée à la suite du nom. */
+  .adm-inscr { margin-left: 8px; }
+  .adm-inscr--recue { @apply border-ac-line bg-ac-pale text-ac; }
+  .adm-inscr--confirmee { @apply border-ok-bd bg-ok-bg text-ok-fg; }
+  .adm-inscr--liste_attente { border-color: #ffd9a0; background: #fff2e0; color: #8a4b00; }
+  .adm-inscr--annulee { @apply border-c-30 bg-c-10 text-c-60; }
+
+  @media (max-width: 700px) {
+    .adm-inscr__form { grid-template-columns: 1fr; }
+  }
+
   .adm-taxo { display: flex; flex-direction: column; gap: 12px; }
   .adm-taxo__bloc { border: 1px solid var(--c-20); background: #fff; padding: 16px; }
   .adm-taxo__form { display: flex; flex-direction: column; gap: 14px; }

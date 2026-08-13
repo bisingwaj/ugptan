@@ -109,7 +109,12 @@ export default async function ModifierEvenementPage(props: {
             )}
           </div>
         </div>
-        <EvenementActions id={evenement.id} enLigne={enLigne} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
+          <EvenementActions id={evenement.id} enLigne={enLigne} />
+          <Link href={adminPath(`/evenements/${evenement.id}/inscriptions`)} className="btn btn--outline btn--sm">
+            {t.inscrLien}
+          </Link>
+        </div>
       </div>
 
       {params.cree && <div className="adm-ok" role="status" style={{ marginTop: 16 }}>{t.creeOk}</div>}

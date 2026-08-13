@@ -85,6 +85,9 @@ export default async function EvenementsAdminPage(props: { searchParams: Promise
         // `contentHtml` n'est pas chargé : la liste n'affiche que la présence
         // d'une traduction, et la description pèse plusieurs kilo-octets.
         translations: { select: { locale: true, title: true, lieu: true } },
+        // Un simple décompte : la liste n'affiche jamais l'identité des
+        // personnes inscrites, qui appartient à l'écran dédié.
+        _count: { select: { inscriptions: true } },
       },
       orderBy: [{ startAt: "desc" }],
       skip: (page - 1) * PAR_PAGE,
@@ -170,6 +173,7 @@ export default async function EvenementsAdminPage(props: { searchParams: Promise
                 <th scope="col">{t.colLangues}</th>
                 <th scope="col">{t.colCategorie}</th>
                 <th scope="col">{t.colDate}</th>
+                <th scope="col">{t.inscrColonne}</th>
                 <th scope="col"><span className="sr-only">Actions</span></th>
               </tr>
             </thead>
@@ -233,6 +237,11 @@ export default async function EvenementsAdminPage(props: { searchParams: Promise
                     <td className="mono adm-table__meta">
                       {intervalleDates(evt.startAt, evt.endAt, "fr", true)}
                       {heures && <span className="adm-table__sub">{heures}</span>}
+                    </td>
+                    <td className="adm-table__meta">
+                      <Link href={adminPath(`/evenements/${evt.id}/inscriptions`)} className="adm-link">
+                        {evt._count.inscriptions}
+                      </Link>
                     </td>
                     <td>
                       <EvenementActions id={evt.id} enLigne={enLigne} compact />

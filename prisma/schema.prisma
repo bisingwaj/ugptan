@@ -584,6 +584,7 @@ model Evenement {
   updatedAt DateTime @updatedAt
 
   translations EvenementTranslation[]
+  inscriptions EvenementInscription[]
 
   @@index([status, startAt])
   @@index([categoryId])
@@ -635,4 +636,58 @@ model EvenementTranslation {
   @@unique([evenementId, locale])
   @@unique([locale, slug])
   @@index([locale])
+}
+
+/// État d'une demande de participation.
+///
+/// `RECUE` est le seul état qu'une personne peut provoquer elle-même : tous les
+/// autres sont posés par l'Unité depuis la console. La distinction compte pour
+/// le décompte des places — une demande reçue n'occupe pas encore de siège.
+enum InscriptionStatus {
+  RECUE
+  CONFIRMEE
+  LISTE_ATTENTE
+  ANNULEE
+}
+
+/// Demande de participation déposée par le formulaire public d'un événement.
+///
+/// ⚠️ Ces lignes portent des DONNÉES PERSONNELLES (identité, adresse, éventuelle
+/// organisation) collectées sans compte. Trois conséquences tenues partout :
+///   1. elles ne sortent JAMAIS vers le site public — aucune fonction de
+///      `lib/events/query.ts` ne les lit, seule la console y accède ;
+///   2. elles tombent avec l'événement (`onDelete: Cascade`) : supprimer une
+///      rencontre ne doit pas laisser derrière elle une liste de participants ;
+///   3. l'adresse fait l'unicité, pour qu'un double envoi mette à jour la
+///      demande au lieu d'inscrire deux fois la même personne.
+///
+/// Le formulaire n'est proposé que si l'événement n'a PAS de lien d'inscription
+/// externe : quand la billetterie est ailleurs, c'est elle qui tient la liste,
+/// et en tenir une seconde ici la rendrait fausse.
+model EvenementInscription {
+  id          String    @id @default(cuid())
+  evenementId String
+  evenement   Evenement @relation(fields: [evenementId], references: [id], onDelete: Cascade)
+
+  nom          String
+  email        String
+  organisation String?
+  telephone    String?
+  /// Question ou besoin d'accessibilité signalé au dépôt.
+  message      String?
+
+  /// Langue du formulaire au moment du dépôt — sert à répondre dans la langue
+  /// où la personne s'est adressée à l'Unité.
+  locale String @default("fr")
+
+  statut InscriptionStatus @default(RECUE)
+  /// Note interne de la console, jamais communiquée au demandeur.
+  note   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([evenementId, email])
+  @@index([evenementId, statut])
+  @@index([createdAt])
 }

@@ -23,6 +23,7 @@ import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 import { PartageArticle } from "@/components/actus/PartageArticle";
 import { EventsGrid } from "@/components/events/EventsGrid";
+import { BoutonInscription } from "@/components/events/BoutonInscription";
 
 type Props = {
   evt: EvtVue;
@@ -184,13 +185,23 @@ export function EvenementVue({ evt, lang, lies, precedent, suivant }: Props) {
 
           {/* ===== Appels à l'action =====
               Rien n'est proposé sur une rencontre terminée : un bouton
-              « s'inscrire » sur une date passée serait une impasse. */}
-          {evt.aVenir && (evt.registrationUrl || evt.onlineUrl || evt.externalUrl) && (
+              « s'inscrire » sur une date passée serait une impasse.
+
+              L'inscription prend UNE forme ou l'AUTRE, jamais les deux : quand
+              un service externe tient la billetterie, c'est lui qui fait
+              autorité sur les places, et ouvrir en plus le formulaire intégré
+              produirait deux listes dont aucune ne serait complète. La server
+              action applique la même règle de son côté (cf.
+              actions/evenements-inscription.ts) : le choix ne dépend pas de ce
+              que la page a bien voulu afficher. */}
+          {evt.aVenir && (
             <div className="evt-actions">
-              {evt.registrationUrl && (
+              {evt.registrationUrl ? (
                 <a href={evt.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn--primary">
                   {t.register}<span className="arrow">↗</span>
                 </a>
+              ) : (
+                <BoutonInscription evt={evt} lang={lang} />
               )}
               {evt.onlineUrl && (
                 <a href={evt.onlineUrl} target="_blank" rel="noopener noreferrer" className="btn btn--outline">
