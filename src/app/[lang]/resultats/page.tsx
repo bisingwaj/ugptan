@@ -3,16 +3,19 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { odp, intermediaires } from "@/content/data";
-import { dialogues } from "@/content/carbon";
 import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
 import { FlowLines, FlowLinesDefs } from "@/components/ui/FlowLines";
-import { CellBloom } from "@/components/ui/CellBloom";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
-import { Histoires } from "@/components/home/Histoires";
+import { SectionsImpact } from "@/components/impact/SectionsImpact";
 import { ProjVideos } from "@/components/resultats/ProjVideos";
+
+/** Cache aligné sur l'accueil : la page sert deux blocs administrés depuis la
+ *  console (dialogues sectoriels, témoignages), invalidés par les écritures du
+ *  module (cf. lib/impact/cache.ts). */
+export const revalidate = 120;
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -76,38 +79,12 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
         </div>
       </section>
 
-      {/* Dialogues sectoriels */}
-      <section className="section">
-        <div className="section__inner">
-          <Reveal>
-            <Kicker>{r.dialoguesLabel}</Kicker>
-            <h2 className="h2--sm" style={{ margin: "0 0 14px" }}>{r.dialoguesTitle}</h2>
-            <p style={{ margin: "0 0 42px", fontSize: 16, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 700 }}>{r.dialoguesLead}</p>
-          </Reveal>
-          <RevealGroup gap={0.045} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(282px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-black)", borderTopWidth: 2 }}>
-            {dialogues.map((d, i) => (
-              <RevealItem fade key={i} className="cell cell--bloom" style={{ padding: "26px 24px", borderTop: `3px solid ${d.color}`, display: "flex", flexDirection: "column", minHeight: 172 }}>
-                <CellBloom color={d.color} />
-                <div className="mono" style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: d.color }}>{pick(d.secteur, lang)}</div>
-                <h3 style={{ margin: "14px 0 0", fontSize: 16.5, fontWeight: 600, lineHeight: 1.32, color: "var(--cell-fg)" }}>{pick(d.titre, lang)}</h3>
-                <p style={{ margin: "10px 0 0", fontSize: 13.5, lineHeight: 1.5, color: "var(--cell-mut)", flex: 1 }}>{pick(d.desc, lang)}</p>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+      {/* Dialogues sectoriels — administré depuis la console. */}
+      <SectionsImpact emplacement="RESULTATS_DIALOGUES" lang={lang} />
 
-      {/* Histoires */}
-      <section className="section section--grey">
-        <div className="section__inner">
-          <Reveal style={{ maxWidth: 680, marginBottom: 44 }}>
-            <Kicker>{t.home.storiesLabel}</Kicker>
-            <h2 className="h2--sm" style={{ marginBottom: 14 }}>{t.home.storiesTitle}</h2>
-            <p className="lead" style={{ margin: 0 }}>{t.home.storiesLead}</p>
-          </Reveal>
-          <Histoires lang={lang} />
-        </div>
-      </section>
+      {/* Histoires — la collection de référence des témoignages, dont l'accueil
+          reprend les entrées (cf. le module « Histoires & impact »). */}
+      <SectionsImpact emplacement="RESULTATS_HISTOIRES" lang={lang} />
     </div>
   );
 }

@@ -639,6 +639,55 @@
   .adm-taxo__grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
   .adm-taxo__ordre { max-width: 120px; }
 
+  /* --- Entrées d'une section « Histoires & impact » -------------------------
+     Une carte dépliable par entrée, et non une ligne de tableau : repliée, elle
+     doit tenir sur une ligne et dire l'essentiel — l'intitulé, l'état, les
+     langues qui manquent ; dépliée, elle porte deux onglets de langue et un
+     bloc de réglages, ce qu'aucune cellule de tableau ne peut contenir. */
+  .adm-items { margin-top: 30px; }
+  .adm-items__tete {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px 20px; margin-bottom: 14px;
+  }
+  .adm-items__liste { display: flex; flex-direction: column; gap: 12px; }
+
+  .adm-item { border: 1px solid var(--c-20); background: #fff; }
+  .adm-item__tete {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 10px 16px; padding: 12px 16px;
+  }
+  .adm-item__ouvrir {
+    display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 220px;
+    padding: 0; text-align: left; color: var(--c-black);
+  }
+  .adm-item__ouvrir:hover .adm-item__resume { color: var(--ac); }
+  .adm-item__rang { flex: 0 0 auto; font-size: 12px; color: var(--c-50); }
+  .adm-item__resume {
+    min-width: 0; font-size: 14px; line-height: 1.4;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .adm-item__etats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .adm-item__deplacer .btn { padding-inline: 10px; }
+
+  .adm-item__corps {
+    display: flex; flex-direction: column; gap: 18px;
+    padding: 4px clamp(12px, 2vw, 18px) clamp(16px, 2vw, 22px);
+    border-top: 1px solid var(--c-20);
+  }
+  .adm-item__corps[hidden] { display: none; }
+  .adm-item__langue {
+    display: flex; flex-direction: column; gap: 18px;
+    border: 1px solid var(--c-20); border-top: 0; background: #fff;
+    padding: clamp(14px, 2vw, 20px);
+  }
+  .adm-item__langue[hidden] { display: none; }
+  .adm-item__reglages {
+    display: flex; flex-direction: column; gap: 14px;
+    border: 1px solid var(--c-20); background: var(--c-10);
+    padding: clamp(14px, 2vw, 20px);
+  }
+  .adm-item__grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+
   @media (max-width: 1100px) {
     .adm-edit { grid-template-columns: 1fr; }
     /* Les réglages passent AVANT le texte une fois la colonne unique : statut et
