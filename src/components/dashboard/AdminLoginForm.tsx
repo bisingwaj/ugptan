@@ -18,11 +18,11 @@ const initialState: LoginState = { error: null };
  */
 export function AdminLoginForm({
   next,
-  avis,
+  notice,
 }: {
   next?: string | null;
-  /** Message d'accueil posé par la page — session périmée, par exemple. */
-  avis?: string | null;
+  /** Message de confirmation, ex. retour de la définition du mot de passe. */
+  notice?: string | null;
 }) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
   const t = ADMIN.login;
@@ -62,11 +62,11 @@ export function AdminLoginForm({
           <h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(24px,2.6vw,32px)", letterSpacing: "-0.02em" }}>{t.title}</h1>
           <p style={{ margin: "10px 0 26px", fontSize: 14, color: "var(--c-60)" }}>{t.lead}</p>
 
-          {/* L'avis passe avant l'erreur et disparaît dès la première tentative :
-              « session expirée » n'a plus rien à dire une fois que l'utilisateur
-              a soumis le formulaire et reçu, le cas échéant, un vrai refus. */}
-          {avis && !state.error && (
-            <div className="adm-ok" role="status" style={{ marginBottom: 16 }}>{avis}</div>
+          {/* L'avis s'efface dès la première tentative : « mot de passe
+              enregistré » ou « session expirée » n'ont plus rien à dire une fois
+              que la personne a soumis le formulaire et reçu un vrai refus. */}
+          {notice && !state.error && (
+            <div className="adm-ok" role="status" style={{ marginBottom: 18 }}>{notice}</div>
           )}
 
           {state.error && (

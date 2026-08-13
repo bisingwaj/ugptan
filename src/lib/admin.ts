@@ -22,6 +22,17 @@ export const adminPath = (slug = "") => `${ADMIN_BASE}${slug}`;
  */
 export const ADMIN_LOGIN = adminPath("/signin");
 
+/**
+ * Deuxième page du sous-arbre ouverte sans session : celle où l'on définit son
+ * mot de passe depuis le lien reçu par e-mail. Elle ne peut pas exiger d'être
+ * connecté — elle sert justement à obtenir le moyen de l'être. L'autorisation
+ * vient du jeton porté par l'URL, vérifié par Better Auth.
+ *
+ * Déclarée ici, et non dans `lib/auth/server.ts`, pour que `proxy.ts` puisse la
+ * lire sans tirer Prisma ni Better Auth dans la middleware.
+ */
+export const ADMIN_SET_PASSWORD = adminPath("/set-password");
+
 /** Accueil après connexion. */
 export const ADMIN_HOME = adminPath("/tableau-de-bord");
 
@@ -36,16 +47,18 @@ export const NEXT_PARAM = "next";
 
 /**
  * Marqueur posé par le garde quand il refuse une session que le cookie laissait
- * espérer valide.
+ * espérer valide (expiration, session révoquée, base réinitialisée).
  *
- * ⚠️ Il n'est pas cosmétique : c'est lui qui ROMPT une boucle de redirection.
- * Le proxy trie sur la seule PRÉSENCE du cookie, le garde de page vérifie la
- * session EN BASE. Un cookie survivant à sa session — expiration, compte
- * supprimé, base réinitialisée — mettait les deux en désaccord permanent : le
- * proxy renvoyait `/signin` vers le tableau de bord, le garde renvoyait le
- * tableau de bord vers `/signin`, indéfiniment (mesuré : 307 en rafale, page
- * jamais rendue). Ce marqueur dit au proxy « la question a déjà été tranchée en
- * base, laisse passer ».
+ * Il ne sert plus qu'à EXPLIQUER : l'écran de connexion s'en sert pour dire
+ * pourquoi la personne se retrouve là, au lieu de la laisser croire à une
+ * déconnexion spontanée.
+ *
+ * Il a un temps rompu une boucle de redirection — le proxy renvoyait `/signin`
+ * vers le tableau de bord dès qu'un cookie existait, le garde renvoyait le
+ * tableau de bord vers `/signin`, sans fin. Ce n'est plus lui qui la tient
+ * ouverte : `proxy.ts` ne fait plus sortir de l'écran de connexion, quel que
+ * soit le cookie. Retirer ce marqueur ne réveillerait donc pas la boucle ; cela
+ * ne ferait que rendre le renvoi muet.
  */
 export const EXPIRED_PARAM = "expire";
 
