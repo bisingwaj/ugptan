@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 import { dict } from "@/content/i18n";
 import { isLang, type Lang } from "@/lib/pick";
 
@@ -29,9 +28,13 @@ export default function SiteError({
   const lang: Lang = isLang(segment) ? segment : "fr";
   const t = dict(lang).erreur;
 
-  useEffect(() => {
-    console.error(`[site] ${[error.name, error.message].filter(Boolean).join(" · ")}`);
-  }, [error]);
+  /* Aucune journalisation ici, délibérément. Le message transmis au navigateur
+     est la sérialisation d'un objet du pilote base, que la production remplace
+     de toute façon par le seul condensé : il n'apprend rien. La cause réelle est
+     déjà tracée côté serveur (cf. src/instrumentation.ts), et le condensé affiché
+     ci-dessous fait le lien. Un `console.error` de plus ne ferait qu'empiler une
+     seconde erreur dans la console, avec une pile pointant vers ce composant
+     plutôt que vers la panne. */
 
   return (
     <section className="section">
