@@ -1,21 +1,20 @@
 "use server";
 
 /**
- * Bibliothèque de médias.
+ * Bibliothèque de médias et de documents.
  *
- * Deux natures de média, une seule table (cf. `MediaAsset` au schéma) :
- *   - un fichier TÉLÉVERSÉ, dont les octets vivent en base et que sert
- *     `/api/medias/<id>` ;
- *   - un média EXTERNE, dont on n'enregistre que l'URL.
+ * Le fichier téléversé part chez CLOUDINARY (cf. `src/lib/cloudinary.ts`) ; la
+ * base ne garde que son adresse, son identifiant public et ses métadonnées.
+ * Écrire le binaire en PostgreSQL rendait l'installation autonome, mais faisait
+ * porter à la base — sauvegardée, répliquée, facturée à l'octet — un rôle de
+ * serveur de fichiers, et à l'application celui de CDN. Un média téléversé et
+ * un média externe se ressemblent désormais : les deux portent une `url`, seul
+ * `publicId` distingue ce qui nous appartient de ce qui est hébergé ailleurs.
  *
- * Stocker le binaire en base est un choix assumé : l'installation reste
- * autonome — aucun service de stockage à provisionner, aucune clé d'API à
- * gérer, une sauvegarde de la base suffit à tout restaurer. Le prix est connu
- * (le plafond de 5 Mo par fichier, et la règle de ne jamais sélectionner la
- * colonne `data` hors de la route qui sert le fichier) ; pour un site
- * institutionnel qui publie quelques visuels par semaine, il est modeste. Une
- * bascule vers un CDN reste ouverte sans migration : il suffit d'enregistrer
- * les visuels comme médias externes.
+ * Deux conséquences à connaître :
+ *   - la suppression retire aussi le fichier du compte Cloudinary ;
+ *   - sans identifiants Cloudinary, le téléversement est refusé avec un message
+ *     explicite. Le reste de la console continue de fonctionner.
  *
  * ⚠️ Autorisation : le module « Médias » OU le module « Actualités ». Un
  * rédacteur doit pouvoir téléverser la couverture de son article sans qu'on lui
@@ -26,8 +25,9 @@ import { db } from "@/lib/db";
 import { adminPath } from "@/lib/admin";
 import { getCurrentUser, type AdminUser } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/permissions";
+import { cloudinaryActif, deposerFichier, supprimerFichier } from "@/lib/cloudinary";
 import { dimensionsImage } from "@/lib/image-size";
-import { MIMES_IMAGE, TAILLE_MAX, poidsLisible } from "@/lib/medias";
+import { MIMES_ACCEPTES, estImage, poidsLisible, tailleMaxPour } from "@/lib/medias";
 import { safeUrl } from "@/lib/html/sanitize";
 import { revaliderActualites } from "@/lib/actus/cache";
 import type { ActuFormState } from "@/actions/admin-actualites";
@@ -52,7 +52,16 @@ async function assertMedias(): Promise<AdminUser> {
 
 /** Retour du téléversement, consommé par le sélecteur de médias de l'éditeur. */
 export type TeleversementResultat =
-  | { ok: true; id: string; src: string; alt: string; width: number | null; height: number | null }
+  | {
+      ok: true;
+      id: string;
+      src: string;
+      alt: string;
+      width: number | null;
+      height: number | null;
+      /** Identifiant de stockage : distingue notre fichier d'un média externe. */
+      publicId: string | null;
+    }
   | { ok: false; error: string };
 
 /**
@@ -61,6 +70,10 @@ export type TeleversementResultat =
  * Renvoie un objet plutôt que d'utiliser `useActionState` : l'appelant est du
  * code d'éditeur qui a besoin de l'URL immédiatement pour insérer l'image à
  * l'endroit du curseur.
+ *
+ * Le dépôt distant précède l'écriture en base, et non l'inverse : un échec
+ * Cloudinary laisse alors la bibliothèque intacte, là qu'une ligne créée
+ * d'abord aurait survécu en pointant vers un fichier inexistant.
  */
 export async function televerserMediaAction(formData: FormData): Promise<TeleversementResultat> {
   const acteur = await assertMedias();
@@ -70,46 +83,84 @@ export async function televerserMediaAction(formData: FormData): Promise<Telever
     return { ok: false, error: "Aucun fichier reçu." };
   }
 
-  if (!(MIMES_IMAGE as readonly string[]).includes(fichier.type)) {
-    return { ok: false, error: "Format non accepté. Utilisez JPEG, PNG, WebP, AVIF ou GIF." };
-  }
-
-  if (fichier.size > TAILLE_MAX) {
+  if (!(MIMES_ACCEPTES as readonly string[]).includes(fichier.type)) {
     return {
       ok: false,
-      error: `Fichier trop lourd (${poidsLisible(fichier.size)}). Limite : ${poidsLisible(TAILLE_MAX)}.`,
+      error: "Format non accepté. Images : JPEG, PNG, WebP, AVIF, GIF. Documents : PDF, Word, Excel, PowerPoint, CSV.",
+    };
+  }
+
+  const plafond = tailleMaxPour(fichier.type);
+  if (fichier.size > plafond) {
+    return {
+      ok: false,
+      error: `Fichier trop lourd (${poidsLisible(fichier.size)}). Limite : ${poidsLisible(plafond)}.`,
+    };
+  }
+
+  if (!cloudinaryActif()) {
+    return {
+      ok: false,
+      error: "Stockage des fichiers non configuré. Renseignez CLOUDINARY_URL dans l'environnement.",
     };
   }
 
   const octets = new Uint8Array(await fichier.arrayBuffer());
-  const taille = dimensionsImage(octets);
+  const nom = fichier.name.slice(0, 180) || (estImage(fichier.type) ? "image" : "document");
+
+  // Dimensions lues localement : Cloudinary les renvoie aussi, mais seulement
+  // pour une ressource « image ». La lecture d'en-tête couvre en plus les cas
+  // où le service les omet, et ne coûte que quelques octets.
+  const taille = estImage(fichier.type) ? dimensionsImage(octets) : null;
+
+  let depot;
+  try {
+    depot = await deposerFichier(octets, {
+      filename: nom,
+      mimeType: fichier.type,
+      sousDossier: estImage(fichier.type) ? "medias" : "documents",
+    });
+  } catch (erreur) {
+    console.error("[medias] dépôt Cloudinary impossible", erreur);
+    return { ok: false, error: "Téléversement refusé par le service de stockage. Réessayez." };
+  }
 
   const alt = texte(formData, "altFr");
 
-  const media = await db().mediaAsset.create({
-    data: {
-      filename: fichier.name.slice(0, 180) || "image",
-      mimeType: fichier.type,
-      size: fichier.size,
-      width: taille?.width ?? null,
-      height: taille?.height ?? null,
-      data: Buffer.from(octets),
-      altFr: optionnel(alt),
-      altEn: optionnel(texte(formData, "altEn")) ?? optionnel(alt),
-      createdById: acteur.id,
-    },
-    select: { id: true, width: true, height: true },
-  });
+  let media;
+  try {
+    media = await db().mediaAsset.create({
+      data: {
+        filename: nom,
+        mimeType: fichier.type,
+        size: depot.size || fichier.size,
+        width: depot.width ?? taille?.width ?? null,
+        height: depot.height ?? taille?.height ?? null,
+        url: depot.url,
+        publicId: depot.publicId,
+        altFr: optionnel(alt),
+        altEn: optionnel(texte(formData, "altEn")) ?? optionnel(alt),
+        createdById: acteur.id,
+      },
+      select: { id: true, width: true, height: true, url: true, publicId: true },
+    });
+  } catch (erreur) {
+    // Le fichier est déjà chez Cloudinary : le retirer évite d'y laisser un
+    // orphelin que plus rien en base ne désigne.
+    await supprimerFichier(depot.publicId, fichier.type);
+    throw erreur;
+  }
 
   revalidatePath(MEDIAS_PATH);
 
   return {
     ok: true,
     id: media.id,
-    src: `/api/medias/${media.id}`,
+    src: media.url ?? "",
     alt,
     width: media.width,
     height: media.height,
+    publicId: media.publicId,
   };
 }
 
@@ -190,15 +241,21 @@ export async function mettreAJourMediaAction(
 }
 
 /**
- * Supprime un média.
+ * Supprime un média, en base ET chez Cloudinary.
  *
  * Refusé tant qu'il sert de couverture : la relation passerait à `null`
  * (`onDelete: SetNull`) et des articles perdraient silencieusement leur visuel.
- * Mieux vaut nommer les articles concernés et laisser l'auteur trancher.
+ * Mieux vaut nommer les articles concernés et laisser l'auteur trancher. Même
+ * règle pour les événements, dont le média est l'affiche.
  *
  * Le corps HTML des articles n'est pas inspecté : une image insérée dans le
  * texte y figure par son URL, pas par une relation. La suppression laisserait
  * donc un lien mort — d'où l'avertissement porté par l'écran « Médias ».
+ *
+ * L'ordre est inverse de celui du téléversement : la base d'abord, le fichier
+ * ensuite. Un échec réseau chez Cloudinary laisse un fichier orphelin que plus
+ * rien ne désigne — gênant, mais sans effet visible ; l'inverse effacerait un
+ * fichier encore référencé.
  */
 export async function supprimerMediaAction(
   _prev: ActuFormState,
@@ -211,7 +268,12 @@ export async function supprimerMediaAction(
 
   const media = await db().mediaAsset.findUnique({
     where: { id },
-    select: { filename: true, _count: { select: { couvertures: true } } },
+    select: {
+      filename: true,
+      mimeType: true,
+      publicId: true,
+      _count: { select: { couvertures: true, affiches: true } },
+    },
   });
   if (!media) return { error: "Média introuvable.", ok: null };
 
@@ -222,7 +284,15 @@ export async function supprimerMediaAction(
     };
   }
 
+  if (media._count.affiches > 0) {
+    return {
+      error: `Ce média est l'affiche de ${media._count.affiches} événement(s). Remplacez-la avant de le supprimer.`,
+      ok: null,
+    };
+  }
+
   await db().mediaAsset.delete({ where: { id } });
+  if (media.publicId) await supprimerFichier(media.publicId, media.mimeType);
 
   revalidatePath(MEDIAS_PATH);
   return { error: null, ok: `« ${media.filename} » supprimé de la bibliothèque.` };

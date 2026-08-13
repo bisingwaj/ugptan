@@ -143,6 +143,11 @@ html.scroll-locked body {
 .btn--on-dark:hover { border-color: #fff; }
 .btn--sm { padding: 11px 18px; font-size: 14px; }
 
+/* Attente d'un bouton : le LIBELLÉ bascule vers sa forme en cours, suivie de
+   points de suspension (« Enregistrement… »). Convention unique du projet, sans
+   anneau ni glyphe — le curseur et l'atténuation disent le reste. */
+.btn:disabled { cursor: progress; opacity: 0.6; }
+
 /* Chips / tags */
 .chip {
   font-family: var(--font-mono); font-size: 12px; font-weight: 600;
@@ -365,6 +370,25 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
   img, video, svg { max-width: 100%; }
 }
 
+/* Cibles tactiles au doigt (≤ 900px, tablette comprise).
+   Règle retenue : 44px de haut au minimum pour tout ce qui se touche. Les
+   boutons l'avaient déjà par `.btn` ; ce qui manquait, ce sont les LIENS de
+   listes — pied de page, sommaire des pages légales, étiquettes d'article —
+   dont la hauteur ne tenait qu'à leur interligne, soit 34 à 36px. Un lien de
+   36px se rate une fois sur trois au pouce, et deux liens empilés se touchent
+   l'un pour l'autre. */
+@media (max-width: 900px) {
+  /* `!important` sur `display` : `.footer-link` porte aussi l'utilitaire
+     Tailwind `block`, et la couche `utilities` l'emporterait sur celle-ci
+     (cf. l'ordre des couches en tête de fichier). */
+  .footer-link, .footer-legal__link {
+    display: flex !important; align-items: center; min-height: 44px;
+  }
+  .legal-toc__link { min-height: 44px; align-items: center; }
+  .actu-tag { display: inline-flex; align-items: center; min-height: 40px; }
+  .comp-anchor { display: inline-flex; align-items: center; min-height: 42px; }
+}
+
 /* Petits écrans : tout en pleine largeur, marges minimales */
 @media (max-width: 480px) {
   :root { --pad-x: clamp(16px, 5vw, 22px); }
@@ -374,6 +398,9 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
      (sinon minmax(400px) force une piste plus large que l'écran → scroll horizontal) */
   [style*="minmax(2"], [style*="minmax(3"], [style*="minmax(4"] { grid-template-columns: 1fr !important; }
   .hero-status { gap: 6px 16px !important; font-size: 11px !important; }
+  /* Bandeau bas du pied de page : mention légale et liens se superposent au
+     lieu de se disputer une ligne de 320px. */
+  .footer-legal { gap: 0 20px; }
 }
 
 /* ===========================================================================
@@ -407,8 +434,15 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 
 /* Overlay (lightbox / drawer scrim) */
 .scrim { position: fixed; inset: 0; z-index: 200; background: rgba(22, 22, 22, 0.62); display: flex; animation: ovF 0.22s both; }
+/* Voile dont l'apparition ET la disparition sont pilotées par framer-motion
+   (tiroir de navigation). L'animation CSS ferait doublon à l'ouverture et
+   rejouerait le fondu entrant au moment de la sortie. */
+.scrim--managed { animation: none; }
 .scrim--center { align-items: center; justify-content: center; padding: max(clamp(16px, 4vw, 56px), var(--sa-t)) clamp(16px, 4vw, 56px) max(clamp(16px, 4vw, 56px), var(--sa-b)); }
-.scrim--right { justify-content: flex-end; }
+/* `overflow: hidden` : pendant sa sortie, le tiroir est traduit hors du cadre.
+   Sans découpe, ce dépassement peut ouvrir un défilement horizontal le temps de
+   l'animation sur certains navigateurs mobiles. */
+.scrim--right { justify-content: flex-end; overflow: hidden; }
 .drawer { width: min(900px, 100%); height: 100%; background: #fff; overflow: auto; overscroll-behavior: contain; padding-bottom: var(--sa-b); animation: revSlideR 0.34s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .modal { animation: ovS 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
@@ -945,8 +979,8 @@ a.footer-legal__link:hover { color: #fff; border-bottom-color: var(--ac-light); 
 .avis {
   position: fixed; z-index: 90;
   /* À droite : la colonne de gauche porte le sommaire collant des pages légales. */
-  right: max(20px, var(--sa-r)); bottom: calc(20px + var(--sa-b));
-  width: min(480px, calc(100vw - 40px));
+  right: max(24px, var(--sa-r)); bottom: calc(24px + var(--sa-b));
+  width: min(480px, calc(100vw - 48px));
   background: var(--c-black); color: var(--c-30);
   border-left: 3px solid var(--ac);
   padding: 26px 28px 24px;
@@ -967,11 +1001,28 @@ a.footer-legal__link:hover { color: #fff; border-bottom-color: var(--ac-light); 
 .avis__lien { font-size: 12.5px; color: var(--c-40); border-bottom: 1px solid var(--c-70); transition: color 0.2s, border-color 0.2s; }
 a.avis__lien:hover { color: #fff; border-bottom-color: var(--ac-light); }
 
-@media (max-width: 560px) {
-  .avis { left: 0; right: 0; bottom: 0; width: auto; border-left: 0; border-top: 3px solid var(--ac); padding: 22px 20px calc(20px + var(--sa-b)); }
-  .avis__titre { font-size: 19px; }
+/* Sous 900px, l'encart cesse d'être une carte posée dans un coin : collé à
+   droite d'un écran étroit, il déséquilibrait la page et rognait la marge de
+   lecture. Il devient un bandeau de bas d'écran, pleine largeur, dont la
+   hauteur est bornée pour ne jamais recouvrir le contenu — le corps de l'avis
+   défile à l'intérieur si l'écran est très court. */
+@media (max-width: 900px) {
+  .avis {
+    left: 0; right: 0; bottom: 0; width: auto;
+    border-left: 0; border-top: 3px solid var(--ac);
+    padding: 22px max(20px, var(--sa-l)) calc(20px + var(--sa-b)) max(20px, var(--sa-r));
+    max-height: min(76dvh, 620px); overflow-y: auto; overscroll-behavior: contain;
+    box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.3);
+  }
+  .avis__titre { font-size: 20px; }
   .avis__actions { gap: 12px 16px; }
-  .avis__btn { width: 100%; justify-content: center; }
+}
+@media (max-width: 560px) {
+  .avis__titre { font-size: 19px; }
+  /* Le bouton passe pleine largeur : c'est l'action principale, elle doit être
+     atteignable au pouce sans viser. */
+  .avis__btn { width: 100%; justify-content: center; min-height: 48px; }
+  .avis__liens { width: 100%; gap: 14px 18px; }
 }
 
 
@@ -1215,6 +1266,208 @@ a.actu-nav__lien:hover { background: var(--c-10); }
   .actu-fil__cat { grid-area: cat; justify-self: start; }
   .actu-fil__titre { grid-area: titre; font-size: 15.5px; }
   .actu-fil__puce { top: 17px; }
+}
+
+
+/* ===========================================================================
+   ÉVÉNEMENTS
+
+   La fiche d'un événement RÉUTILISE la mise en page de l'article — bandeau
+   duotone, colonne de lecture étroite, prose issue de la console. Ces classes
+   (`.actu-hero`, `.actu-corps`, `.actu-prose`, `.actu-nav`) ne sont donc pas
+   propres aux actualités : elles forment la page de contenu du site, et les
+   redéclarer sous un préfixe `evt-` ferait diverger deux gabarits qui doivent
+   rester identiques. Ce qui suit ne couvre que ce qu'un événement a en propre :
+   le calendrier, l'encadré pratique, et une carte qui MÈNE quelque part.
+=========================================================================== */
+
+/* --- Cartes ----------------------------------------------------------------
+   Le titre porte un lien ÉTIRÉ (`::after` couvrant la carte) plutôt qu'un
+   `<Link>` enveloppant l'ensemble : le bouton d'inscription est lui-même un
+   lien, et deux liens imbriqués ne sont pas du HTML valide. La zone cliquable
+   reste la carte entière, l'inscription s'en détache en repassant au-dessus. */
+.evt-card { position: relative; }
+.evt-card .duo > img { transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+.evt-card:hover .duo > img { transform: scale(1.045); }
+.evt-card__lien { color: inherit; transition: color 0.2s; }
+.evt-card__lien::after { content: ""; position: absolute; inset: 0; z-index: 4; }
+.evt-card:hover .evt-card__lien { color: var(--ac); }
+.evt-card__lien:focus-visible { outline: 2px solid var(--ac); outline-offset: 3px; }
+/* Au-dessus du lien étiré : ce qui doit rester cliquable pour son propre compte. */
+.evt-card__action { position: relative; z-index: 5; }
+.evt-card__pied {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-20);
+}
+
+/* Pastille d'état temporel, posée sur le visuel face à la catégorie. */
+.evt-etat {
+  font-size: 10.5px; padding: 4px 9px; text-transform: uppercase; letter-spacing: 0.04em;
+  border: 1px solid currentColor;
+}
+.evt-etat--encours { color: #fff; background: var(--green); border-color: transparent; }
+.evt-etat--passe { color: rgba(255, 255, 255, 0.82); }
+
+/* --- Sections du calendrier ------------------------------------------------ */
+.evt-section { margin-top: clamp(44px, 5.5vw, 76px); }
+.evt-section:first-of-type { margin-top: 0; }
+.evt-section__intro { max-width: 62ch; margin: 14px 0 30px; font-size: 15px; line-height: 1.65; color: var(--c-70); }
+.evt-vide { padding: 30px 0 8px; max-width: 62ch; font-size: 16px; line-height: 1.65; color: var(--c-70); }
+
+/* --- Encadré pratique de la fiche ------------------------------------------
+   Une liste de définitions, et non un tableau : ce sont des paires
+   intitulé/valeur, ce que `<dl>` décrit exactement pour un lecteur d'écran. */
+.evt-pratique { margin: 34px 0 6px; border: 1px solid var(--c-20); background: var(--c-10); padding: clamp(20px, 2.6vw, 28px); }
+.evt-pratique__titre { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-50); margin-bottom: 18px; }
+.evt-pratique__liste { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px 28px; margin: 0; }
+.evt-pratique dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-50); margin-bottom: 6px; }
+.evt-pratique dd { margin: 0; font-size: 15px; line-height: 1.55; color: var(--c-80); }
+.evt-pratique dd strong { font-weight: 600; color: var(--c-black); }
+.evt-pratique__lien { color: var(--ac); border-bottom: 1px solid var(--ac-line); }
+.evt-pratique__lien:hover { border-bottom-color: var(--ac); }
+
+/* --- Appels à l'action de la fiche ----------------------------------------- */
+.evt-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+
+/* Avis d'état — terminé, en cours. Même forme que `.actu-avis`, autre propos. */
+.evt-avis {
+  margin-bottom: 26px; padding: 14px 18px; border-left: 3px solid var(--c-30);
+  background: var(--c-10); font-size: 14.5px; line-height: 1.6; color: var(--c-70);
+}
+.evt-avis--encours { border-left-color: var(--green); }
+
+@media (max-width: 760px) {
+  .evt-pratique__liste { grid-template-columns: 1fr; gap: 18px; }
+  /* Cible de touche : le bouton d'inscription passe sous la jauge plutôt que
+     d'être comprimé à côté d'elle. */
+  .evt-card__pied { flex-wrap: wrap; row-gap: 12px; }
+  .evt-card__action { min-height: 40px; display: inline-flex; align-items: center; }
+}
+
+/* ===========================================================================
+   RAPPORTS & ANALYSES
+
+   Une carte de document n'est pas une carte d'article : elle ne mène nulle
+   part. Elle porte deux gestes de valeur égale — consulter la fiche, prendre
+   le fichier — et ce sont deux boutons, non un lien étiré. C'est aussi pourquoi
+   la page n'a pas d'adresse par document : le détail est un panneau, ouvert
+   sur place et adressable par `?doc=` (cf. components/docs/RessourcesListe.tsx).
+
+   La pastille de format tient lieu de vignette : un rapport n'a pas d'image,
+   et en inventer une (icône générique, première page rasterisée) coûterait un
+   chargement pour ne rien apprendre. Trois lettres disent ce qu'on télécharge.
+=========================================================================== */
+
+.doc-filtres { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+.doc-filtres__label {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--c-50); margin-right: 4px;
+}
+
+.doc-compte {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 24px 0 18px; padding-bottom: 14px; border-bottom: 1px solid var(--c-20);
+  font-size: 12.5px; color: var(--c-50);
+}
+
+/* --- Grille ---------------------------------------------------------------- */
+.doc-grille {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 1px; background: var(--c-20); border: 1px solid var(--c-20);
+  margin: 0; padding: 0; list-style: none;
+}
+.doc-card {
+  display: flex; flex-direction: column; gap: 12px;
+  background: #fff; padding: 24px clamp(18px, 2.2vw, 26px);
+  border-top: 3px solid var(--ac);
+}
+.doc-card__top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.doc-card__ext {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; width: 44px; height: 44px;
+  background: var(--ac-pale); color: var(--ac);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+}
+.doc-card__kicker {
+  flex: 1; min-width: 0;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--c-50);
+}
+.doc-card__une {
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 8px; background: var(--ac); color: #fff;
+}
+.doc-card__titre { font-size: 17px; font-weight: 600; line-height: 1.35; margin: 0; }
+.doc-card__ref {
+  display: block; font-size: 11px; letter-spacing: 0.06em;
+  color: var(--ac); margin-bottom: 5px;
+}
+.doc-card__desc {
+  flex: 1; margin: 0; font-size: 14px; line-height: 1.6; color: var(--c-70);
+  /* Trois lignes au plus : les cartes gardent une hauteur comparable, et la
+     description complète reste lisible dans le panneau de détail. */
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+}
+.doc-card__meta { font-size: 11.5px; color: var(--c-50); }
+.doc-card__auteur { font-size: 13px; color: var(--c-70); }
+.doc-card__pied {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--c-20);
+}
+
+.doc-mention {
+  margin-top: 26px; padding: 18px 22px; border-left: 3px solid var(--ac);
+  background: var(--c-10); font-size: 13px; line-height: 1.65; color: var(--c-70);
+}
+
+/* --- Panneau de détail ------------------------------------------------------ */
+.doc-modal {
+  display: flex; flex-direction: column; width: min(860px, 100%); max-height: 100%;
+  background: #fff; border: 1px solid var(--c-80); overflow: hidden;
+}
+.doc-modal__head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  padding: 24px clamp(20px, 2.6vw, 28px); border-bottom: 1px solid var(--c-20);
+}
+.doc-modal__kicker {
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac);
+}
+.doc-modal__titre { font-size: clamp(19px, 2.4vw, 23px); font-weight: 600; line-height: 1.3; margin: 6px 0 0; }
+.doc-modal__fermer {
+  flex: 0 0 auto; width: 44px; height: 44px;
+  background: var(--c-10); border: 1px solid var(--c-20); color: var(--c-70); font-size: 16px;
+}
+.doc-modal__fermer:hover { border-color: var(--c-black); color: var(--c-black); }
+.doc-modal__corps { flex: 1; overflow-y: auto; padding: clamp(20px, 2.6vw, 28px); }
+.doc-modal__desc { margin: 0 0 22px; font-size: 15px; line-height: 1.65; color: var(--c-70); }
+.doc-modal__defs {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px 24px; margin: 0 0 26px;
+}
+.doc-modal__row dt {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--c-50); margin-bottom: 5px;
+}
+.doc-modal__row dd { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--c-80); }
+.doc-modal__apercu { display: flex; flex-direction: column; gap: 10px; }
+.doc-modal__cadre {
+  width: 100%; height: min(52vh, 460px);
+  border: 1px solid var(--c-20); background: var(--c-10);
+}
+.doc-modal__vide {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  padding: 44px 24px; border: 1px dashed var(--c-20); background: var(--c-10);
+}
+.doc-modal__note { margin: 0; font-size: 12px; line-height: 1.6; color: var(--c-50); text-align: center; }
+.doc-modal__pied {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px;
+  padding: 18px clamp(20px, 2.6vw, 28px); border-top: 1px solid var(--c-20); background: var(--c-10);
+}
+
+@media (max-width: 760px) {
+  .doc-grille { grid-template-columns: 1fr; }
+  .doc-modal__cadre { height: 44vh; }
+  .doc-card__pied .btn { flex: 1; justify-content: center; }
 }
 
 } /* fin @layer components */

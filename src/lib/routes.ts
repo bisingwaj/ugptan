@@ -35,6 +35,18 @@ export const compRoute = (lang: Lang, code: string) =>
   `/${lang}${NAV.composantes}/${code.toLowerCase()}`;
 
 /**
+ * Fiche d'un événement.
+ *
+ * Ici et non dans un composant, contrairement à `cheminArticle` : la grille
+ * d'événements est un composant CLIENT (elle porte la demande de
+ * participation), et une fonction exportée d'un module `"use client"` ne peut
+ * pas être appelée depuis un composant serveur. Ce module, lui, n'a pas de
+ * frontière.
+ */
+export const evenementRoute = (lang: Lang, slug: string) =>
+  `/${lang}${NAV.evenements}/${slug}`;
+
+/**
  * Groupe de navigation : une entrée d'en-tête qui ouvre un sous-menu.
  * `labelKey` réutilise le libellé de la page mère (t.nav) ; les enfants
  * portent, si besoin, un libellé abrégé propre au sous-menu (t.navSub).

@@ -16,7 +16,14 @@ const initialState: LoginState = { error: null };
  * se réparent depuis le module « Utilisateurs », par un administrateur. C'est
  * l'exigence, pas un manque.
  */
-export function AdminLoginForm({ next }: { next?: string | null }) {
+export function AdminLoginForm({
+  next,
+  notice,
+}: {
+  next?: string | null;
+  /** Message de confirmation, ex. retour de la définition du mot de passe. */
+  notice?: string | null;
+}) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
   const t = ADMIN.login;
 
@@ -54,6 +61,13 @@ export function AdminLoginForm({ next }: { next?: string | null }) {
         <div style={{ width: "100%", maxWidth: 420, margin: "0 auto", animation: "revFade .3s both" }}>
           <h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(24px,2.6vw,32px)", letterSpacing: "-0.02em" }}>{t.title}</h1>
           <p style={{ margin: "10px 0 26px", fontSize: 14, color: "var(--c-60)" }}>{t.lead}</p>
+
+          {/* L'avis s'efface dès la première tentative : « mot de passe
+              enregistré » ou « session expirée » n'ont plus rien à dire une fois
+              que la personne a soumis le formulaire et reçu un vrai refus. */}
+          {notice && !state.error && (
+            <div className="adm-ok" role="status" style={{ marginBottom: 18 }}>{notice}</div>
+          )}
 
           {state.error && (
             <div className="auth-error" role="alert" aria-live="polite">{state.error}</div>

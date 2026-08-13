@@ -7,7 +7,8 @@ import {
   equipe, profils, question,
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
-import { humainPoints, galleryProvinces, partners, events } from "@/content/carbon";
+import { prochainsEvenements } from "@/lib/events/query";
+import { galleryProvinces, partners } from "@/content/carbon";
 import { media } from "@/content/media";
 import { NAV, route, compRoute } from "@/lib/routes";
 import { compVar } from "@/lib/comp";
@@ -17,23 +18,28 @@ import { Counter } from "@/components/ui/Counter";
 import { Photo } from "@/components/ui/Photo";
 import { HeroVideo } from "@/components/home/HeroVideo";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
-import { Histoires } from "@/components/home/Histoires";
+import { SectionsImpact } from "@/components/impact/SectionsImpact";
 import { EventsGrid } from "@/components/events/EventsGrid";
 import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { cheminArticle } from "@/components/actus/ActuCard";
 
-/** Cache aligné sur la page « Actualités » : l'accueil affiche les derniers
- *  communiqués, invalidés par les écritures de la console (cf. lib/actus/cache.ts). */
+/** Cache aligné sur les pages « Actualités » et « Événements » : l'accueil
+ *  affiche les derniers communiqués et les prochaines rencontres, invalidés par
+ *  les écritures de la console (cf. lib/actus/cache.ts, lib/events/cache.ts). */
 export const revalidate = 120;
 
 export default async function Home(props: { params: Promise<{ lang: string }> }) {
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
-  const upcoming = events.filter((e) => e.statut === "avenir").slice(0, 3);
-  const actualites = await derniersArticles(lang, 4);
+  // Deux lectures indépendantes, menées de front : aucune ne conditionne
+  // l'autre, et les enchaîner ajouterait un aller-retour à la base pour rien.
+  const [actualites, upcoming] = await Promise.all([
+    derniersArticles(lang, 4),
+    prochainsEvenements(lang, 3),
+  ]);
 
   return (
     <div>
@@ -171,28 +177,11 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== IMPACT HUMAIN ===== */}
-      <section className="section section--grey">
-        <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 48 }}>
-            <div style={{ maxWidth: 760 }}>
-              <Kicker>{t.home.humainLabel}</Kicker>
-              <h2 className="h2" style={{ marginBottom: 18 }}>{t.home.humainTitle}</h2>
-              <p className="lead" style={{ margin: 0 }}>{t.home.humainLead}</p>
-            </div>
-            <Link href={route(lang, NAV.projet)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.cta.discover} <span className="arrow">→</span></Link>
-          </Reveal>
-          <RevealGroup className="grid-4 celled--top" gap={0.05} style={{ background: "var(--c-black)", borderColor: "var(--c-black)" }}>
-            {humainPoints.map((h, i) => (
-              <RevealItem key={i} className="cell" style={{ padding: "32px 28px", display: "flex", flexDirection: "column", minHeight: 200 }}>
-                <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,52px)" }}><span className="stat__approx">{t.lbl.approx}</span>{h.big}</div>
-                <div className="mono" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ac)", marginTop: 10 }}>{pick(h.u, lang)}</div>
-                <p style={{ margin: "auto 0 0", paddingTop: 20, fontSize: 14.5, lineHeight: 1.55, color: "var(--c-70)" }}>{pick(h.t, lang)}</p>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+      {/* ===== IMPACT HUMAIN =====
+          Bloc administré depuis la console (module « Histoires & impact »).
+          Le dessin — grille à filets, grands chiffres, unité en accent — vit
+          dans components/impact/blocs/BlocStats.tsx. */}
+      <SectionsImpact emplacement="ACCUEIL_IMPACT" lang={lang} />
 
       {/* ===== COUVERTURE / CARTE ===== */}
       <section className="section">
@@ -292,27 +281,28 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== HISTOIRES (teaser) ===== */}
-      <section className="section section--sm">
-        <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 44 }}>
-            <div style={{ maxWidth: 680 }}><Kicker>{t.home.storiesLabel}</Kicker><h2 className="h2" style={{ marginBottom: 14 }}>{t.home.storiesTitle}</h2><p className="lead" style={{ margin: 0 }}>{t.home.storiesLead}</p></div>
-            <Link href={route(lang, NAV.resultats)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.home.storiesTeaserCta} →</Link>
-          </Reveal>
-          <Histoires lang={lang} />
-        </div>
-      </section>
+      {/* ===== HISTOIRES (teaser) =====
+          Même section administrée que la page « Résultats » : elle en REPREND
+          les entrées plutôt que d'en tenir une seconde copie, de sorte qu'une
+          citation corrigée le soit aux deux endroits. */}
+      <SectionsImpact emplacement="ACCUEIL_HISTOIRES" lang={lang} />
 
-      {/* ===== ÉVÉNEMENTS (teaser) ===== */}
-      <section className="section section--sm section--grey">
-        <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 36 }}>
-            <div style={{ maxWidth: 620 }}><Kicker>{t.home.evtLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 12 }}>{t.home.evtTitle}</h2><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.evtLead}</p></div>
-            <Link href={route(lang, NAV.evenements)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.home.evtUpcoming} →</Link>
-          </Reveal>
-          <EventsGrid lang={lang} events={upcoming} />
-        </div>
-      </section>
+      {/* ===== ÉVÉNEMENTS (teaser) =====
+          Masqué quand aucune date n'est arrêtée : un bloc « échanger,
+          participer, contribuer » suivi d'une grille vide inviterait à une
+          rencontre qui n'existe pas. La page « Événements » reste, elle,
+          accessible par la navigation, et y explique l'attente. */}
+      {upcoming.length > 0 && (
+        <section className="section section--sm section--grey">
+          <div className="section__inner">
+            <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 36 }}>
+              <div style={{ maxWidth: 620 }}><Kicker>{t.home.evtLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 12 }}>{t.home.evtTitle}</h2><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.evtLead}</p></div>
+              <Link href={route(lang, NAV.evenements)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.home.evtUpcoming} →</Link>
+            </Reveal>
+            <EventsGrid lang={lang} events={upcoming} />
+          </div>
+        </section>
+      )}
 
       {/* ===== GALERIE PAR PROVINCE ===== */}
       <section className="section section--sm section--grey">

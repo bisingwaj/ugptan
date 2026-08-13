@@ -30,21 +30,31 @@ const nextConfig = {
     "@prisma/adapter-neon",
     "@neondatabase/serverless",
     "ws",
+    // Ouvre lui-même ses sockets TLS et charge ses modules par chemin : bundlé,
+    // il perd la résolution de ses dépendances internes.
+    "nodemailer",
+    // Même raison : le SDK Cloudinary ouvre ses propres connexions et charge
+    // ses modules dynamiquement (cf. src/lib/cloudinary.ts).
+    "cloudinary",
   ],
   experimental: {
     serverActions: {
-      // Le CMS d'actualités téléverse ses visuels par server action, et la
-      // limite par défaut (1 Mo) refuserait une photographie ordinaire. Le
-      // plafond applicatif reste plus bas (5 Mo, cf. src/lib/medias.ts) : cette
-      // valeur laisse la marge du surcoût d'encodage multipart, elle ne
-      // l'autorise pas.
-      bodySizeLimit: "8mb",
+      // La console téléverse visuels et documents par server action, et la
+      // limite par défaut (1 Mo) refuserait une photographie ordinaire. Les
+      // plafonds applicatifs restent plus bas (5 Mo pour une image, 10 Mo pour
+      // un document, cf. src/lib/medias.ts) : cette valeur laisse la marge du
+      // surcoût d'encodage multipart, elle ne l'autorise pas.
+      bodySizeLimit: "14mb",
     },
   },
   images: {
     formats: ["image/avif", "image/webp"],
-    // Photographie de démonstration servie depuis Unsplash ; basculer vers le CDN en production.
     remotePatterns: [
+      // Stockage des fichiers téléversés depuis la console (cf. src/lib/cloudinary.ts).
+      // Doit rester aligné sur HOTES_OPTIMISABLES de src/lib/medias.ts, sans
+      // quoi l'optimiseur refuse une source qu'on lui annonce optimisable.
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      // Photographie de démonstration servie depuis Unsplash ; basculer vers le CDN en production.
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "cdn.ugptn.cd" },
     ],

@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/permissions";
 import { compterEnLigne } from "@/lib/actus/query";
+import { compterAVenir } from "@/lib/events/query";
 import { GRIEVANCE_STATUSES, isOpenStatus } from "@/lib/mgp/model";
 
 export const metadata: Metadata = { title: ADMIN.home.title };
@@ -45,10 +46,16 @@ export default async function TableauDeBordPage() {
   // tiret, pas le tableau de bord entier.
   const articles = can(user, "actualites") ? await compterEnLigne().catch(() => null) : null;
 
+  // Événements à venir — même règle que ci-dessus. Le compteur retient aussi
+  // les rencontres EN COURS : elles n'appartiennent plus au passé tant qu'elles
+  // ne sont pas finies (cf. lib/events/statut.ts).
+  const events = can(user, "evenements") ? await compterAVenir().catch(() => null) : null;
+
   /** Valeurs branchées, par clé d'indicateur. Les absentes restent à « — ». */
   const valeurs: Record<string, number> = {};
   if (openGrievances !== null) valeurs.plaintes = openGrievances;
   if (articles !== null) valeurs.articles = articles;
+  if (events !== null) valeurs.events = events;
 
   return (
     <>

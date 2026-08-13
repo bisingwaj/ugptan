@@ -1,39 +1,58 @@
 "use client";
 
 import { useActionState } from "react";
-import { deleteUserAction, setUserActiveAction, type UserFormState } from "@/actions/admin-users";
+import {
+  deleteUserAction,
+  resendInvitationAction,
+  setUserActiveAction,
+  type UserFormState,
+} from "@/actions/admin-users";
 import { ADMIN } from "@/content/admin";
 
 const initialState: UserFormState = { error: null, ok: null };
 
 /**
- * Actions d'un compte : désactivation réversible, puis suppression définitive.
+ * Actions d'un compte : renvoi de l'invitation, désactivation réversible, puis
+ * suppression définitive.
  *
- * Les deux gestes existent parce qu'ils ne disent pas la même chose. Désactiver
- * ferme l'accès en gardant la trace du compte ; supprimer efface la ligne. Les
- * refus (dernier administrateur, compte de la personne connectée) remontent du
- * serveur et s'affichent ici, plutôt que de faire tomber la page.
+ * Désactiver et supprimer existent tous deux parce qu'ils ne disent pas la même
+ * chose : l'un ferme l'accès en gardant la trace du compte, l'autre efface la
+ * ligne. Les refus (dernier administrateur, compte de la personne connectée)
+ * remontent du serveur et s'affichent ici, plutôt que de faire tomber la page.
  */
 export function UserActions({
   id,
   isActive,
   isSelf,
   showDelete = true,
+  showInvite = false,
 }: {
   id: string;
   isActive: boolean;
   isSelf: boolean;
   showDelete?: boolean;
+  /** Réservé à la fiche du compte : la liste serait encombrée par ce bouton. */
+  showInvite?: boolean;
 }) {
   const t = ADMIN.users;
   const [toggleState, toggleAction, togglePending] = useActionState(setUserActiveAction, initialState);
   const [deleteState, removeAction, deletePending] = useActionState(deleteUserAction, initialState);
+  const [inviteState, inviteAction, invitePending] = useActionState(resendInvitationAction, initialState);
 
-  const error = toggleState.error ?? deleteState.error;
+  const error = toggleState.error ?? deleteState.error ?? inviteState.error;
 
   return (
     <div className="adm-actions">
       <div className="adm-actions__row">
+        {showInvite && (
+          <form action={inviteAction}>
+            <input type="hidden" name="id" value={id} />
+            <button type="submit" className="btn btn--outline btn--sm" disabled={invitePending || !isActive}>
+              {invitePending ? t.resendingInvite : t.resendInvite}
+            </button>
+          </form>
+        )}
+
         <form action={toggleAction}>
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="active" value={isActive ? "0" : "1"} />
@@ -44,7 +63,7 @@ export function UserActions({
             // serveur le refuse, le bouton n'a donc pas à être proposé.
             disabled={togglePending || (isSelf && isActive)}
           >
-            {isActive ? t.deactivate : t.activate}
+            {togglePending ? (isActive ? t.deactivating : t.activating) : isActive ? t.deactivate : t.activate}
           </button>
         </form>
 
@@ -57,13 +76,14 @@ export function UserActions({
           >
             <input type="hidden" name="id" value={id} />
             <button type="submit" className="btn btn--danger btn--sm" disabled={deletePending}>
-              {t.remove}
+              {deletePending ? t.removing : t.remove}
             </button>
           </form>
         )}
       </div>
 
       {error && <p className="adm-actions__error" role="alert">{error}</p>}
+      {inviteState.ok && <p className="adm-actions__ok" role="status">{inviteState.ok}</p>}
     </div>
   );
 }

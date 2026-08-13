@@ -72,7 +72,10 @@
   .btn--danger { @apply border-red text-red bg-white; }
   .btn--danger:hover { @apply bg-red text-white; }
   .btn--sm { @apply px-[18px] py-[11px] text-[14px]; }
-  .btn:disabled { @apply cursor-not-allowed opacity-55; }
+  /* Attente d'un bouton : le LIBELLÉ bascule vers sa forme en cours, suivie de
+     points de suspension (« Enregistrement… »). Convention unique du projet,
+     sans anneau ni glyphe — le curseur et l'atténuation disent le reste. */
+  .btn:disabled { @apply cursor-progress opacity-55; }
 
   .field {
     @apply w-full text-[14px] text-c-black bg-white border border-c-20 px-[14px] py-[13px] outline-none;
@@ -341,7 +344,12 @@
 
   .adm-actions { @apply flex flex-col gap-2; }
   .adm-actions__row { @apply flex flex-wrap items-center gap-2; }
+  /* Export : le bouton et, le cas échéant, son message d'échec juste dessous. */
+  .adm-export { @apply inline-flex flex-col gap-1.5; }
+  .adm-export__error { @apply text-[12px] leading-[1.4] text-red max-w-[30ch]; }
+
   .adm-actions__error { @apply text-[12.5px] leading-[1.45] text-red max-w-[42ch]; }
+  .adm-actions__ok { @apply text-[12.5px] leading-[1.45] text-ok-fg max-w-[42ch]; }
 
   /* --- Responsive --------------------------------------------------------- */
   @media (max-width: 900px) {
@@ -565,16 +573,177 @@
   .adm-media-card { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 18px; padding: 16px; border: 1px solid var(--c-20); background: #fff; }
   .adm-media-card__visuel { aspect-ratio: 4 / 3; background: var(--c-10); overflow: hidden; }
   .adm-media-card__visuel img { width: 100%; height: 100%; object-fit: cover; }
+  /* Vignette d'un document : pas d'aperçu à afficher, on donne l'extension et
+     un lien. Occupe la même case que l'image pour que la liste reste alignée. */
+  .adm-media-card__doc {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; height: 100%; text-decoration: none; border: 1px dashed var(--c-20); background: var(--c-10);
+  }
+  .adm-media-card__doc:hover { border-color: var(--ac); background: var(--c-20); }
+  .adm-media-card__ext { font-size: 20px; letter-spacing: 0.04em; color: var(--c-black); }
+  .adm-media-card__doclabel { font-size: 11.5px; color: var(--c-60); }
   .adm-media-card__corps { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
   .adm-media-card__meta { font-size: 11.5px; color: var(--c-60); line-height: 1.5; word-break: break-word; }
   .adm-media-card__form { display: flex; flex-direction: column; gap: 12px; }
 
+  /* --- Module « Rapports & analyses » ----------------------------------------
+     Le fichier est la substance de la fiche : son panneau ouvre l'écran, en
+     pleine largeur, au-dessus du formulaire des métadonnées. */
+  .adm-doc__fichier { display: flex; flex-direction: column; gap: 14px; }
+  .adm-doc__fichier-tete { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  /* Pastille de format : elle tient lieu de vignette pour un fichier qui n'en a
+     pas, et donne d'un coup d'œil ce qu'on s'apprête à ouvrir. */
+  .adm-doc__ext {
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: 0 0 auto; width: 54px; height: 54px;
+    background: var(--ac-pale); color: var(--ac);
+    font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .adm-doc__nom { font-size: 14.5px; font-weight: 600; line-height: 1.4; word-break: break-word; }
+  .adm-doc__remplacer > summary {
+    cursor: pointer; font-size: 13px; color: var(--c-60);
+    padding: 10px 0; border-top: 1px solid var(--c-20);
+  }
+  .adm-doc__remplacer > summary:hover { color: var(--c-black); }
+  .adm-doc__remplacer[open] > summary { color: var(--c-black); font-weight: 600; }
+
+  /* Prévisualisation : la fiche à gauche, le fichier à droite. Les deux
+     ensemble, parce que la vérification avant publication porte sur les deux. */
+  .adm-doc__apercu { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .adm-doc__apercu-fiche { display: flex; flex-direction: column; gap: 12px; border-top: 3px solid var(--ac); padding-top: 16px; }
+  .adm-doc__apercu-kicker { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ac); }
+  .adm-doc__apercu-titre { font-size: 19px; font-weight: 600; line-height: 1.3; margin: 0; }
+  .adm-doc__apercu-desc { font-size: 14px; line-height: 1.6; color: var(--c-70); margin: 0; }
+  .adm-doc__apercu-fichier { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .adm-doc__apercu-cadre { width: 100%; height: min(58vh, 520px); border: 1px solid var(--c-20); background: var(--c-10); }
+  .adm-doc__apercu-vide {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    height: min(58vh, 520px); padding: 24px;
+    border: 1px dashed var(--c-20); background: var(--c-10);
+  }
+
+  @media (max-width: 900px) {
+    .adm-doc__apercu { grid-template-columns: 1fr; }
+    .adm-doc__apercu-cadre, .adm-doc__apercu-vide { height: 46vh; }
+  }
+
   /* --- Catégories & étiquettes ----------------------------------------------- */
+  /* --- Choix d'une couleur d'accent ---------------------------------------
+     Des carrés, pas des ronds : le design system du site ne connaît que l'angle
+     droit. La pastille active se marque par un liseré NOIR détaché, et non par
+     une teinte — sur un nuancier, toute marque colorée se confondrait avec les
+     couleurs qu'elle désigne. */
+  .adm-couleur { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .adm-couleur__pastille {
+    width: 26px; height: 26px; flex: 0 0 auto; padding: 0;
+    border: 1px solid rgba(22, 22, 22, 0.16); cursor: pointer;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .adm-couleur__pastille:hover { transform: translateY(-1px); }
+  .adm-couleur__pastille.is-on { box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--c-black); }
+  .adm-couleur__pastille:focus-visible { outline: 2px solid var(--ac); outline-offset: 3px; }
+
+  /* Pastille « autre » : l'input natif la remplit entièrement et reste
+     cliquable, mais invisible — c'est le carré qui se voit, pas le widget du
+     système. `opacity: 0` et non `display: none` : masqué, un input ne
+     s'ouvrirait plus au clic. */
+  .adm-couleur__libre {
+    position: relative; overflow: hidden;
+    background:
+      linear-gradient(135deg, #0f62fe 0 25%, #009d9a 25% 50%, #8a3ffc 50% 75%, #ff832b 75% 100%);
+  }
+  .adm-couleur__libre input {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer; border: 0; padding: 0;
+  }
+
+  .adm-couleur__hex { width: 116px; flex: 0 0 auto; text-transform: lowercase; }
+  .adm-couleur__vider { padding-inline: 12px; }
+
+  @media (max-width: 520px) {
+    /* La ligne de saisie passe sous le nuancier plutôt que de se réduire à
+       quelques caractères visibles. */
+    .adm-couleur__hex { width: 100%; flex: 1 1 100%; }
+  }
+
+  /* --- Demandes de participation -----------------------------------------
+     Une carte par demande, et non une ligne de tableau : chacune porte une
+     identité, un message libre, un état et une note. Comprimé en colonnes, le
+     message serait tronqué là où il est précisément ce qu'il faut lire. */
+  .adm-inscr__tete { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 20px; }
+  .adm-inscr__message {
+    margin: 12px 0 0; padding: 12px 14px; border-left: 2px solid var(--c-20);
+    background: var(--c-10); font-size: 13.5px; line-height: 1.6; color: var(--c-70);
+    white-space: pre-line;
+  }
+  .adm-inscr__form { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 14px; align-items: end; margin-top: 14px; }
+  .adm-inscr__form .adm-actions__row { grid-column: 1 / -1; }
+
+  /* Pastille d'état, posée à la suite du nom. */
+  .adm-inscr { margin-left: 8px; }
+  .adm-inscr--recue { @apply border-ac-line bg-ac-pale text-ac; }
+  .adm-inscr--confirmee { @apply border-ok-bd bg-ok-bg text-ok-fg; }
+  .adm-inscr--liste_attente { border-color: #ffd9a0; background: #fff2e0; color: #8a4b00; }
+  .adm-inscr--annulee { @apply border-c-30 bg-c-10 text-c-60; }
+
+  @media (max-width: 700px) {
+    .adm-inscr__form { grid-template-columns: 1fr; }
+  }
+
   .adm-taxo { display: flex; flex-direction: column; gap: 12px; }
   .adm-taxo__bloc { border: 1px solid var(--c-20); background: #fff; padding: 16px; }
   .adm-taxo__form { display: flex; flex-direction: column; gap: 14px; }
   .adm-taxo__grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
   .adm-taxo__ordre { max-width: 120px; }
+
+  /* --- Entrées d'une section « Histoires & impact » -------------------------
+     Une carte dépliable par entrée, et non une ligne de tableau : repliée, elle
+     doit tenir sur une ligne et dire l'essentiel — l'intitulé, l'état, les
+     langues qui manquent ; dépliée, elle porte deux onglets de langue et un
+     bloc de réglages, ce qu'aucune cellule de tableau ne peut contenir. */
+  .adm-items { margin-top: 30px; }
+  .adm-items__tete {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px 20px; margin-bottom: 14px;
+  }
+  .adm-items__liste { display: flex; flex-direction: column; gap: 12px; }
+
+  .adm-item { border: 1px solid var(--c-20); background: #fff; }
+  .adm-item__tete {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 10px 16px; padding: 12px 16px;
+  }
+  .adm-item__ouvrir {
+    display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 220px;
+    padding: 0; text-align: left; color: var(--c-black);
+  }
+  .adm-item__ouvrir:hover .adm-item__resume { color: var(--ac); }
+  .adm-item__rang { flex: 0 0 auto; font-size: 12px; color: var(--c-50); }
+  .adm-item__resume {
+    min-width: 0; font-size: 14px; line-height: 1.4;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .adm-item__etats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .adm-item__deplacer .btn { padding-inline: 10px; }
+
+  .adm-item__corps {
+    display: flex; flex-direction: column; gap: 18px;
+    padding: 4px clamp(12px, 2vw, 18px) clamp(16px, 2vw, 22px);
+    border-top: 1px solid var(--c-20);
+  }
+  .adm-item__corps[hidden] { display: none; }
+  .adm-item__langue {
+    display: flex; flex-direction: column; gap: 18px;
+    border: 1px solid var(--c-20); border-top: 0; background: #fff;
+    padding: clamp(14px, 2vw, 20px);
+  }
+  .adm-item__langue[hidden] { display: none; }
+  .adm-item__reglages {
+    display: flex; flex-direction: column; gap: 14px;
+    border: 1px solid var(--c-20); background: var(--c-10);
+    padding: clamp(14px, 2vw, 20px);
+  }
+  .adm-item__grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
 
   @media (max-width: 1100px) {
     .adm-edit { grid-template-columns: 1fr; }
