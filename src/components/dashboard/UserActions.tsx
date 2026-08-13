@@ -63,7 +63,7 @@ export function UserActions({
             // serveur le refuse, le bouton n'a donc pas à être proposé.
             disabled={togglePending || (isSelf && isActive)}
           >
-            {isActive ? t.deactivate : t.activate}
+            {togglePending ? (isActive ? t.deactivating : t.activating) : isActive ? t.deactivate : t.activate}
           </button>
         </form>
 
@@ -76,7 +76,7 @@ export function UserActions({
           >
             <input type="hidden" name="id" value={id} />
             <button type="submit" className="btn btn--danger btn--sm" disabled={deletePending}>
-              {t.remove}
+              {deletePending ? t.removing : t.remove}
             </button>
           </form>
         )}

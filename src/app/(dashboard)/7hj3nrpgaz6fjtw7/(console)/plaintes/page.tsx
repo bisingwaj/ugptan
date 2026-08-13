@@ -15,6 +15,7 @@ import {
   type GrievanceStatus,
 } from "@/lib/mgp/model";
 import { AnonymityBadge, DeadlineCell, StatusBadge } from "@/components/dashboard/GrievanceBadges";
+import { PendingLink } from "@/components/ui/PendingLink";
 
 export const metadata: Metadata = { title: ADMIN.grievances.title };
 
@@ -118,14 +119,14 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
         {FILTERS.map((item) => {
           const active = item.key === filter;
           return (
-            <Link
+            <PendingLink
               key={item.key}
               href={item.key === "tous" ? ADMIN_GRIEVANCES : `${ADMIN_GRIEVANCES}?f=${item.key}`}
               className={`adm-filter${active ? " is-active" : ""}`}
               aria-current={active ? "page" : undefined}
             >
               {item.label}
-            </Link>
+            </PendingLink>
           );
         })}
       </nav>
