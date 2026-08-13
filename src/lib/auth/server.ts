@@ -56,9 +56,18 @@ function createAuth() {
 
   return betterAuth({
     secret,
-    // Laissée à l'inférence depuis la requête en développement ; épinglée en
-    // production par BETTER_AUTH_URL, où l'origine doit être certaine.
+    // Épinglée par BETTER_AUTH_URL. Sans elle, l'origine est déduite de la
+    // requête — Better Auth le signale au démarrage, et les redirections
+    // deviennent hasardeuses derrière un proxy.
     baseURL: process.env.BETTER_AUTH_URL || undefined,
+    /* En développement seulement : le serveur ne tourne pas toujours sur le
+       port inscrit dans BETTER_AUTH_URL (3000 occupé, instance parallèle…), et
+       une origine qui ne correspond pas au pied près ferait refuser les appels
+       à /api/auth. En production, la seule origine de confiance est la baseURL. */
+    trustedOrigins:
+      process.env.NODE_ENV === "production"
+        ? undefined
+        : ["http://localhost:*", "http://127.0.0.1:*"],
     database: prismaAdapter(db(), { provider: "postgresql" }),
 
     emailAndPassword: {
