@@ -1268,4 +1268,80 @@ a.actu-nav__lien:hover { background: var(--c-10); }
   .actu-fil__puce { top: 17px; }
 }
 
+
+/* ===========================================================================
+   ÉVÉNEMENTS
+
+   La fiche d'un événement RÉUTILISE la mise en page de l'article — bandeau
+   duotone, colonne de lecture étroite, prose issue de la console. Ces classes
+   (`.actu-hero`, `.actu-corps`, `.actu-prose`, `.actu-nav`) ne sont donc pas
+   propres aux actualités : elles forment la page de contenu du site, et les
+   redéclarer sous un préfixe `evt-` ferait diverger deux gabarits qui doivent
+   rester identiques. Ce qui suit ne couvre que ce qu'un événement a en propre :
+   le calendrier, l'encadré pratique, et une carte qui MÈNE quelque part.
+=========================================================================== */
+
+/* --- Cartes ----------------------------------------------------------------
+   Le titre porte un lien ÉTIRÉ (`::after` couvrant la carte) plutôt qu'un
+   `<Link>` enveloppant l'ensemble : le bouton d'inscription est lui-même un
+   lien, et deux liens imbriqués ne sont pas du HTML valide. La zone cliquable
+   reste la carte entière, l'inscription s'en détache en repassant au-dessus. */
+.evt-card { position: relative; }
+.evt-card .duo > img { transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+.evt-card:hover .duo > img { transform: scale(1.045); }
+.evt-card__lien { color: inherit; transition: color 0.2s; }
+.evt-card__lien::after { content: ""; position: absolute; inset: 0; z-index: 4; }
+.evt-card:hover .evt-card__lien { color: var(--ac); }
+.evt-card__lien:focus-visible { outline: 2px solid var(--ac); outline-offset: 3px; }
+/* Au-dessus du lien étiré : ce qui doit rester cliquable pour son propre compte. */
+.evt-card__action { position: relative; z-index: 5; }
+.evt-card__pied {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-20);
+}
+
+/* Pastille d'état temporel, posée sur le visuel face à la catégorie. */
+.evt-etat {
+  font-size: 10.5px; padding: 4px 9px; text-transform: uppercase; letter-spacing: 0.04em;
+  border: 1px solid currentColor;
+}
+.evt-etat--encours { color: #fff; background: var(--green); border-color: transparent; }
+.evt-etat--passe { color: rgba(255, 255, 255, 0.82); }
+
+/* --- Sections du calendrier ------------------------------------------------ */
+.evt-section { margin-top: clamp(44px, 5.5vw, 76px); }
+.evt-section:first-of-type { margin-top: 0; }
+.evt-section__intro { max-width: 62ch; margin: 14px 0 30px; font-size: 15px; line-height: 1.65; color: var(--c-70); }
+.evt-vide { padding: 30px 0 8px; max-width: 62ch; font-size: 16px; line-height: 1.65; color: var(--c-70); }
+
+/* --- Encadré pratique de la fiche ------------------------------------------
+   Une liste de définitions, et non un tableau : ce sont des paires
+   intitulé/valeur, ce que `<dl>` décrit exactement pour un lecteur d'écran. */
+.evt-pratique { margin: 34px 0 6px; border: 1px solid var(--c-20); background: var(--c-10); padding: clamp(20px, 2.6vw, 28px); }
+.evt-pratique__titre { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-50); margin-bottom: 18px; }
+.evt-pratique__liste { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px 28px; margin: 0; }
+.evt-pratique dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-50); margin-bottom: 6px; }
+.evt-pratique dd { margin: 0; font-size: 15px; line-height: 1.55; color: var(--c-80); }
+.evt-pratique dd strong { font-weight: 600; color: var(--c-black); }
+.evt-pratique__lien { color: var(--ac); border-bottom: 1px solid var(--ac-line); }
+.evt-pratique__lien:hover { border-bottom-color: var(--ac); }
+
+/* --- Appels à l'action de la fiche ----------------------------------------- */
+.evt-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+
+/* Avis d'état — terminé, en cours. Même forme que `.actu-avis`, autre propos. */
+.evt-avis {
+  margin-bottom: 26px; padding: 14px 18px; border-left: 3px solid var(--c-30);
+  background: var(--c-10); font-size: 14.5px; line-height: 1.6; color: var(--c-70);
+}
+.evt-avis--encours { border-left-color: var(--green); }
+
+@media (max-width: 760px) {
+  .evt-pratique__liste { grid-template-columns: 1fr; gap: 18px; }
+  /* Cible de touche : le bouton d'inscription passe sous la jauge plutôt que
+     d'être comprimé à côté d'elle. */
+  .evt-card__pied { flex-wrap: wrap; row-gap: 12px; }
+  .evt-card__action { min-height: 40px; display: inline-flex; align-items: center; }
+}
+
 } /* fin @layer components */

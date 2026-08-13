@@ -62,6 +62,9 @@ export function AdminLoginForm({
           <h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(24px,2.6vw,32px)", letterSpacing: "-0.02em" }}>{t.title}</h1>
           <p style={{ margin: "10px 0 26px", fontSize: 14, color: "var(--c-60)" }}>{t.lead}</p>
 
+          {/* L'avis s'efface dès la première tentative : « mot de passe
+              enregistré » ou « session expirée » n'ont plus rien à dire une fois
+              que la personne a soumis le formulaire et reçu un vrai refus. */}
           {notice && !state.error && (
             <div className="adm-ok" role="status" style={{ marginBottom: 18 }}>{notice}</div>
           )}
