@@ -207,7 +207,7 @@ export function Header({ lang }: { lang: Lang }) {
                 target="_blank"
                 rel="noopener noreferrer external"
                 title={t.cta.loginHint}
-                className="nav-desktop items-center gap-2 border border-c-black px-[14px] py-2.5 text-[13.5px] font-semibold text-c-black"
+                className="nav-desktop items-center gap-2 border border-ac bg-ac px-[14px] py-2.5 text-[13.5px] font-semibold text-white transition-colors duration-200 hover:border-acd hover:bg-acd"
               >
                 {t.cta.login}
                 <span className="font-mono text-[11px] opacity-70">↗</span>

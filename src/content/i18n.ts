@@ -102,7 +102,7 @@ export function dict(lang: Lang) {
       /* Renvoie au portail des soumissionnaires, hébergé par un tiers
          (cf. lib/external.ts). Aucun lien du site public ne mène à la console
          d'administration de l'UGPTN. */
-      login: t("Connexion", "Sign in"),
+      login: t("Se connecter", "Sign in"),
       loginHint: t(
         "Espace des soumissionnaires — plateforme partenaire, ouverture dans un nouvel onglet",
         "Bidders' space — partner platform, opens in a new tab",
