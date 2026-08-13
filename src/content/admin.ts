@@ -349,7 +349,7 @@ export const ADMIN_ACTUS = {
   champNomEn: "Libellé anglais",
   champNomEnAide: "Laissé vide, le libellé français est repris.",
   champCouleur: "Couleur",
-  champCouleurAide: "Hexadécimal (#0f62fe). Vide : l'accent du site.",
+  champCouleurAide: "Sans couleur, la catégorie prend l'accent du site.",
   champPosition: "Ordre",
   ajouter: "Ajouter",
   colUsage: "Articles",
@@ -502,7 +502,7 @@ export const ADMIN_EVTS = {
   champCategorie: "Catégorie",
   gererCategories: "Gérer les catégories →",
   champCouleur: "Couleur d'accent",
-  champCouleurAide: "Hexadécimal (#0f62fe). Vide : celle de la catégorie, puis l'accent du site.",
+  champCouleurAide: "Sans couleur, l'événement prend celle de sa catégorie, puis l'accent du site.",
   champPosition: "Ordre",
   champComposantes: "Composantes rattachées",
   champComposantesAide: "L'événement remonte alors dans les blocs des pages de composante concernées.",
@@ -548,6 +548,29 @@ export const ADMIN_EVTS = {
   ajouter: "Ajouter",
   supprimerCategorieConfirm: "Supprimer cette catégorie ? Les événements concernés resteront en ligne, sans catégorie.",
 } as const;
+
+/**
+ * Accents proposés par le sélecteur de couleur de la console.
+ *
+ * Ce ne sont pas des couleurs « jolies » mais celles que le site emploie
+ * réellement : les cinq accents de composante (cf. `compColors` dans
+ * content/data.ts) et les trois teintes d'état du design system. Les proposer
+ * d'emblée évite le geste qui abîme une charte — ouvrir une roue chromatique et
+ * choisir un bleu qui n'est pas LE bleu.
+ *
+ * La saisie libre reste ouverte à côté : une catégorie peut légitimement sortir
+ * de la palette, mais ce sera un choix, pas un accident.
+ */
+export const PALETTE_ACCENT: { hex: string; nom: string }[] = [
+  { hex: "#0f62fe", nom: "Bleu (accent du site, C1)" },
+  { hex: "#009d9a", nom: "Turquoise (C2)" },
+  { hex: "#8a3ffc", nom: "Violet (C3)" },
+  { hex: "#ee5396", nom: "Rose (C4)" },
+  { hex: "#6f6f6f", nom: "Gris (C5)" },
+  { hex: "#198038", nom: "Vert" },
+  { hex: "#ff832b", nom: "Orange" },
+  { hex: "#da1e28", nom: "Rouge" },
+];
 
 /** Un module de la console. `key` est aussi la permission qui l'ouvre. */
 export type AdminNavItem = {
