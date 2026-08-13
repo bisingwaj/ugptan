@@ -317,6 +317,8 @@ export async function enregistrerFicheEvtAction(
     data: { ...lireFiche(formData), ...dates, status: statut },
   });
 
+  revalidatePath(`${EVTS_PATH}/${id}`);
+  revalidatePath(EVTS_PATH);
   revaliderEvenements();
   return { error: null, ok: "Réglages enregistrés." };
 }
@@ -436,6 +438,14 @@ export async function basculerPublicationEvtAction(
 
   await db().evenement.update({ where: { id }, data: { status: enLigne ? "DRAFT" : "PUBLISHED" } });
 
+  // ⚠️ La FICHE de la console est revalidée, pas seulement le site public.
+  // Le sélecteur « État » des réglages vit sur la même page que ce bouton : sans
+  // cette ligne, il ne reçoit jamais la nouvelle valeur et continue de renvoyer
+  // l'ancienne au premier enregistrement (cf. EvtReglagesChamps, qui se recale
+  // sur la prop). Les deux corrections vont ensemble — l'une donne la valeur
+  // fraîche, l'autre la prend en compte.
+  revalidatePath(`${EVTS_PATH}/${id}`);
+  revalidatePath(EVTS_PATH);
   revaliderEvenements();
   return { error: null, ok: enLigne ? "Événement dépublié." : "Événement publié." };
 }

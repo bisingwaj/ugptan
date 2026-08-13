@@ -44,6 +44,27 @@ export function EvtReglagesChamps({ evenement, referentiels, assets }: Props) {
   const [statut, setStatut] = useState<EvenementStatut>(evenement.status);
   const [mode, setMode] = useState<EvenementMode>(evenement.mode);
   const [allDay, setAllDay] = useState(evenement.allDay);
+
+  /**
+   * ⚠️ Le serveur fait foi sur le STATUT, parce qu'il n'appartient pas qu'à ce
+   * formulaire : le bouton « Publier » de l'en-tête l'écrit aussi, depuis la
+   * même page (cf. EvenementActions).
+   *
+   * `useState` ne se réinitialise pas quand la prop change. Sans ce recalage, la
+   * suite était : on publie depuis l'en-tête, la base passe à PUBLISHED, ce
+   * champ garde DRAFT en mémoire — et le premier enregistrement des réglages
+   * renvoyait DRAFT, faisant retomber l'événement en brouillon SANS que rien ne
+   * le signale. Mesuré : c'est exactement ce que vivait la rédaction.
+   *
+   * Recalage PENDANT le rendu, et non dans un `useEffect` : React ré-exécute
+   * aussitôt avec la bonne valeur, sans afficher l'état périmé le temps d'une
+   * frame. C'est le motif documenté pour un état dérivé d'une prop.
+   */
+  const [statutServeur, setStatutServeur] = useState<EvenementStatut>(evenement.status);
+  if (statutServeur !== evenement.status) {
+    setStatutServeur(evenement.status);
+    setStatut(evenement.status);
+  }
   const [couverture, setCouverture] = useState({
     mediaId: evenement.coverMediaId,
     key: evenement.coverKey,
