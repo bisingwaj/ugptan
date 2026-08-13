@@ -22,6 +22,17 @@ export const adminPath = (slug = "") => `${ADMIN_BASE}${slug}`;
  */
 export const ADMIN_LOGIN = adminPath("/signin");
 
+/**
+ * Deuxième page du sous-arbre ouverte sans session : celle où l'on définit son
+ * mot de passe depuis le lien reçu par e-mail. Elle ne peut pas exiger d'être
+ * connecté — elle sert justement à obtenir le moyen de l'être. L'autorisation
+ * vient du jeton porté par l'URL, vérifié par Better Auth.
+ *
+ * Déclarée ici, et non dans `lib/auth/server.ts`, pour que `proxy.ts` puisse la
+ * lire sans tirer Prisma ni Better Auth dans la middleware.
+ */
+export const ADMIN_SET_PASSWORD = adminPath("/set-password");
+
 /** Accueil après connexion. */
 export const ADMIN_HOME = adminPath("/tableau-de-bord");
 

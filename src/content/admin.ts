@@ -31,6 +31,26 @@ export const ADMIN = {
     biddersLink: "Accéder à votre espace",
   },
 
+  setPassword: {
+    kicker: "Accès à la console",
+    heroWelcome: "Choisissez votre mot de passe, personne d'autre ne le connaîtra.",
+    heroReset: "Définissez un nouveau mot de passe.",
+    heroLead:
+      "Aucun mot de passe n'a été transmis par e-mail : celui que vous saisissez ici n'est connu que de vous. Il est enregistré sous forme d'empreinte, jamais en clair.",
+    title: "Votre mot de passe",
+    lead: "Huit caractères au minimum. Un gestionnaire de mots de passe reste la meilleure façon d'en retenir un long.",
+    fieldPassword: "Nouveau mot de passe",
+    fieldConfirmation: "Confirmation",
+    hint: "Au moins 8 caractères.",
+    submit: "Enregistrer et continuer",
+    submitting: "Enregistrement…",
+    missingToken:
+      "Ce lien est incomplet. Ouvrez-le directement depuis l'e-mail reçu, sans le recopier partiellement.",
+    footnote:
+      "Ce lien ne fonctionne qu'une fois. Une fois votre mot de passe défini, vous serez conduit à l'écran de connexion.",
+    doneNotice: "Mot de passe enregistré. Connectez-vous avec votre adresse et le mot de passe que vous venez de choisir.",
+  },
+
   shell: {
     signedInAs: "Connecté",
     logout: "Déconnexion",
@@ -83,6 +103,8 @@ export const ADMIN = {
     saving: "Enregistrement…",
     deactivate: "Désactiver",
     activate: "Réactiver",
+    resendInvite: "Renvoyer l'invitation",
+    resendingInvite: "Envoi…",
     remove: "Supprimer",
     removeConfirm: "Supprimer définitivement ce compte ? Cette action est irréversible.",
     back: "Retour à la liste",

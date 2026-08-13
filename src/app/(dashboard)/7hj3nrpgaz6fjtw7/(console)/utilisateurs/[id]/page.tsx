@@ -65,7 +65,7 @@ export default async function UtilisateurPage({ params }: { params: Promise<{ id
 
       <div className="adm__section-title">Accès du compte</div>
       <div className="adm-panel">
-        <UserActions id={user.id} isActive={isActive} isSelf={isSelf} />
+        <UserActions id={user.id} isActive={isActive} isSelf={isSelf} showInvite />
       </div>
     </>
   );
