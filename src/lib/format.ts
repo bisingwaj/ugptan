@@ -44,6 +44,50 @@ const dateTimeFr = new Intl.DateTimeFormat("fr-FR", {
 export const formatDateTime = (date: Date | null | undefined): string | null =>
   date ? dateTimeFr.format(date) : null;
 
+/**
+ * Date d'un article, dans la langue de lecture.
+ *
+ * Même fuseau que ci-dessus : un communiqué publié à 23 h à Kinshasa doit
+ * porter la date de Kinshasa, pas celle du centre de données qui a rendu la
+ * page. `en-GB` et non `en-US` : le site s'adresse d'abord à des partenaires
+ * institutionnels, qui lisent « 23 June 2025 » et non « June 23, 2025 ».
+ */
+const dateArticle: Record<"fr" | "en", Intl.DateTimeFormat> = {
+  fr: new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Kinshasa" }),
+  en: new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Kinshasa" }),
+};
+
+export const formatArticleDate = (date: Date, lang: "fr" | "en"): string =>
+  dateArticle[lang].format(date);
+
+/**
+ * Décalage de Kinshasa (UTC+1), constant : la RDC n'applique pas d'heure d'été.
+ * Le figer permet de convertir dans les deux sens sans bibliothèque de fuseaux.
+ */
+const KINSHASA_OFFSET = "+01:00";
+
+/**
+ * Date d'un `<input type="datetime-local">` (« 2025-06-23T14:05 »), exprimée à
+ * l'heure de Kinshasa. Le format « sv-SE » est retenu pour une seule raison :
+ * c'est le seul que l'ICU rende déjà en « AAAA-MM-JJ HH:MM ».
+ */
+export function toDateTimeLocal(date: Date | null | undefined): string {
+  if (!date) return "";
+  const parts = new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+    timeZone: "Africa/Kinshasa",
+  }).format(date);
+  return parts.replace(" ", "T").slice(0, 16);
+}
+
+/** Lecture inverse : la saisie du formulaire est de l'heure de Kinshasa. */
+export function fromDateTimeLocal(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) return null;
+  const date = new Date(`${value.slice(0, 16)}:00${KINSHASA_OFFSET}`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 export type Countdown = {
   expired: boolean;
   urgent: boolean;

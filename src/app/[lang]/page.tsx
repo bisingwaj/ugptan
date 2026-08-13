@@ -6,7 +6,7 @@ import {
   meta, reperes, composantes, odp, intermediaires, gouvernance,
   equipe, profils, question,
 } from "@/content/data";
-import { actualites } from "@/content/actualites";
+import { derniersArticles } from "@/lib/actus/query";
 import { humainPoints, galleryProvinces, partners, events } from "@/content/carbon";
 import { media } from "@/content/media";
 import { NAV, route, compRoute } from "@/lib/routes";
@@ -22,12 +22,18 @@ import { EventsGrid } from "@/components/events/EventsGrid";
 import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { cheminArticle } from "@/components/actus/ActuCard";
+
+/** Cache aligné sur la page « Actualités » : l'accueil affiche les derniers
+ *  communiqués, invalidés par les écritures de la console (cf. lib/actus/cache.ts). */
+export const revalidate = 120;
 
 export default async function Home(props: { params: Promise<{ lang: string }> }) {
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
   const upcoming = events.filter((e) => e.statut === "avenir").slice(0, 3);
+  const actualites = await derniersArticles(lang, 4);
 
   return (
     <div>
@@ -273,11 +279,11 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           <Reveal><Kicker n="07">{t.sec.actus}</Kicker></Reveal>
           <RevealGroup gap={0.045} style={{ borderTop: "1px solid var(--c-black)" }}>
             {actualites.map((a) => (
-              <RevealItem key={a.dateISO}>
-                <Link href={route(lang, NAV.actualites)} className="actu-row" style={{ display: "grid", gridTemplateColumns: "130px 150px 1fr 40px", gap: "clamp(12px,2vw,28px)", padding: "24px 0", borderBottom: "1px solid var(--c-20)", alignItems: "center" }}>
-                  <span className="mono" style={{ fontSize: 13, color: "var(--c-60)" }}>{a.date}</span>
-                  <span className="mono" style={{ fontSize: 11, color: "var(--ac)", border: "1px solid var(--ac)", padding: "4px 9px", justifySelf: "start", textTransform: "uppercase", letterSpacing: "0.05em" }}>{pick(a.cat, lang)}</span>
-                  <span style={{ fontSize: "clamp(15px,1.7vw,19px)", lineHeight: 1.4 }}>{pick(a.title, lang)}</span>
+              <RevealItem key={a.id}>
+                <Link href={cheminArticle(lang, a.slug)} className="actu-row" style={{ display: "grid", gridTemplateColumns: "130px 150px 1fr 40px", gap: "clamp(12px,2vw,28px)", padding: "24px 0", borderBottom: "1px solid var(--c-20)", alignItems: "center" }}>
+                  <span className="mono" style={{ fontSize: 13, color: "var(--c-60)" }}>{a.dateLabel}</span>
+                  <span className="mono" style={{ fontSize: 11, color: a.categorie?.color ?? "var(--ac)", border: `1px solid ${a.categorie?.color ?? "var(--ac)"}`, padding: "4px 9px", justifySelf: "start", textTransform: "uppercase", letterSpacing: "0.05em" }}>{a.categorie?.nom ?? t.sec.actus}</span>
+                  <span style={{ fontSize: "clamp(15px,1.7vw,19px)", lineHeight: 1.4 }}>{a.title}</span>
                   <span className="mono" style={{ color: "var(--ac)", textAlign: "right" }}>→</span>
                 </Link>
               </RevealItem>

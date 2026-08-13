@@ -974,4 +974,195 @@ a.avis__lien:hover { color: #fff; border-bottom-color: var(--ac-light); }
   .avis__btn { width: 100%; justify-content: center; }
 }
 
+
+/* ===========================================================================
+   ACTUALITÉS — cartes, filtres, page d'article
+
+   Le corps d'un article est produit depuis la console : `.actu-prose` doit donc
+   styliser TOUT ce que l'assainisseur laisse passer (cf. lib/html/sanitize.ts),
+   et rien de plus. Une balise admise sans règle ici s'afficherait avec le style
+   par défaut du navigateur, hors du design system.
+=========================================================================== */
+
+/* --- Cartes ---------------------------------------------------------------- */
+.actu-card { text-align: left; }
+.actu-card .duo > img { transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+a.actu-card:hover .duo > img { transform: scale(1.045); }
+a.actu-card:hover h3 { color: var(--ac); }
+.actu-card h3 { transition: color 0.2s; }
+
+/* --- Barre de filtres et recherche ---------------------------------------- */
+.actu-barre { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.actu-recherche { display: flex; gap: 8px; margin-bottom: 18px; }
+.actu-recherche__champ {
+  border: 1px solid var(--c-20); background: #fff; color: var(--c-black);
+  padding: 9px 14px; font-size: 14px; font-family: inherit; min-width: min(280px, 60vw);
+}
+.actu-recherche__champ:focus { outline: 2px solid var(--ac); outline-offset: -1px; }
+
+.actu-filtre-actif { padding: 4px 0 18px; font-size: 14px; color: var(--c-70); }
+.actu-vide { padding: 40px 0 12px; max-width: 62ch; font-size: 16px; line-height: 1.65; color: var(--c-70); }
+.actu-avis__lien { color: var(--ac); font-weight: 600; border-bottom: 1px solid currentColor; }
+
+.actu-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 18px; margin-top: 40px; }
+.actu-pagination__etat { font-size: 12.5px; color: var(--c-60); }
+
+/* --- Bandeau de prévisualisation ------------------------------------------ */
+.actu-apercu {
+  background: var(--c-black); color: #fff; border-bottom: 3px solid var(--ac);
+  padding: 13px max(var(--pad-x), var(--sa-l)); font-size: 13.5px; line-height: 1.5;
+}
+
+/* --- Héros de l'article ---------------------------------------------------- */
+.actu-hero { min-height: clamp(320px, 44vw, 540px); display: flex; flex-direction: column; justify-content: flex-end; }
+.actu-hero__inner {
+  width: 100%; max-width: var(--maxw); margin: 0 auto;
+  padding: clamp(44px, 6vw, 84px) max(var(--pad-x), var(--sa-r)) clamp(28px, 3.4vw, 44px) max(var(--pad-x), var(--sa-l));
+}
+.actu-hero__crumb { font-size: 12px; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.72); margin-bottom: 20px; }
+.actu-hero__crumb-lien { border-bottom: 1px solid rgba(255, 255, 255, 0.35); }
+a.actu-hero__crumb-lien:hover { color: #fff; border-bottom-color: #fff; }
+.actu-hero__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+.actu-hero__cat { font-size: 10.5px; color: #fff; padding: 5px 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+.actu-hero__date { font-size: 12px; color: rgba(255, 255, 255, 0.85); }
+.actu-hero__titre {
+  margin: 0; max-width: 22ch; color: #fff; font-weight: 600;
+  font-size: clamp(26px, 4vw, 52px); line-height: 1.1; letter-spacing: -0.025em;
+}
+.actu-hero__auteur { margin: 18px 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.86); }
+.actu-hero__role { color: rgba(255, 255, 255, 0.6); }
+
+/* --- Colonne de lecture ----------------------------------------------------- */
+.actu-corps {
+  padding: clamp(38px, 5vw, 66px) max(var(--pad-x), var(--sa-r)) clamp(56px, 7vw, 92px) max(var(--pad-x), var(--sa-l));
+  border-bottom: 1px solid var(--c-20);
+}
+/* Colonne centrée, à la différence du reste du site : sur un texte long, la
+   longueur de ligne prime sur l'alignement au conteneur général. */
+.actu-corps__inner { max-width: 760px; margin: 0 auto; }
+
+.actu-avis {
+  border-left: 3px solid var(--ac); background: var(--ac-pale);
+  padding: 14px 18px; margin-bottom: 28px; font-size: 14px; line-height: 1.6; color: var(--c-80);
+}
+.actu-chapeau {
+  margin: 0 0 32px; padding-bottom: 28px; border-bottom: 1px solid var(--c-20);
+  font-size: clamp(17px, 1.8vw, 20px); line-height: 1.62; color: var(--c-80);
+}
+
+/* --- Corps rédigé depuis la console ---------------------------------------- */
+.actu-prose { font-size: 16.5px; line-height: 1.78; color: var(--c-80); }
+.actu-prose > * + * { margin-top: 22px; }
+.actu-prose h2, .actu-prose h3, .actu-prose h4, .actu-prose h5 {
+  color: var(--c-black); font-weight: 600; letter-spacing: -0.02em; line-height: 1.22;
+}
+.actu-prose h2 { font-size: clamp(22px, 2.4vw, 30px); margin-top: 46px; }
+.actu-prose h3 { font-size: clamp(19px, 2vw, 23px); margin-top: 36px; }
+.actu-prose h4 { font-size: 17.5px; margin-top: 30px; }
+.actu-prose h5 { font-size: 16px; margin-top: 26px; }
+.actu-prose a { color: var(--ac); border-bottom: 1px solid var(--ac-line); }
+.actu-prose a:hover { border-bottom-color: var(--ac); }
+.actu-prose strong, .actu-prose b { font-weight: 600; color: var(--c-black); }
+.actu-prose ul, .actu-prose ol { padding-left: 22px; }
+.actu-prose ul { list-style: disc; }
+.actu-prose ol { list-style: decimal; }
+.actu-prose li + li { margin-top: 8px; }
+.actu-prose li::marker { color: var(--ac); }
+.actu-prose dt { font-weight: 600; color: var(--c-black); margin-top: 14px; }
+.actu-prose dd { margin-left: 18px; }
+.actu-prose blockquote {
+  border-left: 3px solid var(--ac); padding: 4px 0 4px 24px; margin-top: 30px;
+  font-size: clamp(17px, 1.9vw, 21px); line-height: 1.55; font-weight: 500; color: var(--c-black);
+}
+.actu-prose pre {
+  background: var(--c-10); border: 1px solid var(--c-20); padding: 18px; overflow-x: auto;
+  font-family: var(--font-mono); font-size: 13.5px; line-height: 1.62;
+}
+.actu-prose code { font-family: var(--font-mono); font-size: 0.92em; background: var(--c-10); padding: 2px 5px; }
+.actu-prose pre code { background: none; padding: 0; }
+.actu-prose hr { border-top: 1px solid var(--c-20); margin: 40px 0; }
+.actu-prose mark { background: var(--ac-pale); padding: 1px 3px; }
+.actu-prose sub, .actu-prose sup { font-size: 0.75em; }
+
+/* Images et intégrations : toujours à la largeur de la colonne, jamais plus. */
+.actu-prose img { width: 100%; height: auto; }
+.actu-prose figure { margin-top: 34px; }
+.actu-prose figcaption {
+  margin-top: 10px; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.5; color: var(--c-50);
+}
+.actu-prose .actu-embed { position: relative; aspect-ratio: 16 / 9; background: var(--c-black); }
+.actu-prose .actu-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* `display: block` sur le tableau : c'est ce qui lui donne son propre
+   défilement horizontal sur mobile, sans conteneur supplémentaire que l'éditeur
+   aurait à produire. */
+.actu-prose table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 14.5px; }
+.actu-prose th, .actu-prose td { border: 1px solid var(--c-20); padding: 10px 14px; text-align: left; vertical-align: top; }
+.actu-prose th {
+  background: var(--c-10); font-weight: 600; font-size: 12.5px;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-70);
+}
+.actu-prose caption { caption-side: bottom; padding-top: 10px; font-size: 12px; color: var(--c-50); }
+
+.actu-prose .ta-left { text-align: left; }
+.actu-prose .ta-center { text-align: center; }
+.actu-prose .ta-right { text-align: right; }
+.actu-prose .ta-justify { text-align: justify; }
+
+/* --- Vidéo associée, étiquettes, partage ----------------------------------- */
+.actu-video { margin-top: 34px; padding-left: 13px; }
+.actu-video__play {
+  width: 36px; height: 36px; flex: 0 0 auto; background: var(--ac); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 11px; padding-left: 2px;
+}
+
+.actu-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 36px; padding-top: 26px; border-top: 1px solid var(--c-20); }
+.actu-tags__label { margin-right: 4px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-50); }
+.actu-tag { padding: 6px 12px; border: 1px solid var(--c-20); font-size: 12.5px; color: var(--c-70); transition: border-color 0.18s, color 0.18s; }
+a.actu-tag:hover { border-color: var(--ac); color: var(--ac); }
+
+.actu-partage {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
+  margin-top: 28px; padding: 18px 0; border-top: 1px solid var(--c-20); border-bottom: 1px solid var(--c-20);
+}
+.actu-partage__label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-50); }
+.actu-partage__liens { display: flex; flex-wrap: wrap; gap: 8px; }
+.actu-partage__lien {
+  padding: 7px 13px; border: 1px solid var(--c-20); background: #fff; color: var(--c-70);
+  font-size: 12.5px; cursor: pointer; transition: border-color 0.18s, color 0.18s;
+}
+.actu-partage__lien:hover { border-color: var(--c-black); color: var(--c-black); }
+.actu-partage__copier { font-family: var(--font-mono); }
+
+/* --- Navigation entre articles ---------------------------------------------- */
+.actu-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 44px; background: var(--c-20); border: 1px solid var(--c-20); }
+/* Y compris la cellule vide laissée quand il n'y a pas d'article de ce côté :
+   sans cette règle, le fond du conteneur apparaîtrait en gris. */
+.actu-nav > * { background: #fff; }
+.actu-nav__lien { display: flex; flex-direction: column; gap: 8px; padding: 20px 22px; transition: background 0.2s; }
+a.actu-nav__lien:hover { background: var(--c-10); }
+.actu-nav__lien--droite { text-align: right; align-items: flex-end; }
+.actu-nav__sens { font-size: 11.5px; letter-spacing: 0.05em; color: var(--ac); }
+.actu-nav__titre { font-size: 15px; font-weight: 500; line-height: 1.4; color: var(--c-black); }
+
+.actu-retour { margin-top: 34px; }
+.actu-retour__lien { font-size: 13px; font-weight: 600; color: var(--ac); }
+
+@media (max-width: 900px) {
+  .actu-barre { flex-direction: column; align-items: stretch; }
+  .actu-recherche__champ { flex: 1; min-width: 0; }
+}
+
+@media (max-width: 760px) {
+  .actu-hero { min-height: clamp(260px, 62vw, 340px); }
+  .actu-hero__titre { max-width: none; font-size: clamp(24px, 7.4vw, 34px); }
+  .actu-corps__inner { max-width: none; }
+  .actu-prose { font-size: 16px; }
+  .actu-prose blockquote { padding-left: 18px; }
+  .actu-nav { grid-template-columns: 1fr; }
+  .actu-nav__lien--droite { text-align: left; align-items: flex-start; }
+  .actu-partage { flex-direction: column; align-items: flex-start; }
+  .actu-partage__lien { min-height: 40px; display: inline-flex; align-items: center; }
+}
+
 } /* fin @layer components */

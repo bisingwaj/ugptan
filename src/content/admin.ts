@@ -98,6 +98,145 @@ export const ADMIN = {
   },
 } as const;
 
+/**
+ * Module « Actualités ».
+ *
+ * Séparé de l'objet `ADMIN` : le module compte à lui seul plus de libellés que
+ * tout le reste de la console, et il est lu par des composants clients (fiche
+ * d'article, éditeur) qu'on ne veut pas voir embarquer le vocabulaire des
+ * autres écrans.
+ */
+export const ADMIN_ACTUS = {
+  title: "Actualités",
+  lead: "Communiqués, décisions et jalons publiés sur le site. Chaque article existe en français et en anglais ; une langue non traduite est signalée et n'est jamais servie au public.",
+
+  /* --- Liste --------------------------------------------------------------- */
+  nouveau: "Nouvel article",
+  listeVide: "Aucun article pour le moment.",
+  listeVideFiltre: "Aucun article ne correspond à ce filtre.",
+  rechercher: "Rechercher un titre…",
+  filtrer: "Filtrer",
+  reinitialiser: "Tout afficher",
+  tousStatuts: "Tous les statuts",
+  toutesCategories: "Toutes les catégories",
+
+  colArticle: "Article",
+  colStatut: "État",
+  colLangues: "Langues",
+  colCategorie: "Catégorie",
+  colDate: "Publication",
+  colActions: "",
+
+  jamaisPublie: "Non daté",
+  une: "À la une",
+
+  publier: "Publier",
+  depublier: "Dépublier",
+  dupliquer: "Dupliquer",
+  supprimer: "Supprimer",
+  supprimerConfirm: "Supprimer définitivement cet article et toutes ses traductions ? Cette action est irréversible.",
+  modifier: "Modifier",
+  retourListe: "Retour aux actualités",
+
+  creeOk: "Article créé. Complétez-le puis publiez-le.",
+  copieOk: "Copie créée en brouillon.",
+  supprimeOk: "Article supprimé.",
+
+  /* --- Onglets & fiche ----------------------------------------------------- */
+  tradPresente: "traduit",
+  tradManquante: "à traduire",
+  aucuneLangue: "Renseignez au moins un titre pour enregistrer.",
+
+  champTitre: "Titre",
+  champTitreAide: "Il sert de titre H1 sur la page publique et de titre par défaut dans les moteurs de recherche.",
+  champSlug: "Adresse de la page",
+  champResume: "Résumé",
+  champResumePlaceholder: "Deux phrases qui disent ce que l'article apporte.",
+  champResumeAide: "Affiché sur les cartes et dans les partages. Laissé vide, il est déduit des premières lignes du corps.",
+  champCorps: "Corps de l'article",
+  champAlt: "Texte alternatif du visuel",
+  champAltAide: "Décrit l'image pour les lecteurs d'écran et quand elle ne se charge pas.",
+
+  seoTitre: "Référencement",
+  seoAide: "Renseignés seulement s'ils doivent différer du titre et du résumé.",
+  champSeoTitre: "Titre pour les moteurs",
+  champSeoTitrePlaceholder: "Reprend le titre de l'article",
+  champSeoDesc: "Description pour les moteurs",
+
+  /* --- Réglages ------------------------------------------------------------ */
+  blocPublication: "Publication",
+  champStatut: "Statut",
+  champDate: "Date de publication",
+  champDateAide: "Heure de Kinshasa. Une date à venir programme la parution.",
+  champUne: "Mettre à la une",
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  apercu: "Prévisualiser",
+  apercuIndisponible: "L'aperçu sera disponible après le premier enregistrement.",
+
+  blocVisuel: "Image de couverture",
+  aucunVisuel: "Aucun visuel",
+  choisirVisuel: "Choisir un visuel",
+  changerVisuel: "Changer",
+  retirerVisuel: "Retirer",
+  champVideo: "Vidéo associée",
+  champVideoAide: "Lien YouTube. Un bouton de lecture apparaît alors sur la page de l'article.",
+
+  blocClassement: "Classement",
+  champCategorie: "Catégorie",
+  sansCategorie: "Sans catégorie",
+  gererCategories: "Gérer les catégories et les étiquettes →",
+  champTags: "Étiquettes",
+  aucunTag: "Aucune étiquette enregistrée.",
+  champNouveauxTags: "Créer des étiquettes",
+  champNouveauxTagsAide: "Séparées par des virgules. Elles seront créées à l'enregistrement.",
+  champComposantes: "Composantes rattachées",
+  champComposantesAide: "L'article remonte alors dans le bloc « Actualités » des pages de composante concernées.",
+
+  blocAuteur: "Auteur",
+  champCompte: "Compte de la console",
+  sansCompte: "Aucun",
+  champSignature: "Signature affichée",
+  champSignatureAide: "Prime sur le compte. Utile pour signer au nom d'un service.",
+  champFonction: "Fonction",
+  champLieu: "Lieu",
+
+  /* --- Taxonomies ---------------------------------------------------------- */
+  taxoTitle: "Catégories & étiquettes",
+  taxoLead: "Référentiels partagés par tous les articles. Une catégorie classe, une étiquette relie.",
+  categoriesTitle: "Catégories",
+  categoriesLead: "Une seule par article. Elles alimentent les filtres de la page publique.",
+  categoriesVide: "Aucune catégorie.",
+  etiquettesTitle: "Étiquettes",
+  etiquettesLead: "Autant que nécessaire par article.",
+  etiquettesVide: "Aucune étiquette.",
+  champNomFr: "Libellé français",
+  champNomEn: "Libellé anglais",
+  champNomEnAide: "Laissé vide, le libellé français est repris.",
+  champCouleur: "Couleur",
+  champCouleurAide: "Hexadécimal (#0f62fe). Vide : l'accent du site.",
+  champPosition: "Ordre",
+  ajouter: "Ajouter",
+  colUsage: "Articles",
+  supprimerCategorieConfirm: "Supprimer cette catégorie ? Les articles concernés resteront en ligne, sans catégorie.",
+  supprimerTagConfirm: "Supprimer cette étiquette ? Elle sera retirée des articles qui la portent.",
+
+  /* --- Médias -------------------------------------------------------------- */
+  mediasTitle: "Médias",
+  mediasLead: "Visuels des articles. Les fichiers téléversés sont conservés en base et servis par le site ; les médias externes ne sont référencés que par leur adresse.",
+  mediasVide: "La bibliothèque est vide.",
+  mediasTeleverser: "Téléverser un fichier",
+  mediasExterne: "Référencer une image distante",
+  mediasUrl: "Adresse de l'image",
+  mediasAltFr: "Texte alternatif (français)",
+  mediasAltEn: "Texte alternatif (anglais)",
+  mediasLegende: "Légende",
+  mediasEnregistrer: "Enregistrer",
+  mediasSupprimer: "Supprimer",
+  mediasSupprimerConfirm: "Supprimer ce média ? Les images déjà insérées dans le corps d'un article deviendraient des liens morts.",
+  mediasUsage: "Couverture de",
+} as const;
+
 /** Un module de la console. `key` est aussi la permission qui l'ouvre. */
 export type AdminNavItem = {
   key: Permission;
@@ -140,9 +279,9 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     key: "contenus",
     label: "Contenus",
     items: [
-      { key: "actualites", label: "Actualités", soon: true },
+      { key: "actualites", label: "Actualités", slug: "/actualites" },
       { key: "documents", label: "Documents & transparence", soon: true },
-      { key: "medias", label: "Médias", soon: true },
+      { key: "medias", label: "Médias", slug: "/medias" },
       { key: "evenements", label: "Événements", soon: true },
       { key: "histoires", label: "Histoires & impact", soon: true },
       { key: "videos", label: "Vidéos & galerie", soon: true },

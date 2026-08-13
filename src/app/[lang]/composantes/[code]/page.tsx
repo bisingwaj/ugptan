@@ -26,6 +26,10 @@ export function generateStaticParams() {
 }
 export const dynamicParams = false;
 
+/** Le bloc « Actualités » de la page lit la base : même politique de cache que
+ *  la page « Actualités » elle-même (cf. app/[lang]/actualites/page.tsx). */
+export const revalidate = 120;
+
 export async function generateMetadata(props: { params: Promise<{ lang: string; code: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);

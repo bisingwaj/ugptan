@@ -27,6 +27,16 @@ const nextConfig = {
     "@neondatabase/serverless",
     "ws",
   ],
+  experimental: {
+    serverActions: {
+      // Le CMS d'actualités téléverse ses visuels par server action, et la
+      // limite par défaut (1 Mo) refuserait une photographie ordinaire. Le
+      // plafond applicatif reste plus bas (5 Mo, cf. src/lib/medias.ts) : cette
+      // valeur laisse la marge du surcoût d'encodage multipart, elle ne
+      // l'autorise pas.
+      bodySizeLimit: "8mb",
+    },
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     // Photographie de démonstration servie depuis Unsplash ; basculer vers le CDN en production.

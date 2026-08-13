@@ -608,6 +608,57 @@ export function dict(lang: Lang) {
       timeline: t("Fil chronologique", "Timeline"),
       relatedVideo: t("Voir la vidéo associée", "Watch the related video"),
       allNews: t("Toutes les actualités", "All news"),
+
+      /* --- Liste : filtres, recherche, pagination -------------------------- */
+      aLaUne: t("À la une", "Featured"),
+      filtresLabel: t("Filtrer par catégorie", "Filter by category"),
+      rechercher: t("Rechercher dans les actualités…", "Search the news…"),
+      rechercherAction: t("Rechercher", "Search"),
+      filtreEtiquette: t("Articles portant l'étiquette", "Articles tagged"),
+      retirerFiltre: t("Retirer le filtre", "Clear the filter"),
+      aucunArticle: t(
+        "Aucun communiqué n'est publié pour le moment. Les décisions et jalons du Projet paraissent ici au fur et à mesure de leur adoption.",
+        "No release has been published yet. The Project's decisions and milestones appear here as they are adopted.",
+      ),
+      aucunResultat: t(
+        "Aucun article ne correspond à cette recherche.",
+        "No article matches this search.",
+      ),
+      paginationLabel: t("Pages d'actualités", "News pages"),
+      page: t("Page", "Page"),
+      precedent: t("Précédent", "Previous"),
+      suivant: t("Suivant", "Next"),
+
+      /* --- Page d'article --------------------------------------------------- */
+      filArianeLabel: t("Fil d'Ariane", "Breadcrumb"),
+      navigationLabel: t("Article précédent et suivant", "Previous and next article"),
+      par: t("Par", "By"),
+      minutes: t("min de lecture", "min read"),
+      etiquettes: t("Étiquettes", "Tags"),
+      partager: t("Partager", "Share"),
+      copierLien: t("Copier le lien", "Copy link"),
+      lienCopie: t("Lien copié", "Link copied"),
+      aLire: t("À lire également", "Also worth reading"),
+
+      /* Traduction manquante : la mention nomme la langue réellement servie,
+         plutôt que de laisser croire à un texte rédigé dans celle du site. */
+      traductionAbsente: (servie: Lang) =>
+        t(
+          `Cet article n'est pour l'instant disponible qu'en ${servie === "en" ? "anglais" : "français"}.`,
+          `This article is currently available in ${servie === "en" ? "English" : "French"} only.`,
+        ),
+      lireDansLaLangue: (servie: Lang) =>
+        t(
+          `Lire la version ${servie === "en" ? "anglaise" : "française"}`,
+          `Read the ${servie === "en" ? "English" : "French"} version`,
+        ),
+
+      /* --- Prévisualisation ------------------------------------------------- */
+      apercuTitre: t("Aperçu.", "Preview."),
+      apercuTexte: t(
+        "Cette page n'est pas publiée : elle n'est visible que depuis ce lien, et n'est pas indexée.",
+        "This page is not published: it is visible from this link only, and is not indexed.",
+      ),
     },
 
     /* --- Résultats -------------------------------------------------------- */
