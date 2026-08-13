@@ -16,7 +16,14 @@ const initialState: LoginState = { error: null };
  * se réparent depuis le module « Utilisateurs », par un administrateur. C'est
  * l'exigence, pas un manque.
  */
-export function AdminLoginForm({ next }: { next?: string | null }) {
+export function AdminLoginForm({
+  next,
+  avis,
+}: {
+  next?: string | null;
+  /** Message d'accueil posé par la page — session périmée, par exemple. */
+  avis?: string | null;
+}) {
   const [state, formAction, pending] = useActionState(loginAction, initialState);
   const t = ADMIN.login;
 
@@ -54,6 +61,13 @@ export function AdminLoginForm({ next }: { next?: string | null }) {
         <div style={{ width: "100%", maxWidth: 420, margin: "0 auto", animation: "revFade .3s both" }}>
           <h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(24px,2.6vw,32px)", letterSpacing: "-0.02em" }}>{t.title}</h1>
           <p style={{ margin: "10px 0 26px", fontSize: 14, color: "var(--c-60)" }}>{t.lead}</p>
+
+          {/* L'avis passe avant l'erreur et disparaît dès la première tentative :
+              « session expirée » n'a plus rien à dire une fois que l'utilisateur
+              a soumis le formulaire et reçu, le cas échéant, un vrai refus. */}
+          {avis && !state.error && (
+            <div className="adm-ok" role="status" style={{ marginBottom: 16 }}>{avis}</div>
+          )}
 
           {state.error && (
             <div className="auth-error" role="alert" aria-live="polite">{state.error}</div>

@@ -19,7 +19,7 @@
 import { cache } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ADMIN_HOME, ADMIN_LOGIN } from "@/lib/admin";
+import { ADMIN_HOME, ADMIN_LOGIN, EXPIRED_PARAM } from "@/lib/admin";
 import { auth } from "@/lib/auth/server";
 import { can, isRole, type AdminRole, type Permission } from "@/lib/auth/permissions";
 
@@ -74,7 +74,10 @@ export const getCurrentUser = cache(async (): Promise<AdminUser | null> => {
  */
 export async function requireAdmin(): Promise<AdminUser> {
   const user = await getCurrentUser();
-  if (!user) redirect(ADMIN_LOGIN);
+  // `EXPIRED_PARAM` : le proxy a laissé passer sur la foi du cookie, la base
+  // vient de le démentir. Sans ce marqueur, le proxy renverrait `/signin` vers
+  // le tableau de bord, qui repasserait ici — boucle sans fin (cf. lib/admin.ts).
+  if (!user) redirect(`${ADMIN_LOGIN}?${EXPIRED_PARAM}=1`);
   return user;
 }
 
