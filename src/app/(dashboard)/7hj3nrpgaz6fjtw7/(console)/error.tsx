@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { ADMIN } from "@/content/admin";
 
 /**
@@ -20,9 +19,10 @@ export default function ConsoleError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error(`[console] ${[error.name, error.message].filter(Boolean).join(" · ")}`);
-  }, [error]);
+  /* Aucune journalisation ici : même parti que la frontière publique. La cause
+     est tracée côté serveur (cf. src/instrumentation.ts) et le condensé affiché
+     plus bas fait le lien ; rejournaliser côté navigateur n'ajouterait qu'une
+     seconde erreur, dont la pile désignerait ce composant et non la panne. */
 
   return (
     <div className="max-w-[68ch]">
