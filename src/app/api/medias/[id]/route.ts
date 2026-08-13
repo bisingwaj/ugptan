@@ -1,5 +1,14 @@
 /**
- * Service des fichiers de la bibliothèque de médias.
+ * Service des fichiers HISTORIQUES de la bibliothèque de médias.
+ *
+ * Les fichiers téléversés vivent désormais chez Cloudinary et sont servis
+ * directement par son CDN : `mediaSrc()` renvoie leur URL, et cette route n'est
+ * plus sur leur chemin. Elle reste indispensable pour deux raisons :
+ *   - les fichiers déposés AVANT la bascule, dont les octets sont encore en
+ *     base (`MediaAsset.data`), le temps que la reprise soit passée partout ;
+ *   - les articles publiés qui portent `/api/medias/<id>` en dur dans leur
+ *     corps HTML : une fois le média repris, la redirection ci-dessous les
+ *     conduit au fichier sans qu'aucun contenu n'ait été réécrit.
  *
  * Seul endroit du dépôt qui sélectionne `MediaAsset.data` : partout ailleurs,
  * charger cette colonne ferait transiter plusieurs mégaoctets pour afficher une
@@ -40,8 +49,10 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
 
   if (!media) return new Response("Média introuvable.", { status: 404 });
 
-  // Média externe : on renvoie vers sa source plutôt que de la relayer — ce
-  // serait faire de l'application un proxy d'images ouvert.
+  // Fichier hébergé ailleurs — Cloudinary ou CDN tiers : on renvoie vers sa
+  // source plutôt que de la relayer, ce qui ferait de l'application un proxy
+  // d'images ouvert. La redirection est permanente : le fichier ne reviendra
+  // pas en base.
   if (!media.data) {
     return media.url
       ? Response.redirect(media.url, 308)

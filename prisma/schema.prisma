@@ -85,6 +85,9 @@ model User {
   /// Événements saisis par ce compte — trace interne, jamais publiée.
   evenementsSaisis Evenement[] @relation("EvenementSaisiPar")
 
+  /// Rapports et documents déposés par ce compte — trace interne.
+  documentsDeposes Document[] @relation("DocumentDeposePar")
+
   @@index([role])
 }
 
@@ -305,25 +308,37 @@ enum ArticleStatus {
   ARCHIVED
 }
 
-/// Bibliothèque de médias.
+/// Bibliothèque de médias et de documents.
 ///
-/// Deux natures dans une seule table : un fichier TÉLÉVERSÉ (`data` renseigné,
-/// servi par /api/medias/<id>) ou un média EXTERNE (`url` renseignée, hébergé
-/// sur un CDN). Le binaire vit en base pour que l'installation reste autonome —
-/// aucun service de stockage à provisionner. Corollaire à respecter partout :
+/// Une seule table, trois provenances distinguées par les colonnes renseignées :
+///   - fichier TÉLÉVERSÉ chez Cloudinary : `url` + `publicId` (cas normal) ;
+///   - média EXTERNE saisi à la main : `url` seule, hébergé ailleurs ;
+///   - fichier HISTORIQUE : `data` renseigné, servi par /api/medias/<id>.
+///
+/// Les octets ne sont plus écrits en base : un visuel de 3 Mo y coûtait une
+/// ligne de 3 Mo, sauvegardée et restaurée à chaque copie de la base, et servie
+/// par l'application au lieu d'un CDN. `data` ne subsiste que pour les fichiers
+/// déposés avant la bascule (cf. scripts/migrate-medias-cloudinary.mjs, qui les
+/// reprend puis vide la colonne). Corollaire inchangé tant qu'elle existe :
 /// `data` n'est JAMAIS sélectionné hors de la route qui sert le fichier.
 model MediaAsset {
   id        String   @id @default(cuid())
   /// Nom d'origine, conservé pour la recherche dans la bibliothèque.
   filename  String
   mimeType  String
-  /// Octets. Redondant avec `data`, mais évite de charger le binaire pour
-  /// afficher une liste.
+  /// Poids du fichier. Évite de charger le binaire pour afficher une liste, et
+  /// reste la seule source du poids pour un fichier hébergé chez Cloudinary.
   size      Int      @default(0)
   width     Int?
   height    Int?
+  /// HISTORIQUE : octets des fichiers antérieurs à la bascule vers Cloudinary.
+  /// Aucune écriture nouvelle. À supprimer quand la reprise sera terminée.
   data      Bytes?
   url       String?
+  /// Identifiant Cloudinary — la seule prise pour retirer le fichier du compte
+  /// à la suppression du média. Nul pour un média externe, dont le fichier ne
+  /// nous appartient pas.
+  publicId  String?
   altFr     String?
   altEn     String?
   legende   String?
@@ -756,4 +771,155 @@ model EvenementInscription {
   @@unique([evenementId, email])
   @@index([evenementId, statut])
   @@index([createdAt])
+}
+
+/// ===========================================================================
+/// Documents & transparence
+///
+/// Rapports, études, analyses et pièces de référence publiés dans la section
+/// « Rapports et analyses » du site.
+///
+/// ─── Le fichier n'est PAS ici ────────────────────────────────────────────────
+///
+/// Seules les MÉTADONNÉES et les RÉFÉRENCES Cloudinary sont enregistrées :
+/// `fileUrl` (adresse de diffusion) et `filePublicId` (prise pour retirer le
+/// fichier du compte). Aucune colonne binaire, contrairement à ce que
+/// `MediaAsset.data` a porté avant la bascule : une base sauvegardée, répliquée
+/// et facturée à l'octet n'a pas à jouer le rôle de serveur de fichiers, et
+/// l'application n'a pas à jouer celui de CDN.
+///
+/// ─── Pourquoi pas de table de traduction ─────────────────────────────────────
+///
+/// Contrairement à `Article` et `Evenement`, les deux langues vivent en
+/// COLONNES (`titreFr` / `titreEn`), comme sur `ArticleCategory`. Un document
+/// porte un titre et une description courte — pas un corps rédactionnel avec son
+/// slug, son SEO et son cycle de relecture propre. Une table de traduction
+/// imposerait un formulaire par langue et un enregistrement séparé pour deux
+/// champs, alors que le FICHIER, lui, reste le même dans les deux versions du
+/// site. L'anglais vide retombe sur le français : mieux vaut servir un titre
+/// français à un lecteur anglophone que masquer le document.
+///
+/// La langue du FICHIER, elle, est une information distincte et affichée
+/// (`langue`) : le document peut n'exister qu'en français.
+/// ===========================================================================
+
+/// Cycle de vie d'un document.
+///
+/// Les trois états correspondent aux trois gestes demandés au CMS — publier,
+/// dépublier, archiver. Pas de `SCHEDULED` : `publishedAt` est la date que
+/// PORTE le document, pas un déclencheur de parution. Programmer la mise en
+/// ligne d'un rapport n'a pas d'usage établi, et le faire croire coûterait une
+/// tâche planifiée.
+enum DocumentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Nature du document. Enum et non chaîne libre : c'est un axe de FILTRE sur le
+/// site public, et une saisie libre y produirait autant de valeurs que de
+/// saisies. La catégorie, elle, reste une table — les thématiques du projet
+/// évoluent, la nature d'un écrit non.
+enum DocumentType {
+  RAPPORT
+  ETUDE
+  ANALYSE
+  NOTE
+  MANUEL
+  PLAN
+  CADRE
+  PRESENTATION
+  DONNEES
+  AUTRE
+}
+
+/// Catégorie ou thématique documentaire — sert aussi de filtre public.
+///
+/// Table distincte d'`ArticleCategory` et d'`EvenementCategory`, pour la raison
+/// déjà donnée sur cette dernière : les trois nomenclatures n'ont ni le même
+/// contenu ni la même durée de vie, et les fusionner obligerait chaque filtre à
+/// savoir de quel module vient chaque entrée.
+model DocumentCategory {
+  id    String @id @default(cuid())
+  /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
+  slug  String @unique
+  nomFr String
+  nomEn String
+  /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
+  color String?
+  /// Ordre d'affichage des filtres.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documents Document[]
+
+  @@index([position])
+}
+
+/// Un rapport, une étude, une analyse ou une pièce de référence.
+model Document {
+  id     String         @id @default(cuid())
+  status DocumentStatus @default(DRAFT)
+  type   DocumentType   @default(RAPPORT)
+
+  titreFr String
+  /// Vide, le titre français est servi dans les deux langues (cf. l'en-tête).
+  titreEn String?
+
+  descriptionFr String?
+  descriptionEn String?
+
+  /// Sigle documentaire (« MEP », « PPSD », « CGES »), quand il en existe un.
+  /// C'est par lui que ces pièces sont désignées dans les échanges du projet.
+  reference String?
+  /// Auteur ou organisme producteur, tel qu'il doit s'afficher.
+  auteur    String?
+  /// Langue du FICHIER (« FR », « EN », « FR/EN ») — pas celle de la fiche.
+  langue    String  @default("FR")
+
+  /// Date de mise en ligne. Renseignée à la première publication si elle est
+  /// restée vide : un document en ligne sans date n'est pas classable.
+  publishedAt  DateTime?
+  /// Date du document lui-même (production, édition, période couverte).
+  /// Distincte de la précédente : un rapport de 2025 peut être publié en 2026,
+  /// et c'est la date du document qui fait foi pour le lecteur.
+  documentDate DateTime?
+
+  /// Mise en avant : remonte le document en tête de la liste publique.
+  featured Boolean @default(false)
+  /// Ordre d'affichage, à date égale. Plus petit = plus haut.
+  position Int     @default(0)
+  /// Composantes rattachées (C1…C5), même usage que sur un article.
+  comps    String[] @default([])
+
+  categoryId String?
+  category   DocumentCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// --- Fichier : RÉFÉRENCES Cloudinary, jamais d'octets -------------------
+  /// URL de diffusion HTTPS, telle que Cloudinary la renvoie. C'est elle que le
+  /// site public sert au visiteur.
+  fileUrl      String
+  /// Identifiant Cloudinary — seule prise pour retirer le fichier du compte à
+  /// la suppression du document ou au remplacement du fichier.
+  filePublicId String?
+  /// Nom d'origine, conservé pour la recherche et pour nommer le téléchargement.
+  fileName     String
+  fileMime     String
+  /// Poids rapporté par Cloudinary, seule source du « PDF · 4,2 Mo » affiché.
+  fileSize     Int     @default(0)
+  /// Extension normalisée (« pdf », « docx »), pour la pastille de format.
+  fileFormat   String?
+
+  /// Trace de dépôt, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("DocumentDeposePar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([type])
+  @@index([featured])
 }

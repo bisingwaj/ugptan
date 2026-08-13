@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "@/styles/dashboard.css";
+import { NavigationProgress } from "@/components/motion/NavigationProgress";
 
 /**
  * Layout racine de la console d'administration.
@@ -8,6 +9,13 @@ import "@/styles/dashboard.css";
  * un segment statique l'emporte sur le segment dynamique `[lang]`, donc
  * `/<slug>` arrive bien ici et n'hérite d'aucune chrome publique (Header,
  * Footer, Lenis, curseur custom, providers vidéo/motion).
+ *
+ * La barre de progression fait exception : c'est le SEUL composant de la chrome
+ * publique repris ici, et la console en a plus besoin encore que le site. Ses
+ * pages lisent toutes la base au rendu — une liste de plaintes, un article, un
+ * export — et l'App Router laisse l'écran précédent affiché pendant ce temps,
+ * sans rien signaler. La reprendre plutôt que d'en écrire une seconde garantit
+ * que l'attente se lit de la même façon des deux côtés.
  *
  * ⚠️ Aucun contrôle d'authentification à ce niveau : l'écran de connexion vit
  * juste en dessous. Le verrou est dans `(console)/layout.tsx`.
@@ -38,7 +46,10 @@ export default function DashboardRootLayout({ children }: { children: React.Reac
           rel="stylesheet"
         />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <NavigationProgress />
+        {children}
+      </body>
     </html>
   );
 }

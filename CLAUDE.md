@@ -9,4 +9,3 @@
 - Optimiser systématiquement le SEO de chaque page (métadonnées, structure sémantique, titres et descriptions, etc...)
 - Éviter l’utilisation excessive de tirets longs (—) et de formulations typiques générées par les IA dans les textes du site
 - Les pathnames doivent etre en anglais
-- Avant de push sur la database a distance demande toujours et dit pourquoi tu veux le faire 

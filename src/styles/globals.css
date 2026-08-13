@@ -1344,4 +1344,130 @@ a.actu-nav__lien:hover { background: var(--c-10); }
   .evt-card__action { min-height: 40px; display: inline-flex; align-items: center; }
 }
 
+/* ===========================================================================
+   RAPPORTS & ANALYSES
+
+   Une carte de document n'est pas une carte d'article : elle ne mène nulle
+   part. Elle porte deux gestes de valeur égale — consulter la fiche, prendre
+   le fichier — et ce sont deux boutons, non un lien étiré. C'est aussi pourquoi
+   la page n'a pas d'adresse par document : le détail est un panneau, ouvert
+   sur place et adressable par `?doc=` (cf. components/docs/RessourcesListe.tsx).
+
+   La pastille de format tient lieu de vignette : un rapport n'a pas d'image,
+   et en inventer une (icône générique, première page rasterisée) coûterait un
+   chargement pour ne rien apprendre. Trois lettres disent ce qu'on télécharge.
+=========================================================================== */
+
+.doc-filtres { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+.doc-filtres__label {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--c-50); margin-right: 4px;
+}
+
+.doc-compte {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 24px 0 18px; padding-bottom: 14px; border-bottom: 1px solid var(--c-20);
+  font-size: 12.5px; color: var(--c-50);
+}
+
+/* --- Grille ---------------------------------------------------------------- */
+.doc-grille {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 1px; background: var(--c-20); border: 1px solid var(--c-20);
+  margin: 0; padding: 0; list-style: none;
+}
+.doc-card {
+  display: flex; flex-direction: column; gap: 12px;
+  background: #fff; padding: 24px clamp(18px, 2.2vw, 26px);
+  border-top: 3px solid var(--ac);
+}
+.doc-card__top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.doc-card__ext {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; width: 44px; height: 44px;
+  background: var(--ac-pale); color: var(--ac);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+}
+.doc-card__kicker {
+  flex: 1; min-width: 0;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--c-50);
+}
+.doc-card__une {
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 8px; background: var(--ac); color: #fff;
+}
+.doc-card__titre { font-size: 17px; font-weight: 600; line-height: 1.35; margin: 0; }
+.doc-card__ref {
+  display: block; font-size: 11px; letter-spacing: 0.06em;
+  color: var(--ac); margin-bottom: 5px;
+}
+.doc-card__desc {
+  flex: 1; margin: 0; font-size: 14px; line-height: 1.6; color: var(--c-70);
+  /* Trois lignes au plus : les cartes gardent une hauteur comparable, et la
+     description complète reste lisible dans le panneau de détail. */
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+}
+.doc-card__meta { font-size: 11.5px; color: var(--c-50); }
+.doc-card__auteur { font-size: 13px; color: var(--c-70); }
+.doc-card__pied {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--c-20);
+}
+
+.doc-mention {
+  margin-top: 26px; padding: 18px 22px; border-left: 3px solid var(--ac);
+  background: var(--c-10); font-size: 13px; line-height: 1.65; color: var(--c-70);
+}
+
+/* --- Panneau de détail ------------------------------------------------------ */
+.doc-modal {
+  display: flex; flex-direction: column; width: min(860px, 100%); max-height: 100%;
+  background: #fff; border: 1px solid var(--c-80); overflow: hidden;
+}
+.doc-modal__head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  padding: 24px clamp(20px, 2.6vw, 28px); border-bottom: 1px solid var(--c-20);
+}
+.doc-modal__kicker {
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ac);
+}
+.doc-modal__titre { font-size: clamp(19px, 2.4vw, 23px); font-weight: 600; line-height: 1.3; margin: 6px 0 0; }
+.doc-modal__fermer {
+  flex: 0 0 auto; width: 44px; height: 44px;
+  background: var(--c-10); border: 1px solid var(--c-20); color: var(--c-70); font-size: 16px;
+}
+.doc-modal__fermer:hover { border-color: var(--c-black); color: var(--c-black); }
+.doc-modal__corps { flex: 1; overflow-y: auto; padding: clamp(20px, 2.6vw, 28px); }
+.doc-modal__desc { margin: 0 0 22px; font-size: 15px; line-height: 1.65; color: var(--c-70); }
+.doc-modal__defs {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px 24px; margin: 0 0 26px;
+}
+.doc-modal__row dt {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--c-50); margin-bottom: 5px;
+}
+.doc-modal__row dd { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--c-80); }
+.doc-modal__apercu { display: flex; flex-direction: column; gap: 10px; }
+.doc-modal__cadre {
+  width: 100%; height: min(52vh, 460px);
+  border: 1px solid var(--c-20); background: var(--c-10);
+}
+.doc-modal__vide {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  padding: 44px 24px; border: 1px dashed var(--c-20); background: var(--c-10);
+}
+.doc-modal__note { margin: 0; font-size: 12px; line-height: 1.6; color: var(--c-50); text-align: center; }
+.doc-modal__pied {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px;
+  padding: 18px clamp(20px, 2.6vw, 28px); border-top: 1px solid var(--c-20); background: var(--c-10);
+}
+
+@media (max-width: 760px) {
+  .doc-grille { grid-template-columns: 1fr; }
+  .doc-modal__cadre { height: 44vh; }
+  .doc-card__pied .btn { flex: 1; justify-content: center; }
+}
+
 } /* fin @layer components */

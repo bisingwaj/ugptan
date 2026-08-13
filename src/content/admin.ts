@@ -423,8 +423,8 @@ export const ADMIN_ACTUS = {
   supprimerTagConfirm: "Supprimer cette étiquette ? Elle sera retirée des articles qui la portent.",
 
   /* --- Médias -------------------------------------------------------------- */
-  mediasTitle: "Médias",
-  mediasLead: "Visuels des articles. Les fichiers téléversés sont conservés en base et servis par le site ; les médias externes ne sont référencés que par leur adresse.",
+  mediasTitle: "Médias et documents",
+  mediasLead: "Visuels et documents des publications. Les fichiers téléversés sont déposés sur le stockage Cloudinary et servis par son réseau de diffusion ; les médias externes ne sont référencés que par leur adresse.",
   mediasVide: "La bibliothèque est vide.",
   mediasTeleverser: "Téléverser un fichier",
   mediasExterne: "Référencer une image distante",
@@ -434,8 +434,11 @@ export const ADMIN_ACTUS = {
   mediasLegende: "Légende",
   mediasEnregistrer: "Enregistrer",
   mediasSupprimer: "Supprimer",
-  mediasSupprimerConfirm: "Supprimer ce média ? Les images déjà insérées dans le corps d'un article deviendraient des liens morts.",
-  mediasUsage: "Couverture de",
+  mediasSupprimerConfirm: "Supprimer ce média ? Le fichier sera retiré du stockage, et les images déjà insérées dans le corps d'un article deviendraient des liens morts.",
+  mediasUsage: "Utilisé par",
+  mediasDocument: "Document",
+  mediasOuvrir: "Ouvrir le fichier",
+  mediasStockageAbsent: "Stockage des fichiers non configuré : le téléversement est indisponible tant que CLOUDINARY_URL n'est pas renseignée dans l'environnement. Le référencement d'un média externe reste possible.",
 } as const;
 
 /**
@@ -615,6 +618,142 @@ export const ADMIN_EVTS = {
   supprimerCategorieConfirm: "Supprimer cette catégorie ? Les événements concernés resteront en ligne, sans catégorie.",
 } as const;
 
+/**
+ * Module « Documents & transparence ».
+ *
+ * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` et
+ * `ADMIN_EVTS` : il est lu par des composants clients (formulaire de dépôt,
+ * aperçu) qu'on ne veut pas voir embarquer le vocabulaire des autres écrans.
+ *
+ * Le vocabulaire recoupe volontairement celui des deux autres modules là où le
+ * geste est le même — publier, dépublier, filtrer : deux écrans qui se
+ * ressemblent doivent se dire pareil, sinon la console s'apprend deux fois.
+ */
+export const ADMIN_DOCS = {
+  title: "Documents & transparence",
+  lead: "Rapports, études, analyses et pièces de référence publiés dans la section « Rapports et analyses » du site. Les fichiers sont déposés sur le stockage Cloudinary et servis par son réseau de diffusion ; la base ne conserve que leurs métadonnées et leur adresse.",
+
+  /* --- Liste --------------------------------------------------------------- */
+  nouveau: "Déposer un document",
+  listeVide: "Aucun document pour le moment.",
+  listeVideFiltre: "Aucun document ne correspond à ce filtre.",
+  rechercher: "Rechercher un titre, un sigle, un organisme…",
+  filtrer: "Filtrer",
+  reinitialiser: "Tout afficher",
+  tousStatuts: "Tous les états",
+  toutesCategories: "Toutes les catégories",
+  tousTypes: "Toutes les natures",
+  trierPar: "Trier par",
+
+  colDocument: "Document",
+  colStatut: "État",
+  colType: "Nature",
+  colCategorie: "Catégorie",
+  colDate: "Date",
+  colFichier: "Fichier",
+  colOrdre: "Ordre",
+
+  sansCategorie: "Sans catégorie",
+  sansDate: "Non datée",
+  une: "En avant",
+  dateDocument: "Date du document",
+  datePublication: "Mise en ligne",
+
+  publier: "Publier",
+  depublier: "Dépublier",
+  archiver: "Archiver",
+  desarchiver: "Sortir de l'archive",
+  supprimer: "Supprimer",
+  supprimerConfirm:
+    "Supprimer définitivement ce document ? Le fichier sera retiré du stockage et les liens déjà partagés cesseront de fonctionner. Pour une version remplacée, préférez l'archivage.",
+  archiverConfirm:
+    "Archiver ce document ? Il quitte le site public mais reste en base avec son fichier, consultable depuis la console.",
+  modifier: "Modifier le document",
+  retourListe: "Retour aux documents",
+
+  deposeOk: "Document déposé en brouillon. Relisez la fiche, prévisualisez-la, puis publiez-la.",
+  supprimeOk: "Document supprimé.",
+
+  /* --- Fiche --------------------------------------------------------------- */
+  blocIdentite: "Identité du document",
+  champTitreFr: "Titre (français)",
+  champTitreFrAide: "Il sert de titre à la fiche publique et de nom dans les listes.",
+  champTitreEn: "Titre (anglais)",
+  champTitreEnAide: "Laissé vide, le titre français est servi aux lecteurs anglophones — mieux vaut un titre français qu'un document invisible.",
+  champDescriptionFr: "Description (français)",
+  champDescriptionPlaceholder: "Deux phrases qui disent ce que le document établit.",
+  champDescriptionEn: "Description (anglais)",
+  champReference: "Sigle ou référence",
+  champReferenceAide: "MEP, PPSD, CGES… Le code par lequel la pièce est désignée dans les échanges du projet.",
+  champAuteur: "Auteur ou organisme",
+  champAuteurAide: "Direction, cellule, cabinet d'études ou institution ayant produit le document.",
+
+  blocPublication: "Publication",
+  champStatut: "État",
+  champDatePublication: "Date de mise en ligne",
+  champDatePublicationAide: "Laissée vide, elle est posée à la première publication.",
+  champDateDocument: "Date du document",
+  champDateDocumentAide: "Date de production ou d'édition de la pièce. C'est elle qui prime dans le classement public.",
+  champUne: "Mettre en avant",
+  champUneAide: "Le document remonte en tête de la section « Rapports et analyses ».",
+  champPosition: "Ordre d'affichage",
+  champPositionAide: "Plus petit, plus haut. Départage les documents de même mise en avant.",
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  deposer: "Déposer le document",
+  depot: "Téléversement…",
+  voirSite: "Voir sur le site",
+  voirSiteIndisponible: "La fiche publique sera accessible une fois le document publié.",
+
+  blocClassement: "Classement",
+  champType: "Nature du document",
+  champCategorie: "Catégorie ou thématique",
+  gererCategories: "Gérer les catégories →",
+  champComposantes: "Composantes rattachées",
+  champComposantesAide: "Le document est alors rattaché aux composantes concernées.",
+
+  /* --- Fichier ------------------------------------------------------------- */
+  blocFichier: "Fichier",
+  fichierAide:
+    "PDF, Word, Excel, PowerPoint, CSV ou image. Le fichier part sur le stockage Cloudinary ; la base n'en garde que l'adresse et le poids.",
+  fichierChoisir: "Fichier à téléverser",
+  fichierAucun: "Aucun fichier attaché.",
+  fichierOuvrir: "Ouvrir le fichier",
+  fichierTelecharger: "Télécharger",
+  fichierRemplacer: "Remplacer le fichier",
+  fichierRemplacement: "Remplacement…",
+  fichierRemplacerAide:
+    "Le nouveau fichier prend la place de l'ancien, qui est retiré du stockage. Toutes les métadonnées sont conservées, et l'adresse publique change.",
+  fichierStockageAbsent:
+    "Stockage des fichiers non configuré : le dépôt est indisponible tant que CLOUDINARY_URL n'est pas renseignée dans l'environnement.",
+
+  /* --- Aperçu -------------------------------------------------------------- */
+  apercuTitre: "Prévisualisation",
+  apercuLead: "La fiche telle qu'elle paraîtra dans « Rapports et analyses », avant toute mise en ligne.",
+  apercuOuvrir: "Prévisualiser",
+  apercuFermer: "Fermer",
+  apercuFichier: "Aperçu du fichier",
+  apercuIndisponible:
+    "Ce format ne s'affiche pas dans le navigateur. Ouvrez le fichier pour le vérifier avant publication.",
+
+  /* --- Catégories ---------------------------------------------------------- */
+  categoriesTitle: "Catégories documentaires",
+  categoriesLead: "Une seule par document. Elles alimentent les filtres et la pastille des cartes sur la page publique.",
+  categoriesVide: "Aucune catégorie.",
+  champNomFr: "Libellé français",
+  champNomEn: "Libellé anglais",
+  champNomEnAide: "Laissé vide, le libellé français est repris.",
+  champSlug: "Identifiant d'URL",
+  champSlugAide: "Il apparaît dans l'adresse du filtre public (?categorie=…). Laissé vide, il est déduit du libellé.",
+  champCouleur: "Couleur",
+  champCouleurAide: "Hexadécimal (#0f62fe). Vide : l'accent du site.",
+  champOrdre: "Ordre",
+  ajouter: "Ajouter",
+  colUsage: "Documents",
+  supprimerCategorieConfirm:
+    "Supprimer cette catégorie ? Les documents concernés resteront en ligne, sans catégorie.",
+} as const;
+
 /** Un module de la console. `key` est aussi la permission qui l'ouvre. */
 export type AdminNavItem = {
   key: Permission;
@@ -658,7 +797,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     label: "Contenus",
     items: [
       { key: "actualites", label: "Actualités", slug: "/actualites" },
-      { key: "documents", label: "Documents & transparence", soon: true },
+      { key: "documents", label: "Documents & transparence", slug: "/documents" },
       { key: "medias", label: "Médias", slug: "/medias" },
       { key: "evenements", label: "Événements", slug: "/evenements" },
       { key: "histoires", label: "Histoires & impact", soon: true },
