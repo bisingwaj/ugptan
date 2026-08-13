@@ -11,6 +11,7 @@ import { Newsletter } from "@/components/chrome/Newsletter";
 import { AvisNavigation } from "@/components/legal/AvisNavigation";
 import { SlotsOverlay } from "@/components/dev/SlotsOverlay";
 import { MotionProvider } from "@/components/motion/MotionProvider";
+import { NavigationProgress } from "@/components/motion/NavigationProgress";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { Cursor } from "@/components/motion/Cursor";
 
@@ -77,6 +78,7 @@ export default async function LangLayout(props: { children: React.ReactNode; par
       </head>
       <body suppressHydrationWarning>
         <MotionProvider>
+          <NavigationProgress />
           <SmoothScroll />
           <Cursor />
           <VideoProvider lang={lang}>
