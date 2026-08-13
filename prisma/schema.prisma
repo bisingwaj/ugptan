@@ -460,7 +460,6 @@ model ArticleTranslation {
   @@index([locale])
 }
 
-<<<<<<< HEAD
 /// ---------------------------------------------------------------------------
 /// Newsletter
 ///
@@ -520,7 +519,13 @@ model NewsletterSubscriber {
 
   /// Adresse d'origine de la soumission, conservée pour instruire un abus.
   ip String?
-=======
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, subscribedAt])
+}
+
 /// ===========================================================================
 /// Événements
 ///
@@ -640,14 +645,10 @@ model Evenement {
   /// Trace de saisie, interne à la console.
   createdById String?
   createdBy   User?   @relation("EvenementSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
->>>>>>> 9aa49e11f647d8cf5eac49ad41986ef31638effc
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-<<<<<<< HEAD
-  @@index([status, subscribedAt])
-=======
   translations EvenementTranslation[]
   inscriptions EvenementInscription[]
 
@@ -755,5 +756,4 @@ model EvenementInscription {
   @@unique([evenementId, email])
   @@index([evenementId, statut])
   @@index([createdAt])
->>>>>>> 9aa49e11f647d8cf5eac49ad41986ef31638effc
 }
