@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
-import { ADMIN_BASE, ADMIN_HOME, ADMIN_LOGIN, NEXT_PARAM } from "@/lib/admin";
+import { ADMIN_BASE, ADMIN_HOME, ADMIN_LOGIN, EXPIRED_PARAM, NEXT_PARAM } from "@/lib/admin";
 
 const locales = ["fr", "en"];
 const defaultLocale = "fr";
@@ -27,10 +27,18 @@ export async function proxy(req: NextRequest) {
        contenant un point échappe au matcher ci-dessous. */
     const hasSessionCookie = Boolean(getSessionCookie(req));
     const isLogin = pathname === ADMIN_LOGIN || pathname === `${ADMIN_LOGIN}/`;
+    /* Le garde de page vient de refuser cette session APRÈS l'avoir vérifiée en
+       base (cf. lib/auth/guard.ts). Son verdict l'emporte sur ce tri optimiste,
+       qui ne regarde que la présence du cookie : sans cette lecture, le cookie
+       d'une session morte ferait rebondir `/signin` vers le tableau de bord,
+       lequel renverrait vers `/signin`, sans fin. */
+    const sessionRefusee = req.nextUrl.searchParams.has(EXPIRED_PARAM);
 
     // Cookie présent sur l'écran de connexion : on tente le tableau de bord,
-    // qui renverra ici si la session s'avère invalide.
-    if (hasSessionCookie) return isLogin ? redirectTo(req, ADMIN_HOME) : undefined;
+    // sauf si la base vient précisément de dire que cette session ne vaut rien.
+    if (hasSessionCookie && !sessionRefusee) {
+      return isLogin ? redirectTo(req, ADMIN_HOME) : undefined;
+    }
 
     // Seule page du sous-arbre ouverte sans session.
     if (isLogin) return;

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { ADMIN_HOME, NEXT_PARAM, safeAdminRedirect } from "@/lib/admin";
+import { ADMIN_HOME, EXPIRED_PARAM, NEXT_PARAM, safeAdminRedirect } from "@/lib/admin";
 import { ensureInitialAdmin } from "@/lib/auth/bootstrap";
 import { getCurrentUser } from "@/lib/auth/guard";
 import { ADMIN } from "@/content/admin";
@@ -30,5 +30,9 @@ export default async function AdminLoginPage({
   const raw = params[NEXT_PARAM];
   const next = safeAdminRedirect(Array.isArray(raw) ? raw[0] : raw);
 
-  return <AdminLoginForm next={next === ADMIN_HOME ? null : next} />;
+  // Marqueur posé par le garde : le cookie a survécu à sa session. On le dit,
+  // plutôt que de laisser croire à une déconnexion spontanée (cf. lib/admin.ts).
+  const expiree = params[EXPIRED_PARAM] !== undefined;
+
+  return <AdminLoginForm next={next === ADMIN_HOME ? null : next} avis={expiree ? ADMIN.login.expired : null} />;
 }

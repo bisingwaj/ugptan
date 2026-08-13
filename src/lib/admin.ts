@@ -35,6 +35,21 @@ export const ADMIN_GRIEVANCES = adminPath("/plaintes");
 export const NEXT_PARAM = "next";
 
 /**
+ * Marqueur posé par le garde quand il refuse une session que le cookie laissait
+ * espérer valide.
+ *
+ * ⚠️ Il n'est pas cosmétique : c'est lui qui ROMPT une boucle de redirection.
+ * Le proxy trie sur la seule PRÉSENCE du cookie, le garde de page vérifie la
+ * session EN BASE. Un cookie survivant à sa session — expiration, compte
+ * supprimé, base réinitialisée — mettait les deux en désaccord permanent : le
+ * proxy renvoyait `/signin` vers le tableau de bord, le garde renvoyait le
+ * tableau de bord vers `/signin`, indéfiniment (mesuré : 307 en rafale, page
+ * jamais rendue). Ce marqueur dit au proxy « la question a déjà été tranchée en
+ * base, laisse passer ».
+ */
+export const EXPIRED_PARAM = "expire";
+
+/**
  * Filtre anti-redirection ouverte : seuls les chemins internes à la console
  * sont acceptés comme destination après connexion. Tout le reste retombe sur
  * le tableau de bord.
