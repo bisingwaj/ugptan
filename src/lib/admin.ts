@@ -49,6 +49,23 @@ export const ADMIN_NEWSLETTER = adminPath("/newsletter");
 export const NEXT_PARAM = "next";
 
 /**
+ * Marqueur posé par le garde quand il refuse une session que le cookie laissait
+ * espérer valide (expiration, session révoquée, base réinitialisée).
+ *
+ * Il ne sert plus qu'à EXPLIQUER : l'écran de connexion s'en sert pour dire
+ * pourquoi la personne se retrouve là, au lieu de la laisser croire à une
+ * déconnexion spontanée.
+ *
+ * Il a un temps rompu une boucle de redirection — le proxy renvoyait `/signin`
+ * vers le tableau de bord dès qu'un cookie existait, le garde renvoyait le
+ * tableau de bord vers `/signin`, sans fin. Ce n'est plus lui qui la tient
+ * ouverte : `proxy.ts` ne fait plus sortir de l'écran de connexion, quel que
+ * soit le cookie. Retirer ce marqueur ne réveillerait donc pas la boucle ; cela
+ * ne ferait que rendre le renvoi muet.
+ */
+export const EXPIRED_PARAM = "expire";
+
+/**
  * Filtre anti-redirection ouverte : seuls les chemins internes à la console
  * sont acceptés comme destination après connexion. Tout le reste retombe sur
  * le tableau de bord.

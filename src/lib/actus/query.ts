@@ -18,8 +18,9 @@ import { anneeArticle, formatArticleDate } from "@/lib/format";
 import { htmlToText, readingMinutes, truncate } from "@/lib/html/sanitize";
 import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
+import { lecteur } from "@/lib/lecture";
 import { type ArticleStatut } from "@/lib/actus/statut";
-import { describeError, estPanneDeLiaison } from "@/lib/errors";
+import { describeError } from "@/lib/errors";
 
 /** Longueur d'un résumé déduit du corps, faute de résumé saisi. */
 const EXTRAIT_AUTO = 190;
@@ -69,81 +70,12 @@ const enLigne = (now: Date = new Date()) => ({
 });
 
 /**
- * Attentes successives avant chaque reprise, en millisecondes.
- *
- * ⚠️ Ce qui est mesuré, et ce qui ne l'est pas. Le réveil d'un compute Neon
- * suspendu a été soupçonné puis ÉCARTÉ : après huit minutes sans requête, la
- * page « Actualités » se rend en 3,75 s sans déclencher une seule reprise.
- *
- * Ce qui est établi, en revanche, c'est que le transport WebSocket vers Neon
- * échoue par SALVES, là où le transport HTTP reste intact au même instant
- * (mesuré : 8/8 en HTTP contre 3/8 en WebSocket sur la même minute, et 10/10
- * dès lors qu'un même pool est réutilisé). Ces paliers absorbent une salve
- * courte — ils l'ont fait pendant un `next build` à 7 workers, qui s'est
- * terminé sans un seul abandon. Une salve plus longue que le budget ressort en
- * 500, et c'est voulu : mieux vaut une erreur visible qu'une page mise en cache
- * annonçant « aucun communiqué » sur une base pourtant pleine.
- *
- * Le coût est nul tant que la base répond : ce chemin ne s'ouvre que sur une
- * panne de LIAISON avérée.
+ * Enveloppe de toute lecture publique des actualités : reprises sur panne de
+ * liaison, tolérance limitée à la compilation. La mécanique est partagée avec
+ * le module « Événements », qui lit la même base sur les mêmes pages
+ * (cf. lib/lecture.ts, où elle est documentée en détail).
  */
-const REPRISES_MS = [300, 900, 2000];
-
-const enCompilation = () => process.env.NEXT_PHASE === "phase-production-build";
-
-/**
- * Enveloppe de toute lecture publique des actualités. Elle rend deux services.
- *
- * ─── 1. Des reprises sur panne de LIAISON ────────────────────────────────────
- * Neon suspend son compute après quelques minutes sans requête, et celle qui le
- * réveille échoue avant que la socket soit établie. La page « Actualités »
- * tombait alors en 500, à la vue du public. Les reprises sont échelonnées pour
- * couvrir la durée réelle d'un réveil (cf. `REPRISES_MS`), et cantonnées aux
- * pannes de liaison (cf. `estPanneDeLiaison`) : rejouer une requête que la base
- * a refusée ne ferait que la faire refuser autant de fois.
- *
- * ─── 2. Une tolérance limitée À LA COMPILATION ───────────────────────────────
- * L'accueil et les cinq pages de composante sont pré-rendus au build et lisent
- * les actualités. Une base injoignable pendant `next build` ferait échouer la
- * construction entière pour un bloc secondaire de page. Ces listes ont un état
- * vide légitime : on y retombe, en le disant dans le journal de build.
- *
- * À L'EXÉCUTION, la panne est relayée telle quelle : une page « Actualités »
- * affichant « aucun communiqué » sur une base éteinte mentirait au visiteur, et
- * le mensonge serait mis en cache. Mieux vaut une erreur, que l'exploitant voit
- * et corrige (cf. src/instrumentation.ts pour la trace serveur).
- *
- * ⚠️ `faire` est une FONCTION, pas une promesse : une promesse déjà rejetée ne
- * se rejoue pas, la reprise n'aurait servi à rien.
- */
-async function lecture<T>(faire: () => Promise<T>, repli: T, contexte: string): Promise<T> {
-  for (let tentative = 0; ; tentative++) {
-    try {
-      return await faire();
-    } catch (error) {
-      const attente = REPRISES_MS[tentative];
-
-      // Deux sorties, une seule conduite : on abandonne dès que la reprise n'a
-      // plus de sens — paliers épuisés, ou panne qui n'est pas de liaison.
-      if (attente === undefined || !estPanneDeLiaison(error)) {
-        return echec(error, repli, contexte);
-      }
-
-      console.warn(
-        `[actus] ${contexte} : liaison perdue, reprise ${tentative + 1}/${REPRISES_MS.length} dans ${attente} ms. ${describeError(error)}`,
-      );
-      await new Promise((resoudre) => setTimeout(resoudre, attente));
-    }
-  }
-}
-
-function echec<T>(error: unknown, repli: T, contexte: string): T {
-  if (!enCompilation()) throw error;
-  console.warn(
-    `[actus] ${contexte} : base injoignable pendant la compilation, bloc laissé vide. ${describeError(error)}`,
-  );
-  return repli;
-}
+const lecture = lecteur("actus");
 
 /* -------------------------------------------------------------------------- */
 /* Vue                                                                         */
