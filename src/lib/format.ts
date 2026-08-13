@@ -61,6 +61,18 @@ export const formatArticleDate = (date: Date, lang: "fr" | "en"): string =>
   dateArticle[lang].format(date);
 
 /**
+ * Année de publication, au fuseau de Kinshasa.
+ *
+ * Même exigence que ci-dessus, pour la raison inverse : `getFullYear()` lit le
+ * fuseau de la machine. Un communiqué publié le 1er janvier à 00 h 30 à Kinshasa
+ * y serait daté de l'année précédente sur un serveur en UTC, et le fil
+ * chronologique ouvrirait une section « 2024 » au-dessus d'un article de 2025.
+ */
+const anneeKinshasa = new Intl.DateTimeFormat("en-GB", { year: "numeric", timeZone: "Africa/Kinshasa" });
+
+export const anneeArticle = (date: Date): number => Number(anneeKinshasa.format(date));
+
+/**
  * Décalage de Kinshasa (UTC+1), constant : la RDC n'applique pas d'heure d'été.
  * Le figer permet de convertir dans les deux sens sans bibliothèque de fuseaux.
  */
