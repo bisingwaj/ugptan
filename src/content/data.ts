@@ -4,7 +4,7 @@
    ========================================================================== */
 import type {
   Meta, Chiffre, Repere, Odp, Intermediaire, Composante, GouvBody, Mandat, Principe,
-  Pole, Membre, Jalon, Province, Langue, Profil, CompColorMap,
+  Pole, Membre, Province, Langue, Profil, CompColorMap,
 } from "./types";
 import type { Bilingual } from "@/lib/pick";
 
@@ -148,15 +148,11 @@ export const equipe: Membre[] = [
   { role: { fr: "Responsable Informatique", en: "IT Lead" }, pole: { fr: "Systèmes", en: "Systems" } },
 ];
 
-export const jalons: Jalon[] = [
-  { date: "25 nov. 2024", text: { fr: "Signature de l'accord avec la Banque mondiale", en: "Financing agreement signed with the World Bank" } },
-  { date: "14 mars 2025", text: { fr: "Signature de la convention avec l'AFD", en: "Financing convention signed with AFD" } },
-  { date: "15 avr. 2025", text: { fr: "Création de l'UGPTN (arrêté ministériel)", en: "Creation of the UGPTN (ministerial order)" } },
-  { date: "23 juin 2025", text: { fr: "Validation du Manuel d'Exécution (MEP)", en: "Validation of the Implementation Manual (PIM)" } },
-  { date: "31 oct. 2025", text: { fr: "Entrée en vigueur du projet", en: "Project effectiveness" } },
-  { date: "31 déc. 2029", text: { fr: "Achèvement technique", en: "Technical completion" } },
-  { date: "30 avr. 2030", text: { fr: "Date limite de décaissement IDA", en: "IDA disbursement deadline" } },
-];
+/* ⚠️ Les jalons du projet ne sont plus ici : ils sont administrés depuis la
+   console (module « Histoires & impact », gabarit « Frise de jalons »), et leur
+   état initial vit dans `src/content/impact.ts`. Ils y gagnent de vraies dates,
+   là où ce fichier ne portait qu'un libellé français affiché tel quel sur la
+   version anglaise du site. */
 
 export const provinces: Province[] = [
   { nom: "Kinshasa", x: 13, y: 59, prio: true },

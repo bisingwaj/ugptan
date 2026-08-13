@@ -30,6 +30,7 @@ import {
 import type { EvenementSaisie, ReferentielsEvtSaisie } from "@/lib/events/saisie";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
+import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
 
 type Props = {
   evenement: EvenementSaisie;
@@ -240,19 +241,11 @@ export function EvtReglagesChamps({ evenement, referentiels, assets }: Props) {
           </p>
         </div>
 
-        <div className="adm-form__field">
-          <label className="label-mono" htmlFor={`${idBase}-color`}>{t.champCouleur}</label>
-          <input
-            id={`${idBase}-color`}
-            name="color"
-            type="text"
-            className="field mono"
-            spellCheck={false}
-            defaultValue={evenement.color}
-            placeholder="#0f62fe"
-          />
-          <p className="adm-hint" style={{ marginTop: 6 }}>{t.champCouleurAide}</p>
-        </div>
+        <ChampCouleur
+          defaultValue={evenement.color}
+          label={t.champCouleur}
+          aide={t.champCouleurAide}
+        />
 
         <fieldset className="adm-fieldset" style={{ marginTop: 4 }}>
           <legend className="label-mono" style={{ marginBottom: 0 }}>{t.champComposantes}</legend>

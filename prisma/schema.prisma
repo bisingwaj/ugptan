@@ -62,7 +62,7 @@ model User {
 
   /// --- Autorisation propre au projet --------------------------------------
   /// Modules autorisés en plus du socle du rôle. Vide pour un ADMIN, qui a tout.
-  permissions String[] @default([])
+  permissions String[]  @default([])
   /// Dernière connexion, alimentée par un `databaseHook` Better Auth à la
   /// création de session (cf. src/lib/auth/server.ts).
   lastLoginAt DateTime?
@@ -87,6 +87,8 @@ model User {
 
   /// Rapports et documents déposés par ce compte — trace interne.
   documentsDeposes Document[] @relation("DocumentDeposePar")
+  /// Sections « Histoires & impact » saisies par ce compte — trace interne.
+  impactSaisi ImpactSection[] @relation("ImpactSaisiPar")
 
   @@index([role])
 }
@@ -203,8 +205,8 @@ enum GrievanceEventType {
 /// L'anonymat se lit sur `isAnonymous`, dérivé du seul champ « Nom complet » :
 /// une personne peut laisser un moyen de contact sans se nommer.
 model Grievance {
-  id          String  @id @default(cuid())
-  reference   String  @unique
+  id          String @id @default(cuid())
+  reference   String @unique
   /// Code de la catégorie choisie à l'étape 1 (cf. src/content/mgp.ts). Un code
   /// et non un libellé : le formulaire est bilingue, le dossier ne l'est pas.
   category    String
@@ -272,8 +274,8 @@ model GrievanceEvent {
   fromValue   String?
   toValue     String?
 
-  authorId String?
-  author   User?   @relation("GrievanceEventAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId    String?
+  author      User?   @relation("GrievanceEventAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   /// Nom de l'auteur figé à l'écriture : l'historique doit rester lisible même
   /// après la suppression du compte qui a agi.
   authorLabel String?
@@ -350,19 +352,21 @@ model MediaAsset {
   couvertures Article[]
   /// Événements dont ce média est l'image de couverture.
   affiches    Evenement[]
+  /// Entrées « Histoires & impact » illustrées par ce média.
+  impacts     ImpactItem[]
 
   @@index([createdAt])
 }
 
 /// Catégorie d'article — sert aussi de filtre sur la page publique.
 model ArticleCategory {
-  id    String @id @default(cuid())
+  id        String   @id @default(cuid())
   /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
-  slug  String @unique
-  nomFr String
-  nomEn String
+  slug      String   @unique
+  nomFr     String
+  nomEn     String
   /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
-  color String?
+  color     String?
   /// Ordre d'affichage des filtres.
   position  Int      @default(0)
   createdAt DateTime @default(now())
@@ -587,13 +591,13 @@ enum EvenementMode {
 /// n'ont pas le même contenu ni la même durée de vie, et les fusionner
 /// obligerait chaque filtre à savoir de quel module vient chaque entrée.
 model EvenementCategory {
-  id    String @id @default(cuid())
+  id        String   @id @default(cuid())
   /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
-  slug  String @unique
-  nomFr String
-  nomEn String
+  slug      String   @unique
+  nomFr     String
+  nomEn     String
   /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
-  color String?
+  color     String?
   /// Ordre d'affichage des filtres.
   position  Int      @default(0)
   createdAt DateTime @default(now())
@@ -617,7 +621,7 @@ model Evenement {
   /// quoi une rencontre du matin serait annoncée « terminée » à 9 h 01.
   endAt   DateTime?
   /// Journée entière : l'heure n'est plus affichée, seule la date l'est.
-  allDay  Boolean         @default(false)
+  allDay  Boolean   @default(false)
 
   mode     EvenementMode @default(PRESENTIEL)
   /// Mise en avant : remonte l'événement en tête des listes.
@@ -922,4 +926,253 @@ model Document {
   @@index([categoryId])
   @@index([type])
   @@index([featured])
+}
+
+/// Histoires & impact
+///
+/// Le module ne gère pas UNE page mais SIX emplacements répartis sur trois
+/// pages publiques (accueil, résultats, projet). Ce qu'ils ont en commun n'est
+/// pas leur dessin — une frise de jalons ne ressemble pas à une grille de
+/// témoignages — mais leur nature : ce sont les blocs qui racontent d'où vient
+/// le Projet et ce qu'il change.
+///
+/// ─── Deux niveaux, et un seul dessin par niveau ─────────────────────────────
+///
+///   · une SECTION porte l'en-tête (kicker, titre, chapô, bouton), le fond, la
+///     place dans la page et le GABARIT de ses entrées ;
+///   · un ITEM porte une entrée de la section : un chiffre, un témoignage, un
+///     jalon, un diptyque avant/après, une carte sectorielle.
+///
+/// Le gabarit (`layout`) décide de ce qui se lit dans un item, et donc de ce
+/// que le formulaire demande. C'est ce qui évite deux écueils symétriques : une
+/// table par bloc — cinq modules à maintenir pour cinq grilles —, et un champ
+/// « contenu libre » — qui rendrait chaque section responsable de son propre
+/// HTML, donc de sa propre dérive graphique.
+///
+/// ─── Découpage fiche / traduction ───────────────────────────────────────────
+/// Identique aux actualités et aux événements : ce qui ne dépend d'aucune
+/// langue vit sur la fiche, tout ce qui se lit vit sur la traduction. Une
+/// langue non traduite se reconnaît à l'absence de sa ligne, ce qui permet à la
+/// console de la signaler et au site de ne jamais servir un texte français à un
+/// lecteur anglophone.
+/// ===========================================================================
+
+/// Cycle de vie d'une section comme d'une entrée.
+///
+/// Pas de `SCHEDULED` ni d'`ARCHIVED` ici, contrairement aux actualités : ces
+/// blocs sont des éléments de page, pas des parutions. Une section se montre ou
+/// se retire, et le retrait n'a pas de mémoire à conserver.
+enum ImpactStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Où la section s'affiche sur le site public.
+///
+/// ⚠️ Valeur STRUCTURANTE : chaque emplacement correspond à un point d'insertion
+/// réel dans une page (cf. src/lib/impact/query.ts et les pages publiques). En
+/// ajouter un suppose d'ouvrir ce point d'insertion dans la page concernée ;
+/// tout le reste — textes, entrées, ordre, fond — se pilote depuis la console
+/// sans toucher au code.
+enum ImpactEmplacement {
+  ACCUEIL_IMPACT
+  ACCUEIL_HISTOIRES
+  RESULTATS_DIALOGUES
+  RESULTATS_HISTOIRES
+  PROJET_CHANGEMENTS
+  PROJET_JALONS
+}
+
+/// Dessin des entrées d'une section. Chaque gabarit reproduit à l'identique un
+/// bloc qui existait déjà en dur dans les pages (cf. src/components/impact/).
+enum ImpactLayout {
+  /// Grille de chiffres : grande valeur, unité en accent, phrase d'explication.
+  STATS
+  /// Cartes de témoignage : portrait cliquable (vidéo), nom, rôle, citation.
+  TEMOIGNAGES
+  /// Cartes sectorielles : secteur en accent, titre, description.
+  CARTES
+  /// Diptyque : numéro, intitulé, situation actuelle puis situation visée.
+  AVANT_APRES
+  /// Frise verticale : date puis fait marquant.
+  JALONS
+}
+
+/// Fond de la section, repris du design system (cf. `.section--*`).
+enum ImpactTheme {
+  CLAIR
+  GRIS
+  PALE
+  SOMBRE
+}
+
+/// Un bloc « Histoires & impact » affiché sur une page publique.
+model ImpactSection {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché. Il sert d'ancrage à l'amorçage
+  /// (cf. src/lib/impact/bootstrap.ts) : c'est lui qui garantit qu'une reprise
+  /// du contenu d'origine ne crée pas de doublon si elle est rejouée.
+  key String @unique
+
+  emplacement ImpactEmplacement
+  layout      ImpactLayout
+  theme       ImpactTheme       @default(CLAIR)
+  status      ImpactStatus      @default(DRAFT)
+
+  /// Ordre entre les sections d'un MÊME emplacement. Deux sections peuvent
+  /// légitimement se suivre au même endroit : une grille de chiffres puis une
+  /// grille de témoignages, par exemple.
+  position Int @default(0)
+
+  /// Numéro affiché dans le kicker (« [ 03 ] Résultats »). Une chaîne et non un
+  /// entier : la numérotation des sections du site est rédigée (« 02 »), pas
+  /// calculée, et elle ne suit pas l'ordre de cette table.
+  numero String?
+
+  /// Section resserrée (`.section--sm`) : moins d'air vertical.
+  compact    Boolean @default(false)
+  /// Titre à la taille des grandes sections d'accueil (`.h2`) plutôt qu'à celle
+  /// des sections secondaires (`.h2--sm`).
+  grandTitre Boolean @default(false)
+
+  /// Lien du bouton d'en-tête. Son libellé se traduit (cf. la traduction).
+  ctaUrl String?
+
+  /// Section dont celle-ci REPREND les entrées.
+  ///
+  /// Le site montre les mêmes quatre témoignages à deux endroits : un aperçu
+  /// sur l'accueil, la grille complète en fin de page « Résultats ». Sans ce
+  /// renvoi, il faudrait les saisir deux fois et les corriger deux fois — et la
+  /// première correction oubliée ferait mentir l'une des deux pages.
+  ///
+  /// Une section qui reprend n'a pas d'entrées propres : elle porte son
+  /// en-tête, son fond et sa place, et affiche les entrées de sa source.
+  sourceId String?
+  source   ImpactSection?  @relation("ImpactSource", fields: [sourceId], references: [id], onDelete: SetNull)
+  reprises ImpactSection[] @relation("ImpactSource")
+
+  /// Nombre maximal d'entrées affichées. Vide : toutes.
+  limite Int?
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("ImpactSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ImpactSectionTranslation[]
+  items        ImpactItem[]
+
+  @@index([emplacement, position])
+  @@index([status])
+}
+
+/// En-tête d'une section dans une langue. Tout ce qui s'y lit est ici.
+///
+/// `titre` est FACULTATIF, contrairement au titre d'un article : la frise des
+/// jalons de la page « Le projet » n'affiche qu'un kicker, et lui imposer un
+/// H2 ajouterait au site un titre que son dessin n'a jamais porté. Une langue
+/// est réputée servie dès qu'elle porte un kicker ou un titre.
+model ImpactSectionTranslation {
+  id        String        @id @default(cuid())
+  sectionId String
+  section   ImpactSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale    String
+
+  /// Libellé mono qui coiffe la section (« Impact humain »).
+  kicker   String?
+  titre    String?
+  /// Chapô sous le titre.
+  lead     String?
+  /// Libellé du bouton d'en-tête. Sans `ctaUrl` sur la fiche, il ne s'affiche pas.
+  ctaLabel String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sectionId, locale])
+  @@index([locale])
+}
+
+/// Une entrée d'une section : chiffre, témoignage, carte, diptyque ou jalon.
+///
+/// Les champs non linguistiques sont volontairement GÉNÉRIQUES, et leur emploi
+/// dépend du gabarit de la section (cf. src/lib/impact/statut.ts, qui tient la
+/// table de correspondance et les libellés que la console affiche).
+model ImpactItem {
+  id        String        @id @default(cuid())
+  sectionId String
+  section   ImpactSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  position Int          @default(0)
+  status   ImpactStatus @default(PUBLISHED)
+  /// Mise en avant. Le dessin en tire un liseré d'accent, jamais un changement
+  /// de place : l'ordre reste celui de `position`, sinon la grille se réordonne
+  /// sous les yeux de la rédaction sans qu'elle l'ait demandé.
+  featured Boolean      @default(false)
+
+  /// Valeur affichée en grand : « 30 M » pour un chiffre, « 01 » pour un
+  /// diptyque. Une chaîne, parce que ce qui se lit n'est pas toujours un
+  /// nombre et que « 30 M » n'est pas « 30000000 ».
+  valeur  String?
+  /// Couleur d'accent de l'entrée. Vide : l'accent du site.
+  color   String?
+  /// Identifiant YouTube du témoignage, le cas échéant.
+  videoYt String?
+  /// Lien sortant de l'entrée.
+  lienUrl String?
+
+  /// Date réelle d'un jalon. Elle sert à ORDONNER et à afficher la date dans la
+  /// langue de lecture ; un libellé saisi dans la traduction la remplace quand
+  /// la date exacte n'est pas connue (« T1 2026 »).
+  dateAt DateTime?
+
+  /// Visuel issu de la bibliothèque.
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation(fields: [coverMediaId], references: [id], onDelete: SetNull)
+  /// Repli : clé du registre d'images intégré (cf. src/content/media.ts).
+  coverKey     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ImpactItemTranslation[]
+
+  @@index([sectionId, position])
+}
+
+/// Version d'une entrée dans une langue.
+///
+/// Quatre champs de texte couvrent les cinq gabarits, chacun désigné par son
+/// RÔLE dans la carte plutôt que par le contenu d'un bloc particulier :
+/// la console les réétiquette selon le gabarit (« Rôle & lieu » pour un
+/// témoignage, « Unité » pour un chiffre, « Secteur » pour une carte).
+model ImpactItemTranslation {
+  id     String     @id @default(cuid())
+  itemId String
+  item   ImpactItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale String
+
+  /// Ligne courte au-dessus ou sous le titre : unité, rôle, secteur, date.
+  surtitre        String?
+  titre           String?
+  /// Corps principal : explication, citation, situation visée, fait marquant.
+  texte           String?
+  /// Second corps, employé par le seul gabarit AVANT_APRES : la situation
+  /// actuelle, celle que le Projet entend corriger.
+  texteSecondaire String?
+  /// Libellé du lien sortant. Sans `lienUrl` sur la fiche, il ne s'affiche pas.
+  lienLabel       String?
+  /// Texte alternatif du visuel, propre à la langue.
+  mediaAlt        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([itemId, locale])
+  @@index([locale])
 }

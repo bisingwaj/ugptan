@@ -628,6 +628,44 @@
   }
 
   /* --- Catégories & étiquettes ----------------------------------------------- */
+  /* --- Choix d'une couleur d'accent ---------------------------------------
+     Des carrés, pas des ronds : le design system du site ne connaît que l'angle
+     droit. La pastille active se marque par un liseré NOIR détaché, et non par
+     une teinte — sur un nuancier, toute marque colorée se confondrait avec les
+     couleurs qu'elle désigne. */
+  .adm-couleur { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .adm-couleur__pastille {
+    width: 26px; height: 26px; flex: 0 0 auto; padding: 0;
+    border: 1px solid rgba(22, 22, 22, 0.16); cursor: pointer;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .adm-couleur__pastille:hover { transform: translateY(-1px); }
+  .adm-couleur__pastille.is-on { box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--c-black); }
+  .adm-couleur__pastille:focus-visible { outline: 2px solid var(--ac); outline-offset: 3px; }
+
+  /* Pastille « autre » : l'input natif la remplit entièrement et reste
+     cliquable, mais invisible — c'est le carré qui se voit, pas le widget du
+     système. `opacity: 0` et non `display: none` : masqué, un input ne
+     s'ouvrirait plus au clic. */
+  .adm-couleur__libre {
+    position: relative; overflow: hidden;
+    background:
+      linear-gradient(135deg, #0f62fe 0 25%, #009d9a 25% 50%, #8a3ffc 50% 75%, #ff832b 75% 100%);
+  }
+  .adm-couleur__libre input {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer; border: 0; padding: 0;
+  }
+
+  .adm-couleur__hex { width: 116px; flex: 0 0 auto; text-transform: lowercase; }
+  .adm-couleur__vider { padding-inline: 12px; }
+
+  @media (max-width: 520px) {
+    /* La ligne de saisie passe sous le nuancier plutôt que de se réduire à
+       quelques caractères visibles. */
+    .adm-couleur__hex { width: 100%; flex: 1 1 100%; }
+  }
+
   /* --- Demandes de participation -----------------------------------------
      Une carte par demande, et non une ligne de tableau : chacune porte une
      identité, un message libre, un état et une note. Comprimé en colonnes, le
@@ -657,6 +695,55 @@
   .adm-taxo__form { display: flex; flex-direction: column; gap: 14px; }
   .adm-taxo__grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
   .adm-taxo__ordre { max-width: 120px; }
+
+  /* --- Entrées d'une section « Histoires & impact » -------------------------
+     Une carte dépliable par entrée, et non une ligne de tableau : repliée, elle
+     doit tenir sur une ligne et dire l'essentiel — l'intitulé, l'état, les
+     langues qui manquent ; dépliée, elle porte deux onglets de langue et un
+     bloc de réglages, ce qu'aucune cellule de tableau ne peut contenir. */
+  .adm-items { margin-top: 30px; }
+  .adm-items__tete {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px 20px; margin-bottom: 14px;
+  }
+  .adm-items__liste { display: flex; flex-direction: column; gap: 12px; }
+
+  .adm-item { border: 1px solid var(--c-20); background: #fff; }
+  .adm-item__tete {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 10px 16px; padding: 12px 16px;
+  }
+  .adm-item__ouvrir {
+    display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 220px;
+    padding: 0; text-align: left; color: var(--c-black);
+  }
+  .adm-item__ouvrir:hover .adm-item__resume { color: var(--ac); }
+  .adm-item__rang { flex: 0 0 auto; font-size: 12px; color: var(--c-50); }
+  .adm-item__resume {
+    min-width: 0; font-size: 14px; line-height: 1.4;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .adm-item__etats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .adm-item__deplacer .btn { padding-inline: 10px; }
+
+  .adm-item__corps {
+    display: flex; flex-direction: column; gap: 18px;
+    padding: 4px clamp(12px, 2vw, 18px) clamp(16px, 2vw, 22px);
+    border-top: 1px solid var(--c-20);
+  }
+  .adm-item__corps[hidden] { display: none; }
+  .adm-item__langue {
+    display: flex; flex-direction: column; gap: 18px;
+    border: 1px solid var(--c-20); border-top: 0; background: #fff;
+    padding: clamp(14px, 2vw, 20px);
+  }
+  .adm-item__langue[hidden] { display: none; }
+  .adm-item__reglages {
+    display: flex; flex-direction: column; gap: 14px;
+    border: 1px solid var(--c-20); background: var(--c-10);
+    padding: clamp(14px, 2vw, 20px);
+  }
+  .adm-item__grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
 
   @media (max-width: 1100px) {
     .adm-edit { grid-template-columns: 1fr; }

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { composantes, odp, intermediaires, jalons } from "@/content/data";
-import { projetImpacts, projetPersonas, citoyenFaq } from "@/content/carbon";
+import { composantes, odp, intermediaires } from "@/content/data";
+import { projetPersonas, citoyenFaq } from "@/content/carbon";
 import { NAV, route, compRoute } from "@/lib/routes";
 import { compVar } from "@/lib/comp";
 import { Kicker } from "@/components/ui/Kicker";
@@ -13,6 +13,12 @@ import { Accordion } from "@/components/ui/Accordion";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { SectionsImpact } from "@/components/impact/SectionsImpact";
+
+/** Cache aligné sur l'accueil : la page sert deux blocs administrés depuis la
+ *  console (avant/après, frise des jalons), invalidés par les écritures du
+ *  module (cf. lib/impact/cache.ts). */
+export const revalidate = 120;
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -52,28 +58,10 @@ export default async function ProjetPage(props: { params: Promise<{ lang: string
         </div>
       </section>
 
-      {/* Ce que ça change */}
-      <section className="section section--grey">
-        <div className="section__inner">
-          <Reveal>
-            <Kicker>{p.changeLabel}</Kicker>
-            <h2 className="h2--sm" style={{ maxWidth: "18ch" }}>{p.changeTitle}</h2>
-            <p style={{ margin: "22px 0 44px", fontSize: 16, lineHeight: 1.65, color: "var(--c-70)", maxWidth: 720 }}>{p.changeLead}</p>
-          </Reveal>
-          <RevealGroup className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))" }} gap={0.045}>
-            {projetImpacts.map((i) => (
-              <RevealItem key={i.n} className="cell" style={{ padding: "28px clamp(22px,2.4vw,30px)", display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22 }}><span className="mono" style={{ fontWeight: 600, fontSize: 13, color: "#fff", background: "var(--c-black)", padding: "5px 9px" }}>{i.n}</span><span style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.01em" }}>{pick(i.t, lang)}</span></div>
-                <div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.09em", color: "var(--c-50)", marginBottom: 7 }}>{t.words.avant}</div>
-                <p style={{ margin: "0 0 16px", fontSize: 14, lineHeight: 1.5, color: "var(--c-60)" }}>{pick(i.av, lang)}</p>
-                <div className="mono" style={{ fontSize: 13, color: "var(--ac)", marginBottom: 7 }}>↓</div>
-                <div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.09em", color: "var(--ac)", marginBottom: 7 }}>{t.words.apres}</div>
-                <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.5, fontWeight: 500 }}>{pick(i.ap, lang)}</p>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+      {/* Ce que ça change — administré depuis la console (module « Histoires &
+          impact »). Le dessin du diptyque vit dans
+          components/impact/blocs/BlocAvantApres.tsx. */}
+      <SectionsImpact emplacement="PROJET_CHANGEMENTS" lang={lang} />
 
       {/* Pour qui */}
       <section className="section">
@@ -170,23 +158,10 @@ export default async function ProjetPage(props: { params: Promise<{ lang: string
         </div>
       </section>
 
-      {/* Jalons */}
-      <section className="section">
-        <div className="section__inner">
-          <Reveal>
-            <Kicker>{p.jalonsLabel}</Kicker>
-          </Reveal>
-          <RevealGroup style={{ borderLeft: "2px solid var(--c-20)", marginLeft: 8, marginTop: 20 }} gap={0.045}>
-            {jalons.map((j, i) => (
-              <RevealItem key={i} style={{ position: "relative", padding: "0 0 30px 36px" }}>
-                <span style={{ position: "absolute", left: -7, top: 3, width: 12, height: 12, background: "var(--ac)", border: "2px solid #fff" }} />
-                <div className="mono" style={{ fontSize: 13, color: "var(--ac)", fontWeight: 500 }}>{j.date}</div>
-                <div style={{ fontSize: 16, marginTop: 5, maxWidth: 560, lineHeight: 1.4 }}>{pick(j.text, lang)}</div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+      {/* Jalons — frise administrée depuis la console. Les dates sont désormais
+          de vraies dates : elles ordonnent la frise et se mettent en forme dans
+          la langue de lecture. */}
+      <SectionsImpact emplacement="PROJET_JALONS" lang={lang} />
 
       {/* Le projet & vous */}
       <section className="section section--grey">

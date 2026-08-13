@@ -213,19 +213,6 @@ export function dict(lang: Lang) {
         "Une équipe d'exécution organisée en cinq pôles — Direction, Composantes, Fiduciaire, Passation, Sauvegardes & transversal — et vingt-et-un sous-rôles, du pilotage national à la liaison avec les provinces.",
         "An execution team organised into five clusters — Management, Components, Fiduciary, Procurement, Safeguards & cross-cutting — and twenty-one sub-roles, from national steering to provincial liaison.",
       ),
-      humainLabel: t("Impact humain", "Human impact"),
-      humainTitle: t("Ce que ces ambitions représentent, une fois traduites.", "What these ambitions mean, once translated."),
-      humainLead: t(
-        "Ces ambitions ne sont pas des abstractions — ce sont des écoles en ligne, des femmes dans les métiers du numérique et des villages raccordés.",
-        "These ambitions are not abstractions — they are schools online, women in digital careers and villages brought onto the network.",
-      ),
-      storiesLabel: t("Histoires & impact", "Stories & impact"),
-      storiesTitle: t("Au-delà des chiffres, des vies qui changent.", "Beyond the numbers, lives that change."),
-      storiesLead: t(
-        "Celles et ceux pour qui le Projet existe — des visages, des métiers, des territoires.",
-        "The people the Project is for — faces, trades and places across the country.",
-      ),
-      storiesTeaserCta: t("Voir toutes les histoires & vidéos", "See all stories & videos"),
       watchStory: t("Voir le témoignage", "Watch the testimonial"),
       evtLabel: t("Événements & activités", "Events & activities"),
       evtTitle: t("Échanger, participer, contribuer.", "Exchange, take part, contribute."),
@@ -511,16 +498,6 @@ export function dict(lang: Lang) {
         { d: "25.11.2024", t: t("Signature de l'accord de financement avec la Banque mondiale (IDA).", "Financing agreement signed with the World Bank (IDA).") },
         { d: "14.03.2025", t: t("Signature de la convention de financement avec l'Agence Française de Développement.", "Financing convention signed with the French Development Agency.") },
       ],
-      jalonsLabel: t("Calendrier & jalons", "Timeline & milestones"),
-      changeLabel: t("Ce que ça change pour vous", "What it changes for you"),
-      changeTitle: t(
-        "Ce qui change vraiment tient souvent à une seule chose : ne plus avoir à se déplacer pour prouver ce que l'administration sait déjà.",
-        "What really changes often comes down to one thing: no longer travelling to prove what the administration already knows.",
-      ),
-      changeLead: t(
-        "Un projet d'infrastructure ne se juge pas à ce qu'il installe, mais à ce qu'il rend possible — et à ce qu'il cesse d'imposer. Voici, secteur par secteur, la contrainte d'aujourd'hui et le mécanisme précis qui la lève.",
-        "An infrastructure project is judged not by what it installs, but by what it makes possible — and by what it stops imposing. Here, sector by sector, is today's constraint and the precise mechanism that lifts it.",
-      ),
       whoLabel: t("Pour qui ?", "Who benefits"),
       whoTitle: t("À qui cela profite, et à quelle condition.", "Who benefits, and on what condition."),
       cfaqLabel: t("Le projet & vous", "The project & you"),
@@ -879,12 +856,6 @@ export function dict(lang: Lang) {
       projVideosLead: t(
         "Un film par composante, présenté par son responsable : le périmètre, les chantiers en cours et ce que l'on attend d'eux.",
         "One film per component, presented by its lead: the scope, the workstreams under way and what is expected of them.",
-      ),
-      dialoguesLabel: t("Dialogues sectoriels", "Sector dialogues"),
-      dialoguesTitle: t("Le numérique n'est utile qu'appliqué à un métier.", "Digital is only useful when applied to a trade."),
-      dialoguesLead: t(
-        "Une infrastructure ne produit d'effet qu'à travers les politiques sectorielles qui s'en saisissent. Ces dialogues servent à identifier, avec chaque ministère et chaque profession, l'usage précis qui justifie l'investissement.",
-        "Infrastructure only produces effects through the sector policies that take hold of it. These dialogues serve to identify, with each ministry and each profession, the precise use that justifies the investment.",
       ),
     },
 

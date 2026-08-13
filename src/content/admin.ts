@@ -415,7 +415,7 @@ export const ADMIN_ACTUS = {
   champNomEn: "Libellé anglais",
   champNomEnAide: "Laissé vide, le libellé français est repris.",
   champCouleur: "Couleur",
-  champCouleurAide: "Hexadécimal (#0f62fe). Vide : l'accent du site.",
+  champCouleurAide: "Sans couleur, la catégorie prend l'accent du site.",
   champPosition: "Ordre",
   ajouter: "Ajouter",
   colUsage: "Articles",
@@ -571,7 +571,7 @@ export const ADMIN_EVTS = {
   champCategorie: "Catégorie",
   gererCategories: "Gérer les catégories →",
   champCouleur: "Couleur d'accent",
-  champCouleurAide: "Hexadécimal (#0f62fe). Vide : celle de la catégorie, puis l'accent du site.",
+  champCouleurAide: "Sans couleur, l'événement prend celle de sa catégorie, puis l'accent du site.",
   champPosition: "Ordre",
   champComposantes: "Composantes rattachées",
   champComposantesAide: "L'événement remonte alors dans les blocs des pages de composante concernées.",
@@ -754,6 +754,176 @@ export const ADMIN_DOCS = {
     "Supprimer cette catégorie ? Les documents concernés resteront en ligne, sans catégorie.",
 } as const;
 
+/**
+ * Module « Histoires & impact ».
+ *
+ * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` et
+ * `ADMIN_EVTS` : il est lu par des composants clients (fiche de section,
+ * formulaires d'entrée) qu'on ne veut pas voir embarquer le vocabulaire des
+ * autres écrans.
+ *
+ * Le vocabulaire recoupe volontairement celui des deux autres modules là où le
+ * geste est le même (publier, dupliquer, traduire) : deux modules qui se
+ * ressemblent doivent se dire pareil, sinon la console s'apprend deux fois.
+ */
+export const ADMIN_IMPACT = {
+  title: "Histoires & impact",
+  lead: "Les blocs qui racontent d'où vient le Projet et ce qu'il change : chiffres d'impact, témoignages, dialogues sectoriels, diptyques avant/après et frise des jalons. Chaque section existe en français et en anglais ; une langue non traduite est signalée et n'est jamais servie au public.",
+
+  /* --- Liste --------------------------------------------------------------- */
+  nouveau: "Nouvelle section",
+  listeVide: "Aucune section pour le moment.",
+  listeVideFiltre: "Aucune section ne correspond à ce filtre.",
+  filtrer: "Filtrer",
+  reinitialiser: "Tout afficher",
+  tousStatuts: "Tous les états",
+  tousEmplacements: "Tous les emplacements",
+  tousGabarits: "Tous les gabarits",
+
+  colSection: "Section",
+  colStatut: "État",
+  colEmplacement: "Emplacement",
+  colGabarit: "Gabarit",
+  colLangues: "Langues",
+  colEntrees: "Entrées",
+  colOrdre: "Ordre",
+
+  sansTitre: "(sans titre)",
+  reprise: "reprend une autre section",
+  repriseDe: (nom: string) => `Entrées reprises de « ${nom} ».`,
+
+  publier: "Publier",
+  depublier: "Retirer du site",
+  dupliquer: "Dupliquer",
+  supprimer: "Supprimer",
+  supprimerConfirm: "Supprimer définitivement cette section, ses entrées et toutes leurs traductions ? Cette action est irréversible.",
+  retourListe: "Retour aux histoires & impact",
+
+  creeOk: "Section créée. Ajoutez ses entrées puis publiez-la.",
+  copieOk: "Copie créée en brouillon.",
+  supprimeOk: "Section supprimée.",
+
+  /* --- Langues ------------------------------------------------------------- */
+  langueRedaction: "Langue de rédaction",
+  langueRedactionAide:
+    "La section naît dans cette langue. Les autres versions s'ajoutent ensuite depuis la fiche, chacune enregistrée séparément.",
+  tradPresente: "traduit",
+  tradIncomplete: "incomplet",
+  tradManquante: "à traduire",
+  tradNouvelle: (langue: string) =>
+    `Cette version ${langue} n'existe pas encore. Renseignez-la puis enregistrez-la : elle ne touchera à aucune autre langue.`,
+  enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
+  enregistrerFiche: "Enregistrer les réglages",
+  supprimerTraduction: "Supprimer cette traduction",
+  supprimerTraductionConfirm:
+    "Supprimer cette version linguistique ? La section restera en ligne dans les autres langues.",
+  majLe: "Modifié le",
+  creer: "Créer la section",
+  creation: "Création…",
+
+  /* --- En-tête de section -------------------------------------------------- */
+  blocEntete: "En-tête de la section",
+  champKicker: "Libellé de section",
+  champKickerAide: "La petite ligne en capitales au-dessus du titre (« Impact humain »).",
+  champTitre: "Titre",
+  champTitreAide: "Sert de titre H2 sur la page. Laissé vide, la section n'affiche que son libellé.",
+  champLead: "Chapô",
+  champLeadAide: "Le paragraphe d'introduction sous le titre.",
+  champCtaLabel: "Libellé du bouton",
+  champCtaLabelAide: "N'apparaît que si un lien est renseigné dans les réglages.",
+
+  /* --- Réglages de la section ---------------------------------------------- */
+  blocPublication: "Publication",
+  champStatut: "État",
+  champEmplacement: "Emplacement",
+  champEmplacementAide: "La page et l'endroit exact où la section s'insère.",
+  champGabarit: "Gabarit des entrées",
+  champGabaritAide: "Il décide du dessin de la grille et des champs demandés pour chaque entrée.",
+  champPosition: "Ordre",
+  champPositionAide: "Entre plusieurs sections du même emplacement. Le plus petit passe en premier.",
+
+  blocApparence: "Apparence",
+  champTheme: "Fond de la section",
+  champNumero: "Numéro de section",
+  champNumeroAide: "Le chiffre affiché entre crochets devant le libellé (« [ 03 ] »). Vide : aucun.",
+  champCompact: "Section resserrée",
+  champCompactAide: "Réduit l'espace vertical autour de la section.",
+  champGrandTitre: "Grand titre",
+  champGrandTitreAide: "La taille des titres majeurs de l'accueil, plutôt que celle des sections secondaires.",
+
+  blocLien: "Bouton d'en-tête",
+  champCtaUrl: "Lien",
+  champCtaUrlAide: "Chemin interne sans la langue (« /projet ») ou adresse complète. Vide : aucun bouton.",
+
+  blocReprise: "Entrées",
+  champSource: "Reprendre les entrées d'une autre section",
+  champSourceAide:
+    "Les mêmes témoignages s'affichent sur l'accueil et sur la page des résultats. Les rattacher à une seule section évite de les corriger deux fois.",
+  sansSource: "Entrées propres à cette section",
+  champLimite: "Nombre maximal d'entrées",
+  champLimiteAide: "0 : toutes les entrées de la section.",
+
+  /* --- Entrées ------------------------------------------------------------- */
+  itemsTitle: "Entrées de la section",
+  itemsVide: "Aucune entrée. Ajoutez-en une pour que la section puisse être publiée.",
+  itemsReprise: "Cette section n'a pas d'entrées propres : elle affiche celles de sa source. Modifiez-les depuis la section source.",
+  itemAjouter: "Ajouter une entrée",
+  itemSansTitre: "Entrée sans titre",
+  itemMonter: "Monter",
+  itemDescendre: "Descendre",
+  itemSupprimer: "Supprimer l'entrée",
+  itemSupprimerConfirm: "Supprimer cette entrée et toutes ses traductions ?",
+  itemReglages: "Réglages de l'entrée",
+  itemStatut: "Affichage",
+  itemUne: "Mettre en avant",
+  itemUneAide: "Ajoute un liseré d'accent. L'ordre de la grille ne change pas.",
+  itemPosition: "Rang",
+  itemCouleur: "Couleur d'accent",
+  itemCouleurAide: "Sans couleur, l'entrée prend l'accent du site.",
+  itemVideo: "Vidéo",
+  itemVideoAide: "Identifiant YouTube. Le portrait devient alors cliquable et ouvre la vidéo.",
+  itemDate: "Date du jalon",
+  itemDateAide: "Sert à ranger la frise et s'affiche dans la langue de lecture.",
+  itemLien: "Lien sortant",
+  itemLienLabel: "Libellé du lien",
+  itemVisuel: "Visuel",
+  itemAlt: "Texte alternatif du visuel",
+  itemAltAide: "Décrit l'image pour les lecteurs d'écran et quand elle ne se charge pas.",
+  aucunVisuel: "Aucun visuel",
+  choisirVisuel: "Choisir un visuel",
+  changerVisuel: "Changer",
+  retirerVisuel: "Retirer",
+  visuelPartage: "Le visuel et la vidéo valent pour toutes les langues. Seul le texte alternatif se traduit.",
+
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  voirSite: "Voir sur le site",
+  voirSiteIndisponible: "La page publique s'ouvrira une fois la section publiée et traduite.",
+} as const;
+
+/**
+ * Accents proposés par le sélecteur de couleur de la console.
+ *
+ * Ce ne sont pas des couleurs « jolies » mais celles que le site emploie
+ * réellement : les cinq accents de composante (cf. `compColors` dans
+ * content/data.ts) et les trois teintes d'état du design system. Les proposer
+ * d'emblée évite le geste qui abîme une charte — ouvrir une roue chromatique et
+ * choisir un bleu qui n'est pas LE bleu.
+ *
+ * La saisie libre reste ouverte à côté : une catégorie peut légitimement sortir
+ * de la palette, mais ce sera un choix, pas un accident.
+ */
+export const PALETTE_ACCENT: { hex: string; nom: string }[] = [
+  { hex: "#0f62fe", nom: "Bleu (accent du site, C1)" },
+  { hex: "#009d9a", nom: "Turquoise (C2)" },
+  { hex: "#8a3ffc", nom: "Violet (C3)" },
+  { hex: "#ee5396", nom: "Rose (C4)" },
+  { hex: "#6f6f6f", nom: "Gris (C5)" },
+  { hex: "#198038", nom: "Vert" },
+  { hex: "#ff832b", nom: "Orange" },
+  { hex: "#da1e28", nom: "Rouge" },
+];
+
 /** Un module de la console. `key` est aussi la permission qui l'ouvre. */
 export type AdminNavItem = {
   key: Permission;
@@ -800,7 +970,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { key: "documents", label: "Documents & transparence", slug: "/documents" },
       { key: "medias", label: "Médias", slug: "/medias" },
       { key: "evenements", label: "Événements", slug: "/evenements" },
-      { key: "histoires", label: "Histoires & impact", soon: true },
+      { key: "histoires", label: "Histoires & impact", slug: "/histoires" },
       { key: "videos", label: "Vidéos & galerie", soon: true },
       { key: "ressources", label: "Ressources & publications", soon: true },
     ],
