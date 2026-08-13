@@ -39,10 +39,12 @@ export async function chargerReferentiels(): Promise<Referentiels> {
       orderBy: [{ position: "asc" }, { nomFr: "asc" }],
     }),
     db().tag.findMany({ select: { id: true, nomFr: true }, orderBy: { nomFr: "asc" } }),
-    // Seuls les comptes actifs : signer un article du nom d'un compte fermé
-    // laisserait croire à une publication qu'il n'a pas faite.
+    // Seuls les comptes en activité : signer un article du nom d'un compte
+    // désactivé laisserait croire à une publication qu'il n'a pas faite.
+    // `banned` et non un indicateur maison — c'est Better Auth qui porte la
+    // désactivation (cf. lib/auth/server.ts).
     db().user.findMany({
-      where: { isActive: true },
+      where: { banned: false },
       select: { id: true, name: true, email: true },
       orderBy: [{ name: "asc" }, { email: "asc" }],
     }),
@@ -52,7 +54,9 @@ export async function chargerReferentiels(): Promise<Referentiels> {
   return {
     categories: categories.map((item) => ({ id: item.id, nom: item.nomFr })),
     tags: tags.map((item) => ({ id: item.id, nom: item.nomFr })),
-    auteurs: comptes.map((compte) => ({ id: compte.id, nom: compte.name ?? compte.email })),
+    // `name` est requis par Better Auth mais peut valoir l'adresse elle-même :
+    // `||` et non `??`, pour qu'une chaîne vide retombe aussi sur l'adresse.
+    auteurs: comptes.map((compte) => ({ id: compte.id, nom: compte.name || compte.email })),
     composantes: composantes.map((composante) => ({ code: composante.code, titre: composante.titre.fr })),
     assets,
   };

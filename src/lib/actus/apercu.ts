@@ -1,15 +1,19 @@
 /**
  * Jeton de prévisualisation d'un article non publié.
  *
- * Pourquoi un jeton plutôt que la session de la console : le cookie de session
- * porte `Path=/7hj3nrpgaz6fjtw7` (cf. lib/auth/session.ts), il n'est donc JAMAIS
- * envoyé sur `/fr/actualites/…`. La page publique ne peut pas savoir qui la
- * consulte ; l'autorisation voyage dans l'URL, signée.
+ * Pourquoi un jeton plutôt que la session de la console : une relecture avant
+ * publication se demande à qui de droit — un responsable de composante, un
+ * chargé de communication — qui n'a pas forcément de compte. Le lien doit donc
+ * valoir par lui-même. Il ne dépend en outre d'aucune propriété du cookie de
+ * session, dont la portée appartient à Better Auth (cf. lib/auth/server.ts) et
+ * peut changer sans que ce module ait à le savoir.
  *
- * Le jeton est volontairement court de durée et ne porte qu'un identifiant
- * d'article : divulgué, il n'ouvre qu'un brouillon, jamais la console.
+ * Le jeton est volontairement court de durée (deux heures) et ne porte qu'un
+ * identifiant d'article : divulgué, il n'ouvre qu'un brouillon, jamais la
+ * console. La page qu'il sert est `noindex, nofollow`.
  *
- * ⚠️ Web Crypto uniquement, comme `lib/auth/session.ts` : aucun import `node:`.
+ * ⚠️ Web Crypto uniquement : aucun import `node:`, le module étant évalué aussi
+ * bien dans une page serveur que dans une server action.
  */
 
 /** Deux heures : le temps d'une relecture, pas celui d'un partage durable. */
@@ -19,8 +23,9 @@ const DUREE_MS = 2 * 60 * 60 * 1000;
 export const APERCU_PARAM = "apercu";
 
 /**
- * Séparation de domaine : le message signé est préfixé, de sorte qu'un jeton de
- * session ne puisse jamais être présenté comme un jeton d'aperçu, ni l'inverse.
+ * Séparation de domaine : le message signé est préfixé, de sorte qu'aucune
+ * autre valeur signée avec le même secret — jeton de session Better Auth
+ * compris — ne puisse être présentée comme un jeton d'aperçu, ni l'inverse.
  */
 const PREFIXE = "apercu-actu.v1.";
 
@@ -30,8 +35,11 @@ let keyPromise: Promise<CryptoKey> | null = null;
 
 function getKey(): Promise<CryptoKey> {
   if (!keyPromise) {
-    const secret = process.env.SESSION_SECRET;
-    if (!secret) return Promise.reject(new Error("SESSION_SECRET n'est pas défini."));
+    // Même secret que Better Auth : une seule valeur à provisionner par
+    // environnement. La séparation de domaine ci-dessous (`PREFIXE`) garantit
+    // qu'un jeton d'aperçu ne peut jamais être présenté comme une session.
+    const secret = process.env.BETTER_AUTH_SECRET;
+    if (!secret) return Promise.reject(new Error("BETTER_AUTH_SECRET n'est pas défini."));
     keyPromise = crypto.subtle.importKey(
       "raw",
       encoder.encode(secret),

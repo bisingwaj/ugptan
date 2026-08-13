@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { mgpFaq } from "@/content/mgp";
+import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Accordion } from "@/components/ui/Accordion";
@@ -56,6 +58,16 @@ export default async function MgpPage(props: { params: Promise<{ lang: string }>
             <MgpForm lang={lang} />
             <MgpTracker lang={lang} />
           </div>
+
+          {/* Le suivi a sa page dédiée : c'est elle que l'on garde en favori ou
+              que l'on transmet à quelqu'un qui aide la personne à suivre son
+              dossier — le formulaire de dépôt n'a pas à être rechargé pour cela. */}
+          <Reveal style={{ marginTop: 18, display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 14, border: "1px solid var(--c-20)", borderTop: "none", background: "var(--c-10)", padding: "16px 20px" }}>
+            <span style={{ fontSize: 13.5, color: "var(--c-70)", lineHeight: 1.55 }}>{t.trackPageLead}</span>
+            <Link href={route(lang, NAV.mgpSuivi)} className="btn btn--outline btn--sm" style={{ whiteSpace: "nowrap" }}>
+              {t.trackPageTitle} <span className="arrow">→</span>
+            </Link>
+          </Reveal>
 
           {/* EAS/HS confidential channel */}
           <Reveal style={{ marginTop: "clamp(36px,4vw,56px)", border: "1px solid var(--c-20)", borderLeft: "3px solid var(--c-80)", background: "var(--c-10)", padding: "clamp(26px,3.5vw,42px)" }}>
