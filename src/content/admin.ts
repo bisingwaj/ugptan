@@ -619,7 +619,14 @@ export const ADMIN_EVTS = {
 } as const;
 
 /**
- * Module « Documents & transparence ».
+ * Module « Rapports & analyses ».
+ *
+ * ⚠️ Le module porte EXACTEMENT le nom de la section publique qu'il alimente
+ * (cf. `nav.ressources` dans content/i18n.ts). Deux noms pour une même chose —
+ * « Documents & transparence » côté console, « Rapports & analyses » côté site —
+ * obligeaient à faire la traduction de tête à chaque échange. Les identifiants
+ * techniques, eux, restent `documents` : la permission, la route de la console
+ * et les tables sont des clés stables, pas des libellés.
  *
  * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` et
  * `ADMIN_EVTS` : il est lu par des composants clients (formulaire de dépôt,
@@ -630,8 +637,8 @@ export const ADMIN_EVTS = {
  * ressemblent doivent se dire pareil, sinon la console s'apprend deux fois.
  */
 export const ADMIN_DOCS = {
-  title: "Documents & transparence",
-  lead: "Rapports, études, analyses et pièces de référence publiés dans la section « Rapports et analyses » du site. Les fichiers sont déposés sur le stockage Cloudinary et servis par son réseau de diffusion ; la base ne conserve que leurs métadonnées et leur adresse.",
+  title: "Rapports & analyses",
+  lead: "Rapports, études, analyses et pièces de référence publiés dans la section « Rapports & analyses » du site. Les fichiers sont déposés sur le stockage Cloudinary et servis par son réseau de diffusion ; la base ne conserve que leurs métadonnées et leur adresse.",
 
   /* --- Liste --------------------------------------------------------------- */
   nouveau: "Déposer un document",
@@ -695,7 +702,7 @@ export const ADMIN_DOCS = {
   champDateDocument: "Date du document",
   champDateDocumentAide: "Date de production ou d'édition de la pièce. C'est elle qui prime dans le classement public.",
   champUne: "Mettre en avant",
-  champUneAide: "Le document remonte en tête de la section « Rapports et analyses ».",
+  champUneAide: "Le document remonte en tête de la section « Rapports & analyses » du site.",
   champPosition: "Ordre d'affichage",
   champPositionAide: "Plus petit, plus haut. Départage les documents de même mise en avant.",
   enregistrer: "Enregistrer",
@@ -729,7 +736,7 @@ export const ADMIN_DOCS = {
 
   /* --- Aperçu -------------------------------------------------------------- */
   apercuTitre: "Prévisualisation",
-  apercuLead: "La fiche telle qu'elle paraîtra dans « Rapports et analyses », avant toute mise en ligne.",
+  apercuLead: "La fiche telle qu'elle paraîtra dans « Rapports & analyses », avant toute mise en ligne.",
   apercuOuvrir: "Prévisualiser",
   apercuFermer: "Fermer",
   apercuFichier: "Aperçu du fichier",
@@ -967,7 +974,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     label: "Contenus",
     items: [
       { key: "actualites", label: "Actualités", slug: "/actualites" },
-      { key: "documents", label: "Documents & transparence", slug: "/documents" },
+      { key: "documents", label: "Rapports & analyses", slug: "/documents" },
       { key: "medias", label: "Médias", slug: "/medias" },
       { key: "evenements", label: "Événements", slug: "/evenements" },
       { key: "histoires", label: "Histoires & impact", slug: "/histoires" },

@@ -1,5 +1,5 @@
 /**
- * Vocabulaire du module « Documents & transparence ».
+ * Vocabulaire du module « Rapports & analyses ».
  *
  * ⚠️ Aucun import de VALEUR : ce module est lu par les formulaires clients de la
  * console, par la couche de lecture publique et par les gardes serveur. Seuls
@@ -37,7 +37,7 @@ export const DOC_STATUT_LABEL: Record<DocStatut, string> = {
 
 export const DOC_STATUT_HINT: Record<DocStatut, string> = {
   DRAFT: "Visible de la seule console. Le fichier existe déjà chez l'hébergeur, mais rien ne le référence sur le site.",
-  PUBLISHED: "En ligne. Le document apparaît dans « Rapports et analyses » et son fichier est téléchargeable.",
+  PUBLISHED: "En ligne. Le document apparaît dans « Rapports & analyses » et son fichier est téléchargeable.",
   ARCHIVED: "Retiré du site, conservé en base avec son fichier. À préférer à la suppression pour une version remplacée.",
 };
 

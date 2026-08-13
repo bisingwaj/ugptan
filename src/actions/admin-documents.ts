@@ -1,7 +1,7 @@
 "use server";
 
 /**
- * Écritures du module « Documents & transparence ».
+ * Écritures du module « Rapports & analyses ».
  *
  * ⚠️ INVARIANT : chaque action commence par `assertPermission("documents")`.
  * Le proxy laisse passer les POST (rediriger un POST de server action casserait

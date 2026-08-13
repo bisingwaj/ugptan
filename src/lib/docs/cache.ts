@@ -1,5 +1,5 @@
 /**
- * Invalidation du cache après une écriture du module « Documents ».
+ * Invalidation du cache après une écriture du module « Rapports & analyses ».
  *
  * Même contrat que `lib/actus/cache.ts` : le chemin est donné sous sa forme de
  * ROUTE (`/[lang]/ressources`) et non d'URL, seule façon d'invalider les deux
