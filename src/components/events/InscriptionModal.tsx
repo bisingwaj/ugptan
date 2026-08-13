@@ -19,10 +19,10 @@
  * gestionnaire de clic.
  */
 import { useActionState, useEffect, useId, useRef } from "react";
-import { inscrireAction, INSCRIPTION_INITIALE } from "@/actions/evenements-inscription";
+import { inscrireAction } from "@/actions/evenements-inscription";
 import { dict } from "@/content/i18n";
 import type { EvtVue } from "@/lib/events/query";
-import { INSCRIPTION_LIMITES } from "@/lib/events/inscription";
+import { INSCRIPTION_INITIALE, INSCRIPTION_LIMITES } from "@/lib/events/inscription";
 import type { Lang } from "@/lib/pick";
 
 export function InscriptionModal({
