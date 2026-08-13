@@ -2,19 +2,20 @@
  * Chargement des données de la fiche d'article.
  *
  * Partagé par l'écran de création et par celui de modification : les deux
- * affichent le même formulaire, l'un sur une fiche vierge, l'autre sur une
- * fiche relue en base. Regrouper les requêtes ici évite que les deux écrans
- * divergent au premier champ ajouté.
+ * affichent les mêmes champs, l'un sur une fiche vierge, l'autre sur une fiche
+ * relue en base. Regrouper les requêtes ici évite que les deux écrans divergent
+ * au premier champ ajouté.
  */
 import { db } from "@/lib/db";
-import { toDateTimeLocal } from "@/lib/format";
+import { formatDateTime, toDateTimeLocal } from "@/lib/format";
+import { isEmptyHtml } from "@/lib/html/sanitize";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
 import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import { media as registre } from "@/content/media";
 import { composantes } from "@/content/data";
 import type { ImgKey } from "@/content/types";
-import type { ArticleSaisie, TraductionSaisie } from "@/components/dashboard/actus/ArticleForm";
+import type { ArticleSaisie, ReferentielsSaisie, TraductionSaisie } from "@/lib/actus/saisie";
 import type { ArticleStatut } from "@/lib/actus/statut";
 
 /** ⚠️ `data` exclu : cf. le commentaire de `lib/actus/query.ts`. */
@@ -23,13 +24,7 @@ const mediaSelect = {
   width: true, height: true, url: true, altFr: true, altEn: true, legende: true,
 } as const;
 
-export type Referentiels = {
-  categories: { id: string; nom: string }[];
-  tags: { id: string; nom: string }[];
-  auteurs: { id: string; nom: string }[];
-  composantes: { code: string; titre: string }[];
-  assets: MediaRef[];
-};
+export type Referentiels = { referentiels: ReferentielsSaisie; assets: MediaRef[] };
 
 /** Listes déroulantes et bibliothèque, communes aux deux écrans de la fiche. */
 export async function chargerReferentiels(): Promise<Referentiels> {
@@ -52,18 +47,22 @@ export async function chargerReferentiels(): Promise<Referentiels> {
   ]);
 
   return {
-    categories: categories.map((item) => ({ id: item.id, nom: item.nomFr })),
-    tags: tags.map((item) => ({ id: item.id, nom: item.nomFr })),
-    // `name` est requis par Better Auth mais peut valoir l'adresse elle-même :
-    // `||` et non `??`, pour qu'une chaîne vide retombe aussi sur l'adresse.
-    auteurs: comptes.map((compte) => ({ id: compte.id, nom: compte.name || compte.email })),
-    composantes: composantes.map((composante) => ({ code: composante.code, titre: composante.titre.fr })),
+    referentiels: {
+      categories: categories.map((item) => ({ id: item.id, nom: item.nomFr })),
+      tags: tags.map((item) => ({ id: item.id, nom: item.nomFr })),
+      // `name` est requis par Better Auth mais peut valoir l'adresse elle-même :
+      // `||` et non `??`, pour qu'une chaîne vide retombe aussi sur l'adresse.
+      auteurs: comptes.map((compte) => ({ id: compte.id, nom: compte.name || compte.email })),
+      composantes: composantes.map((composante) => ({ code: composante.code, titre: composante.titre.fr })),
+    },
     assets,
   };
 }
 
 const traductionVide = (): TraductionSaisie => ({
-  title: "", slug: "", excerpt: "", content: "", seoTitle: "", seoDescription: "", coverAlt: "",
+  title: "", slug: "", excerpt: "", content: "",
+  seoTitle: "", seoDescription: "", coverAlt: "",
+  existe: false, complete: false, majLe: null,
 });
 
 const traductionsVides = (): Record<Lang, TraductionSaisie> =>
@@ -90,11 +89,11 @@ export const articleVierge = (): ArticleSaisie => ({
 });
 
 /**
- * Fiche relue en base, projetée dans la forme attendue par le formulaire.
+ * Fiche relue en base, projetée dans la forme attendue par les formulaires.
  *
- * Le type de retour resserre `id` sur `string` : `ArticleSaisie.id` est
- * nullable pour couvrir la fiche vierge, mais une fiche relue en a forcément
- * un — sans quoi l'écran d'édition devrait tester partout un cas impossible.
+ * Le type de retour resserre `id` sur `string` : `ArticleSaisie.id` est nullable
+ * pour couvrir la fiche vierge, mais une fiche relue en a forcément un — sans
+ * quoi l'écran d'édition devrait tester partout un cas impossible.
  */
 export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id: string }) | null> {
   const article = await db().article.findUnique({
@@ -107,7 +106,7 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
       translations: {
         select: {
           locale: true, title: true, slug: true, excerpt: true, contentHtml: true,
-          seoTitle: true, seoDescription: true, coverAlt: true,
+          seoTitle: true, seoDescription: true, coverAlt: true, updatedAt: true,
         },
       },
       tags: { select: { tagId: true } },
@@ -116,6 +115,9 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
 
   if (!article) return null;
 
+  // Toutes les langues du site sont présentes, y compris celles qui n'ont
+  // encore aucune ligne : c'est ce qui permet à l'onglet d'annoncer « à
+  // traduire » plutôt que de disparaître.
   const traductions = traductionsVides();
   for (const tr of article.translations) {
     if (!LOCALES.includes(tr.locale as Lang)) continue;
@@ -127,6 +129,9 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
       seoTitle: tr.seoTitle ?? "",
       seoDescription: tr.seoDescription ?? "",
       coverAlt: tr.coverAlt ?? "",
+      existe: true,
+      complete: tr.title.trim().length > 0 && !isEmptyHtml(tr.contentHtml),
+      majLe: formatDateTime(tr.updatedAt),
     };
   }
 

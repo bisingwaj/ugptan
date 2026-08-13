@@ -402,6 +402,8 @@
     font-family: var(--font-mono); font-size: 10.5px; color: var(--c-50);
   }
   .adm-langue.is-on { border-style: solid; border-color: var(--ok-bd); background: var(--ok-bg); color: var(--ok-fg); }
+  /* Traduction commencée mais sans corps : elle n'est pas servie au public. */
+  .adm-langue.is-partiel { border-style: solid; border-color: #ffd9a0; background: #fff2e0; color: #8a4b00; }
 
   .adm-pastille { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; }
   .adm-pastille__point { width: 9px; height: 9px; flex: 0 0 auto; }
@@ -414,8 +416,31 @@
   .adm-edit__aside { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
   .adm-edit__bloc { display: flex; flex-direction: column; gap: 16px; }
   .adm-edit__langue { display: flex; flex-direction: column; gap: 22px; border: 1px solid var(--c-20); border-top: 0; background: #fff; padding: clamp(18px, 2.4vw, 26px); }
+  /* ⚠️ Sans cette règle, l'onglet inactif RESTAIT VISIBLE : la déclaration
+     `display: flex` ci-dessus vit dans la même couche que la remise à zéro de
+     `[hidden]` et l'emportait sur elle (le projet n'importe pas Preflight, mais
+     Preflight n'y aurait rien changé : sa règle est dans la couche `base`). Les
+     deux langues s'affichaient donc l'une sous l'autre. On rehausse la
+     spécificité plutôt que de recourir à `!important`. */
+  .adm-edit__langue[hidden] { display: none; }
+  .adm-edit__form { display: flex; flex-direction: column; gap: 22px; }
+  .adm-edit__langue-choix { margin-bottom: 14px; }
+  /* Bandeau expliquant qu'une langue n'existe pas encore. */
+  .adm-edit__neuve {
+    border-left: 3px solid var(--ac); background: var(--ac-pale);
+    padding: 12px 16px; font-size: 13px; line-height: 1.55; color: var(--c-80);
+  }
   .adm-edit__titre { font-size: 17px; font-weight: 600; }
-  .adm-edit__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .adm-edit__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-top: 4px; border-top: 1px solid var(--c-20); }
+  .adm-edit__aside-form { display: flex; flex-direction: column; gap: 16px; }
+  /* Le bouton d'enregistrement des réglages suit le défilement : la colonne
+     fait plusieurs écrans de haut. */
+  .adm-edit__barre {
+    position: sticky; bottom: 0; z-index: 3;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+    padding: 14px; border: 1px solid var(--c-20); background: #fff;
+    box-shadow: 0 -6px 18px rgb(0 0 0 / 0.06);
+  }
   .adm-edit__requis { font-family: var(--font-mono); font-size: 10px; color: var(--red); text-transform: none; letter-spacing: 0; }
 
   .adm-edit__cover { position: relative; aspect-ratio: 16 / 9; background: var(--c-10); border: 1px solid var(--c-20); display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -437,6 +462,7 @@
     padding: 2px 6px; border: 1px solid var(--c-30); color: var(--c-60);
   }
   .adm-tab__etat.is-ok { border-color: var(--ok-bd); background: var(--ok-bg); color: var(--ok-fg); }
+  .adm-tab__etat.is-partiel { border-color: #ffd9a0; background: #fff2e0; color: #8a4b00; }
 
   /* --- Éditeur de contenu riche -------------------------------------------- */
   .rte { border: 1px solid var(--c-20); background: #fff; }

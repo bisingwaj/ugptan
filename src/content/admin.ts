@@ -40,6 +40,14 @@ export const ADMIN = {
     expand: "Déplier la barre",
   },
 
+  errors: {
+    title: "Le module n'a pas pu être chargé",
+    lead: "Une opération sur la base de données a échoué. Aucune donnée n'a été perdue : la page n'a simplement pas pu être construite.",
+    hint: "Si l'incident se répète, vérifiez l'accès réseau à la base et la variable DATABASE_URL.",
+    retry: "Réessayer",
+    reference: "Référence",
+  },
+
   home: {
     title: "Tableau de bord",
     lead: "Squelette de la console. Les modules de gestion arrivent progressivement.",
@@ -229,10 +237,27 @@ export const ADMIN_ACTUS = {
   copieOk: "Copie créée en brouillon.",
   supprimeOk: "Article supprimé.",
 
-  /* --- Onglets & fiche ----------------------------------------------------- */
+  /* --- Langues -------------------------------------------------------------
+     Chaque langue a son propre formulaire et son propre enregistrement : les
+     libellés doivent dire laquelle on enregistre, sans ambiguïté. */
+  langueRedaction: "Langue de rédaction",
+  langueRedactionAide:
+    "L'article naît dans cette langue. Les autres versions s'ajoutent ensuite depuis la fiche, chacune enregistrée séparément.",
   tradPresente: "traduit",
+  tradIncomplete: "incomplet",
   tradManquante: "à traduire",
+  tradNouvelle: (langue: string) =>
+    `Cette version ${langue} n'existe pas encore. Renseignez-la puis enregistrez-la : elle ne touchera à aucune autre langue.`,
+  enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
+  enregistrerFiche: "Enregistrer les réglages",
+  supprimerTraduction: "Supprimer cette traduction",
+  supprimerTraductionConfirm:
+    "Supprimer cette version linguistique ? L'article restera en ligne dans les autres langues.",
+  majLe: "Modifié le",
+  creer: "Créer l'article",
+  creation: "Création…",
   aucuneLangue: "Renseignez au moins un titre pour enregistrer.",
+  visuelPartage: "La couverture et la vidéo valent pour toutes les langues. Seul le texte alternatif se traduit.",
 
   champTitre: "Titre",
   champTitreAide: "Il sert de titre H1 sur la page publique et de titre par défaut dans les moteurs de recherche.",
