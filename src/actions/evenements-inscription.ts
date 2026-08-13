@@ -24,17 +24,8 @@ import { isValidEmail } from "@/lib/auth/validate";
 import { rateLimit, requestIp } from "@/lib/rate-limit";
 import { LANGS, type Lang } from "@/lib/pick";
 import { phaseEvenement } from "@/lib/events/statut";
-import { INSCRIPTION_LIMITES } from "@/lib/events/inscription";
+import { INSCRIPTION_LIMITES, type InscriptionState } from "@/lib/events/inscription";
 import { revaliderEvenements } from "@/lib/events/cache";
-
-export type InscriptionState = {
-  ok: boolean;
-  error: string | null;
-  /** Message de succès, déjà dans la langue du formulaire. */
-  message: string | null;
-};
-
-export const INSCRIPTION_INITIALE: InscriptionState = { ok: false, error: null, message: null };
 
 /**
  * Une inscription légitime demande une minute de saisie. Cinq par quart d'heure

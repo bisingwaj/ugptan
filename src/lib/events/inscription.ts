@@ -38,6 +38,26 @@ export const INSCRIPTION_HINT: Record<InscriptionStatut, string> = {
  */
 export const occupeUnePlace = (statut: InscriptionStatut): boolean => statut === "CONFIRMEE";
 
+/**
+ * État du formulaire public, partagé par la modale et par la server action.
+ *
+ * ⚠️ Il vit ICI, et non dans `actions/evenements-inscription.ts`, pour une
+ * raison de plateforme : un module « use server » ne peut exporter QUE des
+ * fonctions asynchrones. Next inscrit chaque autre export au registre des
+ * actions, où un objet n'a pas sa place — l'envoi du formulaire échouait alors
+ * en « A "use server" file can only export async functions, found object »,
+ * avant même que la moindre ligne de l'action ne s'exécute. Les types, eux,
+ * sont effacés à la compilation et peuvent y rester.
+ */
+export type InscriptionState = {
+  ok: boolean;
+  error: string | null;
+  /** Message de succès, déjà dans la langue du formulaire. */
+  message: string | null;
+};
+
+export const INSCRIPTION_INITIALE: InscriptionState = { ok: false, error: null, message: null };
+
 /** Longueurs maximales acceptées à la saisie, appliquées côté serveur. */
 export const INSCRIPTION_LIMITES = {
   nom: 120,
