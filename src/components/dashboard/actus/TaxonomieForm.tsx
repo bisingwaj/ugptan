@@ -127,7 +127,7 @@ export function TaxonomieForm({ genre, item }: Props) {
             // FRÈRE et non un descendant : imbriquer deux `<form>` n'est pas
             // permis en HTML, et le navigateur en écarterait un silencieusement.
             <button type="submit" form={idSuppression} className="btn btn--danger btn--sm" disabled={suppressionEnCours}>
-              {t.supprimer}{item.usage > 0 ? ` (${item.usage})` : ""}
+              {suppressionEnCours ? t.suppression : t.supprimer}{!suppressionEnCours && item.usage > 0 ? ` (${item.usage})` : ""}
             </button>
           )}
         </div>

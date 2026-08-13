@@ -38,6 +38,7 @@ export const PERMISSIONS = [
   "histoires",
   "videos",
   "ressources",
+  "newsletter",
   "gouvernance",
   "projet",
   "mgp",
@@ -54,7 +55,14 @@ export type Permission = (typeof PERMISSIONS)[number];
  */
 const ADMIN_ONLY: readonly Permission[] = ["utilisateurs"];
 
-/** Socle de chaque rôle. `"*"` vaut « tous les modules ». */
+/**
+ * Socle de chaque rôle. `"*"` vaut « tous les modules ».
+ *
+ * ⚠️ `newsletter` ne figure PAS dans le socle de l'éditeur, et c'est délibéré :
+ * le module donne accès à une liste d'adresses personnelles et à son export.
+ * Il reste accordable au cas par cas (`assignablePermissions`), ce qui répond à
+ * l'exigence de le réserver aux administrateurs autorisés du CMS.
+ */
 const ROLE_BASE: Record<AdminRole, readonly Permission[] | "*"> = {
   ADMIN: "*",
   EDITOR: [

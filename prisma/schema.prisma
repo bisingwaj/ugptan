@@ -454,3 +454,69 @@ model ArticleTranslation {
   @@unique([locale, slug])
   @@index([locale])
 }
+
+/// ---------------------------------------------------------------------------
+/// Newsletter
+///
+/// Périmètre volontairement réduit à la COLLECTE et à l'EXPORT : le site
+/// recueille des adresses, la console les gère et les sort en fichier. Aucun
+/// envoi n'est effectué depuis l'application, et aucune table de campagne
+/// n'existe.
+///
+/// Ce qui rend l'envoi possible plus tard sans reprendre la liste : chaque
+/// abonné porte sa langue, son statut de consentement et son jeton de
+/// désabonnement. Un module d'envoi se brancherait dessus en ajoutant ses
+/// propres tables, sans toucher à celle-ci ni aux consentements qu'elle
+/// enregistre.
+/// ---------------------------------------------------------------------------
+
+/// État d'un abonnement. Une seule ligne par adresse, quel que soit le nombre
+/// d'allers-retours : un désabonnement n'efface rien, il bascule ce statut.
+/// C'est ce qui permet de refuser une réinscription silencieuse (cf.
+/// src/actions/newsletter.ts).
+enum NewsletterStatus {
+  ACTIVE
+  UNSUBSCRIBED
+}
+
+/// Une adresse collectée.
+///
+/// ⚠️ Donnée personnelle : cette table ne sort de la console que par l'export du
+/// module « Newsletter », réservé aux comptes disposant de la permission
+/// homonyme. Aucune route publique ne lit une adresse — les pages de gestion
+/// d'abonnement travaillent sur le seul `token`.
+model NewsletterSubscriber {
+  id    String @id @default(cuid())
+  /// Normalisée (minuscules, sans espaces) avant écriture : la contrainte
+  /// d'unicité porte sur cette forme, c'est elle qui empêche les doublons.
+  email String @unique
+
+  /// Langue du formulaire au moment de l'inscription. Détermine la langue des
+  /// messages qui lui seront adressés.
+  lang   String           @default("fr")
+  status NewsletterStatus @default(ACTIVE)
+
+  /// Provenance de l'adresse : « site » pour le formulaire public, « console »
+  /// pour une saisie interne, « import » pour une reprise de liste existante.
+  /// Chaîne et non enum : un import futur nommera sa propre origine sans
+  /// migration.
+  source String @default("site")
+
+  /// Jeton porté par les liens de gestion d'abonnement (désabonnement,
+  /// confirmation de réinscription). TIRÉ AU SORT et non dérivé de l'adresse :
+  /// il circule dans des e-mails et ne doit rien apprendre de son porteur.
+  token String @unique
+
+  /// Date de la dernière inscription effective — remise à jour lors d'une
+  /// réinscription, pour que la liste dise depuis quand l'adresse est active.
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  /// Adresse d'origine de la soumission, conservée pour instruire un abus.
+  ip String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, subscribedAt])
+}
