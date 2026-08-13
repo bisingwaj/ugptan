@@ -7,7 +7,8 @@ import {
   equipe, profils, question,
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
-import { humainPoints, galleryProvinces, partners, events } from "@/content/carbon";
+import { prochainsEvenements } from "@/lib/events/query";
+import { humainPoints, galleryProvinces, partners } from "@/content/carbon";
 import { media } from "@/content/media";
 import { NAV, route, compRoute } from "@/lib/routes";
 import { compVar } from "@/lib/comp";
@@ -24,16 +25,21 @@ import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { cheminArticle } from "@/components/actus/ActuCard";
 
-/** Cache aligné sur la page « Actualités » : l'accueil affiche les derniers
- *  communiqués, invalidés par les écritures de la console (cf. lib/actus/cache.ts). */
+/** Cache aligné sur les pages « Actualités » et « Événements » : l'accueil
+ *  affiche les derniers communiqués et les prochaines rencontres, invalidés par
+ *  les écritures de la console (cf. lib/actus/cache.ts, lib/events/cache.ts). */
 export const revalidate = 120;
 
 export default async function Home(props: { params: Promise<{ lang: string }> }) {
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
-  const upcoming = events.filter((e) => e.statut === "avenir").slice(0, 3);
-  const actualites = await derniersArticles(lang, 4);
+  // Deux lectures indépendantes, menées de front : aucune ne conditionne
+  // l'autre, et les enchaîner ajouterait un aller-retour à la base pour rien.
+  const [actualites, upcoming] = await Promise.all([
+    derniersArticles(lang, 4),
+    prochainsEvenements(lang, 3),
+  ]);
 
   return (
     <div>
@@ -303,16 +309,22 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== ÉVÉNEMENTS (teaser) ===== */}
-      <section className="section section--sm section--grey">
-        <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 36 }}>
-            <div style={{ maxWidth: 620 }}><Kicker>{t.home.evtLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 12 }}>{t.home.evtTitle}</h2><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.evtLead}</p></div>
-            <Link href={route(lang, NAV.evenements)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.home.evtUpcoming} →</Link>
-          </Reveal>
-          <EventsGrid lang={lang} events={upcoming} />
-        </div>
-      </section>
+      {/* ===== ÉVÉNEMENTS (teaser) =====
+          Masqué quand aucune date n'est arrêtée : un bloc « échanger,
+          participer, contribuer » suivi d'une grille vide inviterait à une
+          rencontre qui n'existe pas. La page « Événements » reste, elle,
+          accessible par la navigation, et y explique l'attente. */}
+      {upcoming.length > 0 && (
+        <section className="section section--sm section--grey">
+          <div className="section__inner">
+            <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 36 }}>
+              <div style={{ maxWidth: 620 }}><Kicker>{t.home.evtLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 12 }}>{t.home.evtTitle}</h2><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.evtLead}</p></div>
+              <Link href={route(lang, NAV.evenements)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.home.evtUpcoming} →</Link>
+            </Reveal>
+            <EventsGrid lang={lang} events={upcoming} />
+          </div>
+        </section>
+      )}
 
       {/* ===== GALERIE PAR PROVINCE ===== */}
       <section className="section section--sm section--grey">

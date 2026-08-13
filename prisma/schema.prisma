@@ -82,6 +82,9 @@ model User {
   /// Visuels téléversés dans la bibliothèque de médias.
   mediasTeleverses MediaAsset[]
 
+  /// Événements saisis par ce compte — trace interne, jamais publiée.
+  evenementsSaisis Evenement[] @relation("EvenementSaisiPar")
+
   @@index([role])
 }
 
@@ -330,6 +333,8 @@ model MediaAsset {
   createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
   couvertures Article[]
+  /// Événements dont ce média est l'image de couverture.
+  affiches    Evenement[]
 
   @@index([createdAt])
 }
@@ -451,6 +456,183 @@ model ArticleTranslation {
   updatedAt DateTime @updatedAt
 
   @@unique([articleId, locale])
+  @@unique([locale, slug])
+  @@index([locale])
+}
+
+/// ===========================================================================
+/// Événements
+///
+/// Deux axes INDÉPENDANTS gouvernent un événement, et les confondre est la
+/// première erreur à éviter :
+///
+///   · le STATUT DE PUBLICATION — brouillon, publié, archivé — décidé par la
+///     rédaction, stocké dans `status` ;
+///   · la PHASE dans le temps — à venir, en cours, terminé — qui n'est PAS
+///     stockée : elle se déduit de `startAt` / `endAt` à la lecture
+///     (cf. src/lib/events/statut.ts). Aucune tâche planifiée n'entre en jeu,
+///     et un événement ne peut donc jamais rester « à venir » la veille de sa
+///     tenue parce qu'un planificateur est tombé.
+///
+/// Le découpage fiche / traduction reproduit celui des actualités : ce qui ne
+/// dépend d'aucune langue vit sur `Evenement`, tout ce qui se lit vit sur
+/// `EvenementTranslation`. Les deux s'enregistrent par des formulaires séparés
+/// (cf. src/actions/admin-evenements.ts).
+/// ===========================================================================
+
+/// Cycle de vie éditorial d'un événement.
+///
+/// Pas de `SCHEDULED` ici, contrairement aux articles : la date qui compte pour
+/// un événement est celle de sa TENUE, pas celle de sa mise en ligne. Programmer
+/// la parution d'une annonce d'événement reviendrait à porter deux calendriers
+/// concurrents sur la même fiche.
+enum EvenementStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Modalité de participation. Elle décide de ce que la fiche demande — une
+/// adresse n'a de sens qu'en présentiel — et de ce que la page publique affiche.
+enum EvenementMode {
+  PRESENTIEL
+  EN_LIGNE
+  HYBRIDE
+}
+
+/// Catégorie d'événement (Forum, Atelier, Webinaire, Consultation publique…).
+///
+/// Jumelle d'`ArticleCategory` sans être la même table : les deux nomenclatures
+/// n'ont pas le même contenu ni la même durée de vie, et les fusionner
+/// obligerait chaque filtre à savoir de quel module vient chaque entrée.
+model EvenementCategory {
+  id    String @id @default(cuid())
+  /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
+  slug  String @unique
+  nomFr String
+  nomEn String
+  /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
+  color String?
+  /// Ordre d'affichage des filtres.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  evenements Evenement[]
+
+  @@index([position])
+}
+
+/// Fiche commune d'un événement, indépendante de la langue.
+model Evenement {
+  id     String          @id @default(cuid())
+  status EvenementStatus @default(DRAFT)
+
+  /// Début de l'événement. Obligatoire : c'est la donnée qui ordonne toutes les
+  /// listes et qui décide de la phase (à venir / en cours / terminé).
+  startAt DateTime
+  /// Fin, quand elle est connue. `null` vaut « même journée » : la phase se
+  /// calcule alors sur la fin du jour de `startAt` (heure de Kinshasa), sans
+  /// quoi une rencontre du matin serait annoncée « terminée » à 9 h 01.
+  endAt   DateTime?
+  /// Journée entière : l'heure n'est plus affichée, seule la date l'est.
+  allDay  Boolean         @default(false)
+
+  mode     EvenementMode @default(PRESENTIEL)
+  /// Mise en avant : remonte l'événement en tête des listes.
+  featured Boolean       @default(false)
+
+  /// Couleur d'accent propre à l'événement (pastille, bandeau, liseré de
+  /// carte). Vide : celle de la catégorie, puis l'accent du site.
+  color String?
+
+  categoryId String?
+  category   EvenementCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// Image de couverture issue de la bibliothèque.
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation(fields: [coverMediaId], references: [id], onDelete: SetNull)
+  /// Repli : clé du registre d'images intégré (cf. src/content/media.ts), pour
+  /// les événements repris de la version statique du site.
+  coverKey     String?
+
+  /// Lien d'inscription (billetterie, formulaire). Renseigné, il remplace la
+  /// demande de participation intégrée par un renvoi vers ce service.
+  registrationUrl String?
+  /// Lien externe de référence : page officielle, dossier, ordre du jour.
+  externalUrl     String?
+  /// Lien de connexion pour un événement en ligne. Séparé d'`externalUrl` :
+  /// l'un se publie, l'autre ne vaut que le jour même.
+  onlineUrl       String?
+
+  /// Organisateur affiché. Un événement est organisé par une institution ou un
+  /// service, pas par un compte de la console : la signature est donc libre,
+  /// sans relation vers `User`.
+  organiserName  String?
+  organiserEmail String?
+  organiserPhone String?
+  organiserUrl   String?
+
+  /// Composantes rattachées (C1…C5), même usage que sur un article.
+  comps String[] @default([])
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("EvenementSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations EvenementTranslation[]
+
+  @@index([status, startAt])
+  @@index([categoryId])
+  @@index([featured])
+}
+
+/// Version d'un événement dans une langue. Tout ce qui se lit est ici.
+///
+/// Le LIEU en fait partie, contrairement à l'article où il n'est qu'une mention
+/// brute : « Goma — provinces de l'Est » et « Goma — Eastern provinces » sont
+/// deux libellés, pas une donnée géographique. L'adresse postale, elle, reste
+/// traduisible aussi (le nom d'un bâtiment se traduit), mais n'est jamais
+/// obligatoire.
+model EvenementTranslation {
+  id          String    @id @default(cuid())
+  evenementId String
+  evenement   Evenement @relation(fields: [evenementId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale      String
+
+  title String
+  /// Segment d'URL, unique DANS SA LANGUE : /fr/evenements/<slug>.
+  slug  String
+
+  /// Description courte affichée sur les cartes et dans les partages.
+  excerpt     String?
+  /// Description complète, HTML déjà assaini à l'écriture
+  /// (cf. src/lib/html/sanitize.ts). Jamais de HTML brut de l'éditeur en base.
+  contentHtml String  @default("")
+
+  /// Libellé du lieu tel qu'il s'affiche (« Kinshasa », « En ligne »).
+  lieu    String?
+  /// Adresse ou repère de localisation, quand la salle doit être trouvée.
+  adresse String?
+  /// Jauge affichée (« 320 places », « Ouvert à tous »). Un libellé et non un
+  /// nombre : le site annonce aussi bien une capacité qu'une règle d'accès.
+  places  String?
+  /// Informations complémentaires : accès, interprétation, pièces à apporter.
+  infos   String?
+
+  seoTitle       String?
+  seoDescription String?
+  /// Texte alternatif de l'image de couverture, propre à la langue.
+  coverAlt       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([evenementId, locale])
   @@unique([locale, slug])
   @@index([locale])
 }
