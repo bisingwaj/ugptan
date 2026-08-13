@@ -36,7 +36,7 @@ const EXTRAIT_AUTO = 190;
  */
 const mediaSelect = {
   id: true, filename: true, mimeType: true, size: true,
-  width: true, height: true, url: true, altFr: true, altEn: true, legende: true,
+  width: true, height: true, url: true, publicId: true, altFr: true, altEn: true, legende: true,
 } as const;
 
 const articleSelect = {

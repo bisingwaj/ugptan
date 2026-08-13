@@ -897,6 +897,53 @@ export function dict(lang: Lang) {
         "Before choosing a route, calibrating a training programme or settling on an architecture, the question has to be worked through. These notes, reports and analyses are the material on which the Project's decisions rest — published so they can be debated.",
       ),
       download: t("Télécharger", "Download"),
+
+      /* Barre de recherche, filtres et tri de la liste dynamique. */
+      search: t("Rechercher un rapport, un sigle, un organisme…", "Search a report, an acronym, an organisation…"),
+      searchAction: t("Rechercher", "Search"),
+      filterCategory: t("Thématique", "Theme"),
+      filterType: t("Nature", "Type"),
+      all: t("Tout", "All"),
+      sortBy: t("Trier par", "Sort by"),
+      sortRank: t("Pertinence", "Relevance"),
+      sortDate: t("Date", "Date"),
+      sortTitle: t("Titre", "Title"),
+      reset: t("Réinitialiser les filtres", "Clear filters"),
+
+      /* États de liste. */
+      count: (n: number) =>
+        t(`${n} document${n > 1 ? "s" : ""}`, `${n} document${n > 1 ? "s" : ""}`),
+      noResult: t("Aucun document ne correspond à votre recherche.", "No document matches your search."),
+      empty: t(
+        "Aucun rapport n'est publié pour le moment. Les analyses et études du Projet seront mises en ligne au fil de leur validation.",
+        "No report is published yet. The Project's analyses and studies will be posted as they are cleared for release.",
+      ),
+
+      /* Panneau de détail. */
+      details: t("Consulter la fiche", "View details"),
+      close: t("Fermer", "Close"),
+      open: t("Ouvrir le fichier", "Open the file"),
+      preview: t("Aperçu du document", "Document preview"),
+      previewNote: t(
+        "Aperçu à l'écran — le fichier officiel est téléchargeable.",
+        "On-screen preview — the official file is downloadable.",
+      ),
+      previewUnavailable: t(
+        "Ce format ne s'affiche pas dans le navigateur. Téléchargez le fichier pour le consulter.",
+        "This format cannot be displayed in the browser. Download the file to read it.",
+      ),
+      labelType: t("Nature", "Type"),
+      labelCategory: t("Thématique", "Theme"),
+      labelDocDate: t("Date du document", "Document date"),
+      labelPublished: t("Mis en ligne le", "Published on"),
+      labelAuthor: t("Auteur", "Author"),
+      labelReference: t("Référence", "Reference"),
+      labelFile: t("Fichier", "File"),
+      featured: t("À la une", "Featured"),
+      disclaimer: t(
+        "Seuls les documents divulgables sont publiés. Les fichiers sont hébergés sur le réseau de diffusion du Projet ; la date affichée est celle du document lorsqu'elle est connue, à défaut celle de sa mise en ligne.",
+        "Only disclosable documents are published. Files are hosted on the Project's delivery network; the date shown is the document's own where known, otherwise its date of publication.",
+      ),
     },
 
     /* --- MGP -------------------------------------------------------------- */

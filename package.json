@@ -10,6 +10,7 @@
     "postinstall": "prisma generate",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "node --import ./scripts/tests/register.mjs --test \"scripts/tests/*.test.ts\"",
     "db:push": "prisma db push",
     "remotion:studio": "remotion studio remotion/index.ts",
     "remotion:render": "remotion render remotion/index.ts"
@@ -21,6 +22,7 @@
     "@prisma/client-runtime-utils": "7.9.1",
     "@remotion/cli": "^4.0.507",
     "better-auth": "^1.6.27",
+    "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
     "framer-motion": "^13.0.0",
     "lenis": "^1.3.26",
