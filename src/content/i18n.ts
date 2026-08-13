@@ -840,6 +840,18 @@ export function dict(lang: Lang) {
         "The questions most often asked by people hesitating to use the mechanism.",
       ),
     },
+
+    /* --- Frontière d'erreur du site public --------------------------------- */
+    erreur: {
+      titre: t("Cette page n'a pas pu être affichée", "This page could not be displayed"),
+      corps: t(
+        "Une donnée nécessaire à cette page n'a pas pu être lue. Rien n'est perdu : seul l'affichage a échoué. Réessayez dans un instant.",
+        "Data required by this page could not be read. Nothing is lost: only the display failed. Please try again in a moment.",
+      ),
+      reessayer: t("Réessayer", "Try again"),
+      accueil: t("Retour à l'accueil", "Back to home"),
+      reference: t("Référence", "Reference"),
+    },
   };
 }
 

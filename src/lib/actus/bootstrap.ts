@@ -15,6 +15,7 @@ import { actualites } from "@/content/actualites";
 import { db } from "@/lib/db";
 import { sanitizeHtml } from "@/lib/html/sanitize";
 import { slugify, uniqueSlug } from "@/lib/actus/slug";
+import { describeError } from "@/lib/errors";
 
 /** Heure de publication attribuée aux communiqués repris (heure de Kinshasa). */
 const HEURE_REPRISE = "T09:00:00+01:00";
@@ -114,6 +115,6 @@ export async function ensureActualites(): Promise<void> {
     amorce = true;
     console.info(`[actus] ${ordonnees.length} communiqués repris depuis le contenu statique.`);
   } catch (error) {
-    console.error("[actus] Amorçage des actualités impossible :", error);
+    console.error(`[actus] Amorçage des actualités impossible : ${describeError(error)}`);
   }
 }

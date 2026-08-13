@@ -28,12 +28,16 @@ export default async function TableauDeBordPage() {
   // Premier indicateur branché : les plaintes ouvertes, et celles dont
   // l'engagement de 30 jours est dépassé. Réservé aux comptes qui ont le
   // module — un chiffre reste une information.
+  // `catch` : même règle que pour les articles ci-dessous. Sans lui, une base
+  // injoignable faisait tomber le tableau de bord entier — et l'objet levé par
+  // le pilote Neon n'étant pas une `Error`, l'incident ne laissait qu'une ligne
+  // « ⨯ Error: [object Object] » dans le journal.
   const seesGrievances = can(user, "mgp");
   const [openGrievances, lateGrievances] = seesGrievances
     ? await Promise.all([
         db().grievance.count({ where: { status: { in: OPEN_STATUSES } } }),
         db().grievance.count({ where: { dueAt: { lt: new Date() }, status: { in: OPEN_STATUSES } } }),
-      ])
+      ]).catch((): [null, null] => [null, null])
     : [null, null];
 
   // Articles en ligne — même règle : le chiffre n'apparaît qu'aux comptes qui
