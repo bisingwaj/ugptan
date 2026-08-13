@@ -31,10 +31,18 @@ export const DEFAULT_ADMIN_EMAIL = "admin@gmail.com";
 const DEFAULT_ADMIN_PASSWORD = "12345678";
 const DEFAULT_ADMIN_NAME = "Administrateur";
 
+/**
+ * `INITIAL_ADMIN_*` nomme ce dont il s'agit : les identifiants du PREMIER
+ * compte, et d'aucun autre. Les anciens noms restent lus en repli, pour qu'un
+ * déploiement déjà configuré ne se retrouve pas sans amorce après mise à jour.
+ */
 export const initialAdminEmail = () =>
-  (process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL).trim().toLowerCase();
+  (process.env.INITIAL_ADMIN_EMAIL || process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL)
+    .trim()
+    .toLowerCase();
 
-const initialAdminPassword = () => process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
+const initialAdminPassword = () =>
+  process.env.INITIAL_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
 
 /**
  * Mémo par instance : sans lui, chaque affichage de la page de connexion

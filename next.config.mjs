@@ -30,6 +30,9 @@ const nextConfig = {
     "@prisma/adapter-neon",
     "@neondatabase/serverless",
     "ws",
+    // Ouvre lui-même ses sockets TLS et charge ses modules par chemin : bundlé,
+    // il perd la résolution de ses dépendances internes.
+    "nodemailer",
   ],
   experimental: {
     serverActions: {

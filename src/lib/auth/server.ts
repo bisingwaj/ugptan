@@ -22,7 +22,12 @@ import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
 import { adminAc, userAc } from "better-auth/plugins/admin/access";
 import { db } from "@/lib/db";
+import { ADMIN_LOGIN, ADMIN_SET_PASSWORD } from "@/lib/admin";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/lib/auth/validate";
+import { ROLE_LABEL, isRole } from "@/lib/auth/permissions";
+import { APP_ORIGIN } from "@/lib/email/config";
+import { sendEmail } from "@/lib/email/send";
+import { accountInvitationEmail } from "@/lib/email/templates/account-invitation";
 
 /**
  * Les trois rôles du projet, déclarés à Better Auth.
@@ -42,6 +47,27 @@ const ROLES = {
 
 /** Durée d'une session inactive. Reprend les 8 h de la console. */
 const SESSION_EXPIRES_IN = 60 * 60 * 8;
+
+/**
+ * Validité du lien de définition du mot de passe : sept jours.
+ *
+ * Plus long que l'heure d'usage pour une réinitialisation ordinaire, parce que
+ * ce lien sert d'abord d'INVITATION : un compte ouvert un vendredi soir doit
+ * rester utilisable le lundi matin. Le lien reste à usage unique, et la fenêtre
+ * se referme d'elle-même.
+ */
+export const RESET_TOKEN_EXPIRES_IN = 60 * 60 * 24 * 7;
+export const RESET_TOKEN_EXPIRES_DAYS = RESET_TOKEN_EXPIRES_IN / 86_400;
+
+/**
+ * Destination du lien d'invitation, après validation du jeton par Better Auth.
+ *
+ * Chemin RELATIF : c'est ce que `originCheck` accepte sans exiger que l'origine
+ * figure dans les origines de confiance. `welcome=1` distingue à l'écran une
+ * première ouverture de compte d'une redéfinition ultérieure ; Better Auth
+ * ajoute son `token` à côté sans écraser ce paramètre.
+ */
+export const SET_PASSWORD_REDIRECT = `${ADMIN_SET_PASSWORD}?welcome=1`;
 
 /** Message servi à un compte désactivé qui tente de se connecter. */
 export const BANNED_MESSAGE = "Ce compte est désactivé. Contactez un administrateur.";
@@ -78,9 +104,55 @@ function createAuth() {
       disableSignUp: true,
       minPasswordLength: PASSWORD_MIN_LENGTH,
       maxPasswordLength: PASSWORD_MAX_LENGTH,
-      /* Aucune réinitialisation en libre-service : sans page publique pour la
-         demander, un administrateur redéfinit le mot de passe depuis la console. */
       requireEmailVerification: false,
+
+      /* Définition du mot de passe par la personne elle-même. Ce mécanisme est
+         déclenché à la création d'un compte (cf. actions/admin-users.ts) : c'est
+         lui qui porte l'invitation. Aucune page publique ne le demande — un
+         administrateur peut renvoyer l'invitation depuis la console. */
+      resetPasswordTokenExpiresIn: RESET_TOKEN_EXPIRES_IN,
+      /* Redéfinir son mot de passe ferme les sessions ouvertes ailleurs : si le
+         lien a fuité et servi, la reprise en main est immédiate. */
+      revokeSessionsOnPasswordReset: true,
+
+      sendResetPassword: async ({ user, url }) => {
+        /* Le type de `user` ici est le modèle de BASE de Better Auth : les
+           champs ajoutés par le plugin admin n'y figurent pas, bien qu'ils
+           soient présents à l'exécution. D'où la lecture défensive, avec un
+           libellé neutre si le rôle est absent ou inconnu. */
+        const rawRole = (user as { role?: string }).role ?? "";
+        const role = isRole(rawRole) ? ROLE_LABEL[rawRole] : "Compte";
+
+        /* Rien n'est relevé ici, et surtout aucune exception : Better Auth
+           exécute ce rappel via `runInBackgroundOrAwait`, qui attend la promesse
+           mais avale ce qu'elle rejette. Lever ne servirait donc à rien.
+           Le résultat est déposé par `sendEmail` dans un registre que
+           l'appelant relève juste après (cf. lib/email/send.ts) : c'est ainsi
+           que la console sait annoncer un envoi réussi ou manqué. */
+        await sendEmail(
+          accountInvitationEmail({
+            name: user.name || user.email,
+            email: user.email,
+            roleLabel: role,
+            setPasswordUrl: url,
+            signinUrl: `${APP_ORIGIN}${ADMIN_LOGIN}`,
+            expiresInDays: RESET_TOKEN_EXPIRES_DAYS,
+          }),
+        );
+      },
+    },
+
+    /* L'endpoint /request-password-reset est public par construction. Il ne
+       révèle rien (même réponse pour une adresse inconnue) mais il expédie un
+       courriel : sans plafond, il deviendrait un moyen d'inonder la boîte d'un
+       agent. Le plafond est posé explicitement pour valoir aussi en
+       développement, où la limitation de Better Auth est inactive par défaut. */
+    rateLimit: {
+      enabled: true,
+      customRules: {
+        "/request-password-reset": { window: 3600, max: 3 },
+        "/sign-in/email": { window: 600, max: 10 },
+      },
     },
 
     session: {

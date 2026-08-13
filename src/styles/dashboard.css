@@ -342,6 +342,7 @@
   .adm-actions { @apply flex flex-col gap-2; }
   .adm-actions__row { @apply flex flex-wrap items-center gap-2; }
   .adm-actions__error { @apply text-[12.5px] leading-[1.45] text-red max-w-[42ch]; }
+  .adm-actions__ok { @apply text-[12.5px] leading-[1.45] text-ok-fg max-w-[42ch]; }
 
   /* --- Responsive --------------------------------------------------------- */
   @media (max-width: 900px) {
