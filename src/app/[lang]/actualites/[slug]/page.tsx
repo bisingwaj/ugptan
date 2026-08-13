@@ -80,9 +80,12 @@ export default async function ArticlePage(props: Params) {
   const actu = await getArticle(lang, params.slug);
   if (!actu) notFound();
 
+  // Blocs d'accompagnement : leur absence appauvrit la fin de page, elle ne doit
+  // pas emporter l'article lui-même. Une base momentanément injoignable coûte
+  // donc les articles liés et la navigation, pas la lecture.
   const [lies, adjacents] = await Promise.all([
-    articlesLies(actu, lang, 3),
-    voisins(actu, lang),
+    articlesLies(actu, lang, 3).catch(() => []),
+    voisins(actu, lang).catch(() => ({ precedent: null, suivant: null })),
   ]);
 
   /**

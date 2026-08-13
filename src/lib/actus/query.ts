@@ -19,6 +19,7 @@ import { htmlToText, readingMinutes, truncate } from "@/lib/html/sanitize";
 import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
 import { type ArticleStatut } from "@/lib/actus/statut";
+import { describeError, estPanneDeLiaison } from "@/lib/errors";
 
 /** Longueur d'un résumé déduit du corps, faute de résumé saisi. */
 const EXTRAIT_AUTO = 190;
@@ -67,29 +68,58 @@ const enLigne = (now: Date = new Date()) => ({
   publishedAt: { lte: now },
 });
 
+/** Attente avant la seconde tentative : le réveil d'un compute Neon est bref. */
+const DELAI_REPRISE_MS = 450;
+
+const enCompilation = () => process.env.NEXT_PHASE === "phase-production-build";
+
 /**
- * Tolérance de panne LIMITÉE À LA COMPILATION.
+ * Enveloppe de toute lecture publique des actualités. Elle rend deux services.
  *
- * Plusieurs pages pré-rendues au build lisent les actualités : l'accueil et les
- * cinq pages de composante. Une base momentanément injoignable pendant
- * `next build` — Neon en veille, réseau du runner — ferait échouer la
- * construction entière pour un bloc secondaire de la page. Ces listes ont
- * toutes un état vide légitime : on retombe dessus, en le disant dans le
- * journal de build.
+ * ─── 1. Une reprise sur panne de LIAISON ─────────────────────────────────────
+ * Neon suspend son compute après quelques minutes sans requête, et celle qui le
+ * réveille échoue parfois avant que la socket soit établie. La page « Actualités »
+ * tombait alors en 500 — à la vue du public. Une seule reprise suffit à absorber
+ * ce réveil. Elle est cantonnée aux pannes de liaison (cf. `estPanneDeLiaison`) :
+ * rejouer une requête que la base a refusée ne ferait que la faire refuser deux fois.
  *
- * À L'EXÉCUTION, en revanche, la panne est relayée telle quelle : une page
- * « Actualités » qui afficherait « aucun communiqué » sur une base éteinte
- * mentirait au visiteur, et le mensonge serait mis en cache. Mieux vaut une
- * erreur visible, que l'exploitant voit et corrige.
+ * ─── 2. Une tolérance limitée À LA COMPILATION ───────────────────────────────
+ * L'accueil et les cinq pages de composante sont pré-rendus au build et lisent
+ * les actualités. Une base injoignable pendant `next build` ferait échouer la
+ * construction entière pour un bloc secondaire de page. Ces listes ont un état
+ * vide légitime : on y retombe, en le disant dans le journal de build.
+ *
+ * À L'EXÉCUTION, la panne est relayée telle quelle : une page « Actualités »
+ * affichant « aucun communiqué » sur une base éteinte mentirait au visiteur, et
+ * le mensonge serait mis en cache. Mieux vaut une erreur, que l'exploitant voit
+ * et corrige (cf. src/instrumentation.ts pour la trace serveur).
+ *
+ * ⚠️ `faire` est une FONCTION, pas une promesse : une promesse déjà rejetée ne
+ * se rejoue pas, la reprise n'aurait servi à rien.
  */
-async function tolerantAuBuild<T>(lecture: Promise<T>, repli: T, contexte: string): Promise<T> {
+async function lecture<T>(faire: () => Promise<T>, repli: T, contexte: string): Promise<T> {
   try {
-    return await lecture;
-  } catch (error) {
-    if (process.env.NEXT_PHASE !== "phase-production-build") throw error;
-    console.warn(`[actus] ${contexte} : base injoignable pendant la compilation, bloc laissé vide.`, error);
-    return repli;
+    return await faire();
+  } catch (premiere) {
+    if (estPanneDeLiaison(premiere)) {
+      console.warn(`[actus] ${contexte} : liaison perdue, seconde tentative. ${describeError(premiere)}`);
+      await new Promise((resoudre) => setTimeout(resoudre, DELAI_REPRISE_MS));
+      try {
+        return await faire();
+      } catch (seconde) {
+        return echec(seconde, repli, contexte);
+      }
+    }
+    return echec(premiere, repli, contexte);
   }
+}
+
+function echec<T>(error: unknown, repli: T, contexte: string): T {
+  if (!enCompilation()) throw error;
+  console.warn(
+    `[actus] ${contexte} : base injoignable pendant la compilation, bloc laissé vide. ${describeError(error)}`,
+  );
+  return repli;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -266,8 +296,8 @@ export async function listerActualites(options: ListeOptions): Promise<ListeActu
     ...(comp ? { comps: { has: comp } } : {}),
   };
 
-  const [total, rows] = await tolerantAuBuild(
-    Promise.all([
+  const [total, rows] = await lecture(
+    () => Promise.all([
       db().article.count({ where }),
       db().article.findMany({
         where,
@@ -292,8 +322,8 @@ export async function listerActualites(options: ListeOptions): Promise<ListeActu
 
 /** Derniers articles — accueil, bloc d'une page composante, articles liés. */
 export async function derniersArticles(lang: Lang, limite = 4, comp?: string): Promise<ActuVue[]> {
-  const rows = await tolerantAuBuild(
-    db().article.findMany({
+  const rows = await lecture(
+    () => db().article.findMany({
       where: {
         ...enLigne(),
         translations: { some: { locale: lang } },
@@ -314,8 +344,8 @@ export async function derniersArticles(lang: Lang, limite = 4, comp?: string): P
 export async function listerCategories(
   lang: Lang,
 ): Promise<(ActuCategorie & { total: number })[]> {
-  const rows = await tolerantAuBuild(
-    db().articleCategory.findMany({
+  const rows = await lecture(
+    () => db().articleCategory.findMany({
       select: {
         slug: true, nomFr: true, nomEn: true, color: true,
         _count: { select: { articles: { where: { ...enLigne(), translations: { some: { locale: lang } } } } } },
@@ -350,16 +380,24 @@ export async function listerCategories(
  * qu'une 404.
  */
 export async function getArticle(lang: Lang, slug: string): Promise<ActuVue | null> {
-  const dansLaLangue = await db().article.findFirst({
-    where: { ...enLigne(), translations: { some: { locale: lang, slug } } },
-    select: articleSelect,
-  });
+  const dansLaLangue = await lecture(
+    () => db().article.findFirst({
+      where: { ...enLigne(), translations: { some: { locale: lang, slug } } },
+      select: articleSelect,
+    }),
+    null,
+    `article « ${slug} »`,
+  );
   if (dansLaLangue) return toVue(dansLaLangue as LigneArticle, lang);
 
-  const ailleurs = await db().article.findFirst({
-    where: { ...enLigne(), translations: { some: { slug } } },
-    select: articleSelect,
-  });
+  const ailleurs = await lecture(
+    () => db().article.findFirst({
+      where: { ...enLigne(), translations: { some: { slug } } },
+      select: articleSelect,
+    }),
+    null,
+    `article « ${slug} » (toutes langues)`,
+  );
   return ailleurs ? toVue(ailleurs as LigneArticle, lang) : null;
 }
 
@@ -369,7 +407,11 @@ export async function getArticle(lang: Lang, slug: string): Promise<ActuVue | nu
  * (cf. lib/actus/apercu.ts) ou une permission de console.
  */
 export async function apercuArticle(id: string, lang: Lang): Promise<ActuVue | null> {
-  const row = await db().article.findUnique({ where: { id }, select: articleSelect });
+  const row = await lecture(
+    () => db().article.findUnique({ where: { id }, select: articleSelect }),
+    null,
+    "aperçu d'article",
+  );
   return row ? toVue(row as LigneArticle, lang) : null;
 }
 
@@ -382,22 +424,30 @@ export async function articlesLies(article: ActuVue, lang: Lang, limite = 3): Pr
   const base = { ...enLigne(), translations: { some: { locale: lang } }, id: { not: article.id } };
 
   const memeCategorie = article.categorie
-    ? await db().article.findMany({
-        where: { ...base, category: { slug: article.categorie.slug } },
-        select: articleSelect,
-        orderBy: [{ publishedAt: "desc" }],
-        take: limite,
-      })
+    ? await lecture(
+        () => db().article.findMany({
+          where: { ...base, category: { slug: article.categorie!.slug } },
+          select: articleSelect,
+          orderBy: [{ publishedAt: "desc" }],
+          take: limite,
+        }),
+        [],
+        "articles liés (même catégorie)",
+      )
     : [];
 
   const manque = limite - memeCategorie.length;
   const complement = manque > 0
-    ? await db().article.findMany({
-        where: { ...base, id: { notIn: [article.id, ...memeCategorie.map((r) => r.id)] } },
-        select: articleSelect,
-        orderBy: [{ publishedAt: "desc" }],
-        take: manque,
-      })
+    ? await lecture(
+        () => db().article.findMany({
+          where: { ...base, id: { notIn: [article.id, ...memeCategorie.map((r) => r.id)] } },
+          select: articleSelect,
+          orderBy: [{ publishedAt: "desc" }],
+          take: manque,
+        }),
+        [],
+        "articles liés (complément)",
+      )
     : [];
 
   return [...memeCategorie, ...complement]
@@ -412,18 +462,22 @@ export async function voisins(
 ): Promise<{ precedent: ActuVue | null; suivant: ActuVue | null }> {
   const base = { ...enLigne(), translations: { some: { locale: lang } }, id: { not: article.id } };
 
-  const [plusAncien, plusRecent] = await Promise.all([
-    db().article.findFirst({
-      where: { ...base, publishedAt: { lt: article.date } },
-      select: articleSelect,
-      orderBy: [{ publishedAt: "desc" }],
-    }),
-    db().article.findFirst({
-      where: { ...base, publishedAt: { gt: article.date } },
-      select: articleSelect,
-      orderBy: [{ publishedAt: "asc" }],
-    }),
-  ]);
+  const [plusAncien, plusRecent] = await lecture(
+    () => Promise.all([
+      db().article.findFirst({
+        where: { ...base, publishedAt: { lt: article.date } },
+        select: articleSelect,
+        orderBy: [{ publishedAt: "desc" }],
+      }),
+      db().article.findFirst({
+        where: { ...base, publishedAt: { gt: article.date } },
+        select: articleSelect,
+        orderBy: [{ publishedAt: "asc" }],
+      }),
+    ]),
+    [null, null],
+    "article précédent / suivant",
+  );
 
   return {
     precedent: plusAncien ? toVue(plusAncien as LigneArticle, lang) : null,
@@ -436,7 +490,8 @@ export async function voisins(
 /* -------------------------------------------------------------------------- */
 
 /** Nombre d'articles en ligne — indicateur du tableau de bord. */
-export const compterEnLigne = (): Promise<number> => db().article.count({ where: enLigne() });
+export const compterEnLigne = (): Promise<number> =>
+  lecture(() => db().article.count({ where: enLigne() }), 0, "compteur d'articles en ligne");
 
 /**
  * Toutes les URL d'articles servies, pour `app/sitemap.ts`.
@@ -444,16 +499,23 @@ export const compterEnLigne = (): Promise<number> => db().article.count({ where:
  */
 export async function urlsArticles(): Promise<{ locale: Lang; slug: string; updatedAt: Date }[]> {
   try {
-    const rows = await db().articleTranslation.findMany({
-      where: { article: enLigne() },
-      select: { locale: true, slug: true, updatedAt: true },
-      orderBy: { updatedAt: "desc" },
-    });
+    const rows = await lecture(
+      () => db().articleTranslation.findMany({
+        where: { article: enLigne() },
+        select: { locale: true, slug: true, updatedAt: true },
+        orderBy: { updatedAt: "desc" },
+      }),
+      [],
+      "sitemap",
+    );
     return rows
       .filter((row): row is typeof row & { locale: Lang } => estLang(row.locale))
       .map((row) => ({ locale: row.locale, slug: row.slug, updatedAt: row.updatedAt }));
   } catch (error) {
-    console.error("[actus] sitemap : lecture des articles impossible", error);
+    // Seul endroit du module qui avale une panne à l'exécution : un sitemap
+    // amputé vaut mieux qu'une 500 sur /sitemap.xml, que les moteurs relisent
+    // sans cesse. Les pages, elles, laissent l'erreur remonter.
+    console.error(`[actus] sitemap : lecture des articles impossible. ${describeError(error)}`);
     return [];
   }
 }

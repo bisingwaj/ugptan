@@ -25,6 +25,7 @@
  */
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth/server";
+import { describeError } from "@/lib/errors";
 
 export const DEFAULT_ADMIN_EMAIL = "admin@gmail.com";
 const DEFAULT_ADMIN_PASSWORD = "12345678";
@@ -104,30 +105,5 @@ export async function ensureInitialAdmin(): Promise<void> {
   }
 }
 
-/**
- * Rend lisible ce que lève la couche base.
- *
- * `console.error(err)` seul ne suffit pas ici : quand la connexion WebSocket
- * échoue, `@neondatabase/serverless` lève un **ErrorEvent** — qui n'est pas une
- * `Error`, n'a que `stack` et `clientVersion` en propriétés propres, et
- * s'affiche donc « {} ». On perdait la cause au moment où on en avait besoin.
- */
-function describeError(error: unknown): string {
-  if (error instanceof Error) {
-    const code = (error as { code?: string }).code;
-    return [error.name, code, error.message].filter(Boolean).join(" · ");
-  }
-
-  if (error && typeof error === "object") {
-    const kind = error.constructor?.name || Object.prototype.toString.call(error);
-    const stack = (error as { stack?: string }).stack;
-    const origin = typeof stack === "string" ? stack.split("\n")[1]?.trim() : undefined;
-    const hint =
-      kind === "ErrorEvent"
-        ? "connexion à la base injoignable — vérifier DATABASE_URL et l'accès réseau à Neon"
-        : undefined;
-    return [kind, hint, origin].filter(Boolean).join(" · ");
-  }
-
-  return String(error);
-}
+/* `describeError` vit désormais dans lib/errors.ts : le journal des erreurs de
+   requête (instrumentation.ts) en a besoin pour les mêmes raisons. */
