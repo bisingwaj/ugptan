@@ -137,15 +137,41 @@ export type EmailDocument = {
   blocks: string[];
   /** Mention de bas de message, sous le filet. */
   footnote?: string;
+  /**
+   * Intitulé sous la marque, dans le bandeau noir. Par défaut celui de la
+   * console : la plupart des messages en émanent. Un message adressé au PUBLIC
+   * — la newsletter — n'a rien à dire d'une console à laquelle son destinataire
+   * n'a pas accès, et fournit donc le sien.
+   */
+  subtitle?: string;
+  /**
+   * Langue du document. Portée par `<html lang>` : les lecteurs d'écran et les
+   * traducteurs automatiques des clients de messagerie s'y fient.
+   */
+  lang?: string;
+  /**
+   * Dernière ligne du pied, sous la raison sociale. Même motif que `subtitle` :
+   * « message automatique de la console » n'a aucun sens pour un abonné.
+   */
+  signature?: string;
 };
 
 /**
  * Assemble un e-mail complet. Le seul endroit qui connaisse la structure du
  * document : un nouveau message se contente de fournir son titre et ses blocs.
  */
-export function renderEmail({ preheader, kicker, title, blocks, footnote }: EmailDocument): string {
+export function renderEmail({
+  preheader,
+  kicker,
+  title,
+  blocks,
+  footnote,
+  subtitle = "Console d'administration",
+  lang = "fr",
+  signature = "Message automatique de la console d'administration. Merci de ne pas y répondre si vous n'êtes pas concerné.",
+}: EmailDocument): string {
   return `<!doctype html>
-<html lang="fr">
+<html lang="${esc(lang)}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -178,7 +204,7 @@ export function renderEmail({ preheader, kicker, title, blocks, footnote }: Emai
                   <td valign="middle" style="padding-right:12px;">${mark}</td>
                   <td valign="middle">
                     <div style="font-family:${FONT_SANS};font-size:16px;font-weight:700;color:${PALETTE.white};line-height:1.2;">UGPTN</div>
-                    <div style="font-family:${FONT_MONO};font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${PALETTE.grey50};line-height:1.4;">Console d'administration</div>
+                    <div style="font-family:${FONT_MONO};font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${PALETTE.grey50};line-height:1.4;">${esc(subtitle)}</div>
                   </td>
                 </tr>
               </table>
@@ -200,7 +226,7 @@ export function renderEmail({ preheader, kicker, title, blocks, footnote }: Emai
               ${footnote ? `<p style="margin:0 0 12px;font-family:${FONT_SANS};font-size:12px;line-height:1.6;color:${PALETTE.grey60};">${footnote}</p>` : ""}
               <p style="margin:0;font-family:${FONT_SANS};font-size:11.5px;line-height:1.6;color:${PALETTE.grey50};">
                 Unité de Gestion du Projet de Transformation Numérique · République Démocratique du Congo<br>
-                Message automatique de la console d'administration. Merci de ne pas y répondre si vous n'êtes pas concerné.
+                ${esc(signature)}
               </p>
             </td>
           </tr>

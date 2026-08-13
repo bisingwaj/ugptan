@@ -143,6 +143,11 @@ html.scroll-locked body {
 .btn--on-dark:hover { border-color: #fff; }
 .btn--sm { padding: 11px 18px; font-size: 14px; }
 
+/* Attente d'un bouton : le LIBELLÉ bascule vers sa forme en cours, suivie de
+   points de suspension (« Enregistrement… »). Convention unique du projet, sans
+   anneau ni glyphe — le curseur et l'atténuation disent le reste. */
+.btn:disabled { cursor: progress; opacity: 0.6; }
+
 /* Chips / tags */
 .chip {
   font-family: var(--font-mono); font-size: 12px; font-weight: 600;
@@ -365,6 +370,25 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
   img, video, svg { max-width: 100%; }
 }
 
+/* Cibles tactiles au doigt (≤ 900px, tablette comprise).
+   Règle retenue : 44px de haut au minimum pour tout ce qui se touche. Les
+   boutons l'avaient déjà par `.btn` ; ce qui manquait, ce sont les LIENS de
+   listes — pied de page, sommaire des pages légales, étiquettes d'article —
+   dont la hauteur ne tenait qu'à leur interligne, soit 34 à 36px. Un lien de
+   36px se rate une fois sur trois au pouce, et deux liens empilés se touchent
+   l'un pour l'autre. */
+@media (max-width: 900px) {
+  /* `!important` sur `display` : `.footer-link` porte aussi l'utilitaire
+     Tailwind `block`, et la couche `utilities` l'emporterait sur celle-ci
+     (cf. l'ordre des couches en tête de fichier). */
+  .footer-link, .footer-legal__link {
+    display: flex !important; align-items: center; min-height: 44px;
+  }
+  .legal-toc__link { min-height: 44px; align-items: center; }
+  .actu-tag { display: inline-flex; align-items: center; min-height: 40px; }
+  .comp-anchor { display: inline-flex; align-items: center; min-height: 42px; }
+}
+
 /* Petits écrans : tout en pleine largeur, marges minimales */
 @media (max-width: 480px) {
   :root { --pad-x: clamp(16px, 5vw, 22px); }
@@ -374,6 +398,9 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
      (sinon minmax(400px) force une piste plus large que l'écran → scroll horizontal) */
   [style*="minmax(2"], [style*="minmax(3"], [style*="minmax(4"] { grid-template-columns: 1fr !important; }
   .hero-status { gap: 6px 16px !important; font-size: 11px !important; }
+  /* Bandeau bas du pied de page : mention légale et liens se superposent au
+     lieu de se disputer une ligne de 320px. */
+  .footer-legal { gap: 0 20px; }
 }
 
 /* ===========================================================================
@@ -407,8 +434,15 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 
 /* Overlay (lightbox / drawer scrim) */
 .scrim { position: fixed; inset: 0; z-index: 200; background: rgba(22, 22, 22, 0.62); display: flex; animation: ovF 0.22s both; }
+/* Voile dont l'apparition ET la disparition sont pilotées par framer-motion
+   (tiroir de navigation). L'animation CSS ferait doublon à l'ouverture et
+   rejouerait le fondu entrant au moment de la sortie. */
+.scrim--managed { animation: none; }
 .scrim--center { align-items: center; justify-content: center; padding: max(clamp(16px, 4vw, 56px), var(--sa-t)) clamp(16px, 4vw, 56px) max(clamp(16px, 4vw, 56px), var(--sa-b)); }
-.scrim--right { justify-content: flex-end; }
+/* `overflow: hidden` : pendant sa sortie, le tiroir est traduit hors du cadre.
+   Sans découpe, ce dépassement peut ouvrir un défilement horizontal le temps de
+   l'animation sur certains navigateurs mobiles. */
+.scrim--right { justify-content: flex-end; overflow: hidden; }
 .drawer { width: min(900px, 100%); height: 100%; background: #fff; overflow: auto; overscroll-behavior: contain; padding-bottom: var(--sa-b); animation: revSlideR 0.34s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .modal { animation: ovS 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
@@ -945,8 +979,8 @@ a.footer-legal__link:hover { color: #fff; border-bottom-color: var(--ac-light); 
 .avis {
   position: fixed; z-index: 90;
   /* À droite : la colonne de gauche porte le sommaire collant des pages légales. */
-  right: max(20px, var(--sa-r)); bottom: calc(20px + var(--sa-b));
-  width: min(480px, calc(100vw - 40px));
+  right: max(24px, var(--sa-r)); bottom: calc(24px + var(--sa-b));
+  width: min(480px, calc(100vw - 48px));
   background: var(--c-black); color: var(--c-30);
   border-left: 3px solid var(--ac);
   padding: 26px 28px 24px;
@@ -967,11 +1001,28 @@ a.footer-legal__link:hover { color: #fff; border-bottom-color: var(--ac-light); 
 .avis__lien { font-size: 12.5px; color: var(--c-40); border-bottom: 1px solid var(--c-70); transition: color 0.2s, border-color 0.2s; }
 a.avis__lien:hover { color: #fff; border-bottom-color: var(--ac-light); }
 
-@media (max-width: 560px) {
-  .avis { left: 0; right: 0; bottom: 0; width: auto; border-left: 0; border-top: 3px solid var(--ac); padding: 22px 20px calc(20px + var(--sa-b)); }
-  .avis__titre { font-size: 19px; }
+/* Sous 900px, l'encart cesse d'être une carte posée dans un coin : collé à
+   droite d'un écran étroit, il déséquilibrait la page et rognait la marge de
+   lecture. Il devient un bandeau de bas d'écran, pleine largeur, dont la
+   hauteur est bornée pour ne jamais recouvrir le contenu — le corps de l'avis
+   défile à l'intérieur si l'écran est très court. */
+@media (max-width: 900px) {
+  .avis {
+    left: 0; right: 0; bottom: 0; width: auto;
+    border-left: 0; border-top: 3px solid var(--ac);
+    padding: 22px max(20px, var(--sa-l)) calc(20px + var(--sa-b)) max(20px, var(--sa-r));
+    max-height: min(76dvh, 620px); overflow-y: auto; overscroll-behavior: contain;
+    box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.3);
+  }
+  .avis__titre { font-size: 20px; }
   .avis__actions { gap: 12px 16px; }
-  .avis__btn { width: 100%; justify-content: center; }
+}
+@media (max-width: 560px) {
+  .avis__titre { font-size: 19px; }
+  /* Le bouton passe pleine largeur : c'est l'action principale, elle doit être
+     atteignable au pouce sans viser. */
+  .avis__btn { width: 100%; justify-content: center; min-height: 48px; }
+  .avis__liens { width: 100%; gap: 14px 18px; }
 }
 
 

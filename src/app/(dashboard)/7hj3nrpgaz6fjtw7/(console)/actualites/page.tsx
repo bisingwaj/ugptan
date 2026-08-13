@@ -9,6 +9,7 @@ import { LOCALES } from "@/lib/params";
 import { ensureActualites } from "@/lib/actus/bootstrap";
 import { ARTICLE_STATUSES, STATUT_LABEL, statutEffectif, type ArticleStatut } from "@/lib/actus/statut";
 import { ArticleActions } from "@/components/dashboard/actus/ArticleActions";
+import { PendingLink } from "@/components/ui/PendingLink";
 
 export const metadata: Metadata = { title: ADMIN_ACTUS.title };
 
@@ -212,11 +213,11 @@ export default async function ActualitesAdminPage(props: { searchParams: Promise
       {pages > 1 && (
         <nav className="adm-pagination" aria-label="Pages">
           {page > 1 && (
-            <Link href={lien(params, { page: String(page - 1) })} className="btn btn--ghost btn--sm">← Précédent</Link>
+            <PendingLink href={lien(params, { page: String(page - 1) })} className="btn btn--ghost btn--sm" pendingLabel="Précédent…">← Précédent</PendingLink>
           )}
           <span className="mono adm-hint">Page {page} / {pages} · {total} article{total > 1 ? "s" : ""}</span>
           {page < pages && (
-            <Link href={lien(params, { page: String(page + 1) })} className="btn btn--ghost btn--sm">Suivant →</Link>
+            <PendingLink href={lien(params, { page: String(page + 1) })} className="btn btn--ghost btn--sm" pendingLabel="Suivant…">Suivant →</PendingLink>
           )}
         </nav>
       )}

@@ -42,6 +42,9 @@ export const ADMIN_USERS = adminPath("/utilisateurs");
 /** Plaintes reçues par le mécanisme de gestion des plaintes. */
 export const ADMIN_GRIEVANCES = adminPath("/plaintes");
 
+/** Abonnés à la lettre d'information. */
+export const ADMIN_NEWSLETTER = adminPath("/newsletter");
+
 /** Paramètre de requête portant la page demandée avant la redirection. */
 export const NEXT_PARAM = "next";
 

@@ -250,8 +250,122 @@ export function dict(lang: Lang) {
       ),
       placeholder: t("votre@email.cd", "your@email.cd"),
       btn: t("S'inscrire", "Subscribe"),
+      submitting: t("Enregistrement…", "Saving…"),
+      privacy: t(
+        "Pas de spam. Désinscription en un clic.",
+        "No spam. One-click unsubscribe.",
+      ),
+
+      /* Retours d'inscription, par code renvoyé par `subscribeNewsletter`.
+         « Déjà inscrite » et « nouvellement inscrite » partagent le même
+         message : les distinguer ferait du formulaire un moyen de vérifier
+         qu'une personne figure dans la liste. */
       doneTitle: t("Inscription confirmée", "You're subscribed"),
-      doneText: t("Merci — vous recevrez la prochaine édition.", "Thank you — you'll receive the next edition."),
+      doneText: t(
+        "Vous recevrez la prochaine édition à cette adresse.",
+        "You will receive the next edition at this address.",
+      ),
+      confirmTitle: t("Vérifiez votre boîte mail", "Check your inbox"),
+      confirmText: t(
+        "Cette adresse avait été désabonnée. Un message vient d'y être envoyé : ouvrez-le et confirmez pour revenir sur la liste.",
+        "This address had been unsubscribed. A message has just been sent to it: open it and confirm to rejoin the list.",
+      ),
+
+      erreurs: {
+        invalid: t(
+          "Cette adresse ne semble pas valide. Vérifiez la saisie.",
+          "This address does not look valid. Check your entry.",
+        ),
+        rate: t(
+          "Trop de tentatives depuis cette connexion. Réessayez dans quelques minutes.",
+          "Too many attempts from this connection. Try again in a few minutes.",
+        ),
+        robot: t(
+          "L'envoi a été refusé. Rechargez la page et saisissez votre adresse à nouveau.",
+          "The submission was rejected. Reload the page and enter your address again.",
+        ),
+        mail: t(
+          "L'envoi du message de confirmation a échoué. Réessayez plus tard ou écrivez-nous depuis la page Contact.",
+          "The confirmation message could not be sent. Try again later or write to us from the Contact page.",
+        ),
+        server: t(
+          "L'enregistrement a échoué. Réessayez dans un instant.",
+          "Registration failed. Try again shortly.",
+        ),
+      },
+    },
+
+    /* --- Newsletter : pages de gestion d'abonnement -----------------------
+       Pages de service, atteintes depuis le lien d'un e-mail. Elles ne sont ni
+       dans la navigation ni dans le sitemap. */
+    nlp: {
+      crumb: t("Lettre d'information", "Newsletter"),
+
+      /* Désabonnement par jeton */
+      unsubTitle: t("Se désabonner", "Unsubscribe"),
+      unsubLead: t(
+        "Cette page retire votre adresse de la liste de diffusion de la lettre d'information de l'UGPTN. Aucune autre donnée n'est concernée.",
+        "This page removes your address from the mailing list of the UGPTN newsletter. No other data is affected.",
+      ),
+      unsubFor: t("Adresse concernée", "Address concerned"),
+      unsubBtn: t("Confirmer le désabonnement", "Confirm unsubscribe"),
+      unsubPending: t("Traitement…", "Processing…"),
+      unsubDoneTitle: t("Désabonnement enregistré", "Unsubscribe recorded"),
+      unsubDoneText: t(
+        "Cette adresse ne recevra plus la lettre d'information. Vous pouvez vous réinscrire à tout moment depuis le formulaire du site.",
+        "This address will no longer receive the newsletter. You can subscribe again at any time from the form on the site.",
+      ),
+      unsubAlreadyTitle: t("Adresse déjà désabonnée", "Address already unsubscribed"),
+      unsubAlreadyText: t(
+        "Aucun envoi ne part vers cette adresse. Il n'y a rien d'autre à faire.",
+        "Nothing is sent to this address. There is nothing further to do.",
+      ),
+
+      /* Confirmation de réinscription */
+      confirmTitle: t("Confirmer votre inscription", "Confirm your subscription"),
+      confirmLead: t(
+        "Cette adresse avait été désabonnée. Elle ne revient sur la liste que par cette confirmation.",
+        "This address had been unsubscribed. It only returns to the list through this confirmation.",
+      ),
+      confirmBtn: t("Confirmer mon inscription", "Confirm my subscription"),
+      confirmDoneTitle: t("Inscription rétablie", "Subscription restored"),
+      confirmDoneText: t(
+        "Cette adresse figure de nouveau sur la liste. Vous recevrez la prochaine édition.",
+        "This address is back on the list. You will receive the next edition.",
+      ),
+      confirmAlreadyTitle: t("Adresse déjà inscrite", "Address already subscribed"),
+      confirmAlreadyText: t(
+        "Rien à confirmer : cette adresse est active sur la liste.",
+        "Nothing to confirm: this address is active on the list.",
+      ),
+
+      /* Erreurs communes aux deux pages */
+      invalidTitle: t("Lien inutilisable", "Link cannot be used"),
+      invalidText: t(
+        "Ce lien est incomplet ou ne correspond à aucune inscription. Ouvrez-le directement depuis l'e-mail reçu, sans le recopier partiellement.",
+        "This link is incomplete or matches no subscription. Open it directly from the email you received, without copying it partially.",
+      ),
+      serverTitle: t("Opération impossible", "Operation failed"),
+      serverText: t(
+        "Le service est momentanément indisponible. Réessayez dans un instant.",
+        "The service is temporarily unavailable. Try again shortly.",
+      ),
+
+      /* Demande de lien, quand l'e-mail d'origine a été perdu */
+      askTitle: t("Recevoir le lien de désabonnement", "Get the unsubscribe link"),
+      askLead: t(
+        "Saisissez l'adresse inscrite. Si elle figure sur la liste, le lien de désabonnement lui est envoyé.",
+        "Enter the subscribed address. If it is on the list, the unsubscribe link is sent to it.",
+      ),
+      askBtn: t("Envoyer le lien", "Send the link"),
+      askPending: t("Envoi…", "Sending…"),
+      askDoneTitle: t("Demande prise en compte", "Request received"),
+      askDoneText: t(
+        "Si cette adresse figure sur la liste, elle vient de recevoir le lien de désabonnement. Vérifiez également les indésirables.",
+        "If this address is on the list, it has just received the unsubscribe link. Check your spam folder as well.",
+      ),
+
+      back: t("Retour à l'accueil", "Back to home"),
     },
 
     /* --- Vidéo (lightbox) ------------------------------------------------- */
