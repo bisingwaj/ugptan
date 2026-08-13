@@ -7,6 +7,7 @@
  * au premier champ ajouté. Même rôle que `lib/actus/edition.ts` côté articles.
  */
 import { db } from "@/lib/db";
+import { lectureConsole } from "@/lib/lecture";
 import { formatDateTime, toDateTimeLocal } from "@/lib/format";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
 import { LOCALES } from "@/lib/params";
@@ -29,13 +30,20 @@ export type ReferentielsEvt = { referentiels: ReferentielsEvtSaisie; assets: Med
 
 /** Listes déroulantes et bibliothèque, communes aux deux écrans de la fiche. */
 export async function chargerReferentielsEvt(): Promise<ReferentielsEvt> {
-  const [categories, assets] = await Promise.all([
-    db().evenementCategory.findMany({
-      select: { id: true, nomFr: true },
-      orderBy: [{ position: "asc" }, { nomFr: "asc" }],
-    }),
-    db().mediaAsset.findMany({ select: mediaSelect, orderBy: { createdAt: "desc" }, take: 300 }),
-  ]);
+  // Reprise sur panne de liaison : le transport vers Neon échoue par salves, et
+  // une salve d'une demi-seconde ne doit pas faire tomber l'écran d'édition
+  // (cf. lib/lecture.ts). Sans repli — une fiche vide s'écraserait elle-même au
+  // premier enregistrement.
+  const [categories, assets] = await lectureConsole(
+    () => Promise.all([
+      db().evenementCategory.findMany({
+        select: { id: true, nomFr: true },
+        orderBy: [{ position: "asc" }, { nomFr: "asc" }],
+      }),
+      db().mediaAsset.findMany({ select: mediaSelect, orderBy: { createdAt: "desc" }, take: 300 }),
+    ]),
+    "référentiels d'événements",
+  );
 
   return {
     referentiels: {
@@ -99,24 +107,29 @@ export const evenementVierge = (): EvenementSaisie => ({
  * un — sans quoi l'écran d'édition devrait tester partout un cas impossible.
  */
 export async function chargerEvenement(id: string): Promise<(EvenementSaisie & { id: string }) | null> {
-  const evenement = await db().evenement.findUnique({
-    where: { id },
-    select: {
-      id: true, status: true, startAt: true, endAt: true, allDay: true, mode: true,
-      featured: true, color: true, categoryId: true, coverKey: true, coverMediaId: true,
-      registrationUrl: true, externalUrl: true, onlineUrl: true,
-      organiserName: true, organiserEmail: true, organiserPhone: true, organiserUrl: true,
-      comps: true,
-      coverMedia: { select: mediaSelect },
-      translations: {
-        select: {
-          locale: true, title: true, slug: true, excerpt: true, contentHtml: true,
-          lieu: true, adresse: true, places: true, infos: true,
-          seoTitle: true, seoDescription: true, coverAlt: true, updatedAt: true,
+  // Même reprise que ci-dessus : une salve de liaison ne doit pas transformer
+  // l'ouverture d'une fiche en page d'erreur (cf. lib/lecture.ts).
+  const evenement = await lectureConsole(
+    () => db().evenement.findUnique({
+      where: { id },
+      select: {
+        id: true, status: true, startAt: true, endAt: true, allDay: true, mode: true,
+        featured: true, color: true, categoryId: true, coverKey: true, coverMediaId: true,
+        registrationUrl: true, externalUrl: true, onlineUrl: true,
+        organiserName: true, organiserEmail: true, organiserPhone: true, organiserUrl: true,
+        comps: true,
+        coverMedia: { select: mediaSelect },
+        translations: {
+          select: {
+            locale: true, title: true, slug: true, excerpt: true, contentHtml: true,
+            lieu: true, adresse: true, places: true, infos: true,
+            seoTitle: true, seoDescription: true, coverAlt: true, updatedAt: true,
+          },
         },
       },
-    },
-  });
+    }),
+    `fiche d'événement « ${id} »`,
+  );
 
   if (!evenement) return null;
 

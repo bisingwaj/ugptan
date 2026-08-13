@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ADMIN_EVTS } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
+import { lectureConsole } from "@/lib/lecture";
 import { requirePermission } from "@/lib/auth/guard";
 import { formatDateTime } from "@/lib/format";
 import { intervalleDates } from "@/lib/events/dates";
@@ -32,20 +33,25 @@ export default async function InscriptionsPage(props: { params: Promise<{ id: st
   const { id } = await props.params;
   const t = ADMIN_EVTS;
 
-  const evenement = await db().evenement.findUnique({
-    where: { id },
-    select: {
-      id: true, startAt: true, endAt: true, registrationUrl: true,
-      translations: { select: { locale: true, title: true, places: true } },
-      inscriptions: {
-        orderBy: [{ createdAt: "desc" }],
-        select: {
-          id: true, nom: true, email: true, organisation: true, telephone: true,
-          message: true, locale: true, statut: true, note: true, createdAt: true,
+  // Reprise sur panne de liaison (cf. lib/lecture.ts) : une salve vers Neon ne
+  // doit pas transformer la liste des participants en page d'erreur.
+  const evenement = await lectureConsole(
+    () => db().evenement.findUnique({
+      where: { id },
+      select: {
+        id: true, startAt: true, endAt: true, registrationUrl: true,
+        translations: { select: { locale: true, title: true, places: true } },
+        inscriptions: {
+          orderBy: [{ createdAt: "desc" }],
+          select: {
+            id: true, nom: true, email: true, organisation: true, telephone: true,
+            message: true, locale: true, statut: true, note: true, createdAt: true,
+          },
         },
       },
-    },
-  });
+    }),
+    "demandes de participation",
+  );
 
   if (!evenement) notFound();
 
