@@ -8,7 +8,7 @@ import {
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
 import { prochainsEvenements } from "@/lib/events/query";
-import { humainPoints, galleryProvinces, partners } from "@/content/carbon";
+import { galleryProvinces, partners } from "@/content/carbon";
 import { media } from "@/content/media";
 import { NAV, route, compRoute } from "@/lib/routes";
 import { compVar } from "@/lib/comp";
@@ -18,7 +18,7 @@ import { Counter } from "@/components/ui/Counter";
 import { Photo } from "@/components/ui/Photo";
 import { HeroVideo } from "@/components/home/HeroVideo";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
-import { Histoires } from "@/components/home/Histoires";
+import { SectionsImpact } from "@/components/impact/SectionsImpact";
 import { EventsGrid } from "@/components/events/EventsGrid";
 import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
@@ -177,28 +177,11 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== IMPACT HUMAIN ===== */}
-      <section className="section section--grey">
-        <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 48 }}>
-            <div style={{ maxWidth: 760 }}>
-              <Kicker>{t.home.humainLabel}</Kicker>
-              <h2 className="h2" style={{ marginBottom: 18 }}>{t.home.humainTitle}</h2>
-              <p className="lead" style={{ margin: 0 }}>{t.home.humainLead}</p>
-            </div>
-            <Link href={route(lang, NAV.projet)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.cta.discover} <span className="arrow">→</span></Link>
-          </Reveal>
-          <RevealGroup className="grid-4 celled--top" gap={0.05} style={{ background: "var(--c-black)", borderColor: "var(--c-black)" }}>
-            {humainPoints.map((h, i) => (
-              <RevealItem key={i} className="cell" style={{ padding: "32px 28px", display: "flex", flexDirection: "column", minHeight: 200 }}>
-                <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,52px)" }}><span className="stat__approx">{t.lbl.approx}</span>{h.big}</div>
-                <div className="mono" style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ac)", marginTop: 10 }}>{pick(h.u, lang)}</div>
-                <p style={{ margin: "auto 0 0", paddingTop: 20, fontSize: 14.5, lineHeight: 1.55, color: "var(--c-70)" }}>{pick(h.t, lang)}</p>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+      {/* ===== IMPACT HUMAIN =====
+          Bloc administré depuis la console (module « Histoires & impact »).
+          Le dessin — grille à filets, grands chiffres, unité en accent — vit
+          dans components/impact/blocs/BlocStats.tsx. */}
+      <SectionsImpact emplacement="ACCUEIL_IMPACT" lang={lang} />
 
       {/* ===== COUVERTURE / CARTE ===== */}
       <section className="section">
@@ -298,16 +281,11 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== HISTOIRES (teaser) ===== */}
-      <section className="section section--sm">
-        <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 24, marginBottom: 44 }}>
-            <div style={{ maxWidth: 680 }}><Kicker>{t.home.storiesLabel}</Kicker><h2 className="h2" style={{ marginBottom: 14 }}>{t.home.storiesTitle}</h2><p className="lead" style={{ margin: 0 }}>{t.home.storiesLead}</p></div>
-            <Link href={route(lang, NAV.resultats)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.home.storiesTeaserCta} →</Link>
-          </Reveal>
-          <Histoires lang={lang} />
-        </div>
-      </section>
+      {/* ===== HISTOIRES (teaser) =====
+          Même section administrée que la page « Résultats » : elle en REPREND
+          les entrées plutôt que d'en tenir une seconde copie, de sorte qu'une
+          citation corrigée le soit aux deux endroits. */}
+      <SectionsImpact emplacement="ACCUEIL_HISTOIRES" lang={lang} />
 
       {/* ===== ÉVÉNEMENTS (teaser) =====
           Masqué quand aucune date n'est arrêtée : un bloc « échanger,

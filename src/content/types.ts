@@ -45,7 +45,6 @@ export type Mandat = { n: string; titre: Bilingual; desc: Bilingual };
 export type Principe = { titre: Bilingual; desc: Bilingual };
 export type Pole = { nom: Bilingual; role: Bilingual; roles: string[] };
 export type Membre = { role: Bilingual; pole: Bilingual; nom?: string; img?: string };
-export type Jalon = { date: string; text: Bilingual };
 export type Province = { nom: string; x: number; y: number; prio: boolean };
 export type Langue = { code: string; label: string; greeting: string };
 export type Profil = { label: Bilingual; page: Bilingual };
@@ -93,9 +92,7 @@ export type Media = {
 
 /* ---- Migrated Carbon-specific content (was hard-coded in renderVals) ------- */
 
-export type Histoire = { name: string; role: Bilingual; img: ImgKey; color: string; story: Bilingual; videoYt?: string };
 export type ProjVideo = { comp: string; titre: Bilingual; color: string; img: ImgKey; dur: string };
-export type Dialogue = { secteur: Bilingual; color: string; titre: Bilingual; desc: Bilingual };
 export type EventStatut = "avenir" | "passe";
 export type Evenement = {
   id: string; date: Bilingual; type: Bilingual; lieu: Bilingual; color: string;
@@ -113,8 +110,6 @@ export type Partner = { name: string; kind: Bilingual; logo?: string };
 export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: string; comp?: string };
 export type UniteStat = { v: string; u?: string; l: Bilingual };
 export type GalleryItem = { nom: string; img: ImgKey };
-export type HumainPoint = { big: string; u: Bilingual; t: Bilingual };
-export type ProjetImpact = { n: string; t: Bilingual; av: Bilingual; ap: Bilingual };
 export type Persona = { k: Bilingual; d: Bilingual };
 
 export type Contact = {
