@@ -778,10 +778,12 @@ model EvenementInscription {
 }
 
 /// ===========================================================================
-/// Documents & transparence
+/// Rapports & analyses
 ///
 /// Rapports, études, analyses et pièces de référence publiés dans la section
-/// « Rapports et analyses » du site.
+/// « Rapports & analyses » du site, et administrés par le module homonyme de la
+/// console. Les identifiants techniques, eux, restent bâtis sur « document » —
+/// modèles, permission et route : ce sont des clés stables, pas des libellés.
 ///
 /// ─── Le fichier n'est PAS ici ────────────────────────────────────────────────
 ///

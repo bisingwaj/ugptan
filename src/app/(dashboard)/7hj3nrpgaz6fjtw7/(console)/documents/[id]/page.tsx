@@ -43,7 +43,7 @@ export default async function ModifierDocumentPage(props: {
    *
    * Il n'existe que si le document est en ligne : un lien mort sur un brouillon
    * donnerait à croire que la pièce est déjà servie. Le paramètre `doc` ouvre le
-   * panneau de détail de la section « Rapports et analyses » directement sur ce
+   * panneau de détail de la section « Rapports & analyses » directement sur ce
    * document — la liste publique n'a pas de page par document, sa fiche est un
    * panneau (cf. src/components/docs/RessourcesClient.tsx).
    */

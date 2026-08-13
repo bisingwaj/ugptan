@@ -24,7 +24,7 @@ export { estImage, extensionLisible, poidsLisible, tailleMaxPour };
 
 /**
  * Ce que le dépôt de documents accepte : PDF, Word, Excel, PowerPoint, CSV et
- * images. La liste reste FERMÉE — l'ouvrir ferait de la section « Rapports et
+ * images. La liste reste FERMÉE — l'ouvrir ferait de la section « Rapports &
  * analyses » un hébergeur de fichiers arbitraires, exécutables compris.
  */
 export const MIMES_DOC = MIMES_ACCEPTES;

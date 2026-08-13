@@ -586,7 +586,7 @@
   .adm-media-card__meta { font-size: 11.5px; color: var(--c-60); line-height: 1.5; word-break: break-word; }
   .adm-media-card__form { display: flex; flex-direction: column; gap: 12px; }
 
-  /* --- Module « Documents & transparence » -----------------------------------
+  /* --- Module « Rapports & analyses » ----------------------------------------
      Le fichier est la substance de la fiche : son panneau ouvre l'écran, en
      pleine largeur, au-dessus du formulaire des métadonnées. */
   .adm-doc__fichier { display: flex; flex-direction: column; gap: 14px; }

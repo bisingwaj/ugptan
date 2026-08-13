@@ -10,7 +10,8 @@
  * Les CATÉGORIES, elles, sont amorcées : sans nomenclature de départ, le premier
  * dépôt oblige à sortir de l'écran pour créer une thématique avant de pouvoir
  * ranger quoi que ce soit. Les quatre proposées reprennent celles déjà employées
- * par la page « Documents » du site.
+ * par la page publique « Transparence » (`/[lang]/transparence`), qui est une
+ * autre liste et reste servie par son contenu statique.
  *
  * Même contrat que les autres amorçages : ne s'exécute QUE sur une table vide,
  * ne lève jamais, et ne recrée pas ce qu'un administrateur a supprimé.
