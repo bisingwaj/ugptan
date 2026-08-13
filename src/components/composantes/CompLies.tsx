@@ -5,22 +5,22 @@ import Link from "next/link";
 import type { Lang } from "@/lib/pick";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { actualites } from "@/content/actualites";
+import { derniersArticles } from "@/lib/actus/query";
 import { marches } from "@/content/marches";
 import { ressources } from "@/content/carbon";
 import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { cheminArticle } from "@/components/actus/ActuCard";
 
-export function CompLies({ code, lang }: { code: string; lang: Lang }) {
+/* Composant asynchrone depuis que les actualités vivent en base : le tri et le
+   filtrage par composante sont faits par la requête, pas en mémoire. */
+export async function CompLies({ code, lang }: { code: string; lang: Lang }) {
   const t = dict(lang);
   const c = t.comp;
 
-  const actus = actualites
-    .filter((a) => a.comps?.includes(code))
-    .sort((a, b) => (a.dateISO < b.dateISO ? 1 : -1))
-    .slice(0, 4);
+  const actus = await derniersArticles(lang, 4, code);
   const avis = marches.filter((m) => m.comp === code && m.statut === "ouvert");
   const docs = ressources.filter((r) => r.comp === code);
 
@@ -42,10 +42,12 @@ export function CompLies({ code, lang }: { code: string; lang: Lang }) {
             {actus.length > 0 ? (
               <RevealGroup className="comp-lies__list" gap={0.05}>
                 {actus.map((a) => (
-                  <RevealItem key={a.dateISO}>
-                    <Link href={route(lang, NAV.actualites)} className="comp-lie">
-                      <span className="mono comp-lie__meta">{a.date} · {pick(a.cat, lang)}</span>
-                      <span className="comp-lie__t">{pick(a.title, lang)}</span>
+                  <RevealItem key={a.id}>
+                    <Link href={cheminArticle(lang, a.slug)} className="comp-lie">
+                      <span className="mono comp-lie__meta">
+                        {a.dateLabel}{a.categorie ? ` · ${a.categorie.nom}` : ""}
+                      </span>
+                      <span className="comp-lie__t">{a.title}</span>
                       <span className="mono comp-lie__go" aria-hidden>→</span>
                     </Link>
                   </RevealItem>

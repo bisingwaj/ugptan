@@ -52,5 +52,189 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  /// Articles dont ce compte est l'AUTEUR affiché (signature publique).
+  articlesSignes  Article[]    @relation("ArticleAuteur")
+  /// Articles saisis par ce compte — trace interne, jamais publiée.
+  articlesSaisis  Article[]    @relation("ArticleSaisiPar")
+  mediasTeleverses MediaAsset[]
+
   @@index([role])
+}
+
+/// ---------------------------------------------------------------------------
+/// CMS d'actualités
+///
+/// Un article = une fiche commune (statut, date, catégorie, visuel, auteur) et
+/// UNE LIGNE DE TRADUCTION PAR LANGUE. Le titre, le slug, le résumé, le corps
+/// et les métadonnées SEO vivent dans la traduction, jamais dans la fiche : une
+/// langue non traduite se reconnaît alors à l'absence de sa ligne, ce qui permet
+/// à la console de la signaler et au site public de ne pas servir un contenu
+/// dans la mauvaise langue.
+///
+/// Les catégories et les étiquettes, elles, portent leurs deux libellés en
+/// colonnes (`nomFr` / `nomEn`) : ce sont des mots isolés, alignés sur le type
+/// `Bilingual` du reste du contenu (cf. src/lib/pick.ts).
+/// ---------------------------------------------------------------------------
+
+/// Cycle de vie d'un article. `SCHEDULED` n'exige aucune tâche planifiée : la
+/// bascule se fait à la lecture, en comparant `publishedAt` à l'instant courant
+/// (cf. src/lib/actus/statut.ts).
+enum ArticleStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Bibliothèque de médias.
+///
+/// Deux natures dans une seule table : un fichier TÉLÉVERSÉ (`data` renseigné,
+/// servi par /api/medias/<id>) ou un média EXTERNE (`url` renseignée, hébergé
+/// sur un CDN). Le binaire vit en base pour que l'installation reste autonome —
+/// aucun service de stockage à provisionner. Corollaire à respecter partout :
+/// `data` n'est JAMAIS sélectionné hors de la route qui sert le fichier.
+model MediaAsset {
+  id        String   @id @default(cuid())
+  /// Nom d'origine, conservé pour la recherche dans la bibliothèque.
+  filename  String
+  mimeType  String
+  /// Octets. Redondant avec `data`, mais évite de charger le binaire pour
+  /// afficher une liste.
+  size      Int      @default(0)
+  width     Int?
+  height    Int?
+  data      Bytes?
+  url       String?
+  altFr     String?
+  altEn     String?
+  legende   String?
+  createdAt DateTime @default(now())
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  couvertures Article[]
+
+  @@index([createdAt])
+}
+
+/// Catégorie d'article — sert aussi de filtre sur la page publique.
+model ArticleCategory {
+  id    String @id @default(cuid())
+  /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
+  slug  String @unique
+  nomFr String
+  nomEn String
+  /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
+  color String?
+  /// Ordre d'affichage des filtres.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles Article[]
+
+  @@index([position])
+}
+
+/// Étiquette transverse. Plus fine qu'une catégorie : un article n'a qu'une
+/// catégorie, mais autant d'étiquettes que nécessaire.
+model Tag {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nomFr     String
+  nomEn     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles ArticleTag[]
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+/// Fiche commune d'un article, indépendante de la langue.
+model Article {
+  id          String        @id @default(cuid())
+  status      ArticleStatus @default(DRAFT)
+  /// Date de publication — passée pour un article en ligne, future pour un
+  /// article programmé. `null` tant que rien n'a été programmé ni publié.
+  publishedAt DateTime?
+  /// Mise en avant : remonte l'article en tête de la page « Actualités ».
+  featured    Boolean       @default(false)
+  /// Lieu de l'événement rapporté (« Kinshasa », « Paris / Kinshasa »).
+  lieu        String?
+  /// Identifiant YouTube de la vidéo associée, le cas échéant.
+  videoYt     String?
+  /// Composantes rattachées (C1…C5) — alimente le bloc « Actualités » des
+  /// pages composante (cf. src/components/composantes/CompLies.tsx).
+  comps       String[]      @default([])
+
+  categoryId String?
+  category   ArticleCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// Image de couverture issue de la bibliothèque.
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation(fields: [coverMediaId], references: [id], onDelete: SetNull)
+  /// Repli : clé du registre d'images intégré (cf. src/content/media.ts), pour
+  /// les articles repris de la version statique du site.
+  coverKey     String?
+
+  /// Auteur affiché, quand c'est un compte de la console.
+  authorId   String?
+  author     User?   @relation("ArticleAuteur", fields: [authorId], references: [id], onDelete: SetNull)
+  /// Signature libre, quand l'auteur n'a pas de compte (« Cellule communication »).
+  authorName String?
+  authorRole String?
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("ArticleSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ArticleTranslation[]
+  tags         ArticleTag[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([featured])
+}
+
+/// Version d'un article dans une langue. Tout ce qui se lit est ici.
+model ArticleTranslation {
+  id        String  @id @default(cuid())
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale    String
+
+  title String
+  /// Segment d'URL, unique DANS SA LANGUE : /fr/actualites/<slug>.
+  slug  String
+
+  excerpt     String?
+  /// Corps de l'article, HTML déjà assaini à l'écriture
+  /// (cf. src/lib/html/sanitize.ts). Jamais de HTML brut de l'éditeur en base.
+  contentHtml String  @default("")
+
+  seoTitle       String?
+  seoDescription String?
+  /// Texte alternatif de l'image de couverture, propre à la langue.
+  coverAlt       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([articleId, locale])
+  @@unique([locale, slug])
+  @@index([locale])
 }

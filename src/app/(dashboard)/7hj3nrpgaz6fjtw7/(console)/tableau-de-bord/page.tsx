@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ADMIN, ADMIN_KPIS, ADMIN_NAV_SECTIONS } from "@/content/admin";
 import { requirePermission } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/permissions";
+import { compterEnLigne } from "@/lib/actus/query";
 
 export const metadata: Metadata = { title: ADMIN.home.title };
 
@@ -10,6 +11,17 @@ export default async function TableauDeBordPage() {
   // parallèle, donc le redirect du layout n'empêche pas cette page d'être
   // rendue et sérialisée. Toute nouvelle page de la console doit faire pareil.
   const user = await requirePermission("tableau-de-bord");
+
+  // Les indicateurs se branchent au fil des modules livrés. Ceux qui restent à
+  // « — » attendent le leur ; une valeur inventée serait pire qu'un tiret.
+  // Une base momentanément injoignable ne doit pas faire tomber le tableau.
+  const articles = can(user, "actualites")
+    ? await compterEnLigne().catch(() => null)
+    : null;
+
+  const valeurs: Record<string, string> = {
+    articles: articles === null ? ADMIN.home.empty : String(articles),
+  };
 
   // Même filtrage que la barre latérale : un compte ne lit ici que les modules
   // auxquels il a effectivement accès.
@@ -27,8 +39,7 @@ export default async function TableauDeBordPage() {
       <div className="adm-grid">
         {ADMIN_KPIS.map((kpi) => (
           <div key={kpi.key} className="adm-card">
-            {/* Valeurs branchées au fil des modules — cf. GUIDE-DEV §8.2.1 */}
-            <div className="adm-kpi__num">{ADMIN.home.empty}</div>
+            <div className="adm-kpi__num">{valeurs[kpi.key] ?? ADMIN.home.empty}</div>
             <div className="adm-kpi__label">{kpi.label}</div>
           </div>
         ))}
