@@ -14,7 +14,7 @@
  *     un titre français sur la version anglaise du site.
  */
 import { db } from "@/lib/db";
-import { formatArticleDate } from "@/lib/format";
+import { anneeArticle, formatArticleDate } from "@/lib/format";
 import { htmlToText, readingMinutes, truncate } from "@/lib/html/sanitize";
 import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
@@ -287,6 +287,30 @@ export type ListeActus = {
 export const PAR_PAGE = 9;
 
 /**
+ * Contrainte portée par la relation `translations` : la langue de lecture, et
+ * le cas échéant la recherche plein texte.
+ *
+ * ⚠️ Les deux doivent tenir dans UNE SEULE clé `translations`. Écrites en deux
+ * clés d'un même objet littéral, la seconde écraserait la première et la
+ * recherche se ferait toutes langues confondues.
+ *
+ * Partagé par la grille paginée et par le fil chronologique, pour que les deux
+ * blocs de la page répondent exactement au même filtre.
+ */
+function filtreTraductions(lang: Lang, recherche?: string | null): Record<string, unknown> {
+  const q = recherche?.trim();
+  const filtre: Record<string, unknown> = { locale: lang };
+  if (q) {
+    filtre.OR = [
+      { title: { contains: q, mode: "insensitive" } },
+      { excerpt: { contains: q, mode: "insensitive" } },
+      { contentHtml: { contains: q, mode: "insensitive" } },
+    ];
+  }
+  return filtre;
+}
+
+/**
  * Liste paginée de la page « Actualités ».
  *
  * Les articles mis en avant remontent en tête, quel que soit le filtre : c'est
@@ -298,22 +322,9 @@ export async function listerActualites(options: ListeOptions): Promise<ListeActu
   const parPage = options.parPage ?? PAR_PAGE;
   const page = Math.max(1, options.page ?? 1);
 
-  const q = recherche?.trim();
-  const filtreTraduction: Record<string, unknown> = { locale: lang };
-  if (q) {
-    filtreTraduction.OR = [
-      { title: { contains: q, mode: "insensitive" } },
-      { excerpt: { contains: q, mode: "insensitive" } },
-      { contentHtml: { contains: q, mode: "insensitive" } },
-    ];
-  }
-
   const where = {
     ...enLigne(),
-    // Une seule clé `translations` : elle porte à la fois l'exigence de langue
-    // et la recherche plein texte, faute de quoi la seconde écraserait la
-    // première dans l'objet littéral.
-    translations: { some: filtreTraduction },
+    translations: { some: filtreTraductions(lang, recherche) },
     ...(categorie ? { category: { slug: categorie } } : {}),
     ...(tag ? { tags: { some: { tag: { slug: tag } } } } : {}),
     ...(comp ? { comps: { has: comp } } : {}),
@@ -341,6 +352,113 @@ export async function listerActualites(options: ListeOptions): Promise<ListeActu
     pages: Math.max(1, Math.ceil(total / parPage)),
     parPage,
   };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Fil chronologique                                                           */
+/* -------------------------------------------------------------------------- */
+
+/** Une entrée du fil : une date, un titre, un lien. Rien d'autre n'est affiché. */
+export type JalonActu = {
+  id: string;
+  slug: string;
+  titre: string;
+  dateLabel: string;
+  dateISO: string;
+  /** Année au fuseau de Kinshasa, pour les intertitres du fil. */
+  annee: number;
+  categorie: { nom: string; color: string | null } | null;
+};
+
+/**
+ * Sélection réduite au strict nécessaire. Réutiliser `articleSelect` ici
+ * chargerait le corps HTML, les vignettes et les étiquettes de chaque article
+ * pour n'en afficher que le titre et la date.
+ */
+const filSelect = {
+  id: true,
+  publishedAt: true,
+  category: { select: { nomFr: true, nomEn: true, color: true } },
+  translations: { select: { locale: true, title: true, slug: true } },
+} as const;
+
+type LigneFil = {
+  id: string;
+  publishedAt: Date | null;
+  category: { nomFr: string; nomEn: string; color: string | null } | null;
+  translations: { locale: string; title: string; slug: string }[];
+};
+
+/** Plafond du fil. Au-delà, la page s'allonge sans rien apprendre de plus. */
+export const FIL_MAX = 24;
+
+/**
+ * Fil chronologique de publication.
+ *
+ * Deux écarts assumés avec `listerActualites`, qui alimente la grille juste
+ * au-dessus sur la même page :
+ *
+ *  1. **La mise en avant ne joue pas.** Le tri est la date de publication, et
+ *     rien d'autre. Un fil dont l'ordre n'est pas celui du temps ne serait pas
+ *     un fil chronologique — c'est précisément ce que la grille fait déjà.
+ *  2. **Aucune pagination.** Le fil couvre l'ensemble des articles retenus par
+ *     les filtres actifs, plafonné à `FIL_MAX`. C'est ce qui en fait un
+ *     complément et non un doublon : la grille détaille neuf articles, le fil
+ *     en récapitule beaucoup plus.
+ *
+ * Les filtres de la page (catégorie, étiquette, recherche) s'y appliquent. Un
+ * fil qui les ignorerait afficherait, sous une grille filtrée, des articles
+ * sans rapport avec ce que le visiteur a demandé.
+ */
+export async function filChronologique(options: {
+  lang: Lang;
+  categorie?: string | null;
+  tag?: string | null;
+  recherche?: string | null;
+  limite?: number;
+}): Promise<JalonActu[]> {
+  const { lang, categorie, tag, recherche } = options;
+
+  const where = {
+    ...enLigne(),
+    translations: { some: filtreTraductions(lang, recherche) },
+    ...(categorie ? { category: { slug: categorie } } : {}),
+    ...(tag ? { tags: { some: { tag: { slug: tag } } } } : {}),
+  };
+
+  const rows = await lecture(
+    () => db().article.findMany({
+      where,
+      select: filSelect,
+      orderBy: [{ publishedAt: "desc" }],
+      take: options.limite ?? FIL_MAX,
+    }),
+    [],
+    "fil chronologique",
+  );
+
+  return (rows as LigneFil[])
+    .map((row): JalonActu | null => {
+      // Ces deux gardes ne peuvent pas se déclencher : `enLigne()` exige
+      // `publishedAt <= maintenant`, et la clause `translations.some` a exigé la
+      // langue. Ils satisfont le typage sans inventer de valeur de repli.
+      if (!row.publishedAt) return null;
+      const tr = row.translations.find((t) => t.locale === lang);
+      if (!tr) return null;
+
+      return {
+        id: row.id,
+        slug: tr.slug,
+        titre: tr.title,
+        dateLabel: formatArticleDate(row.publishedAt, lang),
+        dateISO: row.publishedAt.toISOString(),
+        annee: anneeArticle(row.publishedAt),
+        categorie: row.category
+          ? { nom: lang === "fr" ? row.category.nomFr : row.category.nomEn, color: row.category.color }
+          : null,
+      };
+    })
+    .filter((j): j is JalonActu => j !== null);
 }
 
 /** Derniers articles — accueil, bloc d'une page composante, articles liés. */

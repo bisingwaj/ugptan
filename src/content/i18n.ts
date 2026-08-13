@@ -607,6 +607,10 @@ export function dict(lang: Lang) {
       readArticle: t("Lire l'article", "Read the article"),
       allFilter: t("Tout", "All"),
       timeline: t("Fil chronologique", "Timeline"),
+      timelineLead: t(
+        "Les publications à leur date, de la plus récente à la plus ancienne. La mise en avant ne joue pas ici : l'ordre est celui du calendrier.",
+        "Each release at its date, most recent first. Featured articles are not promoted here: the order is that of the calendar.",
+      ),
       relatedVideo: t("Voir la vidéo associée", "Watch the related video"),
       allNews: t("Toutes les actualités", "All news"),
 

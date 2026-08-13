@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { asLang } from "@/lib/params";
-import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { jalons } from "@/content/data";
 import { SITE_URL } from "@/lib/site";
 import { NAV, route } from "@/lib/routes";
-import { listerActualites, listerCategories, PAR_PAGE } from "@/lib/actus/query";
+import { filChronologique, listerActualites, listerCategories, PAR_PAGE } from "@/lib/actus/query";
 import { Kicker } from "@/components/ui/Kicker";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
-import { ActuCard } from "@/components/actus/ActuCard";
+import { ActuCard, cheminArticle } from "@/components/actus/ActuCard";
 import { ActuFiltres } from "@/components/actus/ActuFiltres";
 
 /**
@@ -61,9 +59,12 @@ export default async function ActualitesPage(props: {
   const q = recherche.q?.trim() || null;
   const page = Math.max(1, Number.parseInt(recherche.page ?? "1", 10) || 1);
 
-  const [liste, categories] = await Promise.all([
+  const [liste, categories, fil] = await Promise.all([
     listerActualites({ lang, categorie, tag, recherche: q, page, parPage: PAR_PAGE }),
     listerCategories(lang),
+    // Le fil ne dépend pas de `page` : il récapitule tous les articles retenus
+    // par les filtres, pagination mise à part (cf. lib/actus/query.ts).
+    filChronologique({ lang, categorie, tag, recherche: q }),
   ]);
 
   /** Conserve les filtres d'une page de résultats à l'autre. */
@@ -156,20 +157,48 @@ export default async function ActualitesPage(props: {
             </nav>
           )}
 
-          <div style={{ marginTop: "clamp(48px,6vw,84px)" }}>
-            <Reveal>
-              <Kicker>{t.actus.timeline}</Kicker>
-            </Reveal>
-            <RevealGroup style={{ borderLeft: "2px solid var(--c-20)", marginLeft: 8, marginTop: 20 }} gap={0.045}>
-              {jalons.map((j, i) => (
-                <RevealItem key={i} style={{ position: "relative", padding: "0 0 30px 36px" }}>
-                  <span style={{ position: "absolute", left: -7, top: 3, width: 12, height: 12, background: "var(--ac)", border: "2px solid #fff" }} />
-                  <div className="mono" style={{ fontSize: 13, color: "var(--ac)", fontWeight: 500 }}>{j.date}</div>
-                  <div style={{ fontSize: 16, marginTop: 5, maxWidth: 560, lineHeight: 1.4 }}>{pick(j.text, lang)}</div>
-                </RevealItem>
-              ))}
-            </RevealGroup>
-          </div>
+          {/* Fil chronologique : les articles réellement publiés, dans l'ordre
+              des dates. Il partage les filtres de la grille ci-dessus mais pas
+              sa pagination, ce qui en fait un récapitulatif et non un doublon.
+              Masqué quand il n'y a rien à montrer — l'état vide est déjà dit
+              plus haut, le répéter sous un intertitre n'apprendrait rien. */}
+          {fil.length > 0 && (
+            <section className="actu-fil-bloc" aria-label={t.actus.timeline}>
+              <Reveal>
+                <Kicker>{t.actus.timeline}</Kicker>
+              </Reveal>
+              <Reveal>
+                <p className="actu-fil__intro">{t.actus.timelineLead}</p>
+              </Reveal>
+
+              <RevealGroup as="ul" className="actu-fil" gap={0.045}>
+                {fil.map((jalon, index) => (
+                  <RevealItem as="li" key={jalon.id} className="actu-fil__item">
+                    {/* Intertitre d'année, posé au premier article de chaque
+                        millésime : sur deux ou trois ans de publications, la
+                        seule date longue ne donne plus le rythme. */}
+                    {(index === 0 || jalon.annee !== fil[index - 1].annee) && (
+                      <div className="mono actu-fil__annee">{jalon.annee}</div>
+                    )}
+
+                    <Link href={cheminArticle(lang, jalon.slug)} className="actu-fil__lien">
+                      <span className="actu-fil__puce" aria-hidden="true" />
+                      <time dateTime={jalon.dateISO} className="mono actu-fil__date">{jalon.dateLabel}</time>
+                      <span className="actu-fil__titre">{jalon.titre}</span>
+                      {jalon.categorie && (
+                        <span
+                          className="mono actu-fil__cat"
+                          style={{ color: jalon.categorie.color ?? "var(--ac)" }}
+                        >
+                          {jalon.categorie.nom}
+                        </span>
+                      )}
+                    </Link>
+                  </RevealItem>
+                ))}
+              </RevealGroup>
+            </section>
+          )}
         </div>
       </section>
     </div>
