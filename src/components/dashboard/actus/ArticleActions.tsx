@@ -43,14 +43,14 @@ export function ArticleActions({
         <form action={bascule}>
           <input type="hidden" name="id" value={id} />
           <button type="submit" className={`${taille} btn--outline`} disabled={basculeEnCours}>
-            {enLigne ? t.depublier : t.publier}
+            {basculeEnCours ? (enLigne ? t.depublication : t.publication) : enLigne ? t.depublier : t.publier}
           </button>
         </form>
 
         <form action={copie}>
           <input type="hidden" name="id" value={id} />
           <button type="submit" className={`${taille} btn--ghost`} disabled={copieEnCours}>
-            {t.dupliquer}
+            {copieEnCours ? t.duplication : t.dupliquer}
           </button>
         </form>
 
@@ -62,7 +62,7 @@ export function ArticleActions({
         >
           <input type="hidden" name="id" value={id} />
           <button type="submit" className={`${taille} btn--danger`} disabled={suppressionEnCours}>
-            {t.supprimer}
+            {suppressionEnCours ? t.suppression : t.supprimer}
           </button>
         </form>
       </div>

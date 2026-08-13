@@ -9,9 +9,11 @@ import { NAV, NAV_FOOTER, NAV_LEGAL, route } from "@/lib/routes";
    complètes plutôt que composées par surcharge : deux utilitaires de même
    propriété (block/flex, text-c-30/text-ac-light) sont départagés par l'ordre
    de la feuille compilée, pas par l'ordre dans la chaîne de classes. */
+/* `.footer-link` ne porte aucun style sur desktop : elle sert de prise à la
+   règle mobile qui donne à ces liens une hauteur tactile (cf. globals.css). */
 const colLabel = "mb-4 font-mono text-[11px] uppercase tracking-[0.1em] text-c-60";
-const colLink = "block py-[7px] text-[14px] text-c-30";
-const colLinkAccent = "flex items-center gap-2 py-[7px] text-[14px] text-ac-light";
+const colLink = "footer-link block py-[7px] text-[14px] text-c-30 transition-colors duration-200 hover:text-white";
+const colLinkAccent = "footer-link flex items-center gap-2 py-[7px] text-[14px] text-ac-light transition-colors duration-200 hover:text-white";
 
 export function Footer({ lang }: { lang: Lang }) {
   const t = dict(lang);
