@@ -270,7 +270,10 @@ export function dict(lang: Lang) {
     /* --- Vidéo (lightbox) ------------------------------------------------- */
     video: { watch: t("Voir le film du projet", "Watch the project film") },
 
-    /* --- Événements (inscription) ---------------------------------------- */
+    /* --- Événements -------------------------------------------------------
+       Les libellés du calendrier public et de la fiche d'un événement, y
+       compris la demande de participation intégrée, qui ne s'affiche que pour
+       les rencontres sans lien d'inscription externe. */
     evt: {
       register: t("S'inscrire", "Register"),
       upcoming: t("À venir", "Upcoming"),
@@ -283,6 +286,72 @@ export function dict(lang: Lang) {
       ),
       fullName: t("Nom complet", "Full name"),
       orgOptional: t("Organisation (optionnel)", "Organisation (optional)"),
+
+      /* --- Sections du calendrier ---------------------------------------- */
+      sectionAVenir: t("Prochaines rencontres", "Upcoming events"),
+      sectionAVenirLead: t(
+        "Les dates déjà arrêtées, de la plus proche à la plus lointaine.",
+        "Dates already set, from the nearest to the furthest.",
+      ),
+      sectionPasses: t("Rencontres passées", "Past events"),
+      sectionPassesLead: t(
+        "Ce qui s'est tenu, conservé en ligne : les comptes rendus et les engagements pris y renvoient.",
+        "What has already taken place, kept online: reports and commitments refer back to it.",
+      ),
+      ongoing: t("En cours", "Under way"),
+      aucun: t("Aucun événement n'est annoncé pour le moment.", "No events are announced at the moment."),
+      aucunAVenir: t(
+        "Aucune date n'est arrêtée pour l'instant. Les prochaines rencontres seront annoncées ici.",
+        "No date is set for now. Upcoming events will be announced here.",
+      ),
+      aucunResultat: t("Aucun événement ne correspond à cette recherche.", "No event matches this search."),
+      retirerFiltre: t("Tout afficher", "Show all"),
+      rechercher: t("Rechercher un événement…", "Search an event…"),
+      rechercherAction: t("Rechercher", "Search"),
+      filtresLabel: t("Filtrer par catégorie", "Filter by category"),
+      allFilter: t("Tout", "All"),
+
+      /* --- Carte & fiche -------------------------------------------------- */
+      detail: t("Voir le détail", "See details"),
+      allEvents: t("Tous les événements", "All events"),
+      filArianeLabel: t("Fil d'Ariane", "Breadcrumb"),
+      navigationLabel: t("Événement précédent et suivant", "Previous and next event"),
+      precedent: t("Précédent", "Previous"),
+      suivant: t("Suivant", "Next"),
+      aVoir: t("Autres rencontres", "Other events"),
+
+      blocPratique: t("Informations pratiques", "Practical information"),
+      quand: t("Quand", "When"),
+      ou: t("Où", "Where"),
+      adresse: t("Adresse", "Address"),
+      jauge: t("Participation", "Attendance"),
+      organisateur: t("Organisateur", "Organiser"),
+      complement: t("À savoir", "Good to know"),
+      modality: t("Modalité", "Format"),
+      modePresentiel: t("Sur place", "On site"),
+      modeEnLigne: t("En ligne", "Online"),
+      modeHybride: t("Sur place et en ligne", "On site and online"),
+      journee: t("Journée entière", "All day"),
+      rejoindre: t("Rejoindre en ligne", "Join online"),
+      enSavoirPlus: t("En savoir plus", "Find out more"),
+      contacter: t("Écrire à l'organisateur", "Email the organiser"),
+      termine: t(
+        "Cet événement est terminé. La page reste en ligne pour mémoire.",
+        "This event has ended. The page remains online for the record.",
+      ),
+      enCoursAvis: t("Cet événement se tient en ce moment.", "This event is taking place right now."),
+      /* Traduction manquante : la mention nomme la langue réellement servie,
+         plutôt que de laisser croire à un texte rédigé dans celle du site. */
+      traductionAbsente: (servie: Lang) =>
+        t(
+          `Cet événement n'est pour l'instant décrit qu'en ${servie === "en" ? "anglais" : "français"}.`,
+          `This event is currently described in ${servie === "en" ? "English" : "French"} only.`,
+        ),
+      lireDansLaLangue: (servie: Lang) =>
+        t(
+          `Lire la version ${servie === "en" ? "anglaise" : "française"}`,
+          `Read the ${servie === "en" ? "English" : "French"} version`,
+        ),
     },
 
     /* --- Le Projet -------------------------------------------------------- */

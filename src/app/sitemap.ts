@@ -2,14 +2,16 @@ import type { MetadataRoute } from "next";
 import { SITE_URL, ALL_PATHS } from "@/lib/site";
 import { NAV } from "@/lib/routes";
 import { urlsArticles } from "@/lib/actus/query";
+import { urlsEvenements } from "@/lib/events/query";
 
 /**
  * Servi sur /sitemap.xml — toutes les pages localisées (FR + EN), plus une
- * entrée par article publié.
+ * entrée par article et par événement publiés.
  *
- * Les articles étant écrits en base, le fichier est régénéré périodiquement et
- * invalidé à chaque publication (cf. lib/actus/cache.ts). `urlsArticles()` ne
- * lève jamais : un sitemap amputé vaut mieux qu'une erreur sur cette route.
+ * Les deux étant écrits en base, le fichier est régénéré périodiquement et
+ * invalidé à chaque publication (cf. lib/actus/cache.ts, lib/events/cache.ts).
+ * Ni `urlsArticles()` ni `urlsEvenements()` ne lèvent : un sitemap amputé vaut
+ * mieux qu'une erreur sur cette route.
  */
 export const revalidate = 3600;
 
@@ -27,7 +29,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  const articles = (await urlsArticles()).map((article) => ({
+  const [lignesArticles, lignesEvenements] = await Promise.all([urlsArticles(), urlsEvenements()]);
+
+  const articles = lignesArticles.map((article) => ({
     url: `${SITE_URL}/${article.locale}${NAV.actualites}/${article.slug}`,
     lastModified: article.updatedAt,
     changeFrequency: "monthly" as const,
@@ -36,5 +40,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...pages, ...articles];
+  const evenements = lignesEvenements.map((evenement) => ({
+    url: `${SITE_URL}/${evenement.locale}${NAV.evenements}/${evenement.slug}`,
+    lastModified: evenement.updatedAt,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  return [...pages, ...articles, ...evenements];
 }

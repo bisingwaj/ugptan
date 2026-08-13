@@ -27,6 +27,7 @@ export const ADMIN = {
     submit: "Se connecter",
     submitting: "Vérification…",
     noSignup: "Les comptes sont créés par un administrateur. Aucune inscription n'est ouverte.",
+    expired: "Votre session n'est plus valide. Reconnectez-vous pour reprendre là où vous en étiez.",
     biddersPrompt: "Vous êtes soumissionnaire ?",
     biddersLink: "Accéder à votre espace",
   },
@@ -349,6 +350,165 @@ export const ADMIN_ACTUS = {
   mediasUsage: "Couverture de",
 } as const;
 
+/**
+ * Module « Événements ».
+ *
+ * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` : il est lu
+ * par des composants clients (fiche d'événement, éditeur) qu'on ne veut pas
+ * voir embarquer le vocabulaire des autres écrans.
+ *
+ * Le vocabulaire recoupe volontairement celui des actualités là où le geste est
+ * le même (publier, dupliquer, traduire) : deux modules qui se ressemblent
+ * doivent se dire pareil, sinon la console s'apprend deux fois.
+ */
+export const ADMIN_EVTS = {
+  title: "Événements",
+  lead: "Forums, ateliers, webinaires et consultations publiques annoncés sur le site. Chaque événement existe en français et en anglais ; une langue non traduite est signalée et n'est jamais servie au public.",
+
+  /* --- Liste --------------------------------------------------------------- */
+  nouveau: "Nouvel événement",
+  listeVide: "Aucun événement pour le moment.",
+  listeVideFiltre: "Aucun événement ne correspond à ce filtre.",
+  rechercher: "Rechercher un titre…",
+  filtrer: "Filtrer",
+  reinitialiser: "Tout afficher",
+  tousStatuts: "Tous les états",
+  toutesCategories: "Toutes les catégories",
+  toutesPhases: "Toutes les dates",
+
+  colEvenement: "Événement",
+  colStatut: "État",
+  colPhase: "Calendrier",
+  colLangues: "Langues",
+  colCategorie: "Catégorie",
+  colDate: "Date",
+  colLieu: "Lieu",
+
+  sansCategorie: "Sans catégorie",
+  sansLieu: "Lieu non renseigné",
+  une: "À la une",
+
+  publier: "Publier",
+  depublier: "Dépublier",
+  dupliquer: "Dupliquer",
+  supprimer: "Supprimer",
+  supprimerConfirm: "Supprimer définitivement cet événement et toutes ses traductions ? Cette action est irréversible.",
+  modifier: "Modifier l'événement",
+  retourListe: "Retour aux événements",
+
+  creeOk: "Événement créé. Complétez-le puis publiez-le.",
+  copieOk: "Copie créée en brouillon.",
+  supprimeOk: "Événement supprimé.",
+
+  /* --- Langues ------------------------------------------------------------- */
+  langueRedaction: "Langue de rédaction",
+  langueRedactionAide:
+    "L'événement naît dans cette langue. Les autres versions s'ajoutent ensuite depuis la fiche, chacune enregistrée séparément.",
+  tradPresente: "traduit",
+  tradIncomplete: "incomplet",
+  tradManquante: "à traduire",
+  tradNouvelle: (langue: string) =>
+    `Cette version ${langue} n'existe pas encore. Renseignez-la puis enregistrez-la : elle ne touchera à aucune autre langue.`,
+  enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
+  enregistrerFiche: "Enregistrer les réglages",
+  supprimerTraduction: "Supprimer cette traduction",
+  supprimerTraductionConfirm:
+    "Supprimer cette version linguistique ? L'événement restera en ligne dans les autres langues.",
+  majLe: "Modifié le",
+  creer: "Créer l'événement",
+  creation: "Création…",
+
+  champTitre: "Titre",
+  champTitreAide: "Il sert de titre H1 sur la page publique et de titre par défaut dans les moteurs de recherche.",
+  champSlug: "Adresse de la page",
+  champResume: "Description courte",
+  champResumePlaceholder: "Deux phrases qui disent à quoi sert cette rencontre.",
+  champResumeAide: "Affichée sur les cartes et dans les partages. Laissée vide, elle est déduite des premières lignes de la description.",
+  champDescription: "Description complète",
+  champAlt: "Texte alternatif du visuel",
+  champAltAide: "Décrit l'image pour les lecteurs d'écran et quand elle ne se charge pas.",
+
+  blocLieu: "Lieu & accès",
+  blocLieuAide: "Ces libellés se traduisent : « Goma — provinces de l'Est » n'est pas « Goma — Eastern provinces ».",
+  champLieu: "Lieu affiché",
+  champLieuAide: "Ville, salle ou « En ligne ». Sans lui, la langue n'est pas servie au public.",
+  champAdresse: "Adresse ou repère",
+  champAdresseAide: "Facultatif. Affiché sur la fiche pour qui doit s'y rendre.",
+  champPlaces: "Jauge",
+  champPlacesAide: "Un libellé, pas un nombre : « 320 places », « Ouvert à tous », « Illimité ».",
+  champInfos: "Informations complémentaires",
+  champInfosPlaceholder: "Interprétation simultanée, pièce d'identité exigée à l'entrée…",
+  champInfosAide: "Affichées dans l'encadré pratique de la fiche.",
+
+  seoTitre: "Référencement",
+  seoAide: "Renseignés seulement s'ils doivent différer du titre et de la description courte.",
+  champSeoTitre: "Titre pour les moteurs",
+  champSeoTitrePlaceholder: "Reprend le titre de l'événement",
+  champSeoDesc: "Description pour les moteurs",
+
+  /* --- Réglages ------------------------------------------------------------ */
+  blocPublication: "Publication",
+  champStatut: "État",
+  champUne: "Mettre à la une",
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  voirSite: "Voir sur le site",
+  voirSiteIndisponible: "La fiche publique s'ouvrira une fois l'événement publié et traduit.",
+
+  blocCalendrier: "Calendrier",
+  champDebut: "Début",
+  champFin: "Fin",
+  champFinAide: "Laissée vide, l'événement est réputé se tenir sur la seule journée de début.",
+  champJournee: "Journée entière",
+  champJourneeActive: "Les heures ne seront pas affichées au public : seule la date le sera.",
+  champDateAide: "Heure de Kinshasa. Le classement « à venir » ou « terminé » en découle, sans intervention.",
+
+  blocModalite: "Modalité",
+  champMode: "Participation",
+  champLienConnexion: "Lien de connexion",
+  champLienConnexionAide: "Affiché sur la fiche des événements en ligne.",
+  adresseRappel: "L'adresse se saisit dans l'onglet de chaque langue, avec le lieu.",
+
+  blocVisuel: "Image de couverture",
+  aucunVisuel: "Aucun visuel",
+  choisirVisuel: "Choisir un visuel",
+  changerVisuel: "Changer",
+  retirerVisuel: "Retirer",
+  visuelPartage: "La couverture vaut pour toutes les langues. Seul le texte alternatif se traduit.",
+
+  blocClassement: "Classement",
+  champCategorie: "Catégorie",
+  gererCategories: "Gérer les catégories →",
+  champCouleur: "Couleur d'accent",
+  champCouleurAide: "Hexadécimal (#0f62fe). Vide : celle de la catégorie, puis l'accent du site.",
+  champPosition: "Ordre",
+  champComposantes: "Composantes rattachées",
+  champComposantesAide: "L'événement remonte alors dans les blocs des pages de composante concernées.",
+
+  blocParticipation: "Participation",
+  champInscription: "Lien d'inscription",
+  champInscriptionAide: "Billetterie ou formulaire externe. Renseigné, il remplace la demande de participation intégrée.",
+  champLienExterne: "Lien externe",
+  champLienExterneAide: "Page officielle, ordre du jour, dossier de presse.",
+
+  blocOrganisateur: "Organisateur",
+  champOrganisateur: "Nom affiché",
+  champOrganisateurAide: "Institution ou service organisateur, tel qu'il doit apparaître sur la fiche.",
+  champOrganisateurEmail: "Adresse électronique",
+  champOrganisateurTel: "Téléphone",
+  champOrganisateurUrl: "Site de l'organisateur",
+
+  /* --- Catégories ---------------------------------------------------------- */
+  categoriesTitle: "Catégories d'événements",
+  categoriesLead: "Une seule par événement. Elles alimentent les filtres et la pastille des cartes sur la page publique.",
+  categoriesVide: "Aucune catégorie.",
+  champNomFr: "Libellé français",
+  champNomEn: "Libellé anglais",
+  champNomEnAide: "Laissé vide, le libellé français est repris.",
+  ajouter: "Ajouter",
+  supprimerCategorieConfirm: "Supprimer cette catégorie ? Les événements concernés resteront en ligne, sans catégorie.",
+} as const;
+
 /** Un module de la console. `key` est aussi la permission qui l'ouvre. */
 export type AdminNavItem = {
   key: Permission;
@@ -394,7 +554,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { key: "actualites", label: "Actualités", slug: "/actualites" },
       { key: "documents", label: "Documents & transparence", soon: true },
       { key: "medias", label: "Médias", slug: "/medias" },
-      { key: "evenements", label: "Événements", soon: true },
+      { key: "evenements", label: "Événements", slug: "/evenements" },
       { key: "histoires", label: "Histoires & impact", soon: true },
       { key: "videos", label: "Vidéos & galerie", soon: true },
       { key: "ressources", label: "Ressources & publications", soon: true },
