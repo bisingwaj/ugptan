@@ -8,14 +8,31 @@
  * le protocole Flight), la barrière d'autorisation est donc ici, et nulle part
  * ailleurs.
  *
- * Trois règles portent la cohérence du contenu :
+ * ─── Un formulaire par langue ────────────────────────────────────────────────
+ *
+ * La fiche et les traductions s'enregistrent SÉPARÉMENT, par des actions
+ * distinctes :
+ *
+ *   · `enregistrerFicheAction`      → statut, date, catégorie, visuel, auteur…
+ *                                     ce qui appartient à l'article, pas à une langue ;
+ *   · `enregistrerTraductionAction` → UNE langue : titre, slug, résumé, corps, SEO.
+ *
+ * Ce découpage n'est pas cosmétique. Un article se rédige dans une langue puis
+ * se traduit, souvent par quelqu'un d'autre et plus tard. Avec un envoi unique
+ * portant les deux langues, l'écran du traducteur réécrit AUSSI la langue
+ * d'origine telle qu'il l'a chargée : toute correction faite entre-temps par le
+ * rédacteur est écrasée sans que personne ne le voie. Ici, chaque langue est
+ * écrite par son propre envoi, et n'emporte qu'elle-même.
+ *
+ * Corollaire sur les noms de champs : ils ne sont PAS préfixés par la langue
+ * (`title`, et non `fr_title`). Le formulaire porte sa langue dans un champ
+ * `locale`, ce qui rend impossible la confusion de préfixe.
+ *
+ * Deux règles de cohérence, vérifiées côté serveur :
  *   1. le corps d'article est ASSAINI avant écriture — l'éditeur envoie du HTML
  *      produit par le navigateur de l'auteur, jamais une donnée de confiance ;
- *   2. une langue sans titre n'a pas de ligne de traduction : c'est ce qui
- *      permet à la console de signaler une traduction manquante et au site
- *      public de ne pas la servir ;
- *   3. rien ne se publie sans une langue complète (titre + corps), sans quoi on
- *      mettrait en ligne une page vide.
+ *   2. rien ne se publie sans une langue complète (titre + corps) EN BASE, ce
+ *      qui se vérifie sur l'article relu et non sur le formulaire soumis.
  */
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
@@ -38,17 +55,26 @@ const ACTUS_PATH = adminPath("/actualites");
 
 const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 
+/** Nom des langues dans les messages rendus à l'utilisateur. */
+const LANGUE_LABEL: Record<Lang, string> = { fr: "française", en: "anglaise" };
+
 /* -------------------------------------------------------------------------- */
 /* Lecture du formulaire                                                       */
 /* -------------------------------------------------------------------------- */
 
 const texte = (formData: FormData, key: string): string => String(formData.get(key) ?? "").trim();
 const optionnel = (value: string): string | null => (value.length ? value : null);
-const coche = (formData: FormData, key: string): boolean => formData.get(key) === "on" || formData.get(key) === "1";
+const coche = (formData: FormData, key: string): boolean =>
+  formData.get(key) === "on" || formData.get(key) === "1";
 
-/** Contenu d'une langue, tel que soumis par le formulaire. */
+/** Langue portée par le formulaire, ou `null` si elle n'est pas servie par le site. */
+function lireLocale(formData: FormData): Lang | null {
+  const brut = texte(formData, "locale");
+  return (LOCALES as string[]).includes(brut) ? (brut as Lang) : null;
+}
+
+/** Contenu d'UNE langue, tel que soumis par son formulaire. */
 type Traduction = {
-  locale: Lang;
   title: string;
   slug: string;
   excerpt: string | null;
@@ -58,45 +84,40 @@ type Traduction = {
   coverAlt: string | null;
 };
 
-function lireTraductions(formData: FormData): Traduction[] {
-  return LOCALES.map((locale) => {
-    const title = texte(formData, `${locale}_title`);
-    // Le corps est assaini ICI, à la frontière : tout ce qui descend plus bas
-    // est réputé sûr, y compris ce qui sera relu par l'éditeur.
-    const contentHtml = sanitizeHtml(String(formData.get(`${locale}_content`) ?? ""));
-    return {
-      locale,
-      title,
-      slug: slugify(texte(formData, `${locale}_slug`) || title),
-      excerpt: optionnel(texte(formData, `${locale}_excerpt`)),
-      contentHtml: isEmptyHtml(contentHtml) ? "" : contentHtml,
-      seoTitle: optionnel(texte(formData, `${locale}_seoTitle`)),
-      seoDescription: optionnel(texte(formData, `${locale}_seoDescription`)),
-      coverAlt: optionnel(texte(formData, `${locale}_coverAlt`)),
-    };
-  });
+function lireTraduction(formData: FormData): Traduction {
+  const title = texte(formData, "title");
+  // Le corps est assaini ICI, à la frontière : tout ce qui descend plus bas est
+  // réputé sûr, y compris ce que l'éditeur relira ensuite.
+  const contentHtml = sanitizeHtml(String(formData.get("content") ?? ""));
+
+  return {
+    title,
+    slug: slugify(texte(formData, "slug") || title),
+    excerpt: optionnel(texte(formData, "excerpt")),
+    contentHtml: isEmptyHtml(contentHtml) ? "" : contentHtml,
+    seoTitle: optionnel(texte(formData, "seoTitle")),
+    seoDescription: optionnel(texte(formData, "seoDescription")),
+    coverAlt: optionnel(texte(formData, "coverAlt")),
+  };
 }
 
 /**
- * Rend chaque slug unique dans sa langue, en écartant les traductions de
- * l'article courant : réenregistrer une fiche sans y toucher ne doit pas
- * transformer `mon-article` en `mon-article-2`.
+ * Rend un slug unique DANS SA LANGUE (l'unicité est portée par
+ * `@@unique([locale, slug])`), en écartant l'article courant : réenregistrer
+ * une traduction sans toucher au titre ne doit pas transformer `mon-article`
+ * en `mon-article-2`.
  */
-async function resoudreSlugs(traductions: Traduction[], articleId: string | null): Promise<void> {
-  for (const traduction of traductions) {
-    if (!traduction.title) continue;
+async function slugUnique(locale: Lang, base: string, articleId: string | null): Promise<string> {
+  const pris = await db().articleTranslation.findMany({
+    where: {
+      locale,
+      slug: { startsWith: base || "article" },
+      ...(articleId ? { articleId: { not: articleId } } : {}),
+    },
+    select: { slug: true },
+  });
 
-    const pris = await db().articleTranslation.findMany({
-      where: {
-        locale: traduction.locale,
-        slug: { startsWith: traduction.slug },
-        ...(articleId ? { articleId: { not: articleId } } : {}),
-      },
-      select: { slug: true },
-    });
-
-    traduction.slug = uniqueSlug(traduction.slug || "article", pris.map((row) => row.slug));
-  }
+  return uniqueSlug(base || "article", pris.map((row) => row.slug));
 }
 
 /** Codes de composante cochés, réduits à ceux qui existent réellement. */
@@ -106,8 +127,8 @@ function lireComposantes(formData: FormData): string[] {
 
 /**
  * Étiquettes : celles cochées, plus celles saisies à la volée dans le champ
- * libre. Créer une étiquette depuis la fiche d'article évite un aller-retour
- * vers l'écran de taxonomie au moment où l'on écrit.
+ * libre. Créer une étiquette depuis la fiche évite un aller-retour vers l'écran
+ * de taxonomie au moment où l'on classe.
  */
 async function resoudreTags(formData: FormData): Promise<string[]> {
   const ids = new Set(formData.getAll("tags").map(String).filter(Boolean));
@@ -121,11 +142,7 @@ async function resoudreTags(formData: FormData): Promise<string[]> {
   for (const nom of nouveaux) {
     const slug = slugify(nom);
     if (!slug) continue;
-    const tag = await db().tag.upsert({
-      where: { slug },
-      update: {},
-      create: { slug, nomFr: nom, nomEn: nom },
-    });
+    const tag = await db().tag.upsert({ where: { slug }, update: {}, create: { slug, nomFr: nom, nomEn: nom } });
     ids.add(tag.id);
   }
 
@@ -137,7 +154,7 @@ async function resoudreTags(formData: FormData): Promise<string[]> {
 /**
  * Date de publication effective.
  * - `PUBLISHED` sans date : l'article paraît maintenant, c'est le geste attendu
- *   quand on clique « Publier » sans avoir touché au calendrier.
+ *   quand on choisit « Publié » sans avoir touché au calendrier.
  * - `SCHEDULED` : la date est obligatoire et doit être à venir, sinon la
  *   programmation n'en est pas une.
  */
@@ -161,108 +178,221 @@ function resoudreDate(
   return { date: choisie ?? actuelle };
 }
 
+/** Champs de la fiche, communs à toutes les langues. */
+async function lireFiche(formData: FormData) {
+  const coverMediaId = optionnel(texte(formData, "coverMediaId"));
+
+  return {
+    featured: coche(formData, "featured"),
+    lieu: optionnel(texte(formData, "lieu")),
+    videoYt: idYouTube(texte(formData, "videoYt")),
+    comps: lireComposantes(formData),
+    categoryId: optionnel(texte(formData, "categoryId")),
+    coverMediaId,
+    // Une couverture issue de la bibliothèque prime sur une clé du registre :
+    // conserver les deux laisserait deux sources de vérité pour un seul visuel.
+    coverKey: coverMediaId ? null : optionnel(texte(formData, "coverKey")),
+    authorId: optionnel(texte(formData, "authorId")),
+    authorName: optionnel(texte(formData, "authorName")),
+    authorRole: optionnel(texte(formData, "authorRole")),
+    tagIds: await resoudreTags(formData),
+  };
+}
+
+/** Une langue est-elle publiable ? Un titre ne suffit pas, il faut un corps. */
+const estComplete = (t: { title: string; contentHtml: string }): boolean =>
+  t.title.trim().length > 0 && !isEmptyHtml(t.contentHtml);
+
 /* -------------------------------------------------------------------------- */
-/* Création / modification                                                     */
+/* Création                                                                    */
 /* -------------------------------------------------------------------------- */
 
-export async function enregistrerArticleAction(
+/**
+ * Crée l'article et sa PREMIÈRE langue.
+ *
+ * Une seule langue à la création, volontairement : un article naît dans la
+ * langue où il est rédigé. Les autres versions s'ajoutent ensuite, chacune par
+ * son propre formulaire, quand le traducteur s'en saisit.
+ */
+export async function creerArticleAction(
   _prev: ActuFormState,
   formData: FormData,
 ): Promise<ActuFormState> {
   const acteur = await assertPermission("actualites");
 
-  const id = optionnel(texte(formData, "id"));
+  const locale = lireLocale(formData);
+  if (!locale) return { error: "Langue de rédaction inconnue.", ok: null };
+
   const statutBrut = texte(formData, "status");
   if (!isArticleStatut(statutBrut)) return { error: "Statut inconnu.", ok: null };
   const statut = statutBrut;
 
-  const traductions = lireTraductions(formData);
-  const renseignees = traductions.filter((t) => t.title.length > 0);
+  const traduction = lireTraduction(formData);
+  if (!traduction.title) return { error: "Un titre est requis pour créer l'article.", ok: null };
 
-  if (renseignees.length === 0) {
-    return { error: "Un titre est requis dans au moins une langue.", ok: null };
+  // Publier une fiche sans corps mettrait en ligne une page vide : on refuse au
+  // moment de la publication, jamais à l'enregistrement d'un brouillon.
+  if ((statut === "PUBLISHED" || statut === "SCHEDULED") && !estComplete(traduction)) {
+    return { error: "Le corps de l'article est vide : impossible de publier. Enregistrez-le en brouillon.", ok: null };
   }
 
-  // Publier une fiche sans corps mettrait en ligne une page vide : on refuse
-  // au moment de la publication, jamais à l'enregistrement d'un brouillon.
-  if (statut === "PUBLISHED" || statut === "SCHEDULED") {
-    const complete = renseignees.some((t) => t.contentHtml.length > 0);
-    if (!complete) {
-      return { error: "Le corps de l'article est vide : impossible de publier. Enregistrez-le en brouillon.", ok: null };
-    }
-  }
-
-  const existant = id
-    ? await db().article.findUnique({ where: { id }, select: { id: true, publishedAt: true } })
-    : null;
-  if (id && !existant) return { error: "Article introuvable.", ok: null };
-
-  const date = resoudreDate(statut, texte(formData, "publishedAt"), existant?.publishedAt ?? null);
+  const date = resoudreDate(statut, texte(formData, "publishedAt"), null);
   if ("error" in date) return { error: date.error, ok: null };
 
-  await resoudreSlugs(traductions, existant?.id ?? null);
-  const tagIds = await resoudreTags(formData);
+  const { tagIds, ...fiche } = await lireFiche(formData);
+  traduction.slug = await slugUnique(locale, traduction.slug, null);
 
-  const categoryId = optionnel(texte(formData, "categoryId"));
-  const authorId = optionnel(texte(formData, "authorId"));
-  const coverMediaId = optionnel(texte(formData, "coverMediaId"));
+  const article = await db().article.create({
+    data: {
+      ...fiche,
+      status: statut,
+      publishedAt: date.date,
+      createdById: acteur.id,
+      translations: { create: [{ locale, ...traduction }] },
+      tags: { create: tagIds.map((tagId) => ({ tagId })) },
+    },
+    select: { id: true },
+  });
 
-  const commun = {
-    status: statut,
-    publishedAt: date.date,
-    featured: coche(formData, "featured"),
-    lieu: optionnel(texte(formData, "lieu")),
-    videoYt: idYouTube(texte(formData, "videoYt")),
-    comps: lireComposantes(formData),
-    categoryId,
-    coverMediaId,
-    coverKey: coverMediaId ? null : optionnel(texte(formData, "coverKey")),
-    authorId,
-    authorName: optionnel(texte(formData, "authorName")),
-    authorRole: optionnel(texte(formData, "authorRole")),
-  };
+  revaliderActualites();
+  // redirect() lève NEXT_REDIRECT : appelé en dernier, hors de tout try/catch.
+  redirect(`${ACTUS_PATH}/${article.id}?cree=1`);
+}
 
-  const articleId = existant
-    ? existant.id
-    : (await db().article.create({ data: { ...commun, createdById: acteur.id }, select: { id: true } })).id;
+/* -------------------------------------------------------------------------- */
+/* Fiche (tout sauf les langues)                                               */
+/* -------------------------------------------------------------------------- */
 
-  if (existant) {
-    await db().article.update({ where: { id: articleId }, data: commun });
+export async function enregistrerFicheAction(
+  _prev: ActuFormState,
+  formData: FormData,
+): Promise<ActuFormState> {
+  await assertPermission("actualites");
+
+  const id = texte(formData, "id");
+  if (!id) return { error: "Article introuvable.", ok: null };
+
+  const statutBrut = texte(formData, "status");
+  if (!isArticleStatut(statutBrut)) return { error: "Statut inconnu.", ok: null };
+  const statut = statutBrut;
+
+  const article = await db().article.findUnique({
+    where: { id },
+    select: { id: true, publishedAt: true, translations: { select: { title: true, contentHtml: true } } },
+  });
+  if (!article) return { error: "Article introuvable.", ok: null };
+
+  // La complétude se lit EN BASE et non dans le formulaire : cet envoi ne porte
+  // aucune langue, et l'état des traductions a pu changer depuis l'affichage.
+  if ((statut === "PUBLISHED" || statut === "SCHEDULED") && !article.translations.some(estComplete)) {
+    return {
+      error: "Aucune langue complète : renseignez un titre et un corps dans au moins une langue avant de publier.",
+      ok: null,
+    };
   }
 
-  // Traductions : une langue vidée de son titre perd sa ligne. C'est ce qui
-  // fait qu'« absence de traduction » se lit en base, et pas seulement à l'œil.
-  for (const traduction of traductions) {
-    if (!traduction.title) {
-      await db().articleTranslation.deleteMany({
-        where: { articleId, locale: traduction.locale },
-      });
-      continue;
-    }
+  const date = resoudreDate(statut, texte(formData, "publishedAt"), article.publishedAt);
+  if ("error" in date) return { error: date.error, ok: null };
 
-    const { locale, ...donnees } = traduction;
-    await db().articleTranslation.upsert({
-      where: { articleId_locale: { articleId, locale } },
-      update: donnees,
-      create: { articleId, locale, ...donnees },
-    });
-  }
+  const { tagIds, ...fiche } = await lireFiche(formData);
 
-  await db().articleTag.deleteMany({ where: { articleId, tagId: { notIn: tagIds } } });
+  await db().article.update({
+    where: { id },
+    data: { ...fiche, status: statut, publishedAt: date.date },
+  });
+
+  await db().articleTag.deleteMany({ where: { articleId: id, tagId: { notIn: tagIds } } });
   if (tagIds.length) {
     await db().articleTag.createMany({
-      data: tagIds.map((tagId) => ({ articleId, tagId })),
+      data: tagIds.map((tagId) => ({ articleId: id, tagId })),
       skipDuplicates: true,
     });
   }
 
   revaliderActualites();
+  return { error: null, ok: "Réglages enregistrés." };
+}
 
-  // Création : on rejoint la fiche, qui porte l'aperçu et l'historique.
-  // redirect() lève NEXT_REDIRECT — appelé en dernier, hors de tout try/catch.
-  if (!existant) redirect(`${ACTUS_PATH}/${articleId}?cree=1`);
+/* -------------------------------------------------------------------------- */
+/* Traductions                                                                 */
+/* -------------------------------------------------------------------------- */
 
-  return { error: null, ok: "Article enregistré." };
+/** Enregistre UNE langue, et elle seule. */
+export async function enregistrerTraductionAction(
+  _prev: ActuFormState,
+  formData: FormData,
+): Promise<ActuFormState> {
+  await assertPermission("actualites");
+
+  const articleId = texte(formData, "articleId");
+  const locale = lireLocale(formData);
+  if (!articleId) return { error: "Article introuvable.", ok: null };
+  if (!locale) return { error: "Langue inconnue.", ok: null };
+
+  const article = await db().article.findUnique({ where: { id: articleId }, select: { id: true } });
+  if (!article) return { error: "Article introuvable.", ok: null };
+
+  const traduction = lireTraduction(formData);
+  if (!traduction.title) {
+    return {
+      error: "Le titre est obligatoire. Pour retirer cette langue du site, utilisez « Supprimer cette traduction ».",
+      ok: null,
+    };
+  }
+
+  traduction.slug = await slugUnique(locale, traduction.slug, articleId);
+
+  await db().articleTranslation.upsert({
+    where: { articleId_locale: { articleId, locale } },
+    update: traduction,
+    create: { articleId, locale, ...traduction },
+  });
+
+  revaliderActualites();
+
+  const incomplete = isEmptyHtml(traduction.contentHtml)
+    ? " Le corps est encore vide : cette langue ne sera pas servie au public."
+    : "";
+  return { error: null, ok: `Version ${LANGUE_LABEL[locale]} enregistrée.${incomplete}` };
+}
+
+/**
+ * Retire une langue.
+ *
+ * C'est le seul geste qui fait disparaître un article d'une version du site.
+ * Refusé s'il ne reste qu'elle sur un article en ligne : la page publique
+ * n'aurait plus rien à servir dans aucune langue.
+ */
+export async function supprimerTraductionAction(
+  _prev: ActuFormState,
+  formData: FormData,
+): Promise<ActuFormState> {
+  await assertPermission("actualites");
+
+  const articleId = texte(formData, "articleId");
+  const locale = lireLocale(formData);
+  if (!articleId || !locale) return { error: "Traduction introuvable.", ok: null };
+
+  const article = await db().article.findUnique({
+    where: { id: articleId },
+    select: { status: true, translations: { select: { locale: true } } },
+  });
+  if (!article) return { error: "Article introuvable.", ok: null };
+
+  const autres = article.translations.filter((t) => t.locale !== locale);
+  const enLigne = article.status === "PUBLISHED" || article.status === "SCHEDULED";
+
+  if (enLigne && autres.length === 0) {
+    return {
+      error: "C'est la seule langue de cet article publié : dépubliez-le d'abord, ou ajoutez une autre langue.",
+      ok: null,
+    };
+  }
+
+  await db().articleTranslation.deleteMany({ where: { articleId, locale } });
+
+  revaliderActualites();
+  return { error: null, ok: `Version ${LANGUE_LABEL[locale]} supprimée.` };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -293,9 +423,8 @@ export async function basculerPublicationAction(
 
   const enLigne = article.status === "PUBLISHED" || article.status === "SCHEDULED";
 
-  if (!enLigne) {
-    const complet = article.translations.some((t) => t.title.trim() && !isEmptyHtml(t.contentHtml));
-    if (!complet) return { error: "Aucune langue complète : renseignez un titre et un corps avant de publier.", ok: null };
+  if (!enLigne && !article.translations.some(estComplete)) {
+    return { error: "Aucune langue complète : renseignez un titre et un corps avant de publier.", ok: null };
   }
 
   await db().article.update({
@@ -313,6 +442,8 @@ export async function basculerPublicationAction(
  * Duplication : la copie repart en brouillon, sans date de publication et avec
  * des slugs neufs. C'est le geste courant du communiqué de série (« Réunion du
  * COPIL — 3ᵉ session »), qui reprend la structure sans reprendre l'identité.
+ * Toutes les langues sont copiées : traduire deux fois le même modèle n'aurait
+ * pas de sens.
  */
 export async function dupliquerArticleAction(
   _prev: ActuFormState,
@@ -329,20 +460,22 @@ export async function dupliquerArticleAction(
   });
   if (!source) return { error: "Article introuvable.", ok: null };
 
-  const traductions: Traduction[] = source.translations
-    .filter((t) => t.locale === "fr" || t.locale === "en")
-    .map((t) => ({
-      locale: t.locale as Lang,
-      title: `${t.title} (copie)`,
-      slug: slugify(`${t.slug}-copie`),
-      excerpt: t.excerpt,
-      contentHtml: t.contentHtml,
-      seoTitle: t.seoTitle,
-      seoDescription: t.seoDescription,
-      coverAlt: t.coverAlt,
-    }));
+  const copies: { locale: string; slug: string; title: string; excerpt: string | null;
+    contentHtml: string; seoTitle: string | null; seoDescription: string | null; coverAlt: string | null }[] = [];
 
-  await resoudreSlugs(traductions, null);
+  for (const tr of source.translations) {
+    if (!(LOCALES as string[]).includes(tr.locale)) continue;
+    copies.push({
+      locale: tr.locale,
+      title: `${tr.title} (copie)`,
+      slug: await slugUnique(tr.locale as Lang, slugify(`${tr.slug}-copie`), null),
+      excerpt: tr.excerpt,
+      contentHtml: tr.contentHtml,
+      seoTitle: tr.seoTitle,
+      seoDescription: tr.seoDescription,
+      coverAlt: tr.coverAlt,
+    });
+  }
 
   const copie = await db().article.create({
     data: {
@@ -359,7 +492,7 @@ export async function dupliquerArticleAction(
       authorName: source.authorName,
       authorRole: source.authorRole,
       createdById: acteur.id,
-      translations: { create: traductions.map(({ locale, ...rest }) => ({ locale, ...rest })) },
+      translations: { create: copies },
       tags: { create: source.tags.map(({ tagId }) => ({ tagId })) },
     },
     select: { id: true },
