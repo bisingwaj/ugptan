@@ -16,7 +16,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { televerserMediaAction } from "@/actions/admin-medias";
 import { media as registre } from "@/content/media";
 import type { ImgKey } from "@/content/types";
-import { MIMES_IMAGE, mediaSrc, poidsLisible, TAILLE_MAX, type MediaRef } from "@/lib/medias";
+import { estImage, MIMES_IMAGE, mediaSrc, poidsLisible, TAILLE_MAX, type MediaRef } from "@/lib/medias";
 
 /** Ce que le sélecteur renvoie à son appelant. */
 export type ChoixMedia =
@@ -27,7 +27,12 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onSelect: (choix: ChoixMedia) => void;
-  /** Bibliothèque telle que chargée par la page (fichiers + médias externes). */
+  /**
+   * Bibliothèque telle que chargée par la page. Elle contient aussi des
+   * documents depuis la bascule vers Cloudinary ; le sélecteur les écarte —
+   * on choisit ici un VISUEL, et un PDF en couverture d'article ne s'affiche
+   * pas.
+   */
   assets: MediaRef[];
   /** Proposer le registre d'images du site. Réservé à la couverture. */
   avecRegistre?: boolean;
@@ -39,13 +44,13 @@ const CLES_REGISTRE = Object.keys(registre.img) as ImgKey[];
 export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = false, titre = "Choisir un visuel" }: Props) {
   // Copie locale : un téléversement fait depuis la modale doit apparaître tout
   // de suite, sans attendre le rechargement de la page qui porte la liste.
-  const [bibliotheque, setBibliotheque] = useState<MediaRef[]>(assets);
+  const [bibliotheque, setBibliotheque] = useState<MediaRef[]>(() => assets.filter((a) => estImage(a.mimeType)));
   const [recherche, setRecherche] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
   const [enCours, setEnCours] = useState(false);
   const fichierRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => setBibliotheque(assets), [assets]);
+  useEffect(() => setBibliotheque(assets.filter((a) => estImage(a.mimeType))), [assets]);
 
   useEffect(() => {
     if (!open) return;
@@ -74,7 +79,10 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
         size: fichier.size,
         width: resultat.width,
         height: resultat.height,
-        url: null,
+        // L'adresse rendue par le dépôt : c'est elle que `mediaSrc` doit
+        // utiliser, sans repasser par la route de service.
+        url: resultat.src || null,
+        publicId: resultat.publicId,
         altFr: null,
         altEn: null,
         legende: null,
@@ -156,7 +164,9 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
                       <span className="adm-media__nom">{asset.altFr || asset.filename}</span>
                       <span className="adm-media__meta mono">
                         {asset.width && asset.height ? `${asset.width}×${asset.height}` : "—"}
-                        {asset.url ? " · externe" : ` · ${poidsLisible(asset.size)}`}
+                        {/* Une adresse sans identifiant de stockage : le fichier
+                            est hébergé ailleurs, son poids nous est inconnu. */}
+                        {asset.url && !asset.publicId ? " · externe" : ` · ${poidsLisible(asset.size)}`}
                       </span>
                     </button>
                   );

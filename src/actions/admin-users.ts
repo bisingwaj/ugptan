@@ -31,9 +31,11 @@ import { APIError } from "better-auth/api";
 import { ADMIN_USERS, adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { assertPermission } from "@/lib/auth/guard";
-import { auth } from "@/lib/auth/server";
+import { auth, SET_PASSWORD_REDIRECT } from "@/lib/auth/server";
 import { assignablePermissions, isRole, type AdminRole } from "@/lib/auth/permissions";
 import { isValidEmail, normalizeEmail, normalizeName, passwordIssue } from "@/lib/auth/validate";
+import { emailConfigured } from "@/lib/email/config";
+import { takeSendResult } from "@/lib/email/send";
 
 /** État partagé par les formulaires de création et de modification. */
 export type UserFormState = { error: string | null; ok: string | null };
@@ -92,6 +94,55 @@ async function otherActiveAdmins(exceptId: string): Promise<number> {
   return db().user.count({ where: { role: "ADMIN", banned: false, id: { not: exceptId } } });
 }
 
+/**
+ * Envoie à `email` le message d'ouverture de compte : identifiants, adresse de
+ * la console et lien à usage unique pour choisir son mot de passe.
+ *
+ * ⚠️ N'échoue JAMAIS bruyamment. Un e-mail qui ne part pas est un désagrément,
+ * pas une raison d'annuler la création d'un compte déjà enregistré : la
+ * fonction rapporte ce qui s'est passé, l'appelant l'affiche, et rien n'est
+ * défait. C'est Better Auth qui émet le jeton et compose le lien ; le contenu
+ * du message vit dans lib/email/templates/account-invitation.ts.
+ */
+type InvitationOutcome = "sent" | "disabled" | "failed";
+
+async function sendInvitation(email: string): Promise<InvitationOutcome> {
+  if (!emailConfigured) return "disabled";
+
+  try {
+    await auth().api.requestPasswordReset({
+      // Chemin relatif : `originCheck` l'accepte sans exiger que l'origine
+      // figure dans les origines de confiance (cf. lib/auth/server.ts).
+      body: { email, redirectTo: SET_PASSWORD_REDIRECT },
+    });
+  } catch (error) {
+    console.error(`[admin] invitation non émise pour ${email} :`, error);
+    return "failed";
+  }
+
+  /* L'appel ci-dessus répond « succès » même quand l'e-mail n'est pas parti :
+     Better Auth avale l'erreur du rappel d'envoi. Le verdict se lit donc dans
+     le registre alimenté par `sendEmail`, relevé ici (cf. lib/email/send.ts).
+     Un registre vide signifie que le rappel n'a pas eu lieu — adresse inconnue,
+     par exemple : on ne prétend pas alors avoir envoyé quoi que ce soit. */
+  const result = takeSendResult(email);
+  if (!result) {
+    console.error(`[admin] aucun envoi consigné pour ${email} : invitation probablement non émise.`);
+    return "failed";
+  }
+  if (result.ok) return "sent";
+  return result.disabled ? "disabled" : "failed";
+}
+
+/** Ce que l'écran annonce après une création, selon le sort de l'invitation. */
+const invitationNote: Record<InvitationOutcome, string> = {
+  sent: "Une invitation vient de lui être envoyée pour qu'il définisse son mot de passe.",
+  disabled:
+    "L'envoi d'e-mails n'est pas configuré : communiquez vous-même ses identifiants et son mot de passe initial.",
+  failed:
+    "En revanche, l'invitation n'a pas pu être envoyée. Renvoyez-la depuis la fiche du compte, ou transmettez le mot de passe initial autrement.",
+};
+
 export async function createUserAction(
   _prev: UserFormState,
   formData: FormData,
@@ -127,8 +178,42 @@ export async function createUserAction(
     return { error: apiMessage(error, "La création du compte a échoué."), ok: null };
   }
 
+  // Après la création, jamais avant : le compte existe désormais quoi qu'il
+  // advienne de l'e-mail.
+  const outcome = await sendInvitation(email);
+
   revalidatePath(ADMIN_USERS);
-  return { error: null, ok: `Compte ${email} créé.` };
+  return { error: null, ok: `Compte ${email} créé. ${invitationNote[outcome]}` };
+}
+
+/**
+ * Renvoie l'invitation à un compte existant : lien expiré, e-mail égaré,
+ * adresse corrigée. Émet un nouveau jeton, qui invalide le précédent.
+ */
+export async function resendInvitationAction(
+  _prev: UserFormState,
+  formData: FormData,
+): Promise<UserFormState> {
+  await assertPermission("utilisateurs");
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { error: NOT_FOUND, ok: null };
+
+  const target = await db().user.findUnique({ where: { id }, select: { email: true, banned: true } });
+  if (!target) return { error: NOT_FOUND, ok: null };
+  if (target.banned) {
+    return { error: "Ce compte est désactivé : réactivez-le avant de lui renvoyer une invitation.", ok: null };
+  }
+
+  const outcome = await sendInvitation(target.email);
+  if (outcome === "disabled") {
+    return { error: "L'envoi d'e-mails n'est pas configuré (RESEND_API_KEY absente).", ok: null };
+  }
+  if (outcome === "failed") {
+    return { error: "L'invitation n'a pas pu être envoyée. Consultez le journal du serveur.", ok: null };
+  }
+
+  return { error: null, ok: `Invitation renvoyée à ${target.email}.` };
 }
 
 export async function updateUserAction(

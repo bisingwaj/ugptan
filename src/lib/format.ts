@@ -100,6 +100,30 @@ export function fromDateTimeLocal(value: string): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+/**
+ * Même conversion pour un `<input type="date">`, où l'heure n'est pas saisie.
+ *
+ * La date d'un rapport n'a pas d'heure : lui en imposer une obligerait le
+ * rédacteur à en inventer une, et rendrait deux documents du même jour
+ * arbitrairement ordonnés. Le fuseau reste celui de Kinshasa, faute de quoi une
+ * date enregistrée le 1er du mois se relirait le dernier du mois précédent sur
+ * un serveur en UTC-quelque chose.
+ */
+export function toDateInput(date: Date | null | undefined): string {
+  if (!date) return "";
+  return new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric", month: "2-digit", day: "2-digit",
+    timeZone: "Africa/Kinshasa",
+  }).format(date);
+}
+
+/** Lecture inverse : minuit à Kinshasa, le jour saisi. */
+export function fromDateInput(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}T00:00:00${KINSHASA_OFFSET}`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 /** Même fuseau, sans l'heure : listes et échéances, où la minute n'apporte rien. */
 const dateFr = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeZone: "Africa/Kinshasa" });
 

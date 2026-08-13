@@ -10,7 +10,7 @@
  * Le composant sert aussi bien à créer qu'à modifier : en création, il se vide
  * après un succès pour enchaîner la saisie suivante.
  */
-import { useActionState, useEffect, useId, useRef } from "react";
+import { useActionState, useEffect, useId, useRef, useState } from "react";
 import {
   enregistrerCategorieAction,
   enregistrerTagAction,
@@ -19,6 +19,7 @@ import {
 } from "@/actions/admin-taxonomies";
 import type { ActuFormState } from "@/actions/admin-actualites";
 import { ADMIN_ACTUS } from "@/content/admin";
+import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
 
 const etatInitial: ActuFormState = { error: null, ok: null };
 
@@ -57,8 +58,19 @@ export function TaxonomieForm({ genre, item }: Props) {
   const idBase = useId();
   const idSuppression = `suppr-${item?.id ?? "aucun"}`;
 
+  /**
+   * ⚠️ `form.reset()` ne touche QUE les champs natifs : il les ramène à leur
+   * `defaultValue`. Le sélecteur de couleur, lui, tient sa valeur dans un état
+   * React, que rien ne remet à zéro — la couleur de la catégorie précédente
+   * serait restée collée à la suivante. `cycle` sert de `key` : à chaque
+   * création réussie, le composant est remonté, donc vidé.
+   */
+  const [cycle, setCycle] = useState(0);
   useEffect(() => {
-    if (creation && state.ok) formRef.current?.reset();
+    if (creation && state.ok) {
+      formRef.current?.reset();
+      setCycle((n) => n + 1);
+    }
   }, [creation, state.ok]);
 
   const message = state.error ?? etatSuppression.error;
@@ -96,18 +108,7 @@ export function TaxonomieForm({ genre, item }: Props) {
 
           {estCategorie && (
             <>
-              <div className="adm-form__field">
-                <label className="label-mono" htmlFor={`${idBase}-color`}>{t.champCouleur}</label>
-                <input
-                  id={`${idBase}-color`}
-                  name="color"
-                  type="text"
-                  className="field mono"
-                  spellCheck={false}
-                  defaultValue={item?.color ?? ""}
-                  placeholder="#0f62fe"
-                />
-              </div>
+              <ChampCouleur key={cycle} defaultValue={item?.color} label={t.champCouleur} />
 
               <div className="adm-form__field adm-taxo__ordre">
                 <label className="label-mono" htmlFor={`${idBase}-position`}>{t.champPosition}</label>
@@ -127,7 +128,7 @@ export function TaxonomieForm({ genre, item }: Props) {
             // FRÈRE et non un descendant : imbriquer deux `<form>` n'est pas
             // permis en HTML, et le navigateur en écarterait un silencieusement.
             <button type="submit" form={idSuppression} className="btn btn--danger btn--sm" disabled={suppressionEnCours}>
-              {t.supprimer}{item.usage > 0 ? ` (${item.usage})` : ""}
+              {suppressionEnCours ? t.suppression : t.supprimer}{!suppressionEnCours && item.usage > 0 ? ` (${item.usage})` : ""}
             </button>
           )}
         </div>

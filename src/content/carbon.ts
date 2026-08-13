@@ -3,18 +3,17 @@
    renderVals() codé en dur (cf. guide §6/§8 : une seule source de vérité).
    ========================================================================== */
 import type {
-  Histoire, ProjVideo, Dialogue, Evenement, GouvActivite, GouvLead, MissionItem,
+  ProjVideo, Evenement, GouvActivite, GouvLead, MissionItem,
   PoleAction, MethodeEtape, EngagementItem, GlossaireItem, FaqItem, Partner,
-  Ressource, UniteStat, GalleryItem, HumainPoint, ProjetImpact, Persona, Contact,
+  Ressource, UniteStat, GalleryItem, Persona, Contact,
 } from "./types";
 
-/* --- Accueil + Résultats : témoignages de bénéficiaires --------------------- */
-export const histoires: Histoire[] = [
-  { name: "Esther, 24 ans", role: { fr: "Étudiante — Goma", en: "Student — Goma" }, img: "formation", color: "#8a3ffc", videoYt: "lLIB8fyagio", story: { fr: "« Avant, on se partageait un manuel rare. Aujourd'hui je suis des cours en ligne — et j'ai commencé à coder. »", en: "“I used to share one rare textbook. Now I follow courses online — and I've started to code.”" } },
-  { name: "Jean-Pierre", role: { fr: "Commerçant — Tshikapa", en: "Trader — Tshikapa" }, img: "citoyens", color: "#0f62fe", videoYt: "xQpTar5oOgA", story: { fr: "« Je vends maintenant dans tout le pays et j'encaisse par mobile. »", en: "“I now sell across the whole country and get paid by mobile money.”" } },
-  { name: "Dr Mwamba", role: { fr: "Médecin — Kindu", en: "Doctor — Kindu" }, img: "sante", color: "#009d9a", videoYt: "2ZJGxoF610c", story: { fr: "« Le dossier partagé et la téléconsultation changent la prise en charge des patients. »", en: "“Shared records and tele-consultation are changing how we care for patients.”" } },
-  { name: "Mama Kavira", role: { fr: "Agricultrice — Butembo", en: "Farmer — Butembo" }, img: "agri", color: "#198038", videoYt: "1MKgrHH04dM", story: { fr: "« Je connais enfin les vrais prix du marché — en temps réel, avant de vendre. »", en: "“I finally know the real market prices — in real time, before I sell.”" } },
-];
+/* ⚠️ Quatre jeux de données ont quitté ce fichier : les témoignages de
+   bénéficiaires, les chiffres d'impact humain, les diptyques avant/après et les
+   dialogues sectoriels. Ils sont désormais administrés depuis la console
+   (module « Histoires & impact »), et leur état initial vit dans
+   `src/content/impact.ts`. En garder une copie ici aurait garanti la dérive :
+   deux sources pour un même texte, dont une seule est corrigée. */
 
 /* --- Résultats : une vidéo par composante ---------------------------------- */
 export const projVideos: ProjVideo[] = [
@@ -23,16 +22,6 @@ export const projVideos: ProjVideo[] = [
   { comp: "C3", titre: { fr: "Compétences & innovation", en: "Skills & innovation" }, color: "#8a3ffc", img: "formation", dur: "5:01" },
   { comp: "C4", titre: { fr: "Coordination & gestion", en: "Coordination & management" }, color: "#ee5396", img: "hub", dur: "2:54" },
   { comp: "C5", titre: { fr: "Réponse d'urgence (CERC)", en: "Emergency response (CERC)" }, color: "#198038", img: "tour", dur: "3:20" },
-];
-
-/* --- Résultats : dialogues sectoriels -------------------------------------- */
-export const dialogues: Dialogue[] = [
-  { secteur: { fr: "Santé", en: "Health" }, color: "#da1e28", titre: { fr: "Santé numérique & établissements connectés", en: "Digital health & connected facilities" }, desc: { fr: "Rendre l'antériorité médicale portable d'un établissement à l'autre, et permettre l'avis spécialisé sans déplacer le patient — ce qui suppose un identifiant fiable avant tout dossier partagé.", en: "Making a patient's medical history portable between facilities, and enabling specialist advice without moving the patient — which requires a reliable identifier before any shared record." } },
-  { secteur: { fr: "Éducation", en: "Education" }, color: "#8a3ffc", titre: { fr: "Écoles connectées & apprentissage en ligne", en: "Connected schools & online learning" }, desc: { fr: "Raccorder les établissements pour que l'accès aux fonds documentaires ne dépende plus du nombre d'exemplaires physiques disponibles sur place.", en: "Connecting institutions so that access to collections no longer depends on how many physical copies are available on site." } },
-  { secteur: { fr: "Agriculture", en: "Agriculture" }, color: "#198038", titre: { fr: "Prix du marché & services ruraux", en: "Market prices & rural services" }, desc: { fr: "Réduire l'asymétrie d'information entre le producteur et l'acheteur : connaître le prix pratiqué ailleurs change la position de négociation avant la vente.", en: "Reducing the information asymmetry between producer and buyer: knowing the price paid elsewhere changes the bargaining position before the sale." } },
-  { secteur: { fr: "Finance", en: "Finance" }, color: "#0f62fe", titre: { fr: "Inclusion financière & mobile money", en: "Financial inclusion & mobile money" }, desc: { fr: "Lever l'obstacle d'entrée que constitue l'identification du client, puis transformer l'historique de transaction en preuve d'activité mobilisable pour un crédit.", en: "Removing the entry barrier of customer identification, then turning transaction history into evidence of activity that can support a loan." } },
-  { secteur: { fr: "Administration", en: "Public services" }, color: "#009d9a", titre: { fr: "Services publics numériques par défaut", en: "Digital-by-default public services" }, desc: { fr: "Cesser de demander à l'usager une information que l'administration détient déjà, ce qui suppose des registres capables de se vérifier mutuellement.", en: "Ceasing to ask users for information the administration already holds, which requires registries able to verify one another." } },
-  { secteur: { fr: "Secteur privé", en: "Private sector" }, color: "#ff832b", titre: { fr: "Startups, hubs & économie numérique", en: "Startups, hubs & the digital economy" }, desc: { fr: "Créer la demande locale sans laquelle les compétences formées quittent le pays : services, contenus et hébergement produits en RDC.", en: "Creating the local demand without which trained skills leave the country: services, content and hosting produced in the DRC." } },
 ];
 
 /* --- Événements ------------------------------------------------------------ */
@@ -165,24 +154,6 @@ export const galleryProvinces: GalleryItem[] = [
   { nom: "Ituri · Bunia", img: "citoyens" },
   { nom: "Kasaï · Kananga", img: "formation" },
   { nom: "Sud-Kivu · Bukavu", img: "femmes" },
-];
-
-/* --- Accueil : impact humain ----------------------------------------------- */
-export const humainPoints: HumainPoint[] = [
-  { big: "30 M", u: { fr: "utilisateurs visés", en: "users targeted" }, t: { fr: "— l'ambition d'un Congolais sur trois en ligne à l'horizon du projet.", en: "— the ambition of one Congolese in three online over the project horizon." } },
-  { big: "1 000", u: { fr: "institutions", en: "institutions" }, t: { fr: "écoles, hôpitaux et administrations à raccorder progressivement.", en: "schools, hospitals and public offices to be connected progressively." } },
-  { big: "1 000", u: { fr: "femmes", en: "women" }, t: { fr: "visées parmi les diplômés du programme de compétences numériques avancées.", en: "targeted among the graduates of the advanced digital skills programme." } },
-  { big: "180", u: { fr: "communautés", en: "communities" }, t: { fr: "rurales non desservies visées par les premiers lots de déploiement.", en: "underserved rural communities targeted by the first deployment lots." } },
-];
-
-/* --- Projet : ce que ça change (avant / après) ----------------------------- */
-export const projetImpacts: ProjetImpact[] = [
-  { n: "01", t: { fr: "Démarches administratives", en: "Administrative paperwork" }, av: { fr: "Le même justificatif est redemandé à chaque guichet, parce qu'aucun service ne peut vérifier ce que détient le service voisin. La charge de la preuve pèse sur l'usager.", en: "The same supporting document is demanded at every counter, because no office can check what the neighbouring office holds. The burden of proof falls on the user." }, ap: { fr: "Une information déjà détenue par l'administration est vérifiée à sa source, entre systèmes. Ce qui reste demandé à l'usager, c'est ce que l'État ne sait pas.", en: "Information the administration already holds is checked at source, system to system. What is still asked of the user is what the State does not know." } },
-  { n: "02", t: { fr: "École & université", en: "School & university" }, av: { fr: "L'accès aux ressources dépend d'exemplaires physiques rares et d'une bande passante partagée, quand le campus est raccordé. Le savoir circule à la vitesse du papier.", en: "Access to resources depends on scarce physical copies and shared bandwidth, where the campus is connected at all. Knowledge travels at the speed of paper." }, ap: { fr: "Un établissement raccordé ouvre à tous ses étudiants les mêmes fonds documentaires, au même moment, quelle que soit la province.", en: "A connected institution opens the same collections to all its students, at the same time, whatever the province." } },
-  { n: "03", t: { fr: "Petite entreprise", en: "Small business" }, av: { fr: "Le marché s'arrête où s'arrête le déplacement physique, et le paiement en espèces ne laisse aucune trace utilisable pour obtenir un crédit.", en: "The market ends where physical travel ends, and cash payment leaves no record usable to obtain credit." }, ap: { fr: "La vente à distance élargit la clientèle, et l'historique de paiement devient un actif : une preuve d'activité opposable à un prêteur.", en: "Remote selling widens the customer base, and payment history becomes an asset: evidence of activity that a lender can rely on." } },
-  { n: "04", t: { fr: "Santé", en: "Health" }, av: { fr: "L'historique du patient reste dans l'établissement où il a été écrit. Un transfert, une épidémie ou un déplacement de population fait perdre l'antériorité médicale.", en: "The patient's history stays in the facility where it was written. A transfer, an epidemic or a population movement erases the medical record." }, ap: { fr: "Un identifiant fiable et un dossier consultable à distance rendent l'antériorité portable, et permettent l'avis spécialisé sans déplacer le patient.", en: "A reliable identifier and a remotely accessible record make that history portable, and allow specialist advice without moving the patient." } },
-  { n: "05", t: { fr: "Inclusion financière", en: "Financial inclusion" }, av: { fr: "Sans identité vérifiable, l'ouverture d'un compte se heurte aux obligations de connaissance du client : l'exclusion est réglementaire autant qu'économique.", en: "Without verifiable identity, opening an account runs into know-your-customer obligations: exclusion is regulatory as much as economic." }, ap: { fr: "Une identité numérique inclusive lève cet obstacle d'entrée, et rend possibles l'épargne, le paiement et, progressivement, le crédit.", en: "An inclusive digital identity removes that entry barrier, making saving, payment and, progressively, credit possible." } },
-  { n: "06", t: { fr: "Zones rurales", en: "Rural areas" }, av: { fr: "La faible densité et le coût de l'énergie placent ces zones sous le seuil de rentabilité d'un déploiement commercial : le réseau s'y arrête, durablement.", en: "Low density and energy costs place these areas below the profitability threshold for a commercial rollout: the network stops there, lastingly." }, ap: { fr: "Un appui ciblé au déploiement et des solutions énergétiques adaptées déplacent ce seuil, et rendent la couverture soutenable là où elle ne l'était pas.", en: "Targeted deployment support and adapted energy solutions move that threshold, making coverage sustainable where it was not." } },
 ];
 
 /* --- Projet : pour qui (bénéficiaires) ------------------------------------- */

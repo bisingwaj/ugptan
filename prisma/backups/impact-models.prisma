@@ -1,0 +1,125 @@
+// =============================================================================
+// Modèles du module « Impact », relevés dans la base le 13 août 2026.
+//
+// Ces quatre tables et leurs enums existent en base sans figurer au schéma :
+// coller ce bloc dans prisma/schema.prisma rend `prisma db push` inoffensif —
+// il n'aura plus rien à supprimer. Les données sont par ailleurs sauvegardées
+// dans impact-2026-08-13.sql.
+//
+// ⚠️ Relevé par introspection : les noms de relations sont ceux que Prisma
+// déduit, pas forcément ceux d'origine. Le champ inverse à ajouter sur User
+// (ImpactSection[]) et sur MediaAsset (ImpactItem[]) est signalé par Prisma au
+// premier `prisma validate`.
+// =============================================================================
+
+model ImpactItem {
+  id                    String                  @id
+  sectionId             String
+  position              Int                     @default(0)
+  status                ImpactStatus            @default(PUBLISHED)
+  featured              Boolean                 @default(false)
+  valeur                String?
+  color                 String?
+  videoYt               String?
+  lienUrl               String?
+  dateAt                DateTime?
+  coverMediaId          String?
+  coverKey              String?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime
+  MediaAsset            MediaAsset?             @relation(fields: [coverMediaId], references: [id])
+  ImpactSection         ImpactSection           @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  ImpactItemTranslation ImpactItemTranslation[]
+
+  @@index([sectionId, position])
+}
+
+model ImpactItemTranslation {
+  id              String     @id
+  itemId          String
+  locale          String
+  surtitre        String?
+  titre           String?
+  texte           String?
+  texteSecondaire String?
+  lienLabel       String?
+  mediaAlt        String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime
+  ImpactItem      ImpactItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, locale])
+  @@index([locale])
+}
+
+model ImpactSection {
+  id                       String                     @id
+  key                      String                     @unique
+  emplacement              ImpactEmplacement
+  layout                   ImpactLayout
+  theme                    ImpactTheme                @default(CLAIR)
+  status                   ImpactStatus               @default(DRAFT)
+  position                 Int                        @default(0)
+  numero                   String?
+  compact                  Boolean                    @default(false)
+  grandTitre               Boolean                    @default(false)
+  ctaUrl                   String?
+  createdById              String?
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime
+  limite                   Int?
+  sourceId                 String?
+  ImpactItem               ImpactItem[]
+  User                     User?                      @relation(fields: [createdById], references: [id])
+  ImpactSection            ImpactSection?             @relation("ImpactSectionToImpactSection", fields: [sourceId], references: [id])
+  other_ImpactSection      ImpactSection[]            @relation("ImpactSectionToImpactSection")
+  ImpactSectionTranslation ImpactSectionTranslation[]
+
+  @@index([emplacement, position])
+  @@index([status])
+}
+
+model ImpactSectionTranslation {
+  id            String        @id
+  sectionId     String
+  locale        String
+  kicker        String?
+  titre         String?
+  lead          String?
+  ctaLabel      String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime
+  ImpactSection ImpactSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@unique([sectionId, locale])
+  @@index([locale])
+}
+
+enum ImpactEmplacement {
+  ACCUEIL_IMPACT
+  ACCUEIL_HISTOIRES
+  RESULTATS_DIALOGUES
+  RESULTATS_HISTOIRES
+  PROJET_CHANGEMENTS
+  PROJET_JALONS
+}
+
+enum ImpactLayout {
+  STATS
+  TEMOIGNAGES
+  CARTES
+  AVANT_APRES
+  JALONS
+}
+
+enum ImpactStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum ImpactTheme {
+  CLAIR
+  GRIS
+  PALE
+  SOMBRE
+}

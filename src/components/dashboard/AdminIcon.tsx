@@ -45,7 +45,7 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M6 8.5h8M6 12h8M6 15.5h5" />
     </>
   ),
-  /* Documents & transparence : feuilles superposées, coin coupé */
+  /* Rapports & analyses : feuilles superposées, coin coupé */
   documents: (
     <>
       <path d="M8 3h7l4 4v12H8z" />
@@ -91,6 +91,13 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M3 4h5v16H3z" />
       <path d="M9.5 4h5v16h-5z" />
       <path d="M16 7h5v13h-5z" />
+    </>
+  ),
+  /* Newsletter : l'enveloppe et son rabat */
+  newsletter: (
+    <>
+      <path d="M3 5h18v14H3z" />
+      <path d="M3 5l9 7 9-7" />
     </>
   ),
   /* Gouvernance : l'organigramme des instances */

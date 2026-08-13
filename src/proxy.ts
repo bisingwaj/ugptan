@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
-import { ADMIN_BASE, ADMIN_HOME, ADMIN_LOGIN, NEXT_PARAM } from "@/lib/admin";
+import { ADMIN_BASE, ADMIN_LOGIN, ADMIN_SET_PASSWORD, NEXT_PARAM } from "@/lib/admin";
 
 const locales = ["fr", "en"];
 const defaultLocale = "fr";
@@ -18,25 +18,39 @@ export async function proxy(req: NextRequest) {
     // Chaque action porte son propre garde — cf. lib/auth/guard.ts.
     if (req.method !== "GET" && req.method !== "HEAD") return;
 
-    /* Tri OPTIMISTE, tel que le recommande Better Auth pour une middleware :
-       on regarde si le cookie de session existe, sans le valider ni toucher la
-       base. Il évite l'aller-retour inutile vers une page qui redirigerait de
-       toute façon ; il ne PROUVE rien. La vérification qui fait autorité est
+    /* Les deux pages du sous-arbre ouvertes sans session : l'écran de connexion,
+       et celui où l'on définit son mot de passe depuis le lien reçu par e-mail
+       (son autorisation tient au jeton de l'URL, que Better Auth vérifie).
+       Elles passent AVANT tout examen du cookie — voir pourquoi juste après. */
+    if (
+      pathname === ADMIN_LOGIN ||
+      pathname === `${ADMIN_LOGIN}/` ||
+      pathname === ADMIN_SET_PASSWORD ||
+      pathname === `${ADMIN_SET_PASSWORD}/`
+    ) {
+      return;
+    }
+
+    /* Tri OPTIMISTE, tel que le recommande Better Auth pour une middleware : on
+       regarde si le cookie de session EXISTE, sans le valider ni toucher la
+       base. Il évite un aller-retour vers une page qui redirigerait de toute
+       façon ; il ne PROUVE rien. La vérification qui fait autorité est
        `getSession`, appelée par les gardes de chaque layout, page et action
        (cf. lib/auth/guard.ts) — indispensable, d'autant que tout chemin
-       contenant un point échappe au matcher ci-dessous. */
-    const hasSessionCookie = Boolean(getSessionCookie(req));
-    const isLogin = pathname === ADMIN_LOGIN || pathname === `${ADMIN_LOGIN}/`;
+       contenant un point échappe au matcher ci-dessous.
 
-    // Cookie présent sur l'écran de connexion : on tente le tableau de bord,
-    // qui renverra ici si la session s'avère invalide.
-    if (hasSessionCookie) return isLogin ? redirectTo(req, ADMIN_HOME) : undefined;
+       ⚠️ Ce cookie ne sert donc QU'À BLOQUER, jamais à faire sortir de l'écran
+       de connexion. La version précédente y renvoyait vers le tableau de bord
+       dès qu'un cookie était présent, et un cookie PÉRIMÉ (session révoquée,
+       compte supprimé, base réinitialisée) suffisait alors à faire boucler les
+       deux pages indéfiniment : le proxy poussait vers le tableau de bord, le
+       garde de page renvoyait vers la connexion, sans fin. C'est la page de
+       connexion qui redirige vers le tableau de bord, après vérification en
+       base — une seule décision, prise au seul endroit qui sait. */
+    if (getSessionCookie(req)) return;
 
-    // Seule page du sous-arbre ouverte sans session.
-    if (isLogin) return;
-
-    // Toute autre page repart vers la connexion, en gardant en mémoire la
-    // destination initiale pour y revenir une fois l'identité établie.
+    // Aucun cookie : inutile de rendre la page, on renvoie à la connexion en
+    // gardant en mémoire la destination initiale.
     return redirectTo(req, ADMIN_LOGIN, `${pathname}${req.nextUrl.search}`);
   }
 

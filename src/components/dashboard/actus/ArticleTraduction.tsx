@@ -83,7 +83,7 @@ export function ArticleTraduction({
               className="btn btn--danger btn--sm"
               disabled={suppressionEnCours}
             >
-              {t.supprimerTraduction}
+              {suppressionEnCours ? t.suppressionTraduction : t.supprimerTraduction}
             </button>
           )}
 

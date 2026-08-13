@@ -7,9 +7,15 @@ import { cn } from "@/lib/cn";
 /**
  * Barre de progression de navigation, en haut de l'écran.
  *
- * Les pages du site lisent la base au rendu : entre le clic et l'arrivée du
- * contenu, le navigateur reste sur la page précédente sans rien signaler, et
- * l'attente passe pour un site figé. Cette barre occupe cet intervalle.
+ * Montée des DEUX côtés : le site public (app/[lang]/layout.tsx) et la console
+ * (app/(dashboard)/layout.tsx). Les deux en ont le même besoin — leurs pages
+ * lisent la base au rendu, et entre le clic et l'arrivée du contenu le
+ * navigateur reste sur la page précédente sans rien signaler : l'attente passe
+ * pour une application figée. Cette barre occupe cet intervalle.
+ *
+ * Elle ne dépend d'aucune des deux feuilles en particulier : les utilitaires
+ * employés (`bg-ac`, `top-(--sa-t)`) sont générés par l'une comme par l'autre,
+ * qui partagent `tokens.css` et cadrent toutes deux `@source "../components"`.
  *
  * L'App Router n'expose aucun événement de routeur : le départ se déduit donc
  * du clic sur un lien interne (et de `popstate` pour les boutons précédent /

@@ -62,7 +62,7 @@ model User {
 
   /// --- Autorisation propre au projet --------------------------------------
   /// Modules autorisés en plus du socle du rôle. Vide pour un ADMIN, qui a tout.
-  permissions String[] @default([])
+  permissions String[]  @default([])
   /// Dernière connexion, alimentée par un `databaseHook` Better Auth à la
   /// création de session (cf. src/lib/auth/server.ts).
   lastLoginAt DateTime?
@@ -81,6 +81,14 @@ model User {
   articlesSaisis   Article[]    @relation("ArticleSaisiPar")
   /// Visuels téléversés dans la bibliothèque de médias.
   mediasTeleverses MediaAsset[]
+
+  /// Événements saisis par ce compte — trace interne, jamais publiée.
+  evenementsSaisis Evenement[] @relation("EvenementSaisiPar")
+
+  /// Rapports et documents déposés par ce compte — trace interne.
+  documentsDeposes Document[] @relation("DocumentDeposePar")
+  /// Sections « Histoires & impact » saisies par ce compte — trace interne.
+  impactSaisi ImpactSection[] @relation("ImpactSaisiPar")
 
   @@index([role])
 }
@@ -197,8 +205,8 @@ enum GrievanceEventType {
 /// L'anonymat se lit sur `isAnonymous`, dérivé du seul champ « Nom complet » :
 /// une personne peut laisser un moyen de contact sans se nommer.
 model Grievance {
-  id          String  @id @default(cuid())
-  reference   String  @unique
+  id          String @id @default(cuid())
+  reference   String @unique
   /// Code de la catégorie choisie à l'étape 1 (cf. src/content/mgp.ts). Un code
   /// et non un libellé : le formulaire est bilingue, le dossier ne l'est pas.
   category    String
@@ -266,8 +274,8 @@ model GrievanceEvent {
   fromValue   String?
   toValue     String?
 
-  authorId String?
-  author   User?   @relation("GrievanceEventAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  authorId    String?
+  author      User?   @relation("GrievanceEventAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   /// Nom de l'auteur figé à l'écriture : l'historique doit rester lisible même
   /// après la suppression du compte qui a agi.
   authorLabel String?
@@ -302,25 +310,37 @@ enum ArticleStatus {
   ARCHIVED
 }
 
-/// Bibliothèque de médias.
+/// Bibliothèque de médias et de documents.
 ///
-/// Deux natures dans une seule table : un fichier TÉLÉVERSÉ (`data` renseigné,
-/// servi par /api/medias/<id>) ou un média EXTERNE (`url` renseignée, hébergé
-/// sur un CDN). Le binaire vit en base pour que l'installation reste autonome —
-/// aucun service de stockage à provisionner. Corollaire à respecter partout :
+/// Une seule table, trois provenances distinguées par les colonnes renseignées :
+///   - fichier TÉLÉVERSÉ chez Cloudinary : `url` + `publicId` (cas normal) ;
+///   - média EXTERNE saisi à la main : `url` seule, hébergé ailleurs ;
+///   - fichier HISTORIQUE : `data` renseigné, servi par /api/medias/<id>.
+///
+/// Les octets ne sont plus écrits en base : un visuel de 3 Mo y coûtait une
+/// ligne de 3 Mo, sauvegardée et restaurée à chaque copie de la base, et servie
+/// par l'application au lieu d'un CDN. `data` ne subsiste que pour les fichiers
+/// déposés avant la bascule (cf. scripts/migrate-medias-cloudinary.mjs, qui les
+/// reprend puis vide la colonne). Corollaire inchangé tant qu'elle existe :
 /// `data` n'est JAMAIS sélectionné hors de la route qui sert le fichier.
 model MediaAsset {
   id        String   @id @default(cuid())
   /// Nom d'origine, conservé pour la recherche dans la bibliothèque.
   filename  String
   mimeType  String
-  /// Octets. Redondant avec `data`, mais évite de charger le binaire pour
-  /// afficher une liste.
+  /// Poids du fichier. Évite de charger le binaire pour afficher une liste, et
+  /// reste la seule source du poids pour un fichier hébergé chez Cloudinary.
   size      Int      @default(0)
   width     Int?
   height    Int?
+  /// HISTORIQUE : octets des fichiers antérieurs à la bascule vers Cloudinary.
+  /// Aucune écriture nouvelle. À supprimer quand la reprise sera terminée.
   data      Bytes?
   url       String?
+  /// Identifiant Cloudinary — la seule prise pour retirer le fichier du compte
+  /// à la suppression du média. Nul pour un média externe, dont le fichier ne
+  /// nous appartient pas.
+  publicId  String?
   altFr     String?
   altEn     String?
   legende   String?
@@ -330,19 +350,23 @@ model MediaAsset {
   createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
   couvertures Article[]
+  /// Événements dont ce média est l'image de couverture.
+  affiches    Evenement[]
+  /// Entrées « Histoires & impact » illustrées par ce média.
+  impacts     ImpactItem[]
 
   @@index([createdAt])
 }
 
 /// Catégorie d'article — sert aussi de filtre sur la page publique.
 model ArticleCategory {
-  id    String @id @default(cuid())
+  id        String   @id @default(cuid())
   /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
-  slug  String @unique
-  nomFr String
-  nomEn String
+  slug      String   @unique
+  nomFr     String
+  nomEn     String
   /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
-  color String?
+  color     String?
   /// Ordre d'affichage des filtres.
   position  Int      @default(0)
   createdAt DateTime @default(now())
@@ -452,5 +476,705 @@ model ArticleTranslation {
 
   @@unique([articleId, locale])
   @@unique([locale, slug])
+  @@index([locale])
+}
+
+/// ---------------------------------------------------------------------------
+/// Newsletter
+///
+/// Périmètre volontairement réduit à la COLLECTE et à l'EXPORT : le site
+/// recueille des adresses, la console les gère et les sort en fichier. Aucun
+/// envoi n'est effectué depuis l'application, et aucune table de campagne
+/// n'existe.
+///
+/// Ce qui rend l'envoi possible plus tard sans reprendre la liste : chaque
+/// abonné porte sa langue, son statut de consentement et son jeton de
+/// désabonnement. Un module d'envoi se brancherait dessus en ajoutant ses
+/// propres tables, sans toucher à celle-ci ni aux consentements qu'elle
+/// enregistre.
+/// ---------------------------------------------------------------------------
+
+/// État d'un abonnement. Une seule ligne par adresse, quel que soit le nombre
+/// d'allers-retours : un désabonnement n'efface rien, il bascule ce statut.
+/// C'est ce qui permet de refuser une réinscription silencieuse (cf.
+/// src/actions/newsletter.ts).
+enum NewsletterStatus {
+  ACTIVE
+  UNSUBSCRIBED
+}
+
+/// Une adresse collectée.
+///
+/// ⚠️ Donnée personnelle : cette table ne sort de la console que par l'export du
+/// module « Newsletter », réservé aux comptes disposant de la permission
+/// homonyme. Aucune route publique ne lit une adresse — les pages de gestion
+/// d'abonnement travaillent sur le seul `token`.
+model NewsletterSubscriber {
+  id    String @id @default(cuid())
+  /// Normalisée (minuscules, sans espaces) avant écriture : la contrainte
+  /// d'unicité porte sur cette forme, c'est elle qui empêche les doublons.
+  email String @unique
+
+  /// Langue du formulaire au moment de l'inscription. Détermine la langue des
+  /// messages qui lui seront adressés.
+  lang   String           @default("fr")
+  status NewsletterStatus @default(ACTIVE)
+
+  /// Provenance de l'adresse : « site » pour le formulaire public, « console »
+  /// pour une saisie interne, « import » pour une reprise de liste existante.
+  /// Chaîne et non enum : un import futur nommera sa propre origine sans
+  /// migration.
+  source String @default("site")
+
+  /// Jeton porté par les liens de gestion d'abonnement (désabonnement,
+  /// confirmation de réinscription). TIRÉ AU SORT et non dérivé de l'adresse :
+  /// il circule dans des e-mails et ne doit rien apprendre de son porteur.
+  token String @unique
+
+  /// Date de la dernière inscription effective — remise à jour lors d'une
+  /// réinscription, pour que la liste dise depuis quand l'adresse est active.
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  /// Adresse d'origine de la soumission, conservée pour instruire un abus.
+  ip String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, subscribedAt])
+}
+
+/// ===========================================================================
+/// Événements
+///
+/// Deux axes INDÉPENDANTS gouvernent un événement, et les confondre est la
+/// première erreur à éviter :
+///
+///   · le STATUT DE PUBLICATION — brouillon, publié, archivé — décidé par la
+///     rédaction, stocké dans `status` ;
+///   · la PHASE dans le temps — à venir, en cours, terminé — qui n'est PAS
+///     stockée : elle se déduit de `startAt` / `endAt` à la lecture
+///     (cf. src/lib/events/statut.ts). Aucune tâche planifiée n'entre en jeu,
+///     et un événement ne peut donc jamais rester « à venir » la veille de sa
+///     tenue parce qu'un planificateur est tombé.
+///
+/// Le découpage fiche / traduction reproduit celui des actualités : ce qui ne
+/// dépend d'aucune langue vit sur `Evenement`, tout ce qui se lit vit sur
+/// `EvenementTranslation`. Les deux s'enregistrent par des formulaires séparés
+/// (cf. src/actions/admin-evenements.ts).
+/// ===========================================================================
+
+/// Cycle de vie éditorial d'un événement.
+///
+/// Pas de `SCHEDULED` ici, contrairement aux articles : la date qui compte pour
+/// un événement est celle de sa TENUE, pas celle de sa mise en ligne. Programmer
+/// la parution d'une annonce d'événement reviendrait à porter deux calendriers
+/// concurrents sur la même fiche.
+enum EvenementStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Modalité de participation. Elle décide de ce que la fiche demande — une
+/// adresse n'a de sens qu'en présentiel — et de ce que la page publique affiche.
+enum EvenementMode {
+  PRESENTIEL
+  EN_LIGNE
+  HYBRIDE
+}
+
+/// Catégorie d'événement (Forum, Atelier, Webinaire, Consultation publique…).
+///
+/// Jumelle d'`ArticleCategory` sans être la même table : les deux nomenclatures
+/// n'ont pas le même contenu ni la même durée de vie, et les fusionner
+/// obligerait chaque filtre à savoir de quel module vient chaque entrée.
+model EvenementCategory {
+  id        String   @id @default(cuid())
+  /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
+  slug      String   @unique
+  nomFr     String
+  nomEn     String
+  /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
+  color     String?
+  /// Ordre d'affichage des filtres.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  evenements Evenement[]
+
+  @@index([position])
+}
+
+/// Fiche commune d'un événement, indépendante de la langue.
+model Evenement {
+  id     String          @id @default(cuid())
+  status EvenementStatus @default(DRAFT)
+
+  /// Début de l'événement. Obligatoire : c'est la donnée qui ordonne toutes les
+  /// listes et qui décide de la phase (à venir / en cours / terminé).
+  startAt DateTime
+  /// Fin, quand elle est connue. `null` vaut « même journée » : la phase se
+  /// calcule alors sur la fin du jour de `startAt` (heure de Kinshasa), sans
+  /// quoi une rencontre du matin serait annoncée « terminée » à 9 h 01.
+  endAt   DateTime?
+  /// Journée entière : l'heure n'est plus affichée, seule la date l'est.
+  allDay  Boolean   @default(false)
+
+  mode     EvenementMode @default(PRESENTIEL)
+  /// Mise en avant : remonte l'événement en tête des listes.
+  featured Boolean       @default(false)
+
+  /// Couleur d'accent propre à l'événement (pastille, bandeau, liseré de
+  /// carte). Vide : celle de la catégorie, puis l'accent du site.
+  color String?
+
+  categoryId String?
+  category   EvenementCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// Image de couverture issue de la bibliothèque.
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation(fields: [coverMediaId], references: [id], onDelete: SetNull)
+  /// Repli : clé du registre d'images intégré (cf. src/content/media.ts), pour
+  /// les événements repris de la version statique du site.
+  coverKey     String?
+
+  /// Lien d'inscription (billetterie, formulaire). Renseigné, il remplace la
+  /// demande de participation intégrée par un renvoi vers ce service.
+  registrationUrl String?
+  /// Lien externe de référence : page officielle, dossier, ordre du jour.
+  externalUrl     String?
+  /// Lien de connexion pour un événement en ligne. Séparé d'`externalUrl` :
+  /// l'un se publie, l'autre ne vaut que le jour même.
+  onlineUrl       String?
+
+  /// Organisateur affiché. Un événement est organisé par une institution ou un
+  /// service, pas par un compte de la console : la signature est donc libre,
+  /// sans relation vers `User`.
+  organiserName  String?
+  organiserEmail String?
+  organiserPhone String?
+  organiserUrl   String?
+
+  /// Composantes rattachées (C1…C5), même usage que sur un article.
+  comps String[] @default([])
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("EvenementSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations EvenementTranslation[]
+  inscriptions EvenementInscription[]
+
+  @@index([status, startAt])
+  @@index([categoryId])
+  @@index([featured])
+}
+
+/// Version d'un événement dans une langue. Tout ce qui se lit est ici.
+///
+/// Le LIEU en fait partie, contrairement à l'article où il n'est qu'une mention
+/// brute : « Goma — provinces de l'Est » et « Goma — Eastern provinces » sont
+/// deux libellés, pas une donnée géographique. L'adresse postale, elle, reste
+/// traduisible aussi (le nom d'un bâtiment se traduit), mais n'est jamais
+/// obligatoire.
+model EvenementTranslation {
+  id          String    @id @default(cuid())
+  evenementId String
+  evenement   Evenement @relation(fields: [evenementId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale      String
+
+  title String
+  /// Segment d'URL, unique DANS SA LANGUE : /fr/evenements/<slug>.
+  slug  String
+
+  /// Description courte affichée sur les cartes et dans les partages.
+  excerpt     String?
+  /// Description complète, HTML déjà assaini à l'écriture
+  /// (cf. src/lib/html/sanitize.ts). Jamais de HTML brut de l'éditeur en base.
+  contentHtml String  @default("")
+
+  /// Libellé du lieu tel qu'il s'affiche (« Kinshasa », « En ligne »).
+  lieu    String?
+  /// Adresse ou repère de localisation, quand la salle doit être trouvée.
+  adresse String?
+  /// Jauge affichée (« 320 places », « Ouvert à tous »). Un libellé et non un
+  /// nombre : le site annonce aussi bien une capacité qu'une règle d'accès.
+  places  String?
+  /// Informations complémentaires : accès, interprétation, pièces à apporter.
+  infos   String?
+
+  seoTitle       String?
+  seoDescription String?
+  /// Texte alternatif de l'image de couverture, propre à la langue.
+  coverAlt       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([evenementId, locale])
+  @@unique([locale, slug])
+  @@index([locale])
+}
+
+/// État d'une demande de participation.
+///
+/// `RECUE` est le seul état qu'une personne peut provoquer elle-même : tous les
+/// autres sont posés par l'Unité depuis la console. La distinction compte pour
+/// le décompte des places — une demande reçue n'occupe pas encore de siège.
+enum InscriptionStatus {
+  RECUE
+  CONFIRMEE
+  LISTE_ATTENTE
+  ANNULEE
+}
+
+/// Demande de participation déposée par le formulaire public d'un événement.
+///
+/// ⚠️ Ces lignes portent des DONNÉES PERSONNELLES (identité, adresse, éventuelle
+/// organisation) collectées sans compte. Trois conséquences tenues partout :
+///   1. elles ne sortent JAMAIS vers le site public — aucune fonction de
+///      `lib/events/query.ts` ne les lit, seule la console y accède ;
+///   2. elles tombent avec l'événement (`onDelete: Cascade`) : supprimer une
+///      rencontre ne doit pas laisser derrière elle une liste de participants ;
+///   3. l'adresse fait l'unicité, pour qu'un double envoi mette à jour la
+///      demande au lieu d'inscrire deux fois la même personne.
+///
+/// Le formulaire n'est proposé que si l'événement n'a PAS de lien d'inscription
+/// externe : quand la billetterie est ailleurs, c'est elle qui tient la liste,
+/// et en tenir une seconde ici la rendrait fausse.
+model EvenementInscription {
+  id          String    @id @default(cuid())
+  evenementId String
+  evenement   Evenement @relation(fields: [evenementId], references: [id], onDelete: Cascade)
+
+  nom          String
+  email        String
+  organisation String?
+  telephone    String?
+  /// Question ou besoin d'accessibilité signalé au dépôt.
+  message      String?
+
+  /// Langue du formulaire au moment du dépôt — sert à répondre dans la langue
+  /// où la personne s'est adressée à l'Unité.
+  locale String @default("fr")
+
+  statut InscriptionStatus @default(RECUE)
+  /// Note interne de la console, jamais communiquée au demandeur.
+  note   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([evenementId, email])
+  @@index([evenementId, statut])
+  @@index([createdAt])
+}
+
+/// ===========================================================================
+/// Rapports & analyses
+///
+/// Rapports, études, analyses et pièces de référence publiés dans la section
+/// « Rapports & analyses » du site, et administrés par le module homonyme de la
+/// console. Les identifiants techniques, eux, restent bâtis sur « document » —
+/// modèles, permission et route : ce sont des clés stables, pas des libellés.
+///
+/// ─── Le fichier n'est PAS ici ────────────────────────────────────────────────
+///
+/// Seules les MÉTADONNÉES et les RÉFÉRENCES Cloudinary sont enregistrées :
+/// `fileUrl` (adresse de diffusion) et `filePublicId` (prise pour retirer le
+/// fichier du compte). Aucune colonne binaire, contrairement à ce que
+/// `MediaAsset.data` a porté avant la bascule : une base sauvegardée, répliquée
+/// et facturée à l'octet n'a pas à jouer le rôle de serveur de fichiers, et
+/// l'application n'a pas à jouer celui de CDN.
+///
+/// ─── Pourquoi pas de table de traduction ─────────────────────────────────────
+///
+/// Contrairement à `Article` et `Evenement`, les deux langues vivent en
+/// COLONNES (`titreFr` / `titreEn`), comme sur `ArticleCategory`. Un document
+/// porte un titre et une description courte — pas un corps rédactionnel avec son
+/// slug, son SEO et son cycle de relecture propre. Une table de traduction
+/// imposerait un formulaire par langue et un enregistrement séparé pour deux
+/// champs, alors que le FICHIER, lui, reste le même dans les deux versions du
+/// site. L'anglais vide retombe sur le français : mieux vaut servir un titre
+/// français à un lecteur anglophone que masquer le document.
+///
+/// La langue du FICHIER, elle, est une information distincte et affichée
+/// (`langue`) : le document peut n'exister qu'en français.
+/// ===========================================================================
+
+/// Cycle de vie d'un document.
+///
+/// Les trois états correspondent aux trois gestes demandés au CMS — publier,
+/// dépublier, archiver. Pas de `SCHEDULED` : `publishedAt` est la date que
+/// PORTE le document, pas un déclencheur de parution. Programmer la mise en
+/// ligne d'un rapport n'a pas d'usage établi, et le faire croire coûterait une
+/// tâche planifiée.
+enum DocumentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Nature du document. Enum et non chaîne libre : c'est un axe de FILTRE sur le
+/// site public, et une saisie libre y produirait autant de valeurs que de
+/// saisies. La catégorie, elle, reste une table — les thématiques du projet
+/// évoluent, la nature d'un écrit non.
+enum DocumentType {
+  RAPPORT
+  ETUDE
+  ANALYSE
+  NOTE
+  MANUEL
+  PLAN
+  CADRE
+  PRESENTATION
+  DONNEES
+  AUTRE
+}
+
+/// Catégorie ou thématique documentaire — sert aussi de filtre public.
+///
+/// Table distincte d'`ArticleCategory` et d'`EvenementCategory`, pour la raison
+/// déjà donnée sur cette dernière : les trois nomenclatures n'ont ni le même
+/// contenu ni la même durée de vie, et les fusionner obligerait chaque filtre à
+/// savoir de quel module vient chaque entrée.
+model DocumentCategory {
+  id    String @id @default(cuid())
+  /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
+  slug  String @unique
+  nomFr String
+  nomEn String
+  /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
+  color String?
+  /// Ordre d'affichage des filtres.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documents Document[]
+
+  @@index([position])
+}
+
+/// Un rapport, une étude, une analyse ou une pièce de référence.
+model Document {
+  id     String         @id @default(cuid())
+  status DocumentStatus @default(DRAFT)
+  type   DocumentType   @default(RAPPORT)
+
+  titreFr String
+  /// Vide, le titre français est servi dans les deux langues (cf. l'en-tête).
+  titreEn String?
+
+  descriptionFr String?
+  descriptionEn String?
+
+  /// Sigle documentaire (« MEP », « PPSD », « CGES »), quand il en existe un.
+  /// C'est par lui que ces pièces sont désignées dans les échanges du projet.
+  reference String?
+  /// Auteur ou organisme producteur, tel qu'il doit s'afficher.
+  auteur    String?
+  /// Langue du FICHIER (« FR », « EN », « FR/EN ») — pas celle de la fiche.
+  langue    String  @default("FR")
+
+  /// Date de mise en ligne. Renseignée à la première publication si elle est
+  /// restée vide : un document en ligne sans date n'est pas classable.
+  publishedAt  DateTime?
+  /// Date du document lui-même (production, édition, période couverte).
+  /// Distincte de la précédente : un rapport de 2025 peut être publié en 2026,
+  /// et c'est la date du document qui fait foi pour le lecteur.
+  documentDate DateTime?
+
+  /// Mise en avant : remonte le document en tête de la liste publique.
+  featured Boolean @default(false)
+  /// Ordre d'affichage, à date égale. Plus petit = plus haut.
+  position Int     @default(0)
+  /// Composantes rattachées (C1…C5), même usage que sur un article.
+  comps    String[] @default([])
+
+  categoryId String?
+  category   DocumentCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// --- Fichier : RÉFÉRENCES Cloudinary, jamais d'octets -------------------
+  /// URL de diffusion HTTPS, telle que Cloudinary la renvoie. C'est elle que le
+  /// site public sert au visiteur.
+  fileUrl      String
+  /// Identifiant Cloudinary — seule prise pour retirer le fichier du compte à
+  /// la suppression du document ou au remplacement du fichier.
+  filePublicId String?
+  /// Nom d'origine, conservé pour la recherche et pour nommer le téléchargement.
+  fileName     String
+  fileMime     String
+  /// Poids rapporté par Cloudinary, seule source du « PDF · 4,2 Mo » affiché.
+  fileSize     Int     @default(0)
+  /// Extension normalisée (« pdf », « docx »), pour la pastille de format.
+  fileFormat   String?
+
+  /// Trace de dépôt, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("DocumentDeposePar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([type])
+  @@index([featured])
+}
+
+/// Histoires & impact
+///
+/// Le module ne gère pas UNE page mais SIX emplacements répartis sur trois
+/// pages publiques (accueil, résultats, projet). Ce qu'ils ont en commun n'est
+/// pas leur dessin — une frise de jalons ne ressemble pas à une grille de
+/// témoignages — mais leur nature : ce sont les blocs qui racontent d'où vient
+/// le Projet et ce qu'il change.
+///
+/// ─── Deux niveaux, et un seul dessin par niveau ─────────────────────────────
+///
+///   · une SECTION porte l'en-tête (kicker, titre, chapô, bouton), le fond, la
+///     place dans la page et le GABARIT de ses entrées ;
+///   · un ITEM porte une entrée de la section : un chiffre, un témoignage, un
+///     jalon, un diptyque avant/après, une carte sectorielle.
+///
+/// Le gabarit (`layout`) décide de ce qui se lit dans un item, et donc de ce
+/// que le formulaire demande. C'est ce qui évite deux écueils symétriques : une
+/// table par bloc — cinq modules à maintenir pour cinq grilles —, et un champ
+/// « contenu libre » — qui rendrait chaque section responsable de son propre
+/// HTML, donc de sa propre dérive graphique.
+///
+/// ─── Découpage fiche / traduction ───────────────────────────────────────────
+/// Identique aux actualités et aux événements : ce qui ne dépend d'aucune
+/// langue vit sur la fiche, tout ce qui se lit vit sur la traduction. Une
+/// langue non traduite se reconnaît à l'absence de sa ligne, ce qui permet à la
+/// console de la signaler et au site de ne jamais servir un texte français à un
+/// lecteur anglophone.
+/// ===========================================================================
+
+/// Cycle de vie d'une section comme d'une entrée.
+///
+/// Pas de `SCHEDULED` ni d'`ARCHIVED` ici, contrairement aux actualités : ces
+/// blocs sont des éléments de page, pas des parutions. Une section se montre ou
+/// se retire, et le retrait n'a pas de mémoire à conserver.
+enum ImpactStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Où la section s'affiche sur le site public.
+///
+/// ⚠️ Valeur STRUCTURANTE : chaque emplacement correspond à un point d'insertion
+/// réel dans une page (cf. src/lib/impact/query.ts et les pages publiques). En
+/// ajouter un suppose d'ouvrir ce point d'insertion dans la page concernée ;
+/// tout le reste — textes, entrées, ordre, fond — se pilote depuis la console
+/// sans toucher au code.
+enum ImpactEmplacement {
+  ACCUEIL_IMPACT
+  ACCUEIL_HISTOIRES
+  RESULTATS_DIALOGUES
+  RESULTATS_HISTOIRES
+  PROJET_CHANGEMENTS
+  PROJET_JALONS
+}
+
+/// Dessin des entrées d'une section. Chaque gabarit reproduit à l'identique un
+/// bloc qui existait déjà en dur dans les pages (cf. src/components/impact/).
+enum ImpactLayout {
+  /// Grille de chiffres : grande valeur, unité en accent, phrase d'explication.
+  STATS
+  /// Cartes de témoignage : portrait cliquable (vidéo), nom, rôle, citation.
+  TEMOIGNAGES
+  /// Cartes sectorielles : secteur en accent, titre, description.
+  CARTES
+  /// Diptyque : numéro, intitulé, situation actuelle puis situation visée.
+  AVANT_APRES
+  /// Frise verticale : date puis fait marquant.
+  JALONS
+}
+
+/// Fond de la section, repris du design system (cf. `.section--*`).
+enum ImpactTheme {
+  CLAIR
+  GRIS
+  PALE
+  SOMBRE
+}
+
+/// Un bloc « Histoires & impact » affiché sur une page publique.
+model ImpactSection {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché. Il sert d'ancrage à l'amorçage
+  /// (cf. src/lib/impact/bootstrap.ts) : c'est lui qui garantit qu'une reprise
+  /// du contenu d'origine ne crée pas de doublon si elle est rejouée.
+  key String @unique
+
+  emplacement ImpactEmplacement
+  layout      ImpactLayout
+  theme       ImpactTheme       @default(CLAIR)
+  status      ImpactStatus      @default(DRAFT)
+
+  /// Ordre entre les sections d'un MÊME emplacement. Deux sections peuvent
+  /// légitimement se suivre au même endroit : une grille de chiffres puis une
+  /// grille de témoignages, par exemple.
+  position Int @default(0)
+
+  /// Numéro affiché dans le kicker (« [ 03 ] Résultats »). Une chaîne et non un
+  /// entier : la numérotation des sections du site est rédigée (« 02 »), pas
+  /// calculée, et elle ne suit pas l'ordre de cette table.
+  numero String?
+
+  /// Section resserrée (`.section--sm`) : moins d'air vertical.
+  compact    Boolean @default(false)
+  /// Titre à la taille des grandes sections d'accueil (`.h2`) plutôt qu'à celle
+  /// des sections secondaires (`.h2--sm`).
+  grandTitre Boolean @default(false)
+
+  /// Lien du bouton d'en-tête. Son libellé se traduit (cf. la traduction).
+  ctaUrl String?
+
+  /// Section dont celle-ci REPREND les entrées.
+  ///
+  /// Le site montre les mêmes quatre témoignages à deux endroits : un aperçu
+  /// sur l'accueil, la grille complète en fin de page « Résultats ». Sans ce
+  /// renvoi, il faudrait les saisir deux fois et les corriger deux fois — et la
+  /// première correction oubliée ferait mentir l'une des deux pages.
+  ///
+  /// Une section qui reprend n'a pas d'entrées propres : elle porte son
+  /// en-tête, son fond et sa place, et affiche les entrées de sa source.
+  sourceId String?
+  source   ImpactSection?  @relation("ImpactSource", fields: [sourceId], references: [id], onDelete: SetNull)
+  reprises ImpactSection[] @relation("ImpactSource")
+
+  /// Nombre maximal d'entrées affichées. Vide : toutes.
+  limite Int?
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("ImpactSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ImpactSectionTranslation[]
+  items        ImpactItem[]
+
+  @@index([emplacement, position])
+  @@index([status])
+}
+
+/// En-tête d'une section dans une langue. Tout ce qui s'y lit est ici.
+///
+/// `titre` est FACULTATIF, contrairement au titre d'un article : la frise des
+/// jalons de la page « Le projet » n'affiche qu'un kicker, et lui imposer un
+/// H2 ajouterait au site un titre que son dessin n'a jamais porté. Une langue
+/// est réputée servie dès qu'elle porte un kicker ou un titre.
+model ImpactSectionTranslation {
+  id        String        @id @default(cuid())
+  sectionId String
+  section   ImpactSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale    String
+
+  /// Libellé mono qui coiffe la section (« Impact humain »).
+  kicker   String?
+  titre    String?
+  /// Chapô sous le titre.
+  lead     String?
+  /// Libellé du bouton d'en-tête. Sans `ctaUrl` sur la fiche, il ne s'affiche pas.
+  ctaLabel String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sectionId, locale])
+  @@index([locale])
+}
+
+/// Une entrée d'une section : chiffre, témoignage, carte, diptyque ou jalon.
+///
+/// Les champs non linguistiques sont volontairement GÉNÉRIQUES, et leur emploi
+/// dépend du gabarit de la section (cf. src/lib/impact/statut.ts, qui tient la
+/// table de correspondance et les libellés que la console affiche).
+model ImpactItem {
+  id        String        @id @default(cuid())
+  sectionId String
+  section   ImpactSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  position Int          @default(0)
+  status   ImpactStatus @default(PUBLISHED)
+  /// Mise en avant. Le dessin en tire un liseré d'accent, jamais un changement
+  /// de place : l'ordre reste celui de `position`, sinon la grille se réordonne
+  /// sous les yeux de la rédaction sans qu'elle l'ait demandé.
+  featured Boolean      @default(false)
+
+  /// Valeur affichée en grand : « 30 M » pour un chiffre, « 01 » pour un
+  /// diptyque. Une chaîne, parce que ce qui se lit n'est pas toujours un
+  /// nombre et que « 30 M » n'est pas « 30000000 ».
+  valeur  String?
+  /// Couleur d'accent de l'entrée. Vide : l'accent du site.
+  color   String?
+  /// Identifiant YouTube du témoignage, le cas échéant.
+  videoYt String?
+  /// Lien sortant de l'entrée.
+  lienUrl String?
+
+  /// Date réelle d'un jalon. Elle sert à ORDONNER et à afficher la date dans la
+  /// langue de lecture ; un libellé saisi dans la traduction la remplace quand
+  /// la date exacte n'est pas connue (« T1 2026 »).
+  dateAt DateTime?
+
+  /// Visuel issu de la bibliothèque.
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation(fields: [coverMediaId], references: [id], onDelete: SetNull)
+  /// Repli : clé du registre d'images intégré (cf. src/content/media.ts).
+  coverKey     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ImpactItemTranslation[]
+
+  @@index([sectionId, position])
+}
+
+/// Version d'une entrée dans une langue.
+///
+/// Quatre champs de texte couvrent les cinq gabarits, chacun désigné par son
+/// RÔLE dans la carte plutôt que par le contenu d'un bloc particulier :
+/// la console les réétiquette selon le gabarit (« Rôle & lieu » pour un
+/// témoignage, « Unité » pour un chiffre, « Secteur » pour une carte).
+model ImpactItemTranslation {
+  id     String     @id @default(cuid())
+  itemId String
+  item   ImpactItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale String
+
+  /// Ligne courte au-dessus ou sous le titre : unité, rôle, secteur, date.
+  surtitre        String?
+  titre           String?
+  /// Corps principal : explication, citation, situation visée, fait marquant.
+  texte           String?
+  /// Second corps, employé par le seul gabarit AVANT_APRES : la situation
+  /// actuelle, celle que le Projet entend corriger.
+  texteSecondaire String?
+  /// Libellé du lien sortant. Sans `lienUrl` sur la fiche, il ne s'affiche pas.
+  lienLabel       String?
+  /// Texte alternatif du visuel, propre à la langue.
+  mediaAlt        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([itemId, locale])
   @@index([locale])
 }
