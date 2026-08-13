@@ -46,6 +46,7 @@ import { isEmptyHtml, safeUrl, sanitizeHtml } from "@/lib/html/sanitize";
 import { fromDateTimeLocal } from "@/lib/format";
 import { slugify, uniqueSlug } from "@/lib/actus/slug";
 import { isEvenementMode, isEvenementStatut } from "@/lib/events/statut";
+import { INSCRIPTION_LABEL, isInscriptionStatut } from "@/lib/events/inscription";
 import { revaliderEvenements } from "@/lib/events/cache";
 import { composantes } from "@/content/data";
 
@@ -609,4 +610,75 @@ export async function supprimerCategorieEvtAction(
       ? `Catégorie « ${categorie.nomFr} » supprimée. ${orphelins} événement(s) sont désormais sans catégorie.`
       : `Catégorie « ${categorie.nomFr} » supprimée.`,
   };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Inscriptions                                                                */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Arbitrage d'une demande de participation.
+ *
+ * ⚠️ La console est le SEUL endroit qui touche à ces lignes : elles portent des
+ * données personnelles collectées sans compte, et rien du site public n'y
+ * accède (cf. le commentaire du modèle `EvenementInscription`).
+ *
+ * Aucune notification n'est envoyée d'ici. Confirmer une place et prévenir la
+ * personne sont deux gestes distincts, et le second suppose un service de
+ * courriel que le projet n'a pas encore : le faire croire serait pire que de ne
+ * pas le faire.
+ */
+export async function statuerInscriptionAction(
+  _prev: EvtFormState,
+  formData: FormData,
+): Promise<EvtFormState> {
+  await assertPermission("evenements");
+
+  const id = texte(formData, "id");
+  const statut = texte(formData, "statut");
+  if (!id) return { error: "Demande introuvable.", ok: null };
+  if (!isInscriptionStatut(statut)) return { error: "État inconnu.", ok: null };
+
+  const inscription = await db().evenementInscription.findUnique({
+    where: { id },
+    select: { nom: true, evenementId: true },
+  });
+  if (!inscription) return { error: "Demande introuvable.", ok: null };
+
+  await db().evenementInscription.update({
+    where: { id },
+    data: { statut, note: optionnel(texte(formData, "note")) },
+  });
+
+  revalidatePath(`${EVTS_PATH}/${inscription.evenementId}/inscriptions`);
+  return { error: null, ok: `Demande de ${inscription.nom} : ${INSCRIPTION_LABEL[statut]}.` };
+}
+
+/**
+ * Suppression définitive d'une demande.
+ *
+ * Distincte de l'annulation : annuler conserve la trace du passage de la
+ * personne, supprimer l'efface. Le second geste existe pour honorer une
+ * demande d'effacement, pas pour faire le ménage — d'où la confirmation côté
+ * console et l'absence de suppression en lot.
+ */
+export async function supprimerInscriptionAction(
+  _prev: EvtFormState,
+  formData: FormData,
+): Promise<EvtFormState> {
+  await assertPermission("evenements");
+
+  const id = texte(formData, "id");
+  if (!id) return { error: "Demande introuvable.", ok: null };
+
+  const inscription = await db().evenementInscription.findUnique({
+    where: { id },
+    select: { nom: true, evenementId: true },
+  });
+  if (!inscription) return { error: "Demande introuvable.", ok: null };
+
+  await db().evenementInscription.delete({ where: { id } });
+
+  revalidatePath(`${EVTS_PATH}/${inscription.evenementId}/inscriptions`);
+  return { error: null, ok: `Demande de ${inscription.nom} supprimée.` };
 }

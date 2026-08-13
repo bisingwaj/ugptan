@@ -498,6 +498,24 @@ export const ADMIN_EVTS = {
   champOrganisateurTel: "Téléphone",
   champOrganisateurUrl: "Site de l'organisateur",
 
+  /* --- Inscriptions --------------------------------------------------------
+     Demandes de participation déposées par le formulaire public. Elles portent
+     des données personnelles : rien de ce vocabulaire n'apparaît côté site. */
+  inscrTitle: "Demandes de participation",
+  inscrLien: "Inscriptions",
+  inscrVide: "Aucune demande pour le moment.",
+  inscrColonne: "Demandes",
+  inscrConfirmees: "Places confirmées",
+  inscrJauge: "jauge annoncée :",
+  inscrStatut: "État de la demande",
+  inscrNote: "Note interne",
+  inscrNotePlaceholder: "Salle pleine, recontacter si désistement…",
+  inscrSupprimerConfirm:
+    "Supprimer définitivement cette demande ? Utilisez « Annulée » pour garder la trace du passage de la personne.",
+  inscrExterne:
+    "Les inscriptions de cet événement se font sur un service externe : cette liste ne recense que d'anciennes demandes déposées sur le site.",
+  retourFiche: "Retour à la fiche",
+
   /* --- Catégories ---------------------------------------------------------- */
   categoriesTitle: "Catégories d'événements",
   categoriesLead: "Une seule par événement. Elles alimentent les filtres et la pastille des cartes sur la page publique.",

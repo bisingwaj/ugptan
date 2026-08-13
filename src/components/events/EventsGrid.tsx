@@ -24,7 +24,7 @@
  *     déduisent du calendrier (cf. lib/events/statut.ts) : aucune fiche n'a à
  *     être rouverte le lendemain d'une rencontre pour changer d'étiquette.
  */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
@@ -32,23 +32,15 @@ import type { EvtVue } from "@/lib/events/query";
 import { evenementRoute } from "@/lib/routes";
 import { Photo } from "@/components/ui/Photo";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { InscriptionModal } from "@/components/events/InscriptionModal";
 
 type Props = { lang: Lang; events: EvtVue[]; withImage?: boolean };
 
 export function EventsGrid({ lang, events, withImage = false }: Props) {
   const t = dict(lang);
+  // Seul l'événement choisi vit ici : la saisie, l'envoi et l'accusé de
+  // réception appartiennent à la modale, partagée avec la fiche de détail.
   const [reg, setReg] = useState<EvtVue | null>(null);
-  const [done, setDone] = useState(false);
-  const [form, setForm] = useState({ nom: "", email: "", org: "" });
-
-  const close = () => { setReg(null); setDone(false); setForm({ nom: "", email: "", org: "" }); };
-
-  useEffect(() => {
-    if (!reg) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [reg]);
 
   /**
    * Appel à l'action du pied de carte.
@@ -88,7 +80,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
     return (
       <button
         type="button"
-        onClick={() => { setReg(e); setDone(false); }}
+        onClick={() => setReg(e)}
         className="evt-card__action"
         style={style}
       >
@@ -156,45 +148,11 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
         )}
       </RevealGroup>
 
-      {/* Demande de participation intégrée — inchangée : elle ne s'ouvre que
-          pour les rencontres sans service d'inscription externe. */}
-      {reg && (
-        <div className="scrim scrim--center" onClick={close}>
-          <div className="modal" data-lenis-prevent style={{ width: "100%", maxWidth: 480, background: "#fff", border: "1px solid var(--c-80)" }} onClick={(ev) => ev.stopPropagation()}>
-            <div style={{ background: "var(--c-black)", color: "#fff", padding: "24px 26px", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", inset: 0, background: "radial-gradient(120% 120% at 90% 0%, rgba(15,98,254,.34), transparent 55%)" }} />
-              <div style={{ position: "relative", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14 }}>
-                <div>
-                  <div className="mono" style={{ fontSize: 11, color: "var(--ac-light)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>{t.evt.regTitle}</div>
-                  <div style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.3 }}>{reg.title}</div>
-                  <div className="mono" style={{ fontSize: 12, color: "var(--c-40)", marginTop: 8 }}>
-                    {reg.dateLabel}{reg.lieu ? ` · ${reg.lieu}` : ""}
-                  </div>
-                </div>
-                <button onClick={close} aria-label="Fermer" style={{ width: 44, height: 44, flex: "0 0 auto", border: "1px solid var(--c-80)", color: "#fff", fontSize: 16, background: "var(--c-90)" }}>✕</button>
-              </div>
-            </div>
-            {!done ? (
-              <form onSubmit={(ev) => { ev.preventDefault(); setDone(true); }} style={{ padding: 26 }}>
-                <label className="label-mono">{t.evt.fullName}</label>
-                <input value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} required className="field" style={{ marginBottom: 13, background: "var(--c-10)" }} />
-                <label className="label-mono">{t.mgp.email}</label>
-                <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className="field" style={{ marginBottom: 13, background: "var(--c-10)" }} />
-                <label className="label-mono">{t.evt.orgOptional}</label>
-                <input value={form.org} onChange={(e) => setForm({ ...form, org: e.target.value })} className="field" style={{ marginBottom: 20, background: "var(--c-10)" }} />
-                <button type="submit" className="btn btn--primary" style={{ width: "100%", justifyContent: "center" }}>{t.evt.register}<span className="arrow">→</span></button>
-              </form>
-            ) : (
-              <div style={{ padding: "36px 26px", textAlign: "center", animation: "revFade .3s both" }}>
-                <div style={{ width: 54, height: 54, margin: "0 auto 20px", background: "var(--ok-bg)", border: "1px solid var(--ok-bd)", color: "var(--ok-fg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>✓</div>
-                <div style={{ fontSize: 20, fontWeight: 600 }}>{t.evt.regDoneTitle}</div>
-                <p style={{ margin: "12px auto 0", maxWidth: 320, fontSize: 14, lineHeight: 1.6, color: "var(--c-70)" }}>{t.evt.regDoneText}</p>
-                <button onClick={close} className="btn btn--outline" style={{ marginTop: 22 }}>OK</button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Demande de participation — même formulaire que la fiche de détail.
+          Il ne s'ouvre que pour les rencontres sans service d'inscription
+          externe : le bouton renvoie alors directement vers ce service. */}
+      {reg && <InscriptionModal evt={reg} lang={lang} onClose={() => setReg(null)} />}
+
     </>
   );
 }
