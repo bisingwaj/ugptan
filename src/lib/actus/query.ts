@@ -68,20 +68,39 @@ const enLigne = (now: Date = new Date()) => ({
   publishedAt: { lte: now },
 });
 
-/** Attente avant la seconde tentative : le réveil d'un compute Neon est bref. */
-const DELAI_REPRISE_MS = 450;
+/**
+ * Attentes successives avant chaque reprise, en millisecondes.
+ *
+ * ⚠️ Ce qui est mesuré, et ce qui ne l'est pas. Le réveil d'un compute Neon
+ * suspendu a été soupçonné puis ÉCARTÉ : après huit minutes sans requête, la
+ * page « Actualités » se rend en 3,75 s sans déclencher une seule reprise.
+ *
+ * Ce qui est établi, en revanche, c'est que le transport WebSocket vers Neon
+ * échoue par SALVES, là où le transport HTTP reste intact au même instant
+ * (mesuré : 8/8 en HTTP contre 3/8 en WebSocket sur la même minute, et 10/10
+ * dès lors qu'un même pool est réutilisé). Ces paliers absorbent une salve
+ * courte — ils l'ont fait pendant un `next build` à 7 workers, qui s'est
+ * terminé sans un seul abandon. Une salve plus longue que le budget ressort en
+ * 500, et c'est voulu : mieux vaut une erreur visible qu'une page mise en cache
+ * annonçant « aucun communiqué » sur une base pourtant pleine.
+ *
+ * Le coût est nul tant que la base répond : ce chemin ne s'ouvre que sur une
+ * panne de LIAISON avérée.
+ */
+const REPRISES_MS = [300, 900, 2000];
 
 const enCompilation = () => process.env.NEXT_PHASE === "phase-production-build";
 
 /**
  * Enveloppe de toute lecture publique des actualités. Elle rend deux services.
  *
- * ─── 1. Une reprise sur panne de LIAISON ─────────────────────────────────────
+ * ─── 1. Des reprises sur panne de LIAISON ────────────────────────────────────
  * Neon suspend son compute après quelques minutes sans requête, et celle qui le
- * réveille échoue parfois avant que la socket soit établie. La page « Actualités »
- * tombait alors en 500 — à la vue du public. Une seule reprise suffit à absorber
- * ce réveil. Elle est cantonnée aux pannes de liaison (cf. `estPanneDeLiaison`) :
- * rejouer une requête que la base a refusée ne ferait que la faire refuser deux fois.
+ * réveille échoue avant que la socket soit établie. La page « Actualités »
+ * tombait alors en 500, à la vue du public. Les reprises sont échelonnées pour
+ * couvrir la durée réelle d'un réveil (cf. `REPRISES_MS`), et cantonnées aux
+ * pannes de liaison (cf. `estPanneDeLiaison`) : rejouer une requête que la base
+ * a refusée ne ferait que la faire refuser autant de fois.
  *
  * ─── 2. Une tolérance limitée À LA COMPILATION ───────────────────────────────
  * L'accueil et les cinq pages de composante sont pré-rendus au build et lisent
@@ -98,19 +117,23 @@ const enCompilation = () => process.env.NEXT_PHASE === "phase-production-build";
  * se rejoue pas, la reprise n'aurait servi à rien.
  */
 async function lecture<T>(faire: () => Promise<T>, repli: T, contexte: string): Promise<T> {
-  try {
-    return await faire();
-  } catch (premiere) {
-    if (estPanneDeLiaison(premiere)) {
-      console.warn(`[actus] ${contexte} : liaison perdue, seconde tentative. ${describeError(premiere)}`);
-      await new Promise((resoudre) => setTimeout(resoudre, DELAI_REPRISE_MS));
-      try {
-        return await faire();
-      } catch (seconde) {
-        return echec(seconde, repli, contexte);
+  for (let tentative = 0; ; tentative++) {
+    try {
+      return await faire();
+    } catch (error) {
+      const attente = REPRISES_MS[tentative];
+
+      // Deux sorties, une seule conduite : on abandonne dès que la reprise n'a
+      // plus de sens — paliers épuisés, ou panne qui n'est pas de liaison.
+      if (attente === undefined || !estPanneDeLiaison(error)) {
+        return echec(error, repli, contexte);
       }
+
+      console.warn(
+        `[actus] ${contexte} : liaison perdue, reprise ${tentative + 1}/${REPRISES_MS.length} dans ${attente} ms. ${describeError(error)}`,
+      );
+      await new Promise((resoudre) => setTimeout(resoudre, attente));
     }
-    return echec(premiere, repli, contexte);
   }
 }
 
