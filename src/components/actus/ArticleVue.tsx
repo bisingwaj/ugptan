@@ -13,7 +13,6 @@
 import Link from "next/link";
 import type { ActuVue } from "@/lib/actus/query";
 import { dict } from "@/content/i18n";
-import { sanitizeHtml } from "@/lib/html/sanitize";
 import { NAV, route } from "@/lib/routes";
 import type { Lang } from "@/lib/pick";
 import { Photo } from "@/components/ui/Photo";
@@ -22,6 +21,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { VideoButton } from "@/components/video/VideoButton";
 import { ActuCard, cheminArticle } from "@/components/actus/ActuCard";
+import { ProseRiche } from "@/components/prose/ProseRiche";
 import { PartageArticle } from "@/components/actus/PartageArticle";
 
 type Props = {
@@ -104,11 +104,8 @@ export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = fals
 
           {actu.excerpt && <p className="actu-chapeau">{actu.excerpt}</p>}
 
-          {/* Assainissement une seconde fois, à l'affichage : le corps est déjà
-              nettoyé à l'écriture (cf. actions/admin-actualites.ts), mais rien
-              n'interdit qu'une ligne ait été insérée en base autrement que par
-              la console. Le coût est marginal, la page étant mise en cache. */}
-          <div className="actu-prose" dangerouslySetInnerHTML={{ __html: sanitizeHtml(actu.contentHtml) }} />
+          {/* Assainissement et dessin des graphiques : cf. components/prose/ProseRiche.tsx. */}
+          <ProseRiche html={actu.contentHtml} lang={lang} />
 
           {actu.videoYt && (
             <VideoButton

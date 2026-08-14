@@ -29,10 +29,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { televerserMediaAction } from "@/actions/admin-medias";
 import { htmlToText, readingMinutes, sanitizeHtml } from "@/lib/html/sanitize";
+import {
+  GRAPHIQUE_ATTR, GRAPHIQUE_CLASSE, decoderGraphique, figureGraphique, type Graphique,
+} from "@/lib/html/graphique";
 import type { MediaRef } from "@/lib/medias";
 import { idYouTube, urlIntegrationYouTube } from "@/lib/actus/video";
 import { EditorIcon, type EditorIconName } from "@/components/dashboard/actus/EditorIcon";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
+import { GraphiqueModal } from "@/components/dashboard/actus/GraphiqueModal";
 
 type Props = {
   /** Nom du champ transmis au formulaire (contenu HTML assaini). */
@@ -81,12 +85,40 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
   const [message, setMessage] = useState<string | null>(null);
   const [depot, setDepot] = useState(false);
 
+  /* Graphique en cours de composition. `cible` désigne la figure à REMPLACER
+     quand on modifie un graphique déjà posé ; nulle, la figure est insérée au
+     curseur. */
+  const [graphOuvert, setGraphOuvert] = useState(false);
+  const [graphValeur, setGraphValeur] = useState<Graphique | null>(null);
+  const graphCibleRef = useRef<HTMLElement | null>(null);
+
   /* --- Synchronisation ---------------------------------------------------- */
+
+  /**
+   * Une figure de graphique n'est pas un texte : ce qu'elle affiche dans
+   * l'éditeur est le REPLI de sa description (cf. lib/html/graphique.ts), et
+   * corriger un chiffre à la main dans ce tableau ne toucherait pas la
+   * description — le dessin publié ne bougerait pas d'un pixel. Les figures
+   * sont donc verrouillées à la frappe : on les modifie par la modale, qui
+   * réécrit les deux d'un coup.
+   *
+   * L'attribut ne survit pas à l'enregistrement : `contenteditable` n'est pas
+   * sur la liste blanche de l'assainisseur.
+   */
+  const verrouillerGraphiques = useCallback((node: HTMLElement) => {
+    node.querySelectorAll(`figure.${GRAPHIQUE_CLASSE}`).forEach((figure) => {
+      if (figure.getAttribute("contenteditable") !== "false") {
+        figure.setAttribute("contenteditable", "false");
+      }
+    });
+  }, []);
 
   const synchroniser = useCallback(() => {
     const node = editeurRef.current;
-    if (node) setHtml(node.innerHTML);
-  }, []);
+    if (!node) return;
+    verrouillerGraphiques(node);
+    setHtml(node.innerHTML);
+  }, [verrouillerGraphiques]);
 
   const memoriser = useCallback(() => {
     const selection = window.getSelection();
@@ -120,8 +152,9 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
       /* Moteur sans cette commande : le comportement par défaut fait l'affaire. */
     }
     if (!node.innerHTML.trim()) node.innerHTML = "<p><br></p>";
+    verrouillerGraphiques(node);
     setHtml(node.innerHTML);
-  }, []);
+  }, [verrouillerGraphiques]);
 
   /* --- Commandes ---------------------------------------------------------- */
 
@@ -196,6 +229,61 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
     );
   }, [inserer, memoriser]);
 
+  /* --- Graphiques --------------------------------------------------------- */
+
+  /** Ouvre la modale sur une figure vierge, au curseur mémorisé. */
+  const ouvrirGraphique = useCallback(() => {
+    memoriser();
+    graphCibleRef.current = null;
+    setGraphValeur(null);
+    setGraphOuvert(true);
+  }, [memoriser]);
+
+  /**
+   * Clic dans la zone d'édition : une figure de graphique se rouvre à la
+   * modale. Elle est verrouillée à la frappe, le clic est donc le seul geste
+   * qui reste — et c'est celui qu'on tente naturellement.
+   */
+  const surClicZone = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    const figure = (event.target as HTMLElement).closest?.(`figure.${GRAPHIQUE_CLASSE}`);
+    if (!(figure instanceof HTMLElement)) return;
+
+    event.preventDefault();
+    graphCibleRef.current = figure;
+    setGraphValeur(decoderGraphique(figure.getAttribute(GRAPHIQUE_ATTR) ?? ""));
+    setGraphOuvert(true);
+  }, []);
+
+  const validerGraphique = useCallback((graphique: Graphique) => {
+    setGraphOuvert(false);
+
+    const fragment = figureGraphique(graphique);
+    if (!fragment) {
+      setMessage("Série trop longue pour être enregistrée. Réduisez le nombre de lignes.");
+      return;
+    }
+
+    const cible = graphCibleRef.current;
+    graphCibleRef.current = null;
+
+    // Modification : la figure est remplacée dans le document, sans passer par
+    // `execCommand` — la sélection n'est pas dans la figure, qui est verrouillée.
+    if (cible?.isConnected) {
+      const gabarit = document.createElement("div");
+      gabarit.innerHTML = fragment;
+      const neuve = gabarit.firstElementChild;
+      if (neuve) {
+        cible.replaceWith(neuve);
+        setMessage(null);
+        synchroniser();
+        return;
+      }
+    }
+
+    setMessage(null);
+    inserer(`${fragment}<p><br></p>`);
+  }, [inserer, synchroniser]);
+
   const insererImage = useCallback((choix: ChoixMedia) => {
     setPicker(false);
     const legende = choix.kind === "asset" ? choix.asset.legende ?? "" : "";
@@ -232,24 +320,47 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
     const data = event.clipboardData;
     if (!data) return;
 
-    // Capture d'écran ou image glissée depuis une autre page : elle part dans
-    // la bibliothèque plutôt que de gonfler le corps d'un data-URI.
-    const fichier = Array.from(data.items)
-      .find((item) => item.kind === "file" && item.type.startsWith("image/"))
-      ?.getAsFile();
+    const html = data.getData("text/html");
+    const texte = data.getData("text/plain");
 
-    if (fichier) {
+    /**
+     * ⚠️ Le TEXTE l'emporte sur l'image, et l'ordre de ce test est tout le
+     * sujet.
+     *
+     * Word, Excel et Outlook déposent dans le presse-papiers une IMAGE de la
+     * sélection À CÔTÉ de son texte : copier un paragraphe de Word, c'est
+     * copier à la fois du HTML, du texte brut et une capture. Chercher l'image
+     * d'abord — ce que faisait cette fonction — revenait à téléverser une photo
+     * du paragraphe au lieu de coller le paragraphe.
+     *
+     * Une capture d'écran, elle, arrive SEULE : ni HTML, ni texte. C'est
+     * exactement ce que teste la condition, et c'est le seul cas où le fichier
+     * doit gagner.
+     */
+    const capture = !html && !texte
+      ? Array.from(data.items)
+          .find((item) => item.kind === "file" && item.type.startsWith("image/"))
+          ?.getAsFile()
+      : undefined;
+
+    if (capture) {
       event.preventDefault();
       memoriser();
-      void televerserPuisInserer(fichier);
+      void televerserPuisInserer(capture);
       return;
     }
 
-    const colle = data.getData("text/html");
-    if (!colle) return; // texte brut : le comportement natif convient
+    if (!html) return; // texte brut : le comportement natif convient
 
+    // Un fragment que l'assainisseur vide entièrement — une mise en forme sans
+    // aucun texte — ne doit pas faire perdre le collage : on retombe alors sur
+    // le texte brut, que le navigateur aurait inséré de lui-même.
+    const propre = sanitizeHtml(html);
     event.preventDefault();
-    document.execCommand("insertHTML", false, sanitizeHtml(colle));
+
+    if (propre.trim()) document.execCommand("insertHTML", false, propre);
+    else if (texte) document.execCommand("insertText", false, texte);
+
     synchroniser();
   }, [memoriser, synchroniser, televerserPuisInserer]);
 
@@ -267,13 +378,17 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
   const basculerSource = useCallback(() => {
     if (source) {
       const propre = sanitizeHtml(html);
-      if (editeurRef.current) editeurRef.current.innerHTML = propre || "<p><br></p>";
+      const node = editeurRef.current;
+      if (node) {
+        node.innerHTML = propre || "<p><br></p>";
+        verrouillerGraphiques(node);
+      }
       setHtml(propre);
     } else {
       synchroniser();
     }
     setSource((valeur) => !valeur);
-  }, [source, html, synchroniser]);
+  }, [source, html, synchroniser, verrouillerGraphiques]);
 
   /* --- Rendu -------------------------------------------------------------- */
 
@@ -349,6 +464,7 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
         <Bouton icone="image" titre="Insérer une image" onClick={() => { memoriser(); setPicker(true); }} />
         <Bouton icone="video" titre="Insérer une vidéo" onClick={insererVideo} />
         <Bouton icone="tableau" titre="Insérer un tableau" onClick={insererTableau} />
+        <Bouton icone="graphique" titre="Insérer un graphique" onClick={ouvrirGraphique} />
         <Bouton icone="regle" titre="Séparateur" onClick={() => executer("insertHorizontalRule")} />
 
         <span className="rte__sep" />
@@ -417,6 +533,7 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
         onBlur={() => { memoriser(); synchroniser(); }}
         onKeyUp={memoriser}
         onMouseUp={memoriser}
+        onClick={surClicZone}
         onPaste={onPaste}
         onDragOver={(event) => { event.preventDefault(); setDepot(true); }}
         onDragLeave={() => setDepot(false)}
@@ -436,7 +553,9 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
       <div className="rte__pied">
         <span>{mots} mot{mots > 1 ? "s" : ""} · {readingMinutes(html)} min de lecture</span>
         {message && <span className="rte__message" role="status">{message}</span>}
-        <span className="adm-hint">Glissez une image dans la zone pour l'ajouter.</span>
+        <span className="adm-hint">
+          Glissez une image dans la zone pour l'ajouter. Cliquez un graphique pour le modifier.
+        </span>
       </div>
 
       <MediaPicker
@@ -445,6 +564,13 @@ export function RichEditor({ name, defaultValue = "", assets, labelId, placehold
         onClose={() => setPicker(false)}
         onSelect={insererImage}
         titre="Insérer une image dans l'article"
+      />
+
+      <GraphiqueModal
+        open={graphOuvert}
+        valeur={graphValeur}
+        onClose={() => { setGraphOuvert(false); graphCibleRef.current = null; }}
+        onValider={validerGraphique}
       />
     </div>
   );

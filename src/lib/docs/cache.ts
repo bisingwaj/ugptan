@@ -8,6 +8,10 @@
 import { revalidatePath } from "next/cache";
 
 export function revaliderDocuments(): void {
-  revalidatePath("/[lang]/ressources", "page");
+  revalidatePath("/[lang]/resources", "page");
+  // Page de lecture d'une publication rédigée. Le chemin est donné sous sa
+  // forme de ROUTE : les deux langues et TOUTES les pièces sont invalidées d'un
+  // coup, ce qui évite de savoir laquelle vient de changer.
+  revalidatePath("/[lang]/resources/[slug]", "page");
   revalidatePath("/sitemap.xml");
 }

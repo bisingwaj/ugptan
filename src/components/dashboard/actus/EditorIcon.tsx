@@ -10,7 +10,8 @@ import type { ReactElement } from "react";
 export type EditorIconName =
   | "puces" | "numeros" | "gauche" | "centre" | "droite" | "justifie"
   | "lien" | "delier" | "image" | "video" | "tableau" | "regle"
-  | "citation" | "annuler" | "retablir" | "gomme" | "source" | "couleur" | "surlignage";
+  | "citation" | "annuler" | "retablir" | "gomme" | "source" | "couleur" | "surlignage"
+  | "graphique";
 
 const PATHS: Record<EditorIconName, ReactElement> = {
   puces: (
@@ -127,6 +128,15 @@ const PATHS: Record<EditorIconName, ReactElement> = {
     <>
       <path d="M5 13l7-7 4 4-7 7H5z" />
       <path d="M3 20h18" />
+    </>
+  ),
+  /* Trois colonnes sur une ligne de base : le dessin dit « série de valeurs »,
+     ce que la modale demande de saisir, et non « statistiques » en général. */
+  graphique: (
+    <>
+      <path d="M4 20h16" />
+      <path d="M7 20V11h3v9" />
+      <path d="M14 20V6h3v14" />
     </>
   ),
 };

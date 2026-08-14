@@ -16,16 +16,17 @@ export default async function NouveauDocumentPage() {
   await requirePermission("documents");
   await ensureCategoriesDoc();
 
-  const referentiels = await chargerReferentielsDoc();
+  const { referentiels, assets } = await chargerReferentielsDoc();
 
   return (
     <>
       <Link href={adminPath("/documents")} className="adm-back">← {ADMIN_DOCS.retourListe}</Link>
       <h1 className="adm__title" style={{ marginTop: 12 }}>{ADMIN_DOCS.nouveau}</h1>
       <p className="adm__lead">
-        Le fichier part sur le stockage du projet ; la base n'enregistre que son adresse et les informations
-        que vous saisissez ici. Le document est créé en brouillon : vous pourrez le relire et le prévisualiser
-        avant de le publier.
+        Deux façons de publier : téléverser un fichier — il part sur le stockage du projet, la base n'en
+        garde que l'adresse — ou rédiger la publication dans la console, avec ses visuels et ses graphiques,
+        pour qu'elle se lise sur le site. Dans les deux cas la pièce est créée en brouillon : vous pourrez la
+        relire et la prévisualiser avant de la publier.
       </p>
 
       <div style={{ marginTop: 26 }}>
@@ -34,6 +35,7 @@ export default async function NouveauDocumentPage() {
         <DocumentDepot
           document={documentVierge()}
           referentiels={referentiels}
+          assets={assets}
           stockageActif={cloudinaryActif()}
         />
       </div>

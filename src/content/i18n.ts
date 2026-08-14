@@ -907,10 +907,31 @@ export function dict(lang: Lang) {
       labelCategory: t("Thématique", "Theme"),
       labelDocDate: t("Date du document", "Document date"),
       labelPublished: t("Mis en ligne le", "Published on"),
-      labelAuthor: t("Auteur", "Author"),
+      labelAuthor: t("Organisme", "Organisation"),
+      labelSignature: t("Rédigé par", "Written by"),
       labelReference: t("Référence", "Reference"),
       labelFile: t("Fichier", "File"),
       featured: t("À la une", "Featured"),
+
+      /* Publications rédigées et page de lecture. */
+      read: t("Lire la publication", "Read the publication"),
+      readShort: t("Lire", "Read"),
+      onlineBadge: t("À lire en ligne", "Read online"),
+      minutes: t("min de lecture", "min read"),
+      by: t("Par", "By"),
+      attachment: t("Pièce jointe", "Attachment"),
+      attachmentLead: t(
+        "Le document est également disponible en fichier, à consulter ou à télécharger.",
+        "The document is also available as a file, to view or download.",
+      ),
+      backToList: t("Tous les rapports", "All reports"),
+      alsoRead: t("À lire également", "Also worth reading"),
+      breadcrumbLabel: t("Fil d'Ariane", "Breadcrumb"),
+      notTranslated: (langue: string) =>
+        t(
+          `Cette publication n'est pas encore traduite : le texte ci-dessous est servi en ${langue === "en" ? "anglais" : "français"}.`,
+          `This publication is not translated yet: the text below is served in ${langue === "en" ? "English" : "French"}.`,
+        ),
       disclaimer: t(
         "Seuls les documents divulgables sont publiés. Les fichiers sont hébergés sur le réseau de diffusion du Projet ; la date affichée est celle du document lorsqu'elle est connue, à défaut celle de sa mise en ligne.",
         "Only disclosable documents are published. Files are hosted on the Project's delivery network; the date shown is the document's own where known, otherwise its date of publication.",
