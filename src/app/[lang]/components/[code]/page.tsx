@@ -8,6 +8,7 @@ import { composantes, odp as odpAll } from "@/content/data";
 import { composantesDetail, composanteDetail } from "@/content/composantes-detail";
 import { NAV, route, compRoute } from "@/lib/routes";
 import { compColor, compTint, onComp } from "@/lib/comp";
+import { membreComposante } from "@/lib/equipe/query";
 import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
 import { Reveal } from "@/components/motion/Reveal";
@@ -63,6 +64,11 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
   const comp = composantes.find((c) => c.code === detail.code);
   if (!comp) notFound();
 
+  // Responsable administré depuis la console. `null` quand aucune fiche
+  // publiée ne se rattache à la composante : la section disparaît alors, comme
+  // elle le faisait sans profil renseigné.
+  const responsable = await membreComposante(detail.code, lang);
+
   const t = dict(lang);
   const c = t.comp;
   const num = detail.code.slice(1);
@@ -91,7 +97,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
     ...(detail.projets.length ? [{ id: "projets", label: c.aProjets }] : []),
     ...(detail.ecosysteme || odpLies.length ? [{ id: "ecosysteme", label: c.aEcosysteme }] : []),
     ...(detail.finalite ? [{ id: "finalite", label: c.aFinalite }] : []),
-    ...(detail.responsable ? [{ id: "responsable", label: c.aResponsable }] : []),
+    ...(responsable ? [{ id: "responsable", label: c.aResponsable }] : []),
   ];
 
   return (
@@ -335,7 +341,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
       )}
 
       {/* ===== RESPONSABLE ===== */}
-      <CompResponsable resp={detail.responsable} comp={comp} lang={lang} />
+      <CompResponsable membre={responsable} comp={comp} lang={lang} />
 
       {/* ===== CONTENUS RATTACHÉS ===== */}
       <CompLies code={detail.code} lang={lang} />

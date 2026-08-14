@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { meta, mandat, principes, poles, equipe, question, engagement } from "@/content/data";
+import { meta, mandat, principes, poles, question, engagement } from "@/content/data";
 import { ugptnMission, polesAction, uniteStats, methode, engagementsList, glossaire, ugptnFaq } from "@/content/carbon";
-import { initials } from "@/lib/format";
+import { membresEquipe } from "@/lib/equipe/query";
 import { Kicker } from "@/components/ui/Kicker";
 import { Accordion } from "@/components/ui/Accordion";
 import { PageHero } from "@/components/ui/PageHero";
+import { GrilleEquipe } from "@/components/equipe/GrilleEquipe";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
@@ -23,6 +24,7 @@ export default async function UgptnPage(props: { params: Promise<{ lang: string 
   const u = t.ugptn;
   const faq = ugptnFaq.map((f) => ({ q: pick(f.q, lang), r: pick(f.r, lang) }));
   const n2 = (i: number) => String(i + 1).padStart(2, "0");
+  const equipe = await membresEquipe(lang);
 
   return (
     <div>
@@ -105,26 +107,9 @@ export default async function UgptnPage(props: { params: Promise<{ lang: string 
             <div><Kicker>{t.sec.equipe}</Kicker><h2 className="h2--sm">21 {t.words.roles}</h2></div>
             <p style={{ maxWidth: 340, fontSize: 14, lineHeight: 1.55, color: "var(--c-60)", margin: 0 }}>{t.home.equipeLead}</p>
           </Reveal>
-          <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(212px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
-            {equipe.map((m, i) => (
-              <RevealItem key={i} style={{ background: "#fff" }}>
-                <div style={{ aspectRatio: "1/1", backgroundColor: m.img ? "#e8ebf0" : "#eef1f7", position: "relative", overflow: "hidden", display: "flex", alignItems: m.img ? "flex-end" : "center", justifyContent: "center", padding: 14 }}>
-                  {m.img ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={m.img} alt={m.nom ? `${m.nom} — ${pick(m.role, lang)}` : pick(m.role, lang)} loading="lazy" decoding="async" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 18%" }} />
-                  ) : (
-                    <span className="mono" style={{ fontSize: "clamp(30px,5vw,44px)", fontWeight: 600, color: "var(--c-30)", letterSpacing: "0.02em" }}>{initials(pick(m.role, lang))}</span>
-                  )}
-                  <span className="mono" style={{ position: "absolute", top: 12, left: 14, fontSize: 10, color: m.img ? "#fff" : "var(--ac)", textShadow: m.img ? "0 1px 3px rgba(0,0,0,.55)" : undefined }}>{n2(i)}</span>
-                </div>
-                <div style={{ padding: "16px 16px 20px" }}>
-                  <div style={{ fontSize: 14.5, fontWeight: 600, lineHeight: 1.25 }}>{pick(m.role, lang)}</div>
-                  <div style={{ fontSize: 12, color: "var(--c-60)", marginTop: 6 }}>{pick(m.pole, lang)}</div>
-                  {m.nom && <div style={{ fontSize: 13, fontWeight: 600, color: "var(--c-black)", marginTop: 12, borderTop: "1px solid var(--c-10)", paddingTop: 10 }}>{m.nom}</div>}
-                </div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
+          {/* Même grille administrée que l'accueil, à l'habillage près
+              (cf. src/components/equipe/GrilleEquipe.tsx). */}
+          <GrilleEquipe membres={equipe} variante="unite" />
         </div>
       </section>
 

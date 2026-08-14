@@ -4,7 +4,7 @@
    ========================================================================== */
 import type {
   Meta, Chiffre, Repere, Odp, Intermediaire, Composante, GouvBody, Mandat, Principe,
-  Pole, Membre, Province, Langue, Profil, CompColorMap,
+  Pole, Province, Langue, Profil, CompColorMap,
 } from "./types";
 import type { Bilingual } from "@/lib/pick";
 
@@ -133,20 +133,13 @@ export const poles: Pole[] = [
   { nom: { fr: "Sauvegardes & transversal", en: "Safeguards & cross-cutting" }, role: { fr: "Conformité E&S, suivi, communication, systèmes", en: "E&S compliance, M&E, communication, systems" }, roles: ["Spécialiste Environnement", "Spécialiste Développement Social", "Spécialiste VBG/EAS", "Spécialiste Suivi & Évaluation", "Spécialiste Communication", "Responsable Informatique (IT)", "Agent de liaison provincial"] },
 ];
 
-export const equipe: Membre[] = [
-  { role: { fr: "Coordonnateur", en: "Coordinator" }, pole: { fr: "Direction", en: "Management" }, nom: "Noël Jean-David Litanga", img: "/portraits/coordonnateur-litanga.jpg" },
-  { role: { fr: "Coordonnateur Adjoint", en: "Deputy Coordinator" }, pole: { fr: "Direction", en: "Management" } },
-  { role: { fr: "Auditeur Interne", en: "Internal Auditor" }, pole: { fr: "Direction", en: "Management" } },
-  { role: { fr: "Responsable Composante 1", en: "Component 1 Lead" }, pole: { fr: "Accès & inclusion", en: "Access & inclusion" } },
-  { role: { fr: "Responsable Composante 2", en: "Component 2 Lead" }, pole: { fr: "Fondations", en: "Foundations" } },
-  { role: { fr: "Responsable Composante 3", en: "Component 3 Lead" }, pole: { fr: "Compétences", en: "Skills" } },
-  { role: { fr: "Responsable Administratif & Financier", en: "Admin. & Finance Lead" }, pole: { fr: "Fiduciaire", en: "Fiduciary" } },
-  { role: { fr: "Responsable Passation des Marchés", en: "Procurement Lead" }, pole: { fr: "Passation", en: "Procurement" } },
-  { role: { fr: "Spécialiste Suivi & Évaluation", en: "M&E Specialist" }, pole: { fr: "Transversal", en: "Cross-cutting" } },
-  { role: { fr: "Spécialiste VBG/EAS", en: "GBV/SEA Specialist" }, pole: { fr: "Sauvegardes", en: "Safeguards" } },
-  { role: { fr: "Spécialiste Communication", en: "Communication Specialist" }, pole: { fr: "Transversal", en: "Cross-cutting" } },
-  { role: { fr: "Responsable Informatique", en: "IT Lead" }, pole: { fr: "Systèmes", en: "Systems" } },
-];
+/* ⚠️ Les membres de l'équipe ne sont plus ici : ils sont administrés depuis la
+   console (module « L'équipe de l'Unité »), et leur état initial vit dans
+   `src/content/equipe.ts`. Une fiche y vaut pour les quatre emplacements du
+   site — grille de l'accueil, page « L'Unité », cartes de coordination de
+   « Gouvernance », profil du responsable d'une composante — là où ce fichier,
+   `content/carbon.ts` et `content/composantes-detail.ts` en tenaient trois
+   copies, que rien n'obligeait à concorder. */
 
 /* ⚠️ Les jalons du projet ne sont plus ici : ils sont administrés depuis la
    console (module « Histoires & impact », gabarit « Frise de jalons »), et leur

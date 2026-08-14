@@ -701,6 +701,18 @@
      doit tenir sur une ligne et dire l'essentiel — l'intitulé, l'état, les
      langues qui manquent ; dépliée, elle porte deux onglets de langue et un
      bloc de réglages, ce qu'aucune cellule de tableau ne peut contenir. */
+  /* Module « L'équipe de l'Unité »
+     ---------------------------------------------------------------------
+     Deux besoins que les autres modules n'avaient pas : saisir les deux
+     langues d'un pôle côte à côte (deux mots, pas un formulaire par langue),
+     et déplacer une fiche d'un rang depuis sa ligne de tableau. */
+  .adm-form__grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px 18px; margin-top: 12px;
+  }
+  /* Les deux flèches d'ordre, serrées l'une contre l'autre dans leur colonne. */
+  .adm-ordre { display: inline-flex; gap: 4px; }
+
   .adm-items { margin-top: 30px; }
   .adm-items__tete {
     display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;

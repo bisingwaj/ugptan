@@ -4,21 +4,22 @@ import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import {
   meta, reperes, composantes, odp, intermediaires, gouvernance,
-  equipe, profils, question,
+  profils, question,
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
 import { prochainsEvenements } from "@/lib/events/query";
+import { membresEquipe } from "@/lib/equipe/query";
 import { galleryProvinces, partners } from "@/content/carbon";
 import { media } from "@/content/media";
 import { NAV, route, compRoute } from "@/lib/routes";
 import { compVar } from "@/lib/comp";
-import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
 import { Photo } from "@/components/ui/Photo";
 import { HeroVideo } from "@/components/home/HeroVideo";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
+import { GrilleEquipe } from "@/components/equipe/GrilleEquipe";
 import { EventsGrid } from "@/components/events/EventsGrid";
 import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
@@ -36,9 +37,10 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
   const t = dict(lang);
   // Deux lectures indépendantes, menées de front : aucune ne conditionne
   // l'autre, et les enchaîner ajouterait un aller-retour à la base pour rien.
-  const [actualites, upcoming] = await Promise.all([
+  const [actualites, upcoming, equipe] = await Promise.all([
     derniersArticles(lang, 4),
     prochainsEvenements(lang, 3),
+    membresEquipe(lang),
   ]);
 
   return (
@@ -239,26 +241,9 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             <div><Kicker n="06">{t.sec.equipe}</Kicker><h2 className="h2">21 {t.words.roles} · 5 {t.words.poles}</h2></div>
             <p style={{ maxWidth: 340, fontSize: 14.5, lineHeight: 1.55, color: "var(--c-60)", margin: 0 }}>{t.home.equipeLead}</p>
           </Reveal>
-          <RevealGroup gap={0.05} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(212px,1fr))" }}>
-            {equipe.map((m, i) => (
-              <RevealItem key={i} style={{ background: "#fff" }}>
-                <div style={{ aspectRatio: "1/1", backgroundColor: m.img ? "#e8ebf0" : "#eef1f7", position: "relative", overflow: "hidden", display: "flex", alignItems: m.img ? "flex-end" : "center", justifyContent: "center", padding: 14 }}>
-                  {m.img ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={m.img} alt={m.nom ? `${m.nom} — ${pick(m.role, lang)}` : pick(m.role, lang)} loading="lazy" decoding="async" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 18%" }} />
-                  ) : (
-                    <span className="mono" style={{ fontSize: "clamp(30px,5vw,44px)", fontWeight: 600, color: "var(--c-30)", letterSpacing: "0.02em" }}>{initials(pick(m.role, lang))}</span>
-                  )}
-                  <span className="mono" style={{ position: "absolute", top: 12, left: 14, fontSize: 10, color: m.img ? "#fff" : "var(--ac)", textShadow: m.img ? "0 1px 3px rgba(0,0,0,.55)" : undefined }}>{String(i + 1).padStart(2, "0")}</span>
-                </div>
-                <div style={{ padding: "16px 16px 20px" }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>{pick(m.role, lang)}</div>
-                  <div style={{ fontSize: 12, color: "var(--c-60)", marginTop: 6 }}>{pick(m.pole, lang)}</div>
-                  {m.nom && <div style={{ fontSize: 13, fontWeight: 600, color: "var(--c-black)", marginTop: 12, borderTop: "1px solid var(--c-10)", paddingTop: 10 }}>{m.nom}</div>}
-                </div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
+          {/* Grille administrée depuis la console (cf. src/lib/equipe/query.ts).
+              Le même bloc sert la page « L'Unité », à l'habillage près. */}
+          <GrilleEquipe membres={equipe} variante="accueil" />
         </div>
       </section>
 

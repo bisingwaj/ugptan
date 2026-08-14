@@ -3,7 +3,7 @@
    renderVals() codé en dur (cf. guide §6/§8 : une seule source de vérité).
    ========================================================================== */
 import type {
-  ProjVideo, Evenement, GouvActivite, GouvLead, MissionItem,
+  ProjVideo, Evenement, GouvActivite, MissionItem,
   PoleAction, MethodeEtape, EngagementItem, GlossaireItem, FaqItem, Partner,
   Ressource, UniteStat, GalleryItem, Persona, Contact,
 } from "./types";
@@ -43,12 +43,12 @@ export const gouvActivites: GouvActivite[] = [
 ];
 
 /* --- Gouvernance : rôles de coordination ----------------------------------- */
-export const gouvLeads: GouvLead[] = [
-  { role: { fr: "Coordonnateur national", en: "National Coordinator" }, pole: { fr: "Coordination", en: "Coordination" }, color: "#0f62fe", mandate: { fr: "Dirige l'Unité, garantit la cohérence et la relation avec les bailleurs.", en: "Leads the Unit, secures coherence and the relationship with donors." }, nom: "Noël Jean-David Litanga", img: "/portraits/coordonnateur-litanga.jpg" },
-  { role: { fr: "Coordonnateur technique adjoint", en: "Deputy Technical Coordinator" }, pole: { fr: "Technique & normes", en: "Technical & standards" }, color: "#8a3ffc", mandate: { fr: "Pilote la qualité des livrables et le respect des normes.", en: "Drives delivery quality and compliance with standards." } },
-  { role: { fr: "Spécialiste principal en passation", en: "Lead Procurement Specialist" }, pole: { fr: "Passation", en: "Procurement" }, color: "#009d9a", mandate: { fr: "Conduit une passation ouverte et traçable selon les règles de la Banque mondiale.", en: "Runs open, traceable procurement under World Bank rules." } },
-  { role: { fr: "Spécialiste suivi-évaluation", en: "M&E Specialist" }, pole: { fr: "Suivi-évaluation", en: "M&E" }, color: "#198038", mandate: { fr: "Mesure les résultats au regard du cadre 2029, sur 26 provinces.", en: "Measures results against the 2029 framework, across 26 provinces." } },
-];
+/* ⚠️ Les cartes de coordination ne sont plus ici : elles affichent les fiches
+   marquées « mise en avant » dans le module « L'équipe de l'Unité », dont
+   l'état initial vit dans `src/content/equipe.ts`. Ces quatre cartes n'étaient
+   pas quatre personnes de plus — c'étaient le coordonnateur, son adjoint, la
+   passation et le suivi-évaluation, déjà présents dans la grille de l'accueil
+   sous un intitulé voisin. */
 
 /* --- UGPTN : mission (coordonner / exécuter / rendre compte) ---------------- */
 export const ugptnMission: MissionItem[] = [

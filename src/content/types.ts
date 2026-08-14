@@ -44,7 +44,6 @@ export type GouvBody = {
 export type Mandat = { n: string; titre: Bilingual; desc: Bilingual };
 export type Principe = { titre: Bilingual; desc: Bilingual };
 export type Pole = { nom: Bilingual; role: Bilingual; roles: string[] };
-export type Membre = { role: Bilingual; pole: Bilingual; nom?: string; img?: string };
 export type Province = { nom: string; x: number; y: number; prio: boolean };
 export type Langue = { code: string; label: string; greeting: string };
 export type Profil = { label: Bilingual; page: Bilingual };
@@ -99,7 +98,6 @@ export type Evenement = {
   statut: EventStatut; img: ImgKey; titre: Bilingual; desc: Bilingual; places: Bilingual;
 };
 export type GouvActivite = { date: Bilingual; org: string; color: string; titre: Bilingual; note: Bilingual };
-export type GouvLead = { role: Bilingual; pole: Bilingual; color: string; mandate: Bilingual; nom?: string; img?: string };
 export type MissionItem = { t: Bilingual; d: Bilingual };
 export type PoleAction = { pole: Bilingual; color: string; mission: Bilingual; act: Bilingual };
 export type MethodeEtape = { t: Bilingual; d: Bilingual };
@@ -150,16 +148,6 @@ export type CompProjet = {
   points?: Bilingual[];
   chute?: Bilingual;
   img?: ImgKey;
-};
-
-/** Responsable de la composante. Sans `nom`, une pastille d'initiales s'affiche. */
-export type CompResponsable = {
-  nom?: string;
-  role: Bilingual;
-  img?: string;
-  bio?: Bilingual;
-  verbatim?: Bilingual;
-  email?: string;
 };
 
 /** Une brique de l'écosystème de la composante (section sombre). */
@@ -214,7 +202,6 @@ export type ComposanteDetail = {
   projets: CompProjet[];
   ecosysteme?: { titre: Bilingual; lead: Bilingual; couches: CompCouche[] };
   finalite?: { titre: Bilingual; lead: Bilingual; points: Bilingual[] };
-  responsable?: CompResponsable;
   video?: CompVideoSlot;
   odp?: string[];            // indicateurs ODP rattachés
   img: ImgKey;               // visuel du héros
