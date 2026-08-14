@@ -23,6 +23,7 @@ export function dict(lang: Lang) {
       resultats: t("Résultats", "Results"),
       ressources: t("Rapports & analyses", "Reports & analyses"),
       evenements: t("Événements", "Events"),
+      galerie: t("Vidéos & galeries", "Videos & galleries"),
       contact: t("Contact", "Contact"),
       mgp: t("Plaintes (MGP)", "Grievances"),
       mgpSuivi: t("Suivre une plainte", "Track a grievance"),
@@ -85,6 +86,10 @@ export function dict(lang: Lang) {
       evenements: t(
         "Consultations publiques, ateliers et webinaires ouverts à contribution.",
         "Public consultations, workshops and webinars open for contribution.",
+      ),
+      galerie: t(
+        "Photographies et films des chantiers, des ateliers et des territoires.",
+        "Photographs and films of works, workshops and territories.",
       ),
       contact: t(
         "Siège à Kinshasa, points focaux provinciaux et numéro vert.",
@@ -935,6 +940,80 @@ export function dict(lang: Lang) {
       disclaimer: t(
         "Seuls les documents divulgables sont publiés. Les fichiers sont hébergés sur le réseau de diffusion du Projet ; la date affichée est celle du document lorsqu'elle est connue, à défaut celle de sa mise en ligne.",
         "Only disclosable documents are published. Files are hosted on the Project's delivery network; the date shown is the document's own where known, otherwise its date of publication.",
+      ),
+    },
+
+    /* --- Vidéos & galeries ------------------------------------------------ */
+    galerie: {
+      titre: t("Vidéos & galeries", "Videos & galleries"),
+      hero: t("Ce que le Projet change, vu du terrain.", "What the Project changes, seen from the ground."),
+      lead: t(
+        "Un chantier de fibre optique, un atelier de formation, une salle de serveurs qui s'allume : ces images disent ce qu'un tableau d'indicateurs ne montre pas. Elles sont prises au fil de l'exécution, dans les provinces où le Projet travaille, et publiées telles quelles.",
+        "A fibre-optic worksite, a training workshop, a server room powering up: these images say what a table of indicators cannot show. They are taken as implementation proceeds, in the provinces where the Project works, and published as they are.",
+      ),
+
+      /* Barre de recherche, filtres et tri. */
+      search: t("Rechercher un titre, une légende, un lieu…", "Search a title, a caption, a place…"),
+      searchAction: t("Rechercher", "Search"),
+      filterCategory: t("Rubrique", "Section"),
+      filterType: t("Nature", "Type"),
+      all: t("Tout", "All"),
+      sortBy: t("Trier par", "Sort by"),
+      sortRank: t("Sélection", "Selection"),
+      sortDate: t("Date", "Date"),
+      sortTitle: t("Titre", "Title"),
+      reset: t("Réinitialiser les filtres", "Clear filters"),
+
+      /* États de liste. */
+      count: (n: number) =>
+        t(`${n} contenu${n > 1 ? "s" : ""}`, `${n} item${n > 1 ? "s" : ""}`),
+      noResult: t("Aucun contenu ne correspond à votre recherche.", "No item matches your search."),
+      empty: t(
+        "La galerie n'est pas encore alimentée. Les photographies et les films des activités du Projet y seront publiés au fil de leur validation.",
+        "The gallery is not yet populated. Photographs and films of the Project's activities will be posted as they are cleared for release.",
+      ),
+
+      /* Albums — les reportages, en tête de la galerie. */
+      albums: t("Albums", "Albums"),
+      albumsLead: t(
+        "Les reportages complets : un événement, une mission, un chantier, et toutes les images qui vont avec.",
+        "Full photo stories: an event, a mission, a worksite, and every image that goes with it.",
+      ),
+      albumOuvrir: t("Voir l'album", "View the album"),
+      albumCount: (n: number) =>
+        t(`${n} contenu${n > 1 ? "s" : ""}`, `${n} item${n > 1 ? "s" : ""}`),
+      albumRetour: t("Retour à la galerie", "Back to the gallery"),
+      albumTous: t("Voir tous les albums", "See all albums"),
+      albumIntro: t("Album", "Album"),
+      toutesImages: t("Toutes les images", "All images"),
+      toutesImagesLead: t(
+        "L'ensemble des photographies et des films publiés, albums compris.",
+        "Every published photograph and film, albums included.",
+      ),
+
+      /* Vignettes et visionneuse. */
+      openPhoto: t("Agrandir la photo", "Enlarge the photo"),
+      openVideo: t("Lire la vidéo", "Play the video"),
+      close: t("Fermer", "Close"),
+      previous: t("Contenu précédent", "Previous item"),
+      next: t("Contenu suivant", "Next item"),
+      counter: (index: number, total: number) => `${index} / ${total}`,
+      labelPlace: t("Lieu", "Place"),
+      labelDate: t("Date", "Date"),
+      labelSection: t("Rubrique", "Section"),
+      labelDuration: t("Durée", "Duration"),
+      featured: t("En avant", "Featured"),
+      videoUnavailable: t(
+        "Cette vidéo ne peut pas être lue ici. Réessayez depuis un autre navigateur.",
+        "This video cannot be played here. Try again from another browser.",
+      ),
+      keyboardHint: t(
+        "Flèches pour parcourir, Échap pour fermer.",
+        "Arrow keys to browse, Esc to close.",
+      ),
+      disclaimer: t(
+        "Photographies et films produits pour le Projet ou pour ses partenaires d'exécution. Les fichiers sont hébergés sur le réseau de diffusion du Projet ; la date affichée est celle de la prise de vue lorsqu'elle est connue, à défaut celle de la mise en ligne.",
+        "Photographs and films produced for the Project or for its implementing partners. Files are hosted on the Project's delivery network; the date shown is the shooting date where known, otherwise the date of publication.",
       ),
     },
 

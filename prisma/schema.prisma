@@ -93,6 +93,10 @@ model User {
   impactSaisi      ImpactSection[] @relation("ImpactSaisiPar")
   /// Fiches de l'équipe saisies par ce compte — trace interne.
   equipeSaisie     TeamMember[]    @relation("TeamMemberSaisiPar")
+  /// Photos et vidéos publiées dans la galerie par ce compte — trace interne.
+  galerieSaisie    GalerieItem[]   @relation("GalerieSaisiPar")
+  /// Albums de la galerie créés par ce compte — trace interne.
+  albumsSaisis     GalerieAlbum[]  @relation("AlbumSaisiPar")
 
   @@index([role])
 }
@@ -1431,4 +1435,311 @@ model TeamMemberTranslation {
 
   @@unique([memberId, locale])
   @@index([locale])
+}
+
+/// ===========================================================================
+/// « Vidéos & galeries » — la bibliothèque de contenus visuels PUBLIABLES.
+///
+/// ─── Pourquoi une table à part, et non une vue sur `MediaAsset` ─────────────
+///
+/// Les deux modules manipulent des images déposées chez le même hébergeur, et
+/// c'est leur seule ressemblance. `MediaAsset` est un MAGASIN de pièces : ses
+/// entrées existent pour être RÉUTILISÉES ailleurs — couverture d'un article,
+/// affiche d'un événement, portrait d'un membre — et n'ont aucune adresse
+/// publique en propre. Une entrée de galerie, elle, est une PUBLICATION : elle
+/// porte un titre, une description, une date de prise de vue, un statut de mise
+/// en ligne et un rang d'affichage, et son existence même est de paraître sur
+/// le site.
+///
+/// Les confondre coûterait des deux côtés. Verser tout `MediaAsset` dans la
+/// galerie y ferait entrer les logos de partenaires et les visuels d'illustration,
+/// que personne n'a choisi de montrer ; ajouter à `MediaAsset` les six colonnes
+/// éditoriales de ce modèle imposerait à chaque téléversement d'article un
+/// formulaire de publication dont il n'a que faire. Le modèle repris est donc
+/// celui de `Document`, qui porte lui aussi ses propres références de fichier :
+/// une pièce publiée détient son fichier, elle ne l'emprunte pas.
+///
+/// ─── Une seule table pour la photo ET la vidéo ──────────────────────────────
+///
+/// `type` distingue les deux, et rien d'autre ne les sépare : mêmes textes,
+/// mêmes filtres, même grille, même visionneuse. Deux tables auraient obligé
+/// chaque tri, chaque pagination et chaque compteur de la page publique à
+/// fusionner deux listes ordonnées différemment — pour un affichage qui, lui,
+/// mêle délibérément les deux.
+///
+/// ─── Le fichier n'est PAS ici ───────────────────────────────────────────────
+///
+/// Aucune colonne binaire, pour la raison déjà tenue sur `Document` et sur
+/// `MediaAsset` : la base est sauvegardée, répliquée et facturée à l'octet, elle
+/// n'a pas à servir de serveur de fichiers. Seules les références Cloudinary
+/// sont enregistrées — l'adresse de diffusion et l'identifiant qui permet de
+/// retirer le fichier du compte.
+///
+/// ─── Pourquoi pas de table de traduction ────────────────────────────────────
+///
+/// Les deux langues vivent en COLONNES (`titreFr` / `titreEn`), comme sur
+/// `Document`. Une légende de photographie n'est pas un corps rédactionnel : ni
+/// slug, ni SEO, ni cycle de relecture propre. Une table de traduction imposerait
+/// un enregistrement séparé pour deux champs, alors que l'IMAGE, elle, est la
+/// même dans les deux versions du site. L'anglais vide retombe sur le français :
+/// mieux vaut une légende française à un lecteur anglophone qu'une photo muette.
+/// ===========================================================================
+
+/// Nature de l'entrée. Une enum et non une chaîne : c'est l'axe de filtre
+/// principal de la page publique (« Photos » / « Vidéos »), et une saisie libre
+/// y produirait autant de valeurs que de saisies.
+enum GalerieType {
+  PHOTO
+  VIDEO
+}
+
+/// Visibilité de l'entrée sur le site.
+///
+/// Deux états, contrairement aux documents qui en ont trois. Le module répond à
+/// une question binaire — ce contenu paraît-il, oui ou non — et `ARCHIVED` n'y
+/// apporterait rien : une photographie retirée de la galerie n'est pas une
+/// version remplacée qu'il faudrait pouvoir citer plus tard, c'est une image
+/// qu'on ne montre plus. `DRAFT` la conserve en base, fichier compris, et suffit
+/// donc à tout retrait non définitif.
+enum GalerieStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Un album : le reportage d'un événement, d'une mission, d'un chantier.
+///
+/// ─── Pourquoi un album n'est PAS une rubrique ───────────────────────────────
+///
+/// Les deux regroupent, et c'est là que s'arrête la ressemblance. Une RUBRIQUE
+/// est une nomenclature : une poignée d'entrées stables, choisies d'avance, qui
+/// servent de filtres et valent pour toute la durée du projet. Un ALBUM est un
+/// ÉVÉNEMENT : « Atelier de Goma, mars 2026 » naît le jour du reportage, porte
+/// sa propre date, son lieu, son texte de présentation, et n'a plus vocation à
+/// bouger ensuite. Ranger les albums dans la table des rubriques ferait enfler
+/// la barre de filtres d'une entrée par reportage, jusqu'à la rendre illisible.
+///
+/// Les deux axes se cumulent donc : l'album « Atelier de Goma » se range dans la
+/// rubrique « Événements », comme un article se range dans une catégorie.
+///
+/// ─── L'album a sa propre page ───────────────────────────────────────────────
+///
+/// D'où le `slug` : contrairement à une entrée de galerie, qui n'est qu'une
+/// vignette dans une mosaïque, un album est une PAGE — avec son titre, sa
+/// description, ses métadonnées de partage et ses données structurées. C'est ce
+/// qu'un reportage d'événement doit être pour être trouvé et partagé.
+///
+/// Un seul slug pour les deux langues, contrairement aux articles : le module
+/// tient ses textes en colonnes bilingues et non en table de traduction
+/// (cf. l'en-tête de `GalerieItem`), et un slug par langue supposerait cette
+/// table. L'adresse est en anglais, comme tous les pathnames du site.
+///
+/// ─── Le rattachement est FACULTATIF ─────────────────────────────────────────
+///
+/// Une entrée peut vivre hors de tout album, et c'est le cas courant : la photo
+/// isolée d'un chantier n'a pas de reportage autour d'elle. La galerie montre
+/// donc les deux — les albums en tête, puis la mosaïque complète.
+model GalerieAlbum {
+  id     String        @id @default(cuid())
+  /// Identifiant d'URL, stable : il apparaît dans /gallery/<slug>.
+  slug   String        @unique
+  status GalerieStatus @default(DRAFT)
+
+  titreFr String
+  /// Vide, le titre français est servi dans les deux langues (cf. l'en-tête).
+  titreEn String?
+
+  descriptionFr String?
+  descriptionEn String?
+
+  /// Lieu du reportage, tel qu'il s'affiche (« Goma », « Kinshasa »).
+  lieu String?
+
+  /// Date de l'ÉVÉNEMENT couvert — celle qui situe le reportage, et qui ordonne
+  /// les albums entre eux. Distincte de la mise en ligne : un atelier de mars
+  /// peut être publié en avril.
+  dateAt      DateTime?
+  /// Fin de la PÉRIODE couverte, quand le reportage s'étale sur plusieurs jours
+  /// (« 12 – 14 mars 2026 »). Vide, l'album porte une date unique.
+  ///
+  /// Une seconde colonne plutôt qu'un libellé libre : la période doit rester
+  /// TRIABLE et affichable dans les deux langues, ce qu'une chaîne saisie à la
+  /// main ne permet pas — « du 12 au 14 mars » ne se traduit pas tout seul.
+  dateFin     DateTime?
+  /// Date de mise en ligne, posée à la première publication si elle est restée
+  /// vide : un album en ligne sans date n'est classable par aucun tri.
+  publishedAt DateTime?
+
+  /// Mise en avant : remonte l'album en tête du bandeau de la galerie.
+  featured Boolean  @default(false)
+  /// Ordre d'affichage, à mise en avant égale. Plus petit = plus haut.
+  position Int      @default(0)
+  /// Composantes rattachées (C1…C5), même usage que sur un article.
+  comps    String[] @default([])
+
+  categoryId String?
+  category   GalerieCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// Visuel de couverture, CHOISI PARMI LES CONTENUS de l'album.
+  ///
+  /// Une relation vers une entrée plutôt qu'un téléversement séparé : la
+  /// couverture d'un reportage est l'une de ses photographies, et redemander le
+  /// fichier ferait payer deux fois le même octet pour la même image. Vide, la
+  /// couverture est la première entrée dans l'ordre d'affichage — un album n'est
+  /// donc jamais sans vignette tant qu'il a un contenu.
+  ///
+  /// `SetNull` : retirer la photo de couverture ne doit pas emporter l'album.
+  coverItemId String?
+  coverItem   GalerieItem? @relation("AlbumCouverture", fields: [coverItemId], references: [id], onDelete: SetNull)
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("AlbumSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items GalerieItem[] @relation("AlbumContenu")
+
+  @@index([status, position])
+  @@index([categoryId])
+  @@index([featured])
+  @@index([dateAt])
+}
+
+/// Rubrique de la galerie (Activités, Événements, Projets, Actualités…).
+///
+/// Table et non enum, pour la raison déjà donnée sur `EvenementCategory` et
+/// `DocumentCategory` : les rubriques d'un projet évoluent, et les renommer ou
+/// les scinder relève de la console, pas d'une migration. Table DISTINCTE des
+/// trois autres nomenclatures pour la même raison : les fusionner obligerait
+/// chaque filtre à savoir de quel module vient chaque entrée.
+model GalerieCategory {
+  id        String   @id @default(cuid())
+  /// Identifiant d'URL, stable : il apparaît dans ?rubrique=… .
+  slug      String   @unique
+  nomFr     String
+  nomEn     String
+  /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
+  color     String?
+  /// Ordre d'affichage des filtres.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items  GalerieItem[]
+  albums GalerieAlbum[]
+
+  @@index([position])
+}
+
+/// Une photographie ou une vidéo publiée dans la galerie du site.
+model GalerieItem {
+  id     String        @id @default(cuid())
+  type   GalerieType   @default(PHOTO)
+  status GalerieStatus @default(DRAFT)
+
+  titreFr String
+  /// Vide, le titre français est servi dans les deux langues (cf. l'en-tête).
+  titreEn String?
+
+  descriptionFr String?
+  descriptionEn String?
+
+  /// Texte alternatif de l'image, propre à chaque langue.
+  ///
+  /// Distinct du titre, et c'est délibéré : le titre NOMME (« Pose de la fibre
+  /// à Matadi »), l'alternatif DÉCRIT ce que montre l'image à qui ne la voit
+  /// pas. Les confondre reviendrait à faire annoncer deux fois la même chose par
+  /// un lecteur d'écran, une fois comme légende et une fois comme image. Vide,
+  /// l'affichage retombe sur le titre — préférable à un attribut nul.
+  altFr String?
+  altEn String?
+
+  /// Lieu de la prise de vue, tel qu'il s'affiche (« Kinshasa », « Nord-Kivu »).
+  /// Hors traduction : un toponyme s'écrit de même dans les deux langues.
+  lieu String?
+
+  /// Date de la PRISE DE VUE ou du tournage — celle qui intéresse le visiteur.
+  /// Distincte de la mise en ligne : une photo de 2024 peut paraître en 2026, et
+  /// c'est la première qui situe la scène.
+  priseAt     DateTime?
+  /// Date de mise en ligne, posée à la première publication si elle est restée
+  /// vide : une entrée en ligne sans date n'est classable par aucun tri.
+  publishedAt DateTime?
+
+  /// Mise en avant : remonte l'entrée en tête de la galerie et lui donne une
+  /// cellule double dans la grille.
+  featured Boolean  @default(false)
+  /// Ordre d'affichage, à mise en avant égale. Plus petit = plus haut.
+  position Int      @default(0)
+  /// Composantes rattachées (C1…C5), même usage que sur un article.
+  comps    String[] @default([])
+
+  categoryId String?
+  category   GalerieCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// Album auquel l'entrée appartient. FACULTATIF : une photographie isolée est
+  /// un cas courant, pas un oubli.
+  ///
+  /// `SetNull` et non `Cascade` : supprimer un album libère ses contenus au lieu
+  /// de les détruire. Effacer par mégarde le reportage d'un événement ne doit
+  /// pas emporter quarante photographies dont on ne détient plus les originaux.
+  /// La console annonce le nombre d'entrées libérées.
+  albumId String?
+  album   GalerieAlbum? @relation("AlbumContenu", fields: [albumId], references: [id], onDelete: SetNull)
+
+  /// Albums dont cette entrée est la couverture. Un tableau parce que Prisma
+  /// exige le côté inverse d'une relation ; en pratique il n'en porte qu'un.
+  couvertureDe GalerieAlbum[] @relation("AlbumCouverture")
+
+  /// --- Visuel : RÉFÉRENCES Cloudinary, jamais d'octets --------------------
+  /// La photographie pour une entrée PHOTO, la vignette d'attente pour une
+  /// entrée VIDEO. Une seule série de colonnes pour les deux usages : c'est la
+  /// même image, au même format, dans la même grille — seul ce qu'on déclenche
+  /// en cliquant diffère.
+  imageUrl      String?
+  /// Identifiant Cloudinary — seule prise pour retirer le fichier du compte à la
+  /// suppression de l'entrée ou au remplacement du visuel.
+  imagePublicId String?
+  imageMime     String?
+  /// Dimensions natives : elles donnent son ratio à la cellule de la grille, ce
+  /// qui évite que la page se réorganise sous les yeux du visiteur au fil des
+  /// chargements.
+  imageWidth    Int?
+  imageHeight   Int?
+  /// Poids rapporté par Cloudinary, seule source du poids affiché en console.
+  imageSize     Int     @default(0)
+
+  /// --- Vidéo -------------------------------------------------------------
+  /// Une SEULE provenance : un fichier téléversé depuis la console, déposé chez
+  /// Cloudinary comme n'importe quel autre média.
+  ///
+  /// Les deux autres voies un temps prévues — un identifiant YouTube, une
+  /// adresse de fichier saisie à la main — ont été RETIRÉES : elles demandaient
+  /// une saisie par vidéo, ce que le module refuse par principe (l'information
+  /// vit sur l'album), et n'ont jamais servi. Aucune donnée ne les employait.
+  ///
+  /// Adresse de diffusion du fichier, telle que Cloudinary la renvoie.
+  videoUrl      String?
+  /// Identifiant Cloudinary du fichier vidéo — la seule prise pour le retirer du
+  /// compte à la suppression de l'entrée.
+  videoPublicId String?
+  /// Durée en secondes, telle que Cloudinary la rapporte au dépôt. Jamais
+  /// saisie : une durée tapée à la main se désaccorde du fichier au premier
+  /// remplacement.
+  videoDuree    Int?
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("GalerieSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, position])
+  @@index([type])
+  @@index([categoryId])
+  @@index([albumId, position])
+  @@index([featured])
+  @@index([priseAt])
 }

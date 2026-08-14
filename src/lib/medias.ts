@@ -135,9 +135,22 @@ export const MIMES_DOCUMENT = [
 /** Tout ce que la bibliothèque accepte, images et documents confondus. */
 export const MIMES_ACCEPTES = [...MIMES_IMAGE, ...MIMES_DOCUMENT] as const;
 
+/**
+ * Vidéos acceptées au téléversement — module « Vidéos & galeries » uniquement.
+ *
+ * Hors de `MIMES_ACCEPTES`, et ce n'est pas un oubli : la bibliothèque de médias
+ * sert des visuels à insérer dans des contenus, pas des films. Les deux formats
+ * retenus sont ceux que tout navigateur lit sans extension : un `.mov` ou un
+ * `.avi` déposé tel quel resterait muet chez la moitié des visiteurs.
+ */
+export const MIMES_VIDEO = ["video/mp4", "video/webm"] as const;
+
 /** Ce média s'affiche-t-il comme une image, ou se télécharge-t-il ? */
 export const estImage = (mimeType: string): boolean =>
   mimeType.startsWith("image/") || mimeType === "image/*";
+
+/** Ce média se lit-il comme une vidéo ? */
+export const estVideo = (mimeType: string): boolean => mimeType.startsWith("video/");
 
 /** Plafond d'une image téléversée (octets). Aligné sur `next.config.mjs`. */
 export const TAILLE_MAX = 5 * 1024 * 1024;
@@ -150,9 +163,32 @@ export const TAILLE_MAX = 5 * 1024 * 1024;
  */
 export const TAILLE_MAX_DOCUMENT = 10 * 1024 * 1024;
 
+/**
+ * Plafond d'une vidéo téléversée depuis la console (octets).
+ *
+ * ⚠️ Ce plafond n'est pas un choix éditorial mais une CONTRAINTE DE TRANSPORT :
+ * le fichier transite par une server action, et `bodySizeLimit` de
+ * `next.config.mjs` plafonne le corps de la requête à 14 Mo, surcoût d'encodage
+ * multipart compris. Le relever ici sans le relever là ferait échouer l'envoi
+ * avant même d'atteindre nos contrôles, sur une erreur que personne ne sait
+ * lire.
+ *
+ * Douze mégaoctets couvrent une capsule d'une à deux minutes correctement
+ * compressée, c'est-à-dire le format courant d'un module de galerie. Au-delà, la
+ * console propose la seule voie tenable pour un film : le dépôt direct sur le
+ * compte Cloudinary du Projet (ou sur la chaîne YouTube), puis la saisie de son
+ * adresse. Faire transiter cinq cents mégaoctets par une server action ne
+ * marcherait sur aucun hébergeur sans découpage en morceaux, et ce découpage est
+ * un chantier à lui seul.
+ */
+export const TAILLE_MAX_VIDEO = 12 * 1024 * 1024;
+
 /** Plafond applicable à un type donné. */
-export const tailleMaxPour = (mimeType: string): number =>
-  estImage(mimeType) ? TAILLE_MAX : TAILLE_MAX_DOCUMENT;
+export const tailleMaxPour = (mimeType: string): number => {
+  if (estImage(mimeType)) return TAILLE_MAX;
+  if (estVideo(mimeType)) return TAILLE_MAX_VIDEO;
+  return TAILLE_MAX_DOCUMENT;
+};
 
 /** Extension affichée sur la vignette d'un document. */
 export const extensionLisible = (filename: string): string => {
