@@ -806,6 +806,205 @@
   .adm-taxo__grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
   .adm-taxo__ordre { max-width: 120px; }
 
+  /* --- Module « Vidéos & galeries » ------------------------------------------
+     Une grille de vignettes là où les autres modules alignent un tableau, et la
+     raison tient au contenu : ce qu'on vient vérifier ici est l'IMAGE. Une
+     ligne de texte obligerait à ouvrir chaque fiche pour savoir laquelle est
+     laquelle, ce qui est exactement le geste qu'un module de galerie doit
+     épargner.
+
+     La vignette est recadrée en 4/3, contrairement à la mosaïque publique qui
+     respecte le ratio natif : ici, l'alignement des cartes prime — on compare
+     des états et des rubriques, on ne regarde pas des photographies. */
+  .adm-gal__liste {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;
+  }
+  .adm-gal__carte {
+    display: flex; flex-direction: column;
+    border: 1px solid var(--c-20); background: #fff; overflow: hidden;
+  }
+  .adm-gal__vignette {
+    position: relative; display: block; aspect-ratio: 4 / 3;
+    background: var(--c-10); overflow: hidden;
+  }
+  .adm-gal__vignette img { width: 100%; height: 100%; object-fit: cover; }
+  .adm-gal__vignette:hover { opacity: 0.92; }
+  .adm-gal__vignette:focus-visible { outline: 2px solid var(--ac); outline-offset: -3px; }
+  .adm-gal__vignette-vide {
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
+    border: 1px dashed var(--c-20); font-size: 11.5px; color: var(--c-60);
+  }
+  .adm-gal__play {
+    position: absolute; top: 10px; left: 10px;
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 10px; font-size: 12px;
+    background: rgba(22, 22, 22, 0.74); color: #fff;
+  }
+  .adm-gal__play em { font-style: normal; font-size: 11px; }
+
+  .adm-gal__corps { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 16px; }
+  .adm-gal__tete { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .adm-gal__titre { font-size: 15px; font-weight: 600; line-height: 1.4; margin: 0; }
+  .adm-gal__meta { font-size: 11.5px; color: var(--c-60); line-height: 1.5; }
+  /* Une vidéo sans source ne peut pas être rendue visible : on le dit sur la
+     carte, plutôt que d'attendre le refus du bouton « Rendre visible ». */
+  .adm-gal__alerte {
+    margin: 0; padding: 8px 10px; font-size: 11.5px; line-height: 1.5;
+    border-left: 3px solid var(--orange); background: #fff2e0; color: #8a4b00;
+  }
+
+  /* Le visuel est la substance de la fiche : son panneau ouvre l'écran, en
+     pleine largeur, au-dessus du formulaire des métadonnées. */
+  .adm-gal__visuel { display: flex; flex-direction: column; gap: 14px; }
+  .adm-gal__visuel-tete {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .adm-gal__visuel-corps { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; }
+  .adm-gal__apercu {
+    display: flex; align-items: center; justify-content: center;
+    aspect-ratio: 4 / 3; background: var(--c-10); border: 1px solid var(--c-20); overflow: hidden;
+  }
+  .adm-gal__apercu img { width: 100%; height: 100%; object-fit: contain; }
+  .adm-gal__apercu-vide { font-size: 11.5px; color: var(--c-60); }
+  .adm-gal__remplacer { display: flex; flex-direction: column; gap: 12px; }
+
+  .adm-gal__video { display: flex; flex-direction: column; gap: 14px; }
+  .adm-gal__video-etat { display: flex; flex-direction: column; gap: 12px; }
+  .adm-gal__video-tete {
+    display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px;
+  }
+  .adm-gal__video-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .adm-gal__video-nom { margin: 6px 0 0; font-size: 15px; font-weight: 600; }
+  .adm-gal__video-vide { margin: 6px 0 0; font-size: 14px; color: var(--red); }
+  .adm-gal__video-url { word-break: break-all; }
+
+  /* Décompte posé sur la vignette d'un album, dans la liste. */
+  .adm-gal__compte {
+    position: absolute; top: 10px; right: 10px;
+    padding: 5px 9px; font-size: 11px;
+    background: rgba(22, 22, 22, 0.74); color: #fff;
+  }
+
+  /* --- Album : versement en série ---------------------------------------------
+     La barre de progression n'est pas décorative : le versement peut durer une
+     minute sur quarante photographies, et sans elle rien ne distingue un envoi
+     en cours d'un écran figé. Elle avance sur des faits — un cran par fichier
+     réellement traité — et non sur une animation d'attente. */
+  .adm-gal__versement { display: flex; flex-direction: column; }
+  .adm-gal__progres { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .adm-gal__progres-barre { height: 6px; background: var(--c-20); overflow: hidden; }
+  .adm-gal__progres-barre span {
+    display: block; height: 100%; background: var(--ac);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* File d'attente : une ligne par fichier, avec son état. C'est la réponse à
+     « où en est le versement » — le compteur global ne dit pas QUEL fichier
+     traîne, ni lequel a échoué. */
+  .adm-gal__file {
+    margin: 14px 0 0; padding: 0; list-style: none;
+    border: 1px solid var(--c-20); max-height: 340px; overflow-y: auto;
+  }
+  .adm-gal__file-item {
+    display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; align-items: center; gap: 12px;
+    padding: 9px 14px; border-bottom: 1px solid var(--c-20); background: #fff;
+  }
+  .adm-gal__file-item:last-child { border-bottom: 0; }
+  .adm-gal__file-etat { font-size: 14px; text-align: center; color: var(--c-40); }
+  .adm-gal__file-nom { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .adm-gal__file-nom > .mono {
+    font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .adm-gal__file-meta { font-size: 11px; color: var(--c-60); }
+  .adm-gal__file-badge {
+    flex: 0 0 auto; padding: 3px 8px; font-size: 10.5px; letter-spacing: 0.04em;
+    background: var(--c-10); color: var(--c-60);
+  }
+
+  .adm-gal__file-item--cours { background: var(--ac-pale); }
+  .adm-gal__file-item--cours .adm-gal__file-etat { color: var(--ac); }
+  .adm-gal__file-item--cours .adm-gal__file-badge { background: var(--ac); color: #fff; }
+  .adm-gal__file-item--termine .adm-gal__file-etat { color: var(--green); }
+  .adm-gal__file-item--termine .adm-gal__file-badge { background: var(--ok-bg); color: var(--ok-fg); }
+  .adm-gal__file-item--erreur { background: #fff1f1; }
+  .adm-gal__file-item--erreur .adm-gal__file-etat,
+  .adm-gal__file-item--erreur .adm-gal__file-meta { color: #7a1116; }
+  .adm-gal__file-item--erreur .adm-gal__file-badge { background: var(--red); color: #fff; }
+
+  /* --- Album : mosaïque des contenus -------------------------------------------
+     Une mosaïque et non une liste : à quarante médias, une ligne par entrée fait
+     défiler sur trois écrans pour un accrochage qu'on juge d'un coup d'œil. Les
+     gestes sont posés SUR la vignette, révélés au survol — aucun champ, aucun
+     formulaire, conformément au principe du module (l'information vit sur
+     l'album). Ils restent visibles au focus clavier, sans quoi la barre
+     deviendrait inatteignable sans souris. */
+  .adm-gal__mosaique {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;
+    margin: 0; padding: 0; list-style: none;
+  }
+  .adm-gal__tuile { position: relative; border: 1px solid var(--c-20); background: var(--c-10); }
+  .adm-gal__tuile--cover { border-color: var(--ac); box-shadow: inset 0 0 0 2px var(--ac); }
+  .adm-gal__tuile--masque { opacity: 0.55; }
+  .adm-gal__tuile--masque:hover, .adm-gal__tuile--masque:focus-within { opacity: 1; }
+
+  .adm-gal__tuile-visuel {
+    position: relative; display: block; aspect-ratio: 1 / 1; overflow: hidden;
+  }
+  .adm-gal__tuile-visuel img { width: 100%; height: 100%; object-fit: cover; }
+  .adm-gal__tuile-etats {
+    position: absolute; inset: auto 6px 6px 6px; z-index: 2;
+    display: flex; flex-wrap: wrap; gap: 4px;
+  }
+
+  .adm-gal__tuile-gestes {
+    position: absolute; inset: 0 0 auto 0; z-index: 3;
+    display: flex; align-items: center; justify-content: flex-end; gap: 2px;
+    padding: 5px; background: linear-gradient(180deg, rgba(22,22,22,0.72), transparent);
+    opacity: 0; transition: opacity 0.2s ease;
+  }
+  .adm-gal__tuile:hover .adm-gal__tuile-gestes,
+  .adm-gal__tuile:focus-within .adm-gal__tuile-gestes { opacity: 1; }
+
+  .adm-gal__geste {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; font-size: 13px; line-height: 1;
+    background: rgba(255, 255, 255, 0.92); color: var(--c-black);
+    transition: background 0.15s, color 0.15s;
+  }
+  .adm-gal__geste:hover:not(:disabled) { background: var(--ac); color: #fff; }
+  .adm-gal__geste:disabled { opacity: 0.35; cursor: not-allowed; }
+  .adm-gal__geste--danger:hover:not(:disabled) { background: var(--red); color: #fff; }
+  /* Cible tactile : au doigt, une pastille de 26 px se rate. */
+  @media (hover: none) {
+    .adm-gal__tuile-gestes { opacity: 1; }
+    .adm-gal__geste { width: 34px; height: 34px; }
+  }
+
+  /* --- Album : contenus ------------------------------------------------------- */
+  .adm-gal__contenu { display: flex; flex-direction: column; gap: 14px; }
+  .adm-gal__contenu-tete {
+    display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
+    gap: 14px;
+  }
+  .adm-gal__contenu-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .adm-gal__contenu-vide {
+    margin: 0; padding: 28px 20px; text-align: center;
+    border: 1px dashed var(--c-20); background: var(--c-10);
+    font-size: 13px; color: var(--c-60);
+  }
+
+
+  @media (max-width: 900px) {
+    .adm-gal__visuel-corps { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 620px) {
+    /* Deux colonnes de vignettes restent lisibles au téléphone ; une seule
+       ferait défiler quarante médias sur autant d'écrans. */
+    .adm-gal__mosaique { grid-template-columns: repeat(2, 1fr); }
+    .adm-gal__file-item { grid-template-columns: 22px minmax(0, 1fr); }
+    .adm-gal__file-badge { grid-column: 2; justify-self: start; }
+  }
+
   /* --- Entrées d'une section « Histoires & impact » -------------------------
      Une carte dépliable par entrée, et non une ligne de tableau : repliée, elle
      doit tenir sur une ligne et dire l'essentiel — l'intitulé, l'état, les

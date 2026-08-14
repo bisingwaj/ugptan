@@ -3,8 +3,9 @@
  *
  * Même contrat que `lib/actus/cache.ts`, `lib/events/cache.ts` et
  * `lib/impact/cache.ts` : les chemins sont donnés sous leur forme de ROUTE
- * (`/[lang]/gouvernance`) et non d'URL, seule façon d'invalider les deux
- * langues d'un coup.
+ * (`/[lang]/governance`) et non d'URL, seule façon d'invalider les deux langues
+ * d'un coup — et DÉRIVÉS de `NAV` plutôt qu'écrits en toutes lettres
+ * (cf. `patronRoute` dans lib/routes.ts).
  *
  * Les quatre pages sont invalidées ensemble, sans regarder ce qui a été touché.
  * C'est le propre de ce module : une fiche unique alimente l'accueil, la page
@@ -21,10 +22,11 @@
  * de `lib/impact/cache.ts`, qui vaut mot pour mot ici.
  */
 import { revalidatePath } from "next/cache";
+import { NAV, patronRoute } from "@/lib/routes";
 
 export function revaliderEquipe(): void {
-  revalidatePath("/[lang]", "page");
-  revalidatePath("/[lang]/ugptn", "page");
-  revalidatePath("/[lang]/governance", "page");
-  revalidatePath("/[lang]/components/[code]", "page");
+  revalidatePath(patronRoute(NAV.accueil), "page");
+  revalidatePath(patronRoute(NAV.ugptn), "page");
+  revalidatePath(patronRoute(NAV.gouvernance), "page");
+  revalidatePath(patronRoute(`${NAV.composantes}/[code]`), "page");
 }

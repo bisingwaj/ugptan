@@ -55,6 +55,16 @@ export type EvtFormState = { error: string | null; ok: string | null };
 
 const EVTS_PATH = adminPath("/events");
 const CATEGORIES_PATH = adminPath("/events/categories");
+/**
+ * Segment de l'écran des demandes de participation.
+ *
+ * ⚠️ Le dossier de route s'appelle `registrations` et non `inscriptions` : les
+ * pathnames sont en anglais. Le littéral français avait survécu au renommage, et
+ * `revalidatePath` ne lève PAS sur un chemin inexistant — il n'invalidait rien,
+ * sans le dire, si bien qu'un changement de statut ne se voyait qu'au
+ * rechargement suivant du cache.
+ */
+const INSCRIPTIONS_SEGMENT = "registrations";
 
 const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 
@@ -660,7 +670,7 @@ export async function statuerInscriptionAction(
     data: { statut, note: optionnel(texte(formData, "note")) },
   });
 
-  revalidatePath(`${EVTS_PATH}/${inscription.evenementId}/inscriptions`);
+  revalidatePath(`${EVTS_PATH}/${inscription.evenementId}/${INSCRIPTIONS_SEGMENT}`);
   return { error: null, ok: `Demande de ${inscription.nom} : ${INSCRIPTION_LABEL[statut]}.` };
 }
 
@@ -689,6 +699,6 @@ export async function supprimerInscriptionAction(
 
   await db().evenementInscription.delete({ where: { id } });
 
-  revalidatePath(`${EVTS_PATH}/${inscription.evenementId}/inscriptions`);
+  revalidatePath(`${EVTS_PATH}/${inscription.evenementId}/${INSCRIPTIONS_SEGMENT}`);
   return { error: null, ok: `Demande de ${inscription.nom} supprimée.` };
 }

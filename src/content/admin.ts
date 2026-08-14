@@ -807,6 +807,252 @@ export const ADMIN_DOCS = {
 } as const;
 
 /**
+ * Module « Vidéos & galeries ».
+ *
+ * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` et
+ * `ADMIN_DOCS` : il est lu par des composants clients qu'on ne veut pas voir
+ * embarquer le vocabulaire des autres écrans.
+ *
+ * Le vocabulaire reprend celui des documents là où le geste est le même —
+ * déposer, classer, mettre en avant, ranger par rubrique : deux modules qui se
+ * ressemblent doivent se dire pareil, sinon la console s'apprend deux fois. Il
+ * s'en écarte sur un point, et volontairement : on n'y « publie » pas, on rend
+ * VISIBLE. Un rapport se publie parce qu'il fait foi ; une photographie se
+ * montre ou ne se montre pas.
+ */
+export const ADMIN_GALERIE = {
+  title: "Vidéos & galeries",
+  lead: "La bibliothèque de contenus visuels publiables : photographies et vidéos des activités, événements, projets et actualités du Projet, telles qu'elles paraissent dans la galerie du site. Les fichiers sont déposés sur le stockage Cloudinary et servis par son réseau de diffusion ; la base ne conserve que leurs métadonnées et leur adresse.",
+  distinction:
+    "À ne pas confondre avec le module « Médias », qui tient les visuels réutilisés à l'intérieur des contenus du site (couvertures d'articles, affiches d'événements, portraits). Ici, chaque entrée est une publication à part entière : elle a son titre, sa rubrique, sa date et son propre état de visibilité.",
+
+  /* --- Liste --------------------------------------------------------------- */
+  nouvellePhoto: "Ajouter une photo",
+  nouvelleVideo: "Ajouter une vidéo",
+  listeVide: "Aucun contenu dans la galerie pour le moment.",
+  listeVideFiltre: "Aucun contenu ne correspond à ce filtre.",
+  rechercher: "Rechercher un titre, une légende, un lieu…",
+  filtrer: "Filtrer",
+  reinitialiser: "Tout afficher",
+  tousStatuts: "Tous les états",
+  toutesRubriques: "Toutes les rubriques",
+  tousTypes: "Photos et vidéos",
+  trierPar: "Trier par",
+
+  colMedia: "Contenu",
+  colStatut: "État",
+  colType: "Nature",
+  colRubrique: "Rubrique",
+  colDate: "Date",
+  colLieu: "Lieu",
+
+  sansRubrique: "Sans rubrique",
+  sansDate: "Non datée",
+  sansLieu: "Lieu non précisé",
+  une: "En avant",
+  datePrise: "Prise de vue",
+  datePublication: "Mise en ligne",
+  vignetteAbsente: "Sans vignette",
+
+  publier: "Rendre visible",
+  depublier: "Masquer",
+  supprimer: "Supprimer",
+  supprimerConfirm:
+    "Supprimer définitivement ce contenu ? Le fichier sera retiré du stockage et les liens déjà partagés cesseront de fonctionner. Pour le retirer du site sans l'effacer, utilisez « Masquer ».",
+  modifier: "Modifier le contenu",
+  retourListe: "Retour à la galerie",
+
+  ajouteOk: "Contenu ajouté, masqué pour l'instant. Vérifiez la fiche et le rendu, puis rendez-le visible.",
+  supprimeOk: "Contenu supprimé.",
+
+  /* --- Fiche --------------------------------------------------------------- */
+  blocIdentite: "Ce qui se lit",
+  champTitreFr: "Titre (français)",
+  champTitreFrAide: "Il coiffe la vignette dans la galerie et l'écran de la visionneuse.",
+  champTitreEn: "Titre (anglais)",
+  champTitreEnAide: "Laissé vide, le titre français est servi aux lecteurs anglophones — mieux vaut un titre français qu'une image muette.",
+  champDescriptionFr: "Légende (français)",
+  champDescriptionPlaceholder: "Une ou deux phrases : ce que montre l'image, et pourquoi elle compte.",
+  champDescriptionEn: "Légende (anglais)",
+  champLieu: "Lieu",
+  champLieuAide: "Kinshasa, Nord-Kivu, Matadi… Affiché sous le titre et cherché par la recherche.",
+
+  blocAccessibilite: "Accessibilité",
+  blocAccessibiliteAide:
+    "Le texte alternatif décrit l'image à qui ne la voit pas. Il n'est pas le titre : le titre nomme la scène, l'alternatif la décrit. Laissé vide, le titre en tient lieu.",
+  champAltFr: "Texte alternatif (français)",
+  champAltEn: "Texte alternatif (anglais)",
+
+  blocPublication: "Visibilité",
+  champStatut: "État",
+  champDatePublication: "Date de mise en ligne",
+  champDatePublicationAide: "Laissée vide, elle est posée à la première mise en visibilité.",
+  champDatePrise: "Date de prise de vue",
+  champDatePriseAide: "Le jour où l'image a été faite. C'est elle qui prime dans le classement public.",
+  champUne: "Mettre en avant",
+  champUneAide: "Le contenu remonte en tête de la galerie et occupe une cellule double dans la mosaïque.",
+  champPosition: "Ordre d'affichage",
+  champPositionAide: "Plus petit, plus haut. Départage les contenus de même mise en avant.",
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  ajouter: "Ajouter à la galerie",
+  ajout: "Téléversement…",
+  voirSite: "Voir dans la galerie",
+  voirSiteIndisponible: "La galerie publique montrera ce contenu une fois qu'il sera visible.",
+
+  blocClassement: "Classement",
+  champType: "Nature",
+  champRubrique: "Rubrique",
+  gererRubriques: "Gérer les rubriques →",
+  champComposantes: "Composantes rattachées",
+  champComposantesAide: "Le contenu est alors rattaché aux composantes concernées.",
+
+  /* --- Visuel -------------------------------------------------------------- */
+  blocVisuel: "Visuel",
+  visuelChoisir: "Image à téléverser",
+  visuelAide:
+    "JPEG, PNG, WebP, AVIF ou GIF. Cadrez avant de déposer : la galerie respecte le format d'origine, elle ne recadre pas.",
+  visuelVignetteAide:
+    "Facultative pour une vidéo, mais vivement conseillée : sans elle, la vignette de la galerie n'affiche qu'une plaque d'accent et le titre.",
+  visuelVignette: "Vignette d'attente",
+  visuelAucun: "Aucun visuel attaché.",
+  visuelAjouter: "Ajouter le visuel",
+  visuelRemplacer: "Remplacer le visuel",
+  visuelRemplacement: "Remplacement…",
+  visuelRemplacerAide:
+    "Le nouveau visuel prend la place de l'ancien, qui est retiré du stockage. Toutes les informations de la fiche sont conservées, et l'adresse publique change.",
+  stockageAbsent:
+    "Stockage des fichiers non configuré : le dépôt est indisponible tant que CLOUDINARY_URL n'est pas renseignée dans l'environnement.",
+
+  /* --- Vidéo ---------------------------------------------------------------
+     Une seule voie : le fichier téléversé. L'identifiant YouTube et l'adresse
+     saisie à la main ont été retirés — ils demandaient une saisie par vidéo, ce
+     que le module refuse par principe, et n'ont jamais servi. */
+  blocVideo: "Fichier vidéo",
+  champVideoFichier: "Vidéo à téléverser",
+  champVideoFichierAide: (max: string) =>
+    `MP4 ou WebM · ${max} maximum. La vignette d'attente et la durée sont relevées automatiquement — rien à saisir.`,
+  videoSourceActuelle: "Fichier en place",
+  videoSourceAucune: "Aucun fichier : la vidéo ne peut pas être rendue visible.",
+  videoSourceFichier: "Vidéo téléversée",
+  videoEnregistrer: "Téléverser la vidéo",
+  videoRemplacer: "Remplacer la vidéo",
+  videoEnregistrement: "Téléversement…",
+  videoOuvrir: "Ouvrir la vidéo",
+  videoDuree: "Durée",
+
+  /* --- Albums --------------------------------------------------------------
+     Un album est un REPORTAGE : les photos et les vidéos d'un même événement,
+     d'une même mission, d'un même chantier. À ne pas confondre avec la rubrique,
+     qui est une nomenclature stable et sert de filtre : l'album « Atelier de
+     Goma, mars 2026 » se range DANS la rubrique « Événements ». */
+  albumsTitle: "Albums",
+  albumsLead:
+    "Les reportages de la galerie : un album rassemble les photos et les vidéos d'un même événement. Il porte sa date, son lieu et sa propre page sur le site. Une entrée peut aussi vivre hors de tout album — la photo isolée d'un chantier n'a pas besoin d'un reportage autour d'elle.",
+  albumsVide: "Aucun album pour le moment.",
+  albumNouveau: "Créer un album",
+  albumModifier: "Modifier l'album",
+  albumRetour: "Retour aux albums",
+  albumCreeOk: "Album créé, masqué pour l'instant. Versez-y vos photos, puis publiez-le.",
+  albumSupprimerConfirm:
+    "Supprimer cet album ? Les photos et vidéos qu'il contient NE sont pas supprimées : elles restent dans la galerie, sans album.",
+  albumSupprimer: "Supprimer l'album",
+  albumVoirSite: "Voir l'album sur le site",
+  albumVoirSiteIndisponible: "La page de l'album sera accessible une fois qu'il sera publié.",
+  albumSansContenu: "Cet album est encore vide. Versez-y vos photos et vidéos ci-dessus.",
+  albumCompte: (n: number) => `${n} contenu${n > 1 ? "s" : ""}`,
+
+  champAlbumTitreFr: "Titre de l'album (français)",
+  champAlbumTitreFrAide: "Le nom de l'événement couvert : « Atelier régional de Goma ».",
+  champAlbumTitreEn: "Titre de l'album (anglais)",
+  champAlbumDescriptionFr: "Présentation (français)",
+  champAlbumDescriptionPlaceholder: "Deux ou trois phrases : ce qui s'est passé, et pourquoi cela compte.",
+  champAlbumDescriptionEn: "Présentation (anglais)",
+  champAlbumDate: "Date de l'événement",
+  champAlbumDateAide: "Elle situe le reportage et ordonne les albums entre eux.",
+  champAlbumDateFin: "Fin de la période",
+  champAlbumDateFinAide:
+    "À renseigner seulement si le reportage s'étale sur plusieurs jours : le site affiche alors « 12 – 14 mars 2026 ».",
+  champAlbumSlug: "Identifiant d'URL",
+  champAlbumSlugAide:
+    "Il forme l'adresse publique de l'album (/gallery/…). Laissé vide, il est déduit du titre. Le modifier casse les liens déjà partagés.",
+  champAlbumUne: "Mettre l'album en avant",
+  champAlbumUneAide: "L'album remonte en tête du bandeau de la galerie.",
+  champAlbumStatutAide:
+    "Un album ne peut être publié que s'il contient au moins un média visible : une page d'album vide n'aurait rien à montrer.",
+
+  /* --- Contenus d'un album --------------------------------------------------
+     ⚠️ Aucun libellé de SAISIE ici, et ce n'est pas un oubli : les informations
+     vivent sur l'album. Les médias ne portent que des gestes d'accrochage. */
+  contenuTitre: "Contenus de l'album",
+  contenuLead:
+    "Dans l'ordre où ils paraîtront. Rien à saisir : les informations sont celles de l'album. Survolez une vignette pour la déplacer, la choisir en couverture, la masquer ou la retirer.",
+  contenuResume: (total: number, videos: number, masques: number) => {
+    const parts = [`${total} média${total > 1 ? "s" : ""}`];
+    if (videos > 0) parts.push(`dont ${videos} vidéo${videos > 1 ? "s" : ""}`);
+    if (masques > 0) parts.push(`${masques} masqué${masques > 1 ? "s" : ""}`);
+    return parts.join(" · ");
+  },
+  contenuCouverture: "Couverture",
+  contenuDefinirCouverture: "Choisir comme couverture",
+  contenuCouvertureAuto: "Couverture automatique",
+  contenuCouvertureAutoAide:
+    "Sans choix explicite, la couverture est le premier média de l'album.",
+  contenuMonter: "Monter",
+  contenuDescendre: "Descendre",
+  contenuMasque: "Masqué",
+  contenuMasquer: "Masquer ce média",
+  contenuMontrer: "Remontrer ce média",
+  contenuRetirer: "Retirer de l'album",
+  contenuRetirerConfirm:
+    "Retirer ce contenu de l'album ? Il n'est pas supprimé : il reste dans la galerie, sans album.",
+  contenuDetails: "Détails (facultatif)",
+  contenuSansSource: "Vidéo sans source",
+
+  /* --- Versement en série --------------------------------------------------- */
+  versementTitre: "Verser des médias dans l'album",
+  versementAide:
+    "Sélectionnez d'un coup autant de photos et de vidéos que vous voulez, mélangées. Elles partent trois à la fois, une par envoi : un fichier lourd ne bloque pas les autres, et un échec ne fait perdre que le sien. Aucune information à saisir — chaque média hérite de la rubrique, de la date, du lieu et des composantes de l'album, et devient visible dès que l'album l'est.",
+  versementChoisir: "Photos et vidéos à verser",
+  versementFormats: (maxImage: string, maxVideo: string) =>
+    `Photos JPEG, PNG, WebP, AVIF ou GIF · ${maxImage} maximum. Vidéos MP4 ou WebM · ${maxVideo} maximum — compressez les films plus lourds avant de les verser.`,
+  versementLancer: "Verser dans l'album",
+  versementVider: "Vider la liste",
+  versementEnCours: (fait: number, total: number) => `Versement… ${fait} / ${total}`,
+  versementCompte: (termines: number, restants: number, erreurs: number, total: number) => {
+    const parts = [`${termines} / ${total} versé${termines > 1 ? "s" : ""}`];
+    if (restants > 0) parts.push(`${restants} restant${restants > 1 ? "s" : ""}`);
+    if (erreurs > 0) parts.push(`${erreurs} en erreur`);
+    return parts.join(" · ");
+  },
+  versementPhotoTag: "Photo",
+  versementVideoTag: "Vidéo",
+
+  champAlbum: "Album",
+  champAlbumAide: "Le reportage auquel ce contenu appartient. Facultatif.",
+  sansAlbum: "Hors album",
+  gererAlbums: "Gérer les albums →",
+
+  /* --- Rubriques ----------------------------------------------------------- */
+  rubriquesTitle: "Rubriques de la galerie",
+  rubriquesLead: "Une seule par contenu. Elles alimentent les filtres et la pastille des vignettes sur la page publique.",
+  rubriquesVide: "Aucune rubrique.",
+  champNomFr: "Libellé français",
+  champNomEn: "Libellé anglais",
+  champNomEnAide: "Laissé vide, le libellé français est repris.",
+  champSlug: "Identifiant d'URL",
+  champSlugAide: "Il apparaît dans l'adresse du filtre public (?rubrique=…). Laissé vide, il est déduit du libellé.",
+  champCouleur: "Couleur",
+  champCouleurAide: "Hexadécimal (#0f62fe). Vide : l'accent du site.",
+  champOrdre: "Ordre",
+  /** Bouton d'ajout d'une rubrique — distinct de l'ajout d'un contenu. */
+  ajouterRubrique: "Ajouter",
+  colUsage: "Contenus",
+  supprimerRubriqueConfirm:
+    "Supprimer cette rubrique ? Les contenus concernés resteront en ligne, sans rubrique.",
+} as const;
+
+/**
  * Module « Histoires & impact ».
  *
  * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` et
@@ -1160,7 +1406,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
       { key: "medias", label: "Médias", slug: "/media" },
       { key: "evenements", label: "Événements", slug: "/events" },
       { key: "histoires", label: "Histoires & impact", slug: "/stories" },
-      { key: "videos", label: "Vidéos & galerie", soon: true },
+      { key: "videos", label: "Vidéos & galeries", slug: "/gallery" },
       { key: "ressources", label: "Ressources & publications", soon: true },
     ],
   },
