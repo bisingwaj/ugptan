@@ -20,6 +20,7 @@
  * l'adresse de diffusion enregistrée au dépôt, et le navigateur va la chercher
  * chez l'hébergeur.
  */
+import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { lecteur } from "@/lib/lecture";
 import { formatArticleDate } from "@/lib/format";
@@ -97,7 +98,7 @@ const itemSelect = {
   videoUrl: true,
   videoDuree: true,
   category: { select: { slug: true, nomFr: true, nomEn: true, color: true } },
-} as const;
+} as const satisfies Prisma.GalerieItemSelect;
 
 /* -------------------------------------------------------------------------- */
 /* Vue                                                                         */
@@ -400,7 +401,7 @@ const albumSelect = {
      rapatrie pas quarante photographies pour n'en dessiner qu'une. */
   items: { where: servisDansAlbum, select: itemSelect, orderBy: ordre("RANG"), take: 1 },
   _count: { select: { items: { where: servisDansAlbum } } },
-} as const;
+} as const satisfies Prisma.GalerieAlbumSelect;
 
 type LigneAlbum = {
   id: string;

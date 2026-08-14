@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { Prisma } from "@/generated/prisma/client";
 import { ADMIN_GALERIE } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
@@ -61,6 +62,26 @@ function ordreConsole(tri: GalerieTri) {
   }
 }
 
+/**
+ * Champs relus pour la liste.
+ *
+ * ⚠️ `satisfies` n'est PAS décoratif ici, et il a fallu un incident pour
+ * l'apprendre : un `select` écrit EN LIGNE dans `findMany({ … })` n'est pas
+ * contrôlé par TypeScript. Le littéral est inféré dans un paramètre générique,
+ * ce qui fait perdre le contrôle des propriétés excédentaires — un champ retiré
+ * du schéma, ou purement inventé, passe la compilation ET le lint pour n'échouer
+ * qu'à l'exécution. Extrait en constante et contraint par `satisfies`, il est
+ * vérifié. `as const` reste nécessaire devant : sans lui, les `true` se
+ * généralisent en `boolean` et Prisma ne sait plus quels champs sont retenus.
+ */
+const LISTE_SELECT = {
+  id: true, type: true, status: true, titreFr: true, lieu: true,
+  priseAt: true, publishedAt: true, featured: true, position: true,
+  imageUrl: true, altFr: true, videoUrl: true, videoDuree: true,
+  category: { select: { nomFr: true, color: true } },
+  album: { select: { id: true, titreFr: true } },
+} as const satisfies Prisma.GalerieItemSelect;
+
 export default async function GalerieAdminPage(props: { searchParams: Promise<Recherche> }) {
   // Indispensable en plus du garde du layout : pages et layouts rendent en
   // parallèle, donc le redirect du layout n'empêche pas cette page d'être
@@ -103,13 +124,7 @@ export default async function GalerieAdminPage(props: { searchParams: Promise<Re
       db().galerieItem.count({ where }),
       db().galerieItem.findMany({
         where,
-        select: {
-          id: true, type: true, status: true, titreFr: true, lieu: true,
-          priseAt: true, publishedAt: true, featured: true, position: true,
-          imageUrl: true, altFr: true, videoYt: true, videoUrl: true, videoDuree: true,
-          category: { select: { nomFr: true, color: true } },
-          album: { select: { id: true, titreFr: true } },
-        },
+        select: LISTE_SELECT,
         orderBy: ordreConsole(tri),
         skip: (page - 1) * PAR_PAGE,
         take: PAR_PAGE,
