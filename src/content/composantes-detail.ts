@@ -298,9 +298,6 @@ export const composantesDetail: ComposanteDetail[] = [
         { fr: "payer moins cher un accès de meilleure qualité", en: "pay less for better-quality access" },
       ],
     },
-    responsable: {
-      role: { fr: "Responsable de la Composante 1 — Accès et Inclusion Numériques", en: "Component 1 Lead — Digital Access and Inclusion" },
-    },
     video: {
       titre: { fr: "Composante 1 — Accès & inclusion numériques", en: "Component 1 — Digital access & inclusion" },
       duree: "4:12",
@@ -687,10 +684,6 @@ export const composantesDetail: ComposanteDetail[] = [
         { fr: "de rapprocher davantage les services de l'État des citoyens et des entreprises", en: "to bring State services closer to citizens and businesses" },
       ],
     },
-    responsable: {
-      nom: "Christian KAZADI",
-      role: { fr: "Responsable de la Composante 2 — Infrastructures et Services Publics Numériques", en: "Component 2 Lead — Digital Infrastructure and Public Services" },
-    },
     video: {
       titre: { fr: "Composante 2 — Fondations numériques", en: "Component 2 — Digital foundations" },
       duree: "3:38",
@@ -940,9 +933,6 @@ export const composantesDetail: ComposanteDetail[] = [
         { fr: "des solutions conçues pour les usages et les langues du pays", en: "solutions designed for the country's uses and languages" },
         { fr: "une capacité d'innovation qui survit à la fin du projet", en: "an innovation capacity that outlives the project" },
       ],
-    },
-    responsable: {
-      role: { fr: "Responsable de la Composante 3 — Compétences Numériques et Innovation", en: "Component 3 Lead — Digital Skills and Innovation" },
     },
     video: {
       titre: { fr: "Composante 3 — Compétences & innovation", en: "Component 3 — Skills & innovation" },
@@ -1205,15 +1195,6 @@ export const composantesDetail: ComposanteDetail[] = [
         { fr: "des données cloisonnées et des règles d'accès strictes", en: "siloed data and strict access rules" },
         { fr: "les prérogatives des bailleurs intégralement préservées", en: "donor prerogatives fully preserved" },
       ],
-    },
-    responsable: {
-      nom: "Noël Jean-David Litanga",
-      role: { fr: "Coordonnateur national — UGPTN", en: "National Coordinator — UGPTN" },
-      img: "/portraits/coordonnateur-litanga.jpg",
-      bio: {
-        fr: "La Composante 4 est portée directement par la coordination de l'Unité, appuyée par les pôles fiduciaire, passation, suivi-évaluation et sauvegardes.",
-        en: "Component 4 is carried directly by the Unit's coordination, supported by the fiduciary, procurement, M&E and safeguards clusters.",
-      },
     },
     video: {
       titre: { fr: "Composante 4 — Coordination & gestion", en: "Component 4 — Coordination & management" },

@@ -908,6 +908,143 @@ export const ADMIN_IMPACT = {
   voirSiteIndisponible: "La page publique s'ouvrira une fois la section publiée et traduite.",
 } as const;
 
+/* ===========================================================================
+   Module « L'équipe de l'Unité »
+   =========================================================================== */
+
+export const ADMIN_EQUIPE = {
+  title: "L'équipe de l'Unité",
+  lead: "Les personnes et les postes de l'Unité. Une fiche vaut pour les quatre endroits où le site montre l'équipe : la grille de l'accueil, la page « L'Unité », les cartes de coordination de « Gouvernance » et le profil du responsable d'une composante. Chaque fiche existe en français et en anglais ; une langue non traduite est signalée et n'est jamais servie au public.",
+
+  /* --- Liste --------------------------------------------------------------- */
+  nouveau: "Nouveau membre",
+  listeVide: "Aucune fiche pour le moment.",
+  listeVideFiltre: "Aucune fiche ne correspond à ce filtre.",
+  filtrer: "Filtrer",
+  reinitialiser: "Tout afficher",
+  tousStatuts: "Tous les états",
+  tousPoles: "Tous les pôles",
+  toutesComposantes: "Toutes les composantes",
+
+  colMembre: "Membre",
+  colStatut: "État",
+  colPole: "Pôle",
+  colFonction: "Fonction",
+  colLangues: "Langues",
+  colOu: "Affiché sur",
+  colOrdre: "Ordre",
+
+  posteVacant: "Poste à pourvoir",
+  sansPole: "Sans pôle",
+  sansFonction: "(fonction non renseignée)",
+
+  /* Où la fiche s'affiche, déduit de son état plutôt que coché à la main. */
+  ouGrille: "Grille",
+  ouGrilleAide: "Accueil et page « L'Unité ».",
+  ouCoordination: "Coordination",
+  ouCoordinationAide: "Cartes de la page « Gouvernance ».",
+  ouComposante: (code: string) => `Composante ${code}`,
+  ouRien: "Nulle part tant que la fiche est masquée.",
+
+  publier: "Publier",
+  depublier: "Retirer du site",
+  supprimer: "Supprimer",
+  supprimerConfirm:
+    "Supprimer définitivement cette fiche et toutes ses traductions ? Elle disparaîtra des quatre emplacements du site. Cette action est irréversible.",
+  retourListe: "Retour à l'équipe",
+
+  creeOk: "Fiche créée. Complétez-la puis publiez-la.",
+  supprimeOk: "Fiche supprimée.",
+
+  monter: "Monter",
+  descendre: "Descendre",
+  ordreAide:
+    "L'ordre de la grille porte la hiérarchie de l'Unité : il ne se déduit ni de l'alphabet ni de la date de saisie.",
+
+  /* --- Langues ------------------------------------------------------------- */
+  langueRedaction: "Langue de rédaction",
+  langueRedactionAide:
+    "La fiche naît dans cette langue. L'autre version s'ajoute ensuite depuis la fiche, enregistrée séparément.",
+  tradPresente: "traduit",
+  tradManquante: "à traduire",
+  tradNouvelle: (langue: string) =>
+    `Cette version ${langue} n'existe pas encore. Renseignez-la puis enregistrez-la : elle ne touchera à aucune autre langue.`,
+  enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
+  enregistrerFiche: "Enregistrer les réglages",
+  supprimerTraduction: "Supprimer cette traduction",
+  supprimerTraductionConfirm:
+    "Supprimer cette version linguistique ? La fiche restera en ligne dans les autres langues.",
+  majLe: "Modifié le",
+  creer: "Créer la fiche",
+  creation: "Création…",
+
+  /* --- Profil (par langue) ------------------------------------------------- */
+  blocProfil: "Profil",
+
+  /* --- Réglages de la fiche ------------------------------------------------ */
+  blocPublication: "Publication",
+  champStatut: "État",
+  champNom: "Nom",
+  champNomAide:
+    "Le nom d'usage, identique dans les deux langues. Laissé vide, la fiche décrit un poste à pourvoir : le site affiche l'intitulé et une pastille d'initiales.",
+  champPosition: "Ordre",
+  champPositionAide: "Le plus petit passe en premier dans la grille.",
+
+  blocRattachement: "Rattachement",
+  champPole: "Pôle",
+  champPoleAide: "Le libellé affiché sous la fonction, dans la grille comme sur les cartes.",
+  champComposante: "Responsable d'une composante",
+  champComposanteAide:
+    "Installe cette fiche sur la page publique de la composante choisie, avec sa biographie et sa citation. Une seule fiche par composante.",
+  sansComposante: "Aucune",
+
+  blocMiseEnAvant: "Mise en avant",
+  champFeatured: "Afficher parmi les cartes de coordination",
+  champFeaturedAide:
+    "Ajoute la fiche à la page « Gouvernance », avec ses responsabilités. Sa place dans la grille ne change pas.",
+  champCouleur: "Couleur d'accent",
+  champCouleurAide: "Liseré de la carte de coordination. Sans couleur, celle du pôle, puis l'accent du site.",
+
+  blocContact: "Contact",
+  champEmail: "Adresse de contact",
+  champEmailAide:
+    "Publiée sur la fiche de composante. Vide, l'adresse générale de l'Unité s'affiche à la place.",
+
+  blocPortrait: "Portrait",
+  champPhotoPath: "Chemin du portrait",
+  champPhotoPathAide:
+    "Pour les portraits servis depuis le dossier public (« /portraits/… »). Un portrait choisi dans la bibliothèque l'emporte sur ce champ.",
+  aucunPortrait: "Aucun portrait",
+  choisirPortrait: "Choisir un portrait",
+  changerPortrait: "Changer",
+  retirerPortrait: "Retirer",
+  portraitPartage:
+    "Le portrait vaut pour toutes les langues. Sans portrait, les cartes affichent les initiales de la fonction — c'est un état prévu par le dessin du site.",
+
+  /* --- Pôles --------------------------------------------------------------- */
+  polesTitle: "Pôles",
+  polesLead:
+    "Les pôles regroupent les fiches et donnent la ligne affichée sous chaque fonction. Les modifier ne touche pas aux fiches qui s'y rattachent.",
+  polesLien: "Gérer les pôles",
+  polesRetour: "Retour aux fiches",
+  poleNouveau: "Nouveau pôle",
+  poleNom: "Nom",
+  poleMission: "Mission",
+  poleMissionAide: "Ce dont le pôle répond, en une ligne. Affiché sur la page « L'Unité ».",
+  poleCouleur: "Couleur d'accent",
+  poleMembres: "Fiches rattachées",
+  poleSupprimer: "Supprimer le pôle",
+  poleSupprimerConfirm: "Supprimer ce pôle ? Les fiches rattachées le perdront sans être supprimées.",
+  poleVide: "Aucun pôle pour le moment.",
+  poleFr: "Français",
+  poleEn: "English",
+  poleEnAide: "Nom anglais effacé, le pôle n'apparaît plus sur la version anglaise du site.",
+
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  voirSite: "Voir la grille sur le site",
+} as const;
+
 /**
  * Accents proposés par le sélecteur de couleur de la console.
  *
@@ -991,6 +1128,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     key: "institution",
     label: "Institution",
     items: [
+      { key: "equipe", label: "L'équipe de l'Unité", slug: "/equipe" },
       { key: "gouvernance", label: "Gouvernance", soon: true },
       { key: "projet", label: "Le projet", soon: true },
     ],
