@@ -257,14 +257,23 @@ export function RessourcesListe({
             <div className="doc-modal__pied">
               {ouvert.fichier && (
                 <>
-                  <a
-                    href={ouvert.fichier.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn--outline btn--sm"
-                  >
-                    {t.open} ↗
-                  </a>
+                  {/* « Ouvrir » n'est proposé que si le navigateur sait AFFICHER
+                      le fichier — la même condition qui commande l'aperçu
+                      ci-dessus. Sur un DOCX ou un XLSX, aucun navigateur ne rend
+                      le format : le lien déclenchait un téléchargement muet, si
+                      bien que le panneau disait « ce format ne s'affiche pas »
+                      tout en proposant de l'afficher. Le bouton promettait ce
+                      qu'il ne pouvait pas tenir. */}
+                  {ouvert.fichier.apercu && (
+                    <a
+                      href={ouvert.fichier.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--outline btn--sm"
+                    >
+                      {t.open} ↗
+                    </a>
+                  )}
                   {/* Un seul bouton principal par pied de panneau : sur une
                       publication rédigée, c'est la LECTURE, et le fichier
                       redescend au rang d'annexe. */}
