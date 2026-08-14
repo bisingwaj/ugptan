@@ -32,7 +32,7 @@ function lien(params: Recherche, changement: Partial<Recherche>): string {
     query.set(cle, String(valeur));
   }
   const suffixe = query.toString();
-  return suffixe ? `${adminPath("/evenements")}?${suffixe}` : adminPath("/evenements");
+  return suffixe ? `${adminPath("/events")}?${suffixe}` : adminPath("/events");
 }
 
 /** Classe de pastille pour une phase — le CSS des états d'article est réutilisé. */
@@ -116,10 +116,10 @@ export default async function EvenementsAdminPage(props: { searchParams: Promise
           <p className="adm__lead">{t.lead}</p>
         </div>
         <div className="adm-entete__actions">
-          <Link href={adminPath("/evenements/nouveau")} className="btn btn--primary">
+          <Link href={adminPath("/events/new")} className="btn btn--primary">
             {t.nouveau}<span className="arrow">→</span>
           </Link>
-          <Link href={adminPath("/evenements/categories")} className="btn btn--outline btn--sm">
+          <Link href={adminPath("/events/categories")} className="btn btn--outline btn--sm">
             {t.categoriesTitle}
           </Link>
         </div>
@@ -158,7 +158,7 @@ export default async function EvenementsAdminPage(props: { searchParams: Promise
         </select>
         <button type="submit" className="btn btn--outline btn--sm">{t.filtrer}</button>
         {filtre && (
-          <Link href={adminPath("/evenements")} className="adm-link" style={{ fontSize: 13 }}>
+          <Link href={adminPath("/events")} className="adm-link" style={{ fontSize: 13 }}>
             {t.reinitialiser}
           </Link>
         )}
@@ -195,7 +195,7 @@ export default async function EvenementsAdminPage(props: { searchParams: Promise
                 return (
                   <tr key={evt.id}>
                     <td>
-                      <Link href={adminPath(`/evenements/${evt.id}`)} className="adm-link">{titre}</Link>
+                      <Link href={adminPath(`/events/${evt.id}`)} className="adm-link">{titre}</Link>
                       {evt.featured && <span className="adm-badge adm-badge--self">{t.une}</span>}
                       <span className="adm-table__sub">{lieu || t.sansLieu}</span>
                     </td>
@@ -245,7 +245,7 @@ export default async function EvenementsAdminPage(props: { searchParams: Promise
                       {heures && <span className="adm-table__sub">{heures}</span>}
                     </td>
                     <td className="adm-table__meta">
-                      <Link href={adminPath(`/evenements/${evt.id}/inscriptions`)} className="adm-link">
+                      <Link href={adminPath(`/events/${evt.id}/registrations`)} className="adm-link">
                         {evt._count.inscriptions}
                       </Link>
                     </td>

@@ -15,6 +15,7 @@
    vignette, et le reste du dessin ne bouge pas. */
 import type { Lang } from "@/lib/pick";
 import type { ImpactItemVue } from "@/lib/impact/query";
+import { lienPublic } from "@/lib/routes";
 import { Photo } from "@/components/ui/Photo";
 import { useVideo } from "@/components/video/VideoProvider";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
@@ -105,7 +106,7 @@ export function BlocTemoignages({
               )}
               {item.lienUrl && item.lienLabel && (
                 <a
-                  href={item.lienUrl.startsWith("/") ? `/${lang}${item.lienUrl}` : item.lienUrl}
+                  href={lienPublic(item.lienUrl, lang)}
                   className="mono"
                   style={{ marginTop: 16, fontSize: 12, color: accent, display: "inline-flex", alignItems: "center", gap: 8 }}
                 >

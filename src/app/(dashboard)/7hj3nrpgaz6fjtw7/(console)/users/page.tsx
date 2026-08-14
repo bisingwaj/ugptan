@@ -64,7 +64,7 @@ export default async function UtilisateursPage() {
                 return (
                   <tr key={user.id}>
                     <td>
-                      <Link href={adminPath(`/utilisateurs/${user.id}`)} className="adm-link">
+                      <Link href={adminPath(`/users/${user.id}`)} className="adm-link">
                         {user.name ?? user.email}
                       </Link>
                       {user.name && <span className="adm-table__sub">{user.email}</span>}

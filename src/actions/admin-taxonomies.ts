@@ -18,8 +18,8 @@ import { slugify } from "@/lib/actus/slug";
 import { revaliderActualites } from "@/lib/actus/cache";
 import type { ActuFormState } from "@/actions/admin-actualites";
 
-const CATEGORIES_PATH = adminPath("/actualites/categories");
-const ETIQUETTES_PATH = adminPath("/actualites/etiquettes");
+const CATEGORIES_PATH = adminPath("/news/categories");
+const ETIQUETTES_PATH = adminPath("/news/tags");
 
 const texte = (formData: FormData, key: string): string => String(formData.get(key) ?? "").trim();
 

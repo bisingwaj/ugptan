@@ -36,7 +36,7 @@ export default async function CategoriesEvenementsPage() {
 
   return (
     <>
-      <Link href={adminPath("/evenements")} className="adm-back">← {t.retourListe}</Link>
+      <Link href={adminPath("/events")} className="adm-back">← {t.retourListe}</Link>
       <h1 className="adm__title" style={{ marginTop: 12 }}>{t.categoriesTitle}</h1>
       <p className="adm__lead">{t.categoriesLead}</p>
 

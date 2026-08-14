@@ -17,7 +17,7 @@ export default async function NouvelEvenementPage() {
 
   return (
     <>
-      <Link href={adminPath("/evenements")} className="adm-back">← {ADMIN_EVTS.retourListe}</Link>
+      <Link href={adminPath("/events")} className="adm-back">← {ADMIN_EVTS.retourListe}</Link>
       <h1 className="adm__title" style={{ marginTop: 12 }}>{ADMIN_EVTS.nouveau}</h1>
       <p className="adm__lead">
         Annoncez l'événement dans une langue. Une fois créé, sa fiche ouvre un formulaire par langue :

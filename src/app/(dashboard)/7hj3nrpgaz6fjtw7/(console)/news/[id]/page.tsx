@@ -6,6 +6,7 @@ import { adminPath } from "@/lib/admin";
 import { requirePermission } from "@/lib/auth/guard";
 import { formatDateTime, fromDateTimeLocal } from "@/lib/format";
 import { LOCALES } from "@/lib/params";
+import { NAV } from "@/lib/routes";
 import { APERCU_PARAM, signerApercu } from "@/lib/actus/apercu";
 import { chargerArticle, chargerReferentiels } from "@/lib/actus/edition";
 import { STATUT_LABEL, statutEffectif } from "@/lib/actus/statut";
@@ -37,13 +38,13 @@ export default async function ModifierArticlePage(props: {
   // Le lien d'aperçu porte un jeton signé : il vaut par lui-même, pour être
   // transmis à un relecteur sans compte (cf. lib/actus/apercu.ts).
   const jeton = await signerApercu(article.id).catch(() => null);
-  const apercuUrl = jeton ? `/fr/actualites/apercu?${APERCU_PARAM}=${jeton}` : null;
+  const apercuUrl = jeton ? `/fr${NAV.actualites}/preview?${APERCU_PARAM}=${jeton}` : null;
 
   const titre = article.traductions.fr.title || article.traductions.en.title || "(sans titre)";
 
   return (
     <>
-      <Link href={adminPath("/actualites")} className="adm-back">← {t.retourListe}</Link>
+      <Link href={adminPath("/news")} className="adm-back">← {t.retourListe}</Link>
 
       <div className="adm-entete" style={{ marginTop: 12 }}>
         <div style={{ minWidth: 0 }}>

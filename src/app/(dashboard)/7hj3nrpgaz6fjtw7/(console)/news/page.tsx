@@ -26,7 +26,7 @@ function lien(params: Recherche, changement: Partial<Recherche>): string {
     query.set(cle, String(valeur));
   }
   const suffixe = query.toString();
-  return suffixe ? `${adminPath("/actualites")}?${suffixe}` : adminPath("/actualites");
+  return suffixe ? `${adminPath("/news")}?${suffixe}` : adminPath("/news");
 }
 
 export default async function ActualitesAdminPage(props: { searchParams: Promise<Recherche> }) {
@@ -89,10 +89,10 @@ export default async function ActualitesAdminPage(props: { searchParams: Promise
           <p className="adm__lead">{t.lead}</p>
         </div>
         <div className="adm-entete__actions">
-          <Link href={adminPath("/actualites/nouveau")} className="btn btn--primary">
+          <Link href={adminPath("/news/new")} className="btn btn--primary">
             {t.nouveau}<span className="arrow">→</span>
           </Link>
-          <Link href={adminPath("/actualites/categories")} className="btn btn--outline btn--sm">
+          <Link href={adminPath("/news/categories")} className="btn btn--outline btn--sm">
             {t.taxoTitle}
           </Link>
         </div>
@@ -125,7 +125,7 @@ export default async function ActualitesAdminPage(props: { searchParams: Promise
         </select>
         <button type="submit" className="btn btn--outline btn--sm">{t.filtrer}</button>
         {filtre && (
-          <Link href={adminPath("/actualites")} className="adm-link" style={{ fontSize: 13 }}>
+          <Link href={adminPath("/news")} className="adm-link" style={{ fontSize: 13 }}>
             {t.reinitialiser}
           </Link>
         )}
@@ -159,7 +159,7 @@ export default async function ActualitesAdminPage(props: { searchParams: Promise
                 return (
                   <tr key={article.id}>
                     <td>
-                      <Link href={adminPath(`/actualites/${article.id}`)} className="adm-link">{titre}</Link>
+                      <Link href={adminPath(`/news/${article.id}`)} className="adm-link">{titre}</Link>
                       {article.featured && <span className="adm-badge adm-badge--self">{t.une}</span>}
                     </td>
                     <td>

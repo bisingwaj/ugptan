@@ -73,7 +73,7 @@ export default async function HistoiresAdminPage(props: { searchParams: Promise<
           <p className="adm__lead">{t.lead}</p>
         </div>
         <div className="adm-entete__actions">
-          <Link href={adminPath("/histoires/nouveau")} className="btn btn--primary">
+          <Link href={adminPath("/stories/new")} className="btn btn--primary">
             {t.nouveau}<span className="arrow">→</span>
           </Link>
         </div>
@@ -104,7 +104,7 @@ export default async function HistoiresAdminPage(props: { searchParams: Promise<
         </select>
         <button type="submit" className="btn btn--outline btn--sm">{t.filtrer}</button>
         {filtre && (
-          <Link href={adminPath("/histoires")} className="adm-link" style={{ fontSize: 13 }}>
+          <Link href={adminPath("/stories")} className="adm-link" style={{ fontSize: 13 }}>
             {t.reinitialiser}
           </Link>
         )}
@@ -148,7 +148,7 @@ export default async function HistoiresAdminPage(props: { searchParams: Promise<
                     return (
                       <tr key={section.id}>
                         <td>
-                          <Link href={adminPath(`/histoires/${section.id}`)} className="adm-link">{nom}</Link>
+                          <Link href={adminPath(`/stories/${section.id}`)} className="adm-link">{nom}</Link>
                           {section.sourceId && (
                             <span className="adm-table__sub">
                               {sourceNom ? t.repriseDe(sourceNom) : t.reprise}

@@ -70,7 +70,7 @@ export default async function InscriptionsPage(props: { params: Promise<{ id: st
 
   return (
     <>
-      <Link href={adminPath(`/evenements/${evenement.id}`)} className="adm-back">← {t.retourFiche}</Link>
+      <Link href={adminPath(`/events/${evenement.id}`)} className="adm-back">← {t.retourFiche}</Link>
 
       <div className="adm-entete" style={{ marginTop: 12 }}>
         <div style={{ minWidth: 0 }}>

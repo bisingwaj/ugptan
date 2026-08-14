@@ -1,6 +1,6 @@
 import type { Lang } from "./pick";
 
-/** Build a locale-prefixed path. `slug` is "" for home, "/projet" otherwise. */
+/** Build a locale-prefixed path. `slug` is "" for home, "/project" otherwise. */
 export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 
 export type NavKey =
@@ -14,15 +14,91 @@ export type NavItem = { slug: string; key: NavKey };
  * Source unique des chemins publics : `lib/site.ts` en dérive ALL_PATHS, que
  * `app/sitemap.ts` publie tel quel. Toute entrée ici DOIT correspondre à une
  * route existante, sinon le sitemap annonce des 404.
+ *
+ * ⚠️ Deux vocabulaires distincts, à ne pas confondre :
+ *   · la CLÉ (`actualites`, `mgp`…) est un identifiant interne. Elle nomme le
+ *     libellé traduit dans `t.nav` et ne paraît jamais dans une URL ;
+ *   · le SLUG est un pathname, et les pathnames sont en anglais — les mêmes
+ *     sous `/fr` et sous `/en`. Le français reste dans les libellés, pas dans
+ *     les adresses.
+ *
+ * Les anciens chemins français restent redirigés en 308 par `src/proxy.ts` :
+ * ils ont été indexés et imprimés, les casser coûterait le référencement.
  */
 export const NAV: Record<NavKey, string> = {
-  accueil: "", projet: "/projet", composantes: "/composantes", ugptn: "/ugptn",
-  gouvernance: "/gouvernance",
-  marches: "/marches", transparence: "/transparence", actualites: "/actualites",
-  resultats: "/resultats", ressources: "/ressources", evenements: "/evenements",
-  contact: "/contact", mgp: "/mgp", mgpSuivi: "/mgp/suivi",
-  confidentialite: "/confidentialite", conditions: "/conditions",
+  accueil: "", projet: "/project", composantes: "/components", ugptn: "/ugptn",
+  gouvernance: "/governance",
+  marches: "/procurement", transparence: "/transparency", actualites: "/news",
+  resultats: "/results", ressources: "/resources", evenements: "/events",
+  contact: "/contact", mgp: "/grievances", mgpSuivi: "/grievances/track",
+  confidentialite: "/privacy", conditions: "/terms",
 };
+
+/**
+ * Anciens chemins français → chemin actuel, sans le préfixe de langue.
+ *
+ * Ces adresses ont été indexées, partagées et imprimées — `/fr/mgp` figure sur
+ * les supports du mécanisme de gestion des plaintes. Deux usages, un seul
+ * tableau : `src/proxy.ts` en fait des redirections permanentes (308), et
+ * `lienPublic` ci-dessous rattrape les chemins encore stockés en base, saisis
+ * en console avant le renommage.
+ *
+ * ⚠️ L'ordre compte : la première entrée qui correspond l'emporte, donc un
+ * chemin plus spécifique doit précéder le préfixe qui le contient — sans quoi
+ * `/mgp/suivi` deviendrait `/grievances/suivi`.
+ */
+export const LEGACY_PATHS: readonly (readonly [string, string])[] = [
+  ["/actualites/apercu", `${NAV.actualites}/preview`],
+  ["/mgp/suivi", NAV.mgpSuivi],
+  ["/actualites", NAV.actualites],
+  ["/composantes", NAV.composantes],
+  ["/conditions", NAV.conditions],
+  ["/confidentialite", NAV.confidentialite],
+  ["/evenements", NAV.evenements],
+  ["/gouvernance", NAV.gouvernance],
+  ["/marches", NAV.marches],
+  ["/mgp", NAV.mgp],
+  ["/projet", NAV.projet],
+  ["/ressources", NAV.ressources],
+  ["/resultats", NAV.resultats],
+  ["/transparence", NAV.transparence],
+  /* Hors navigation, donc absente de NAV : la page « Médias » n'est liée nulle
+     part et ne figure pas au sitemap. Reprise ici quand même — une adresse a pu
+     circuler. */
+  ["/medias", "/media"],
+];
+
+/**
+ * Chemin actuel correspondant à `chemin` (déjà privé de son préfixe de langue).
+ * Renvoie l'entrée telle quelle si elle n'a pas d'ancienne forme connue.
+ */
+export function cheminActuel(chemin: string): string {
+  for (const [ancien, actuel] of LEGACY_PATHS) {
+    if (chemin === ancien || chemin.startsWith(`${ancien}/`)) {
+      return `${actuel}${chemin.slice(ancien.length)}`;
+    }
+  }
+  return chemin;
+}
+
+/**
+ * Destination publique d'un lien saisi en console.
+ *
+ * Trois formes admises, dans cet ordre : adresse complète ou `mailto:`/`tel:`,
+ * qui partent telles quelles ; chemin interne SANS langue (« /project »), que
+ * l'on préfixe ici — le stocker avec la langue enverrait un lecteur anglophone
+ * sur la version française ; le reste, rendu inchangé.
+ *
+ * Le passage par `cheminActuel` n'est pas une politesse : des sections créées
+ * avant le renommage portent encore « /projet » en base. Sans lui, le site
+ * afficherait des liens qui ne valent que par une redirection.
+ */
+export function lienPublic(url: string, lang: Lang): string {
+  if (/^https?:\/\//i.test(url) || url.startsWith("mailto:") || url.startsWith("tel:")) return url;
+  if (!url.startsWith("/")) return url;
+  const chemin = cheminActuel(url);
+  return `/${lang}${chemin === "/" ? "" : chemin}`;
+}
 
 /** Pages légales — reléguées au bandeau bas du pied de page, hors navigation. */
 export const NAV_LEGAL: NavItem[] = [

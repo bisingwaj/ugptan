@@ -56,7 +56,7 @@ export default async function ModifierEvenementPage(props: {
 
   return (
     <>
-      <Link href={adminPath("/evenements")} className="adm-back">← {t.retourListe}</Link>
+      <Link href={adminPath("/events")} className="adm-back">← {t.retourListe}</Link>
 
       <div className="adm-entete" style={{ marginTop: 12 }}>
         <div style={{ minWidth: 0 }}>
@@ -111,7 +111,7 @@ export default async function ModifierEvenementPage(props: {
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
           <EvenementActions id={evenement.id} enLigne={enLigne} />
-          <Link href={adminPath(`/evenements/${evenement.id}/inscriptions`)} className="btn btn--outline btn--sm">
+          <Link href={adminPath(`/events/${evenement.id}/registrations`)} className="btn btn--outline btn--sm">
             {t.inscrLien}
           </Link>
         </div>

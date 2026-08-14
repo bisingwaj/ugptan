@@ -34,13 +34,13 @@ export const ADMIN_LOGIN = adminPath("/signin");
 export const ADMIN_SET_PASSWORD = adminPath("/set-password");
 
 /** Accueil après connexion. */
-export const ADMIN_HOME = adminPath("/tableau-de-bord");
+export const ADMIN_HOME = adminPath("/dashboard");
 
 /** Gestion des comptes. */
-export const ADMIN_USERS = adminPath("/utilisateurs");
+export const ADMIN_USERS = adminPath("/users");
 
 /** Plaintes reçues par le mécanisme de gestion des plaintes. */
-export const ADMIN_GRIEVANCES = adminPath("/plaintes");
+export const ADMIN_GRIEVANCES = adminPath("/grievances");
 
 /** Abonnés à la lettre d'information. */
 export const ADMIN_NEWSLETTER = adminPath("/newsletter");

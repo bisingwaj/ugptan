@@ -32,7 +32,7 @@ import { safeUrl } from "@/lib/html/sanitize";
 import { revaliderActualites } from "@/lib/actus/cache";
 import type { ActuFormState } from "@/actions/admin-actualites";
 
-const MEDIAS_PATH = adminPath("/medias");
+const MEDIAS_PATH = adminPath("/media");
 
 const texte = (formData: FormData, key: string): string => String(formData.get(key) ?? "").trim();
 const optionnel = (value: string): string | null => (value.length ? value : null);

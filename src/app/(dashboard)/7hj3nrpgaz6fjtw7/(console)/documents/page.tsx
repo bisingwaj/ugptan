@@ -135,7 +135,7 @@ export default async function DocumentsAdminPage(props: { searchParams: Promise<
           <p className="adm__lead">{t.lead}</p>
         </div>
         <div className="adm-entete__actions">
-          <Link href={adminPath("/documents/nouveau")} className="btn btn--primary">
+          <Link href={adminPath("/documents/new")} className="btn btn--primary">
             {t.nouveau}<span className="arrow">→</span>
           </Link>
           <Link href={adminPath("/documents/categories")} className="btn btn--outline btn--sm">
