@@ -86,9 +86,11 @@ model User {
   evenementsSaisis Evenement[] @relation("EvenementSaisiPar")
 
   /// Rapports et documents déposés par ce compte — trace interne.
-  documentsDeposes Document[] @relation("DocumentDeposePar")
+  documentsDeposes Document[]      @relation("DocumentDeposePar")
   /// Sections « Histoires & impact » saisies par ce compte — trace interne.
-  impactSaisi ImpactSection[] @relation("ImpactSaisiPar")
+  impactSaisi      ImpactSection[] @relation("ImpactSaisiPar")
+  /// Fiches de l'équipe saisies par ce compte — trace interne.
+  equipeSaisie     TeamMember[]    @relation("TeamMemberSaisiPar")
 
   @@index([role])
 }
@@ -354,6 +356,8 @@ model MediaAsset {
   affiches    Evenement[]
   /// Entrées « Histoires & impact » illustrées par ce média.
   impacts     ImpactItem[]
+  /// Portraits des membres de l'équipe.
+  portraits   TeamMember[]
 
   @@index([createdAt])
 }
@@ -846,13 +850,13 @@ enum DocumentType {
 /// contenu ni la même durée de vie, et les fusionner obligerait chaque filtre à
 /// savoir de quel module vient chaque entrée.
 model DocumentCategory {
-  id    String @id @default(cuid())
+  id        String   @id @default(cuid())
   /// Identifiant d'URL, stable : il apparaît dans ?categorie=… .
-  slug  String @unique
-  nomFr String
-  nomEn String
+  slug      String   @unique
+  nomFr     String
+  nomEn     String
   /// Couleur d'accent de la pastille. Vide = accent du site (var(--ac)).
-  color String?
+  color     String?
   /// Ordre d'affichage des filtres.
   position  Int      @default(0)
   createdAt DateTime @default(now())
@@ -893,9 +897,9 @@ model Document {
   documentDate DateTime?
 
   /// Mise en avant : remonte le document en tête de la liste publique.
-  featured Boolean @default(false)
+  featured Boolean  @default(false)
   /// Ordre d'affichage, à date égale. Plus petit = plus haut.
-  position Int     @default(0)
+  position Int      @default(0)
   /// Composantes rattachées (C1…C5), même usage que sur un article.
   comps    String[] @default([])
 
@@ -1176,5 +1180,182 @@ model ImpactItemTranslation {
   updatedAt DateTime @updatedAt
 
   @@unique([itemId, locale])
+  @@index([locale])
+}
+
+/// ===========================================================================
+/// « L'équipe de l'Unité » — une fiche par poste, quatre affichages.
+///
+/// Le site montrait la même personne à quatre endroits, saisie dans trois
+/// fichiers : la grille de l'accueil et celle de la page « L'Unité »
+/// (`content/data.ts`), les cartes de coordination de la page « Gouvernance »
+/// (`content/carbon.ts`) et le profil du responsable d'une composante
+/// (`content/composantes-detail.ts`). Le coordonnateur y figurait trois fois,
+/// sous trois intitulés différents : corriger son titre demandait trois
+/// éditions, et la troisième était oubliée.
+///
+/// Une fiche vaut donc pour les quatre emplacements. Ce qui les distingue n'est
+/// pas la personne mais ce qu'on montre d'elle : `featured` l'ajoute aux cartes
+/// de coordination, `composante` l'installe sur la fiche de sa composante, et
+/// la grille reçoit tout membre publié. Rien n'est saisi deux fois.
+/// ===========================================================================
+
+enum TeamStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Pôle d'organisation de l'Unité (Direction, Fiduciaire, Passation…).
+///
+/// Une table plutôt qu'un enum : les pôles sont un choix d'organisation, pas
+/// une donnée de structure. Un pôle scindé ou renommé relève de la console, non
+/// d'une migration.
+model TeamPole {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché. Il ancre l'amorçage
+  /// (cf. src/lib/equipe/bootstrap.ts) : c'est lui qui garantit qu'une reprise
+  /// du contenu d'origine rejouée ne crée pas de doublon.
+  key String @unique
+
+  /// Ordre des pôles entre eux, quand la grille est groupée.
+  position Int @default(0)
+
+  /// Couleur d'accent du pôle, reprise par les cartes de coordination. Vide :
+  /// l'accent du site.
+  color String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations TeamPoleTranslation[]
+  membres      TeamMember[]
+
+  @@index([position])
+}
+
+/// Nom et mission d'un pôle dans une langue.
+model TeamPoleTranslation {
+  id     String   @id @default(cuid())
+  poleId String
+  pole   TeamPole @relation(fields: [poleId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale String
+
+  nom     String
+  /// Ce dont le pôle répond, en une ligne (« Pilotage, arbitrage, contrôle
+  /// interne »). Affiché sur la page « L'Unité ».
+  mission String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([poleId, locale])
+  @@index([locale])
+}
+
+/// Un membre de l'Unité — ou un poste, quand il n'est pas encore pourvu.
+///
+/// Une fiche sans nom est LÉGITIME et le site la dessine déjà ainsi : la grille
+/// affiche l'intitulé du poste et une pastille d'initiales, la fiche de
+/// composante annonce le recrutement en cours. C'est pourquoi `nom` est
+/// facultatif alors que la fonction, portée par la traduction, ne l'est pas.
+model TeamMember {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché (cf. `TeamPole.key`).
+  key String @unique
+
+  /// Nom d'usage, hors traduction : « Noël Jean-David Litanga » s'écrit de même
+  /// dans les deux langues. Une graphie propre à une langue reste possible sur
+  /// la traduction, qui l'emporte alors.
+  nom String?
+
+  status   TeamStatus @default(DRAFT)
+  /// Ordre d'affichage dans la grille. Il porte la hiérarchie voulue par
+  /// l'Unité, que ni l'ordre alphabétique ni la date de saisie ne rendent.
+  position Int        @default(0)
+
+  /// Ajoute le membre aux cartes de coordination de la page « Gouvernance ».
+  /// Ne change RIEN à sa place dans la grille : mettre en avant ne doit pas
+  /// réordonner un écran sous les yeux de la rédaction.
+  featured Boolean @default(false)
+
+  /// Couleur d'accent de la carte de coordination. Vide : celle du pôle, puis
+  /// l'accent du site.
+  color String?
+
+  /// Adresse de contact publiée sur la fiche de composante. Vide : l'adresse
+  /// générale de l'Unité (cf. src/content/carbon.ts).
+  email String?
+
+  /// Composante dont ce membre est le responsable (« C1 »…« C5 »). Renseignée,
+  /// la fiche publique de cette composante affiche ce profil. Une chaîne plutôt
+  /// qu'une relation : les composantes sont une donnée de structure du projet,
+  /// écrite dans le code et non administrée.
+  composante String?
+
+  poleId String?
+  pole   TeamPole? @relation(fields: [poleId], references: [id], onDelete: SetNull)
+
+  /// Portrait déposé depuis la console (Cloudinary).
+  photoMediaId String?
+  photoMedia   MediaAsset? @relation(fields: [photoMediaId], references: [id], onDelete: SetNull)
+  /// Repli : chemin d'un portrait servi depuis `public/`, pour les fiches
+  /// reprises de la version statique du site. Sans portrait ni l'un ni l'autre,
+  /// la carte affiche les initiales — c'est un état prévu, pas une image
+  /// manquante.
+  photoPath    String?
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("TeamMemberSaisiPar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations TeamMemberTranslation[]
+
+  @@index([status, position])
+  @@index([poleId])
+  @@index([featured])
+  @@index([composante])
+}
+
+/// Version d'une fiche dans une langue. Tout ce qui se lit est ici.
+///
+/// Les quatre champs de texte sont désignés par leur RÔLE dans la page, et non
+/// par l'emplacement qui les affiche : la même responsabilité se lit sur une
+/// carte de coordination et sur une fiche de composante. Un emplacement ajouté
+/// plus tard puise dans les mêmes champs sans en demander de nouveaux.
+model TeamMemberTranslation {
+  id       String     @id @default(cuid())
+  memberId String
+  member   TeamMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale   String
+
+  /// Graphie du nom propre à cette langue. Vide : le nom de la fiche.
+  nom String?
+
+  /// Fonction exercée (« Coordonnateur national »). Obligatoire : c'est le seul
+  /// texte que toutes les cartes affichent, et une langue n'est réputée servie
+  /// qu'à partir de lui.
+  role String
+
+  /// Ce dont le membre répond, en une phrase. Affiché par les cartes de
+  /// coordination de la page « Gouvernance ».
+  mandat String?
+
+  /// Présentation développée, affichée sur la fiche de composante.
+  bio String?
+
+  /// Citation attribuée au membre, affichée entre guillemets sous sa bio.
+  verbatim String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([memberId, locale])
   @@index([locale])
 }
