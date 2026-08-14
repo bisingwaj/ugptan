@@ -16,7 +16,7 @@ export async function register(): Promise<void> {
   }
 }
 
-/**
+/***
  * Journal des erreurs de requête.
  *
  * Sans ce crochet, une panne de la couche base ne laissait qu'une ligne
