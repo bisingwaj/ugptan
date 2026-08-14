@@ -619,14 +619,18 @@ export const ADMIN_EVTS = {
 } as const;
 
 /**
- * Module « Rapports & analyses ».
+ * Module « Ressources & publications ».
  *
- * ⚠️ Le module porte EXACTEMENT le nom de la section publique qu'il alimente
- * (cf. `nav.ressources` dans content/i18n.ts). Deux noms pour une même chose —
- * « Documents & transparence » côté console, « Rapports & analyses » côté site —
- * obligeaient à faire la traduction de tête à chaque échange. Les identifiants
- * techniques, eux, restent `documents` : la permission, la route de la console
- * et les tables sont des clés stables, pas des libellés.
+ * ⚠️ Le module alimente UNE seule section publique, « Documents publiés »
+ * (/transparency). Les deux noms diffèrent volontairement, ce qui n'était pas
+ * le cas avant la fusion : la console gère un FONDS — rapports, études, notes,
+ * pièces de référence, publiés ou non —, tandis que la page publique n'en
+ * montre que la part publiée, et l'annonce comme telle au visiteur. Nommer
+ * l'écran de saisie « Documents publiés » aurait promis que tout ce qui s'y
+ * trouve est en ligne, alors qu'un brouillon y vit aussi.
+ *
+ * Les identifiants techniques, eux, restent `documents` : la permission, la
+ * route de la console et les tables sont des clés stables, pas des libellés.
  *
  * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` et
  * `ADMIN_EVTS` : il est lu par des composants clients (formulaire de dépôt,
@@ -637,8 +641,8 @@ export const ADMIN_EVTS = {
  * ressemblent doivent se dire pareil, sinon la console s'apprend deux fois.
  */
 export const ADMIN_DOCS = {
-  title: "Rapports & analyses",
-  lead: "Rapports, études, analyses et pièces de référence de la section « Rapports & analyses » du site. Deux façons de publier : téléverser un fichier, ou rédiger la publication ici même — texte, visuels et graphiques — pour qu'elle se lise directement sur le site.",
+  title: "Ressources & publications",
+  lead: "Rapports, études, analyses et pièces de référence. Ce qui est publié ici alimente la page « Documents publiés » du site. Deux façons de publier : téléverser un fichier, ou rédiger la publication ici même (texte, visuels et graphiques) pour qu'elle se lise directement sur le site.",
 
   /* --- Liste --------------------------------------------------------------- */
   nouveau: "Nouvelle publication",
@@ -695,6 +699,8 @@ export const ADMIN_DOCS = {
   champDescriptionEn: "Description (anglais)",
   champReference: "Sigle ou référence",
   champReferenceAide: "MEP, PPSD, CGES… Le code par lequel la pièce est désignée dans les échanges du projet.",
+  champVersion: "Version",
+  champVersionAide: "v1.0, T2 2026, évolutif… Telle qu'elle doit s'afficher. Une pièce révisée garde son sigle et change de version, ce qui permet au lecteur de repérer celle qu'il a déjà lue.",
   champAuteur: "Organisme producteur",
   champAuteurAide: "Direction, cellule, cabinet d'études ou institution d'où vient la pièce. La personne qui l'a écrite se renseigne dans « Signature ».",
 
@@ -1402,12 +1408,14 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     label: "Contenus",
     items: [
       { key: "actualites", label: "Actualités", slug: "/news" },
-      { key: "documents", label: "Rapports & analyses", slug: "/documents" },
+      /* L'entrée « Ressources & publications » a longtemps figuré ici en
+         attente, à côté d'un module « Rapports & analyses » qui faisait déjà le
+         travail. Les deux ont fusionné : un seul module, sous le nom attendu. */
+      { key: "documents", label: "Ressources & publications", slug: "/documents" },
       { key: "medias", label: "Médias", slug: "/media" },
       { key: "evenements", label: "Événements", slug: "/events" },
       { key: "histoires", label: "Histoires & impact", slug: "/stories" },
       { key: "videos", label: "Vidéos & galeries", slug: "/gallery" },
-      { key: "ressources", label: "Ressources & publications", soon: true },
     ],
   },
   {

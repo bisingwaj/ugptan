@@ -146,6 +146,23 @@ export function DocumentIdentite({ document }: { document: DocumentSaisie }) {
         </div>
 
         <div className="adm-form__field">
+          <label className="label-mono" htmlFor={`${idBase}-version`}>{t.champVersion}</label>
+          <input
+            id={`${idBase}-version`}
+            name="version"
+            type="text"
+            className="field mono"
+            spellCheck={false}
+            maxLength={32}
+            defaultValue={document.version}
+            placeholder="v1.0"
+          />
+          <p className="adm-hint" style={{ marginTop: 6 }}>{t.champVersionAide}</p>
+        </div>
+      </div>
+
+      <div className="adm-form__row">
+        <div className="adm-form__field">
           <label className="label-mono" htmlFor={`${idBase}-auteur`}>{t.champAuteur}</label>
           <input
             id={`${idBase}-auteur`}

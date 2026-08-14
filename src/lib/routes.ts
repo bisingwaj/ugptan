@@ -5,7 +5,7 @@ export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 
 export type NavKey =
   | "accueil" | "projet" | "composantes" | "ugptn" | "gouvernance" | "marches" | "transparence"
-  | "actualites" | "resultats" | "ressources" | "evenements" | "galerie" | "contact" | "mgp"
+  | "actualites" | "resultats" | "evenements" | "galerie" | "contact" | "mgp"
   | "mgpSuivi" | "confidentialite" | "conditions";
 
 export type NavItem = { slug: string; key: NavKey };
@@ -29,20 +29,29 @@ export const NAV: Record<NavKey, string> = {
   accueil: "", projet: "/project", composantes: "/components", ugptn: "/ugptn",
   gouvernance: "/governance",
   marches: "/procurement", transparence: "/transparency", actualites: "/news",
-  resultats: "/results", ressources: "/resources", evenements: "/events",
+  resultats: "/results", evenements: "/events",
   galerie: "/gallery",
   contact: "/contact", mgp: "/grievances", mgpSuivi: "/grievances/track",
   confidentialite: "/privacy", conditions: "/terms",
 };
 
 /**
- * Anciens chemins français → chemin actuel, sans le préfixe de langue.
+ * Anciens chemins → chemin actuel, sans le préfixe de langue.
  *
  * Ces adresses ont été indexées, partagées et imprimées — `/fr/mgp` figure sur
  * les supports du mécanisme de gestion des plaintes. Deux usages, un seul
  * tableau : `src/proxy.ts` en fait des redirections permanentes (308), et
  * `lienPublic` ci-dessous rattrape les chemins encore stockés en base, saisis
  * en console avant le renommage.
+ *
+ * La table a d'abord servi au passage des chemins français à l'anglais, d'où
+ * l'essentiel de son contenu. `/resources` fait exception : c'est un chemin
+ * ANGLAIS retiré à la fusion des deux pages documentaires. « Documents
+ * publiés » et « Rapports & publications » servaient le même catalogue et le
+ * même modèle `Document` — deux adresses pour un seul fonds partageaient le
+ * référencement entre elles et obligeaient l'administrateur à deviner sur
+ * laquelle sa fiche paraîtrait. Le fonds vit désormais sous `/transparency`,
+ * et les liens émis vers `/resources` continuent d'aboutir.
  *
  * ⚠️ L'ordre compte : la première entrée qui correspond l'emporte, donc un
  * chemin plus spécifique doit précéder le préfixe qui le contient — sans quoi
@@ -60,7 +69,11 @@ export const LEGACY_PATHS: readonly (readonly [string, string])[] = [
   ["/marches", NAV.marches],
   ["/mgp", NAV.mgp],
   ["/projet", NAV.projet],
-  ["/ressources", NAV.ressources],
+  /* Les deux orthographes mènent au même fonds : la française d'avant le
+     renommage des chemins, l'anglaise d'avant la fusion. Le préfixe emporte le
+     segment qui suit, donc `/resources/<slug>` retrouve sa page de lecture. */
+  ["/ressources", NAV.transparence],
+  ["/resources", NAV.transparence],
   ["/resultats", NAV.resultats],
   ["/transparence", NAV.transparence],
   /* Hors navigation, donc absente de NAV : la page « Médias » n'est liée nulle
@@ -154,7 +167,7 @@ export const evenementRoute = (lang: Lang, slug: string) =>
  * été réenregistrées, et une adresse en identifiant vaut mieux qu'un lien mort.
  */
 export const documentRoute = (lang: Lang, slug: string) =>
-  `/${lang}${NAV.ressources}/${slug}`;
+  `/${lang}${NAV.transparence}/${slug}`;
 
 /**
  * Groupe de navigation : une entrée d'en-tête qui ouvre un sous-menu.
@@ -200,7 +213,6 @@ const G_TRANSPARENCE: NavGroup = {
   labelKey: "transparence",
   children: [
     { slug: NAV.transparence, key: "transparence" },
-    { slug: NAV.ressources, key: "ressources" },
     { slug: NAV.mgp, key: "mgp" },
   ],
 };

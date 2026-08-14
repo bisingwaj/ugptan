@@ -47,6 +47,8 @@ export type DocumentSaisie = {
   contenuEn: string;
 
   reference: string;
+  /** Version publiée, telle qu'elle s'affiche (« v1.0 », « T2 2026 »). */
+  version: string;
   /** Organisme producteur — la structure d'où vient la pièce. */
   auteur: string;
   langue: DocLangue;

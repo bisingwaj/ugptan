@@ -130,6 +130,9 @@ function lireFiche(formData: FormData) {
     descriptionFr: optionnel(texte(formData, "descriptionFr")),
     descriptionEn: optionnel(texte(formData, "descriptionEn")),
     reference: optionnel(texte(formData, "reference").toUpperCase()),
+    /* Pas de normalisation de casse, contrairement au sigle : « v1.0 » et
+       « T2 2026 » n'ont pas la même graphie, et « évolutif » est un mot. */
+    version: optionnel(texte(formData, "version")),
     auteur: optionnel(texte(formData, "auteur")),
     langue: isDocLangue(langueBrute) ? langueBrute : ("FR" as const),
     // La signature de l'auteur, distincte du compte qui saisit : c'est elle qui

@@ -70,12 +70,10 @@ export type Marche = {
 export type MethodePassation = { sigle: string; label: Bilingual };
 export type EtapeCandidature = { n: string; titre: Bilingual; desc: Bilingual };
 
-export type DocCat = "reference" | "passation" | "sauvegardes" | "fiduciaire";
-export type Document = {
-  sigle: string; titre: string; cat: DocCat;
-  version: string; date: string; langue: string; taille: string;
-};
-export type DocumentCategorie = { code: DocCat; label: Bilingual };
+/* `DocCat`, `Document` et `DocumentCategorie` ont disparu d'ici : le fonds
+   documentaire est tenu en base et typé par Prisma (modèles `Document` et
+   `DocumentCategory`). Un second type portant le même nom aurait fini par
+   diverger de la table. */
 
 export type MgpFaqItem = { q: Bilingual; r: Bilingual };
 

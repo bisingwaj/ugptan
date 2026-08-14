@@ -108,7 +108,12 @@ export function RessourcesListe({
 
             {document.description && <p className="doc-card__desc">{document.description}</p>}
 
+            {/* La version précède la date : c'est elle qui distingue deux
+                éditions d'une même pièce, et le lecteur qui revient cherche
+                d'abord à savoir si le document a changé depuis sa dernière
+                visite. */}
             <div className="doc-card__meta mono">
+              {document.version ? `${document.version} · ` : ""}
               {document.dateLabel ? `${document.dateLabel} · ` : ""}
               {document.technique ||
                 (document.lecture ? `${document.lecture} ${t.minutes}` : "")}
@@ -175,6 +180,12 @@ export function RessourcesListe({
                   <div className="doc-modal__row">
                     <dt>{t.labelReference}</dt>
                     <dd className="mono">{ouvert.reference}</dd>
+                  </div>
+                )}
+                {ouvert.version && (
+                  <div className="doc-modal__row">
+                    <dt>{t.labelVersion}</dt>
+                    <dd className="mono">{ouvert.version}</dd>
                   </div>
                 )}
                 {ouvert.dateLabel && (
@@ -246,14 +257,23 @@ export function RessourcesListe({
             <div className="doc-modal__pied">
               {ouvert.fichier && (
                 <>
-                  <a
-                    href={ouvert.fichier.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn--outline btn--sm"
-                  >
-                    {t.open} ↗
-                  </a>
+                  {/* « Ouvrir » n'est proposé que si le navigateur sait AFFICHER
+                      le fichier — la même condition qui commande l'aperçu
+                      ci-dessus. Sur un DOCX ou un XLSX, aucun navigateur ne rend
+                      le format : le lien déclenchait un téléchargement muet, si
+                      bien que le panneau disait « ce format ne s'affiche pas »
+                      tout en proposant de l'afficher. Le bouton promettait ce
+                      qu'il ne pouvait pas tenir. */}
+                  {ouvert.fichier.apercu && (
+                    <a
+                      href={ouvert.fichier.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--outline btn--sm"
+                    >
+                      {t.open} ↗
+                    </a>
+                  )}
                   {/* Un seul bouton principal par pied de panneau : sur une
                       publication rédigée, c'est la LECTURE, et le fichier
                       redescend au rang d'annexe. */}
