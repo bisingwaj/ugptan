@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { Prisma } from "@/generated/prisma/client";
 import { ADMIN_GALERIE } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
@@ -14,6 +15,29 @@ export const metadata: Metadata = { title: ADMIN_GALERIE.albumsTitle };
 
 type Recherche = { supprime?: string };
 
+/**
+ * Champs relus pour la liste des albums.
+ *
+ * Extrait en constante et contraint par `satisfies` : un `select` écrit en ligne
+ * dans `findMany({ … })` échappe au typecheck (cf. le commentaire détaillé dans
+ * ../page.tsx). `as const` reste nécessaire devant, sans quoi les `true` se
+ * généralisent en `boolean` et Prisma ne sait plus quels champs sont retenus.
+ */
+const ALBUMS_SELECT = {
+  id: true, slug: true, status: true, titreFr: true, lieu: true,
+  dateAt: true, publishedAt: true, featured: true,
+  category: { select: { nomFr: true, color: true } },
+  coverItem: { select: { imageUrl: true, altFr: true } },
+  /* Repli de couverture : la première entrée dans l'ordre d'affichage,
+     exactement comme le site la choisit (cf. lib/galerie/query.ts). */
+  items: {
+    select: { imageUrl: true, altFr: true },
+    orderBy: [{ featured: "desc" }, { position: "asc" }],
+    take: 1,
+  },
+  _count: { select: { items: true } },
+} as const satisfies Prisma.GalerieAlbumSelect;
+
 export default async function AlbumsPage(props: { searchParams: Promise<Recherche> }) {
   // Indispensable en plus du garde du layout : pages et layouts rendent en
   // parallèle (cf. lib/auth/guard.ts).
@@ -26,20 +50,7 @@ export default async function AlbumsPage(props: { searchParams: Promise<Recherch
   // Reprise sur panne de liaison (cf. lib/lecture.ts).
   const albums = await lectureConsole(
     () => db().galerieAlbum.findMany({
-      select: {
-        id: true, slug: true, status: true, titreFr: true, lieu: true,
-        dateAt: true, publishedAt: true, featured: true,
-        category: { select: { nomFr: true, color: true } },
-        coverItem: { select: { imageUrl: true, altFr: true } },
-        /* Repli de couverture : la première entrée dans l'ordre d'affichage,
-           exactement comme le site la choisit (cf. lib/galerie/query.ts). */
-        items: {
-          select: { imageUrl: true, altFr: true },
-          orderBy: [{ featured: "desc" }, { position: "asc" }],
-          take: 1,
-        },
-        _count: { select: { items: true } },
-      },
+      select: ALBUMS_SELECT,
       orderBy: [
         { featured: "desc" },
         { position: "asc" },

@@ -5,6 +5,7 @@
  * les mêmes champs, l'un sur une fiche vierge, l'autre sur une fiche relue en
  * base. Même rôle que `lib/docs/edition.ts` côté documents.
  */
+import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { lectureConsole } from "@/lib/lecture";
 import { formatDateTime, toDateInput } from "@/lib/format";
@@ -113,7 +114,7 @@ const itemSelect = {
   videoPublicId: true,
   videoDuree: true,
   updatedAt: true,
-} as const;
+} as const satisfies Prisma.GalerieItemSelect;
 
 /**
  * Fiche relue en base, projetée dans la forme attendue par les formulaires.
@@ -218,7 +219,7 @@ const albumSelect = {
   coverItemId: true,
   updatedAt: true,
   _count: { select: { items: true } },
-} as const;
+} as const satisfies Prisma.GalerieAlbumSelect;
 
 /** Fiche d'album relue en base, projetée dans la forme attendue par le formulaire. */
 export async function chargerAlbum(id: string): Promise<(AlbumSaisie & { id: string }) | null> {
