@@ -2,8 +2,9 @@
  * Invalidation du cache après une écriture du module « Histoires & impact ».
  *
  * Même contrat que `lib/actus/cache.ts` et `lib/events/cache.ts` : les chemins
- * sont donnés sous leur forme de ROUTE (`/[lang]/resultats`) et non d'URL,
- * seule façon d'invalider les deux langues d'un coup.
+ * sont donnés sous leur forme de ROUTE (`/[lang]/results`) et non d'URL, seule
+ * façon d'invalider les deux langues d'un coup — et DÉRIVÉS de `NAV` plutôt
+ * qu'écrits en toutes lettres (cf. `patronRoute` dans lib/routes.ts).
  *
  * Les trois pages sont invalidées ensemble, sans regarder l'emplacement touché.
  * Distinguer coûterait une condition à tenir à jour à chaque nouvel
@@ -19,9 +20,10 @@
  * ces invalidations ; en développement, la question ne se pose pas.
  */
 import { revalidatePath } from "next/cache";
+import { NAV, patronRoute } from "@/lib/routes";
 
 export function revaliderImpact(): void {
-  revalidatePath("/[lang]", "page");
-  revalidatePath("/[lang]/resultats", "page");
-  revalidatePath("/[lang]/projet", "page");
+  revalidatePath(patronRoute(NAV.accueil), "page");
+  revalidatePath(patronRoute(NAV.resultats), "page");
+  revalidatePath(patronRoute(NAV.projet), "page");
 }

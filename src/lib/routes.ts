@@ -5,7 +5,7 @@ export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 
 export type NavKey =
   | "accueil" | "projet" | "composantes" | "ugptn" | "gouvernance" | "marches" | "transparence"
-  | "actualites" | "resultats" | "ressources" | "evenements" | "contact" | "mgp"
+  | "actualites" | "resultats" | "ressources" | "evenements" | "galerie" | "contact" | "mgp"
   | "mgpSuivi" | "confidentialite" | "conditions";
 
 export type NavItem = { slug: string; key: NavKey };
@@ -30,6 +30,7 @@ export const NAV: Record<NavKey, string> = {
   gouvernance: "/governance",
   marches: "/procurement", transparence: "/transparency", actualites: "/news",
   resultats: "/results", ressources: "/resources", evenements: "/events",
+  galerie: "/gallery",
   contact: "/contact", mgp: "/grievances", mgpSuivi: "/grievances/track",
   confidentialite: "/privacy", conditions: "/terms",
 };
@@ -67,6 +68,25 @@ export const LEGACY_PATHS: readonly (readonly [string, string])[] = [
      circuler. */
   ["/medias", "/media"],
 ];
+
+/**
+ * Chemin de ROUTE d'une page publique — la forme attendue par
+ * `revalidatePath(..., "page")`, où le segment de langue reste un paramètre.
+ *
+ * ⚠️ À utiliser SYSTÉMATIQUEMENT dans les modules d'invalidation — les
+ * `cache.ts` de chaque module — plutôt que d'écrire le chemin en toutes lettres.
+ * La raison n'est pas cosmétique : ces littéraux ont silencieusement cessé de
+ * désigner quoi que ce soit au renommage des routes en anglais.
+ * `revalidatePath` ne lève PAS sur un chemin inexistant — il n'invalide rien,
+ * sans le dire. Une publication paraissait donc à l'expiration du `revalidate`
+ * au lieu du premier rechargement, et rien dans les journaux ne le signalait.
+ *
+ * Dérivés de `NAV`, les chemins suivent désormais tout renommage à venir.
+ *
+ * `slug` vaut "" pour l'accueil, d'où `/[lang]` sans barre finale. Les segments
+ * dynamiques se concatènent, par exemple `NAV.actualites` suivi de « /[slug] ».
+ */
+export const patronRoute = (slug = "") => `/[lang]${slug}`;
 
 /**
  * Chemin actuel correspondant à `chemin` (déjà privé de son préfixe de langue).
@@ -177,6 +197,10 @@ const G_ACTUS: NavGroup = {
   children: [
     { slug: NAV.actualites, key: "actualites" },
     { slug: NAV.evenements, key: "evenements" },
+    /* La galerie tient sa place ici plutôt qu'avec les documents : ce qu'elle
+       montre relève de la VIE du projet — chantiers, ateliers, rencontres — au
+       même titre qu'un communiqué, non de la production analytique. */
+    { slug: NAV.galerie, key: "galerie" },
   ],
 };
 
