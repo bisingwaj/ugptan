@@ -62,7 +62,7 @@ export type ImpactSeedSection = {
   numero?: string;
   compact?: boolean;
   grandTitre?: boolean;
-  /** Chemin interne : la langue est ajoutée à l'affichage (« /projet »). */
+  /** Chemin interne : la langue est ajoutée à l'affichage (« /project »). */
   ctaUrl?: string;
   /** `key` de la section dont les entrées sont reprises. */
   sourceKey?: string;
@@ -144,7 +144,7 @@ export const impactSeed: ImpactSeedSection[] = [
     theme: "GRIS",
     position: 0,
     grandTitre: true,
-    ctaUrl: "/projet",
+    ctaUrl: "/project",
     fr: {
       kicker: "Impact humain",
       titre: "Ce que ces ambitions représentent, une fois traduites.",
@@ -212,7 +212,7 @@ export const impactSeed: ImpactSeedSection[] = [
     position: 0,
     compact: true,
     grandTitre: true,
-    ctaUrl: "/resultats",
+    ctaUrl: "/results",
     sourceKey: "resultats-histoires",
     fr: {
       kicker: "Histoires & impact",

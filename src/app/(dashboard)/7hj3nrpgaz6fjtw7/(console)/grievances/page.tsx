@@ -155,7 +155,7 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
                 return (
                   <tr key={g.id}>
                     <td>
-                      <Link href={adminPath(`/plaintes/${g.id}`)} className="adm-link mono">
+                      <Link href={adminPath(`/grievances/${g.id}`)} className="adm-link mono">
                         {g.reference}
                       </Link>
                       <span className="adm-table__sub">

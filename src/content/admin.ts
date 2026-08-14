@@ -958,7 +958,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
     key: "pilotage",
     label: "Pilotage",
-    items: [{ key: "tableau-de-bord", label: "Tableau de bord", slug: "/tableau-de-bord" }],
+    items: [{ key: "tableau-de-bord", label: "Tableau de bord", slug: "/dashboard" }],
   },
   {
     key: "marches",
@@ -966,18 +966,18 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     items: [
       { key: "marches", label: "Appels d'offres", soon: true },
       { key: "soumissionnaires", label: "Soumissionnaires", soon: true },
-      { key: "mgp", label: "Plaintes (MGP)", slug: "/plaintes" },
+      { key: "mgp", label: "Plaintes (MGP)", slug: "/grievances" },
     ],
   },
   {
     key: "contenus",
     label: "Contenus",
     items: [
-      { key: "actualites", label: "Actualités", slug: "/actualites" },
+      { key: "actualites", label: "Actualités", slug: "/news" },
       { key: "documents", label: "Rapports & analyses", slug: "/documents" },
-      { key: "medias", label: "Médias", slug: "/medias" },
-      { key: "evenements", label: "Événements", slug: "/evenements" },
-      { key: "histoires", label: "Histoires & impact", slug: "/histoires" },
+      { key: "medias", label: "Médias", slug: "/media" },
+      { key: "evenements", label: "Événements", slug: "/events" },
+      { key: "histoires", label: "Histoires & impact", slug: "/stories" },
       { key: "videos", label: "Vidéos & galerie", soon: true },
       { key: "ressources", label: "Ressources & publications", soon: true },
     ],
@@ -999,7 +999,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     key: "administration",
     label: "Administration",
     items: [
-      { key: "utilisateurs", label: "Utilisateurs", slug: "/utilisateurs" },
+      { key: "utilisateurs", label: "Utilisateurs", slug: "/users" },
       { key: "reglages", label: "i18n & réglages", soon: true },
     ],
   },

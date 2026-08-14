@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const pages = ALL_PATHS.map((path) => {
     const isHome = path === "/fr" || path === "/en";
-    const isNews = path.endsWith("/actualites") || path.endsWith("/evenements");
+    const isNews = path.endsWith(NAV.actualites) || path.endsWith(NAV.evenements);
     return {
       url: `${SITE_URL}${path}`,
       lastModified,

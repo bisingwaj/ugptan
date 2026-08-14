@@ -35,7 +35,7 @@ export default async function TaxonomiesPage() {
 
   return (
     <>
-      <Link href={adminPath("/actualites")} className="adm-back">← {t.retourListe}</Link>
+      <Link href={adminPath("/news")} className="adm-back">← {t.retourListe}</Link>
       <h1 className="adm__title" style={{ marginTop: 12 }}>{t.taxoTitle}</h1>
       <p className="adm__lead">{t.taxoLead}</p>
 

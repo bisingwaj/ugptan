@@ -46,7 +46,7 @@ import {
 /** État partagé par tous les formulaires du module. */
 export type ImpactFormState = { error: string | null; ok: string | null };
 
-const IMPACT_PATH = adminPath("/histoires");
+const IMPACT_PATH = adminPath("/stories");
 
 /**
  * Nom des langues dans les messages rendus à l'utilisateur.

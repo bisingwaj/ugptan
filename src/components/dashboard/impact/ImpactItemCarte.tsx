@@ -269,7 +269,7 @@ export function ImpactItemCarte({
                 type="text"
                 className="field"
                 defaultValue={item.lienUrl}
-                placeholder="/composantes/c1"
+                placeholder="/components/c1"
               />
             </div>
           </div>

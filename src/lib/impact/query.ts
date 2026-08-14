@@ -28,6 +28,7 @@ import { lecteur } from "@/lib/lecture";
 import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import { formatArticleDate } from "@/lib/format";
 import type { Lang } from "@/lib/pick";
+import { lienPublic } from "@/lib/routes";
 import {
   impactSeed, seedItems, seedPourEmplacement,
   type ImpactSeedItem, type ImpactSeedSection,
@@ -144,16 +145,14 @@ const vide = (valeur: string | null | undefined): string | null => {
 /**
  * Destination du bouton d'en-tête.
  *
- * Un chemin interne est stocké SANS langue (« /projet ») et préfixé ici : la
- * même section sert les deux versions du site, et y figer « /fr/projet »
- * enverrait un lecteur anglophone sur la version française. Une adresse
- * complète part telle quelle.
+ * Un chemin interne est stocké SANS langue (« /project ») et préfixé par
+ * `lienPublic` : la même section sert les deux versions du site, et y figer
+ * « /fr/project » enverrait un lecteur anglophone sur la version française.
+ * Une adresse complète part telle quelle.
  */
 function href(ctaUrl: string | null, lang: Lang): string | null {
   const url = vide(ctaUrl);
-  if (!url) return null;
-  if (/^https?:\/\//i.test(url) || url.startsWith("mailto:") || url.startsWith("tel:")) return url;
-  return url.startsWith("/") ? `/${lang}${url === "/" ? "" : url}` : url;
+  return url ? lienPublic(url, lang) : null;
 }
 
 type ItemBrut = {

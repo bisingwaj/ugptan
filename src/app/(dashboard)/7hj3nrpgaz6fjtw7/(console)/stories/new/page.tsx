@@ -17,7 +17,7 @@ export default async function NouvelleSectionImpactPage() {
 
   return (
     <>
-      <Link href={adminPath("/histoires")} className="adm-back">← {ADMIN_IMPACT.retourListe}</Link>
+      <Link href={adminPath("/stories")} className="adm-back">← {ADMIN_IMPACT.retourListe}</Link>
       <h1 className="adm__title" style={{ marginTop: 12 }}>{ADMIN_IMPACT.nouveau}</h1>
       <p className="adm__lead">
         Choisissez où la section s'affiche et quel gabarit dessine ses entrées, puis rédigez son en-tête

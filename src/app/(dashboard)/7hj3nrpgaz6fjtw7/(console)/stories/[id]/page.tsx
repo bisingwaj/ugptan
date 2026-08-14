@@ -62,7 +62,7 @@ export default async function ModifierSectionImpactPage(props: {
 
   return (
     <>
-      <Link href={adminPath("/histoires")} className="adm-back">← {t.retourListe}</Link>
+      <Link href={adminPath("/stories")} className="adm-back">← {t.retourListe}</Link>
 
       <div className="adm-entete" style={{ marginTop: 12 }}>
         <div style={{ minWidth: 0 }}>

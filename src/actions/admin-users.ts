@@ -283,7 +283,7 @@ export async function updateUserAction(
   }
 
   revalidatePath(ADMIN_USERS);
-  revalidatePath(adminPath(`/utilisateurs/${id}`));
+  revalidatePath(adminPath(`/users/${id}`));
   return { error: null, ok: "Compte mis à jour." };
 }
 
@@ -330,7 +330,7 @@ export async function setUserActiveAction(
   }
 
   revalidatePath(ADMIN_USERS);
-  revalidatePath(adminPath(`/utilisateurs/${id}`));
+  revalidatePath(adminPath(`/users/${id}`));
   return { error: null, ok: active ? "Compte réactivé." : "Compte désactivé." };
 }
 

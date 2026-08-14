@@ -53,8 +53,8 @@ import { composantes } from "@/content/data";
 /** État partagé par tous les formulaires du module. */
 export type EvtFormState = { error: string | null; ok: string | null };
 
-const EVTS_PATH = adminPath("/evenements");
-const CATEGORIES_PATH = adminPath("/evenements/categories");
+const EVTS_PATH = adminPath("/events");
+const CATEGORIES_PATH = adminPath("/events/categories");
 
 const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 

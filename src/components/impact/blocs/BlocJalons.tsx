@@ -9,6 +9,7 @@
    apparaîtrait au milieu de la frise. */
 import type { Lang } from "@/lib/pick";
 import type { ImpactItemVue } from "@/lib/impact/query";
+import { lienPublic } from "@/lib/routes";
 import { themeSombre, type ImpactTheme } from "@/lib/impact/statut";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
@@ -81,7 +82,7 @@ export function BlocJalons({
             )}
             {item.lienUrl && item.lienLabel && (
               <a
-                href={item.lienUrl.startsWith("/") ? `/${lang}${item.lienUrl}` : item.lienUrl}
+                href={lienPublic(item.lienUrl, lang)}
                 className="mono"
                 style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: accent }}
               >
