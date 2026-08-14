@@ -71,6 +71,7 @@ const documentSelect = {
   contenuFr: true,
   contenuEn: true,
   reference: true,
+  version: true,
   auteur: true,
   langue: true,
   authorName: true,
@@ -138,6 +139,8 @@ export type DocVue = {
   visuel: Visuel;
   categorie: { slug: string; nom: string; color: string | null } | null;
   reference: string | null;
+  /** Version publiée (« v1.0 », « T2 2026 »). `null` quand la pièce n'en porte pas. */
+  version: string | null;
   /** Organisme producteur. */
   auteur: string | null;
   /** Signature de la personne qui a écrit — jamais celle qui a saisi. */
@@ -173,6 +176,7 @@ type LigneDocument = {
   contenuFr: string;
   contenuEn: string;
   reference: string | null;
+  version: string | null;
   auteur: string | null;
   langue: string;
   authorName: string | null;
@@ -237,7 +241,7 @@ function vue(ligne: LigneDocument, lang: Lang): DocVue {
   return {
     id: ligne.id,
     slug,
-    chemin: `/${lang}${NAV.ressources}/${slug}`,
+    chemin: `/${lang}${NAV.transparence}/${slug}`,
     titre,
     description: bilingue(ligne.descriptionFr, ligne.descriptionEn, lang),
     type,
@@ -257,6 +261,7 @@ function vue(ligne: LigneDocument, lang: Lang): DocVue {
         }
       : null,
     reference: ligne.reference,
+    version: ligne.version,
     auteur: ligne.auteur,
     langue: ligne.langue,
     date,

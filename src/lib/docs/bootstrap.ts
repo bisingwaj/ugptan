@@ -9,9 +9,13 @@
  *
  * Les CATÉGORIES, elles, sont amorcées : sans nomenclature de départ, le premier
  * dépôt oblige à sortir de l'écran pour créer une thématique avant de pouvoir
- * ranger quoi que ce soit. Les quatre proposées reprennent celles déjà employées
- * par la page publique « Transparence » (`/[lang]/transparence`), qui est une
- * autre liste et reste servie par son contenu statique.
+ * ranger quoi que ce soit. Les quatre proposées sont celles qu'employait la
+ * page « Transparence » avant que les deux sections documentaires ne fusionnent.
+ *
+ * ⚠️ `scripts/seed-documents-transparence.mjs` déclare la MÊME liste, et doit
+ * rester aligné sur celle-ci : le script se rattache aux catégories déjà en
+ * base et ne crée que les manquantes, donc un slug qui divergerait ferait
+ * apparaître une thématique en double.
  *
  * Même contrat que les autres amorçages : ne s'exécute QUE sur une table vide,
  * ne lève jamais, et ne recrée pas ce qu'un administrateur a supprimé.

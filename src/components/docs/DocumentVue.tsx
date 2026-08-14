@@ -43,7 +43,7 @@ export function DocumentVue({
   const entete = (
     <div className="actu-hero__inner">
       <nav className="mono actu-hero__crumb" aria-label={t.breadcrumbLabel}>
-        <Link href={route(lang, NAV.ressources)} className="actu-hero__crumb-lien">{t.titre}</Link>
+        <Link href={route(lang, NAV.transparence)} className="actu-hero__crumb-lien">{t.titre}</Link>
         {document.categorie && <> / {document.categorie.nom}</>}
       </nav>
 
@@ -187,7 +187,7 @@ export function DocumentVue({
           <PartageArticle lang={lang} titre={document.titre} />
 
           <p className="actu-retour">
-            <Link href={route(lang, NAV.ressources)} className="mono actu-retour__lien">
+            <Link href={route(lang, NAV.transparence)} className="mono actu-retour__lien">
               ← {t.backToList}
             </Link>
           </p>

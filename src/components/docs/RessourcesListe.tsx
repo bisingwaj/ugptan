@@ -108,7 +108,12 @@ export function RessourcesListe({
 
             {document.description && <p className="doc-card__desc">{document.description}</p>}
 
+            {/* La version précède la date : c'est elle qui distingue deux
+                éditions d'une même pièce, et le lecteur qui revient cherche
+                d'abord à savoir si le document a changé depuis sa dernière
+                visite. */}
             <div className="doc-card__meta mono">
+              {document.version ? `${document.version} · ` : ""}
               {document.dateLabel ? `${document.dateLabel} · ` : ""}
               {document.technique ||
                 (document.lecture ? `${document.lecture} ${t.minutes}` : "")}
@@ -175,6 +180,12 @@ export function RessourcesListe({
                   <div className="doc-modal__row">
                     <dt>{t.labelReference}</dt>
                     <dd className="mono">{ouvert.reference}</dd>
+                  </div>
+                )}
+                {ouvert.version && (
+                  <div className="doc-modal__row">
+                    <dt>{t.labelVersion}</dt>
+                    <dd className="mono">{ouvert.version}</dd>
                   </div>
                 )}
                 {ouvert.dateLabel && (
