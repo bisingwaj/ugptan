@@ -1,29 +1,34 @@
 /* Profil du responsable de la composante. Sans nom publié, on affiche l'intitulé
-   du poste avec une pastille d'initiales — même traitement que la grille d'équipe. */
+   du poste avec une pastille d'initiales — même traitement que la grille d'équipe.
+
+   La fiche provient du module « L'équipe de l'Unité » (cf. src/lib/equipe/query.ts),
+   et non plus de `content/composantes-detail.ts` : c'est la MÊME personne que
+   celle de la grille de l'accueil, elle n'a donc plus lieu d'être saisie ici une
+   seconde fois. Le dessin, lui, est repris à l'identique. */
 import Link from "next/link";
 import type { Lang } from "@/lib/pick";
-import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { contact } from "@/content/carbon";
-import type { Composante, CompResponsable as Resp } from "@/content/types";
+import type { Composante } from "@/content/types";
+import type { MembreEquipe } from "@/lib/equipe/query";
 import { NAV, route } from "@/lib/routes";
 import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 
 export function CompResponsable({
-  resp,
+  membre,
   comp,
   lang,
 }: {
-  resp?: Resp;
+  membre?: MembreEquipe | null;
   comp: Composante;
   lang: Lang;
 }) {
-  if (!resp) return null;
+  if (!membre) return null;
   const t = dict(lang).comp;
-  const role = pick(resp.role, lang);
-  const mail = resp.email || contact.email;
+  const mail = membre.email || contact.email;
+  const photo = membre.portrait.src;
 
   return (
     <section className="section section--grey" id="responsable" data-anchor>
@@ -34,27 +39,27 @@ export function CompResponsable({
         <Reveal delay={0.06}>
           <div className="comp-resp">
             <div className="comp-resp__media">
-              {resp.img ? (
+              {photo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={resp.img} alt={resp.nom ? `${resp.nom} — ${role}` : role} loading="lazy" decoding="async" />
+                <img src={photo} alt={membre.portrait.alt} loading="lazy" decoding="async" />
               ) : (
-                <span className="mono comp-resp__initials">{initials(resp.nom || role)}</span>
+                <span className="mono comp-resp__initials">{initials(membre.nom || membre.role)}</span>
               )}
             </div>
 
             <div className="comp-resp__body">
               <div className="mono comp-resp__code">{comp.code}</div>
-              {resp.nom ? (
-                <h3 className="comp-resp__nom">{resp.nom}</h3>
+              {membre.nom ? (
+                <h3 className="comp-resp__nom">{membre.nom}</h3>
               ) : (
                 <h3 className="comp-resp__nom comp-resp__nom--vacant">{t.respSoon}</h3>
               )}
-              <div className="comp-resp__role">{role}</div>
+              <div className="comp-resp__role">{membre.role}</div>
 
-              {resp.bio && <p className="comp-resp__bio">{pick(resp.bio, lang)}</p>}
+              {membre.bio && <p className="comp-resp__bio">{membre.bio}</p>}
 
-              {resp.verbatim && (
-                <blockquote className="comp-resp__verbatim">« {pick(resp.verbatim, lang)} »</blockquote>
+              {membre.verbatim && (
+                <blockquote className="comp-resp__verbatim">« {membre.verbatim} »</blockquote>
               )}
 
               {comp.sous.length > 0 && (
@@ -63,7 +68,7 @@ export function CompResponsable({
                   <ul>
                     {comp.sous.map((s) => (
                       <li key={s.ref}>
-                        <span className="mono">{s.ref}</span> {pick(s.text, lang)}
+                        <span className="mono">{s.ref}</span> {pickSous(s.text, lang)}
                       </li>
                     ))}
                   </ul>
@@ -82,4 +87,9 @@ export function CompResponsable({
       </div>
     </section>
   );
+}
+
+/** Le périmètre reste écrit dans le code : il décrit la composante, pas la personne. */
+function pickSous(text: { fr: string; en: string }, lang: Lang): string {
+  return lang === "en" ? text.en : text.fr;
 }

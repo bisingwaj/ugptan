@@ -3,12 +3,13 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { gouvernance } from "@/content/data";
-import { gouvActivites, gouvLeads } from "@/content/carbon";
-import { initials } from "@/lib/format";
+import { gouvActivites } from "@/content/carbon";
+import { membresEnAvant } from "@/lib/equipe/query";
 import { Kicker } from "@/components/ui/Kicker";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { CartesCoordination } from "@/components/equipe/CartesCoordination";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -20,6 +21,7 @@ export default async function GouvernancePage(props: { params: Promise<{ lang: s
   const lang = asLang(params.lang);
   const t = dict(lang);
   const g = t.gouv;
+  const leads = await membresEnAvant(lang);
 
   return (
     <div>
@@ -99,30 +101,10 @@ export default async function GouvernancePage(props: { params: Promise<{ lang: s
             <h2 className="h2--sm" style={{ marginBottom: 14 }}>{g.leadsTitle}</h2>
             <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{g.leadsLead}</p>
           </Reveal>
-          <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(262px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
-            {gouvLeads.map((l, i) => (
-              <RevealItem key={i} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
-                <div style={{ aspectRatio: "5/4", backgroundColor: l.img ? "#e8ebf0" : "#eef1f7", position: "relative", overflow: "hidden", display: "flex", alignItems: l.img ? "flex-end" : "center", justifyContent: "center", padding: 14, borderTop: `3px solid ${l.color}` }}>
-                  {l.img ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={l.img} alt={l.nom ? `${l.nom} — ${pick(l.role, lang)}` : pick(l.role, lang)} loading="lazy" decoding="async" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 22%" }} />
-                  ) : (
-                    <span className="mono" style={{ fontSize: "clamp(32px,4.4vw,46px)", fontWeight: 600, color: "var(--c-30)", letterSpacing: "0.02em" }}>{initials(pick(l.role, lang))}</span>
-                  )}
-                </div>
-                <div style={{ padding: "18px 18px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
-                  <div style={{ fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{pick(l.role, lang)}</div>
-                  <span className="mono" style={{ display: "inline-block", alignSelf: "flex-start", marginTop: 10, fontSize: 10.5, fontWeight: 600, color: l.color, border: `1px solid ${l.color}`, padding: "3px 8px" }}>{pick(l.pole, lang)}</span>
-                  <p style={{ margin: "14px 0 0", fontSize: 13, lineHeight: 1.5, color: "var(--c-70)", flex: 1 }}>{pick(l.mandate, lang)}</p>
-                  {l.nom && (
-                    <div style={{ marginTop: 14, borderTop: "1px solid var(--c-10)", paddingTop: 12 }}>
-                      <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--c-black)" }}>{l.nom}</span>
-                    </div>
-                  )}
-                </div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
+          {/* Fiches marquées « mise en avant » dans la console. Ce sont les
+              mêmes personnes que la grille de l'accueil, montrées avec leur
+              responsabilité (cf. src/components/equipe/CartesCoordination.tsx). */}
+          <CartesCoordination membres={leads} />
         </div>
       </section>
     </div>
