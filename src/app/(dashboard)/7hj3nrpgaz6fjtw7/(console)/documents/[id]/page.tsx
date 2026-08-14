@@ -53,8 +53,8 @@ export default async function ModifierDocumentPage(props: {
   const publicUrl = !enLigne
     ? null
     : document.support === "REDIGE"
-      ? `/fr${NAV.ressources}/${document.slug || document.id}`
-      : `/fr${NAV.ressources}?doc=${document.id}`;
+      ? `/fr${NAV.transparence}/${document.slug || document.id}`
+      : `/fr${NAV.transparence}?doc=${document.id}`;
 
   return (
     <>

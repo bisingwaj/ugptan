@@ -60,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // les deux adresses existent réellement (cf. le modèle `Document` au schéma).
   const documents = lignesDocuments.flatMap((doc) =>
     LOCALES.map((locale) => ({
-      url: `${SITE_URL}/${locale}${NAV.ressources}/${doc.slug}`,
+      url: `${SITE_URL}/${locale}${NAV.transparence}/${doc.slug}`,
       lastModified: doc.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.6,

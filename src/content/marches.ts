@@ -1,6 +1,6 @@
 /* Marchés publics (appels d'offres), méthodes de passation, candidature, documents. */
 import type {
-  Marche, MethodePassation, EtapeCandidature, Document, DocumentCategorie,
+  Marche, MethodePassation, EtapeCandidature,
 } from "./types";
 
 export const marches: Marche[] = [
@@ -131,24 +131,10 @@ export const candidature: EtapeCandidature[] = [
   { n: "04", titre: { fr: "Suivi & attribution", en: "Tracking & award" }, desc: { fr: "Évaluation selon les critères annoncés, avis de non-objection du bailleur, puis publication du résultat — y compris le nom de l'attributaire.", en: "Evaluation against the announced criteria, donor no-objection, then publication of the result — including the awardee's name." } },
 ];
 
-export const documents: Document[] = [
-  { sigle: "MEP", titre: "Manuel d'Exécution du Projet", cat: "reference", version: "v1.0", date: "23 juin 2025", langue: "FR", taille: "4,2 Mo" },
-  { sigle: "PPSD", titre: "Stratégie de Passation des Marchés (PPSD)", cat: "passation", version: "v1.0", date: "2025", langue: "FR", taille: "1,8 Mo" },
-  { sigle: "PPM", titre: "Plan de Passation des Marchés (18 mois)", cat: "passation", version: "T2 2026", date: "2026", langue: "FR", taille: "0,9 Mo" },
-  { sigle: "CGES", titre: "Cadre de Gestion Environnementale et Sociale", cat: "sauvegardes", version: "v2.1", date: "2025", langue: "FR", taille: "6,5 Mo" },
-  { sigle: "CPR", titre: "Cadre de Politique de Réinstallation", cat: "sauvegardes", version: "v1.0", date: "2025", langue: "FR", taille: "2,3 Mo" },
-  { sigle: "PPA", titre: "Plan en Faveur des Populations Autochtones", cat: "sauvegardes", version: "v1.0", date: "2025", langue: "FR", taille: "2,0 Mo" },
-  { sigle: "PMPP", titre: "Plan de Mobilisation des Parties Prenantes", cat: "sauvegardes", version: "v1.2", date: "2025", langue: "FR", taille: "1,6 Mo" },
-  { sigle: "PGMO", titre: "Procédures de Gestion de la Main d'Œuvre", cat: "sauvegardes", version: "v1.0", date: "2025", langue: "FR", taille: "1,1 Mo" },
-  { sigle: "PEES", titre: "Plan d'Engagement Environnemental et Social", cat: "sauvegardes", version: "évolutif", date: "2025", langue: "FR", taille: "0,9 Mo" },
-  { sigle: "RFI", titre: "Synthèse des Rapports Financiers Intermédiaires", cat: "fiduciaire", version: "T1 2026", date: "2026", langue: "FR", taille: "0,7 Mo" },
-];
-
-export const documentsCats: DocumentCategorie[] = [
-  { code: "reference", label: { fr: "Référence", en: "Reference" } },
-  { code: "passation", label: { fr: "Passation", en: "Procurement" } },
-  { code: "sauvegardes", label: { fr: "Sauvegardes E&S", en: "E&S safeguards" } },
-  { code: "fiduciaire", label: { fr: "Fiduciaire", en: "Fiduciary" } },
-];
+/* Les dix pièces de référence qui vivaient ici (MEP, PPSD, CGES…) sont passées
+   au CMS : elles sont désormais servies par le module « Ressources &
+   publications » sur /transparency. `scripts/seed-documents-transparence.mjs`
+   les a reprises. Les garder en double aurait fait diverger la liste écrite en
+   dur de celle que l'Unité tient à jour. */
 
 export const marchesOuverts = marches.filter((m) => m.statut === "ouvert").length;

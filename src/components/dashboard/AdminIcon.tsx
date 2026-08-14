@@ -85,14 +85,6 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M10 8.5l5.5 3.5-5.5 3.5z" />
     </>
   ),
-  /* Ressources & publications : les volumes rangés */
-  ressources: (
-    <>
-      <path d="M3 4h5v16H3z" />
-      <path d="M9.5 4h5v16h-5z" />
-      <path d="M16 7h5v13h-5z" />
-    </>
-  ),
   /* Newsletter : l'enveloppe et son rabat */
   newsletter: (
     <>
