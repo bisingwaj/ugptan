@@ -22,6 +22,7 @@ import { redirect } from "next/navigation";
 import { ADMIN_HOME, ADMIN_LOGIN, EXPIRED_PARAM } from "@/lib/admin";
 import { auth } from "@/lib/auth/server";
 import { can, isRole, type AdminRole, type Permission } from "@/lib/auth/permissions";
+import { db } from "@/lib/db";
 import { estPanneDeLiaison } from "@/lib/errors";
 import { lectureConsole } from "@/lib/lecture";
 
@@ -87,6 +88,38 @@ export const getCurrentUser = cache(async (): Promise<AdminUser | null> => {
 });
 
 /**
+ * Lève si l'absence de session s'explique par une base injoignable.
+ *
+ * ⚠️ Le `catch` de `getCurrentUser` ne suffit PAS, et il a fallu une panne pour
+ * le voir. Better Auth ne laisse jamais sortir l'erreur de son adaptateur : il
+ * l'attrape, écrit « ERROR [Better Auth]: INTERNAL_SERVER_ERROR » dans le
+ * journal, et rend `null`. Aucune exception n'atteint donc `lectureConsole`,
+ * qui ne rejoue rien, ni le `catch`, qui ne distingue rien — et un `null` de
+ * PANNE devient indiscernable d'un `null` d'ABSENCE de session. Mesuré sur une
+ * liaison instable : `read ECONNRESET` côté Neon, « Session expirée.
+ * Reconnectez-vous. » côté rédaction, session pourtant valide.
+ *
+ * On lève l'ambiguïté en interrogeant la base nous-mêmes : si elle répond,
+ * l'absence est réelle ; si elle est injoignable, c'est une panne.
+ *
+ * ⚠️ À n'appeler QUE depuis les gardes qui refusent une opération. L'écran de
+ * connexion, lui, appelle `getCurrentUser` directement et doit continuer de
+ * s'afficher base éteinte : c'est précisément là qu'on a besoin de le lire.
+ * Une sonde posée plus haut le ferait tomber en erreur.
+ *
+ * Le coût est nul dans le cas courant : une session valide ne l'atteint jamais.
+ * Et il n'y a pas de brèche — cette fonction n'accorde aucun accès, elle choisit
+ * seulement entre « déconnecté » et « injoignable ».
+ *
+ * Sans reprises, volontairement : `lectureConsole` vient d'en dépenser cinq sur
+ * la même liaison. Les rejouer doublerait l'attente pour redire ce que la
+ * première série a déjà établi.
+ */
+async function refuserSiBaseInjoignable(): Promise<void> {
+  await db().$queryRaw`SELECT 1`;
+}
+
+/**
  * À appeler au début de TOUT layout, page et server action de la console.
  *
  * ⚠️ « Aussi dans la page », et pas seulement dans le layout : l'App Router rend
@@ -97,12 +130,19 @@ export const getCurrentUser = cache(async (): Promise<AdminUser | null> => {
  */
 export async function requireAdmin(): Promise<AdminUser> {
   const user = await getCurrentUser();
+  if (user) return user;
+
+  // Pas de session : reste à savoir si c'est la personne qui n'en a plus, ou la
+  // base qui n'a pas pu le dire. Renvoyer une rédactrice à l'écran de connexion
+  // au milieu d'une salve lui ferait refaire une connexion qui échouerait pour
+  // la même raison.
+  await refuserSiBaseInjoignable();
+
   // `EXPIRED_PARAM` : le proxy a laissé passer sur la foi du cookie, la base
   // vient de le démentir. Le marqueur permet à l'écran de connexion de le DIRE,
   // plutôt que d'accueillir la personne comme si elle s'était déconnectée
   // d'elle-même (cf. lib/admin.ts).
-  if (!user) redirect(`${ADMIN_LOGIN}?${EXPIRED_PARAM}=1`);
-  return user;
+  redirect(`${ADMIN_LOGIN}?${EXPIRED_PARAM}=1`);
 }
 
 /**
@@ -121,7 +161,26 @@ export async function requirePermission(permission: Permission): Promise<AdminUs
  * une exception ne peut pas être confondue avec un succès par l'appelant.
  */
 export async function assertPermission(permission: Permission): Promise<AdminUser> {
-  const user = await getCurrentUser();
+  let user: AdminUser | null;
+
+  try {
+    user = await getCurrentUser();
+    // Pas de session : la sonde tranche entre une session réellement finie et
+    // une base qui n'a pas pu répondre (cf. `refuserSiBaseInjoignable`).
+    if (!user) await refuserSiBaseInjoignable();
+  } catch (error) {
+    // Une panne de liaison ne dit RIEN de la session. Répondre
+    // « Reconnectez-vous » enverrait la personne vers un écran de connexion qui
+    // échouerait pour la même raison, et lui ferait croire qu'elle a perdu son
+    // travail. On refuse l'opération — mais en nommant la vraie cause.
+    if (estPanneDeLiaison(error)) {
+      throw new Error(
+        "Base de données momentanément injoignable. Votre session reste valide : réessayez dans un instant.",
+      );
+    }
+    throw error;
+  }
+
   if (!user) throw new Error("Session expirée. Reconnectez-vous.");
   if (!can(user, permission)) throw new Error("Droits insuffisants pour cette opération.");
   return user;
