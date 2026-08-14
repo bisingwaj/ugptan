@@ -25,6 +25,6 @@ import { revalidatePath } from "next/cache";
 export function revaliderEquipe(): void {
   revalidatePath("/[lang]", "page");
   revalidatePath("/[lang]/ugptn", "page");
-  revalidatePath("/[lang]/gouvernance", "page");
-  revalidatePath("/[lang]/composantes/[code]", "page");
+  revalidatePath("/[lang]/governance", "page");
+  revalidatePath("/[lang]/components/[code]", "page");
 }
