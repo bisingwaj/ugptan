@@ -87,6 +87,8 @@ model User {
 
   /// Rapports et documents déposés par ce compte — trace interne.
   documentsDeposes Document[]      @relation("DocumentDeposePar")
+  /// Rapports dont ce compte est l'AUTEUR affiché (signature publique).
+  documentsSignes  Document[]      @relation("DocumentAuteur")
   /// Sections « Histoires & impact » saisies par ce compte — trace interne.
   impactSaisi      ImpactSection[] @relation("ImpactSaisiPar")
   /// Fiches de l'équipe saisies par ce compte — trace interne.
@@ -358,6 +360,8 @@ model MediaAsset {
   impacts     ImpactItem[]
   /// Portraits des membres de l'équipe.
   portraits   TeamMember[]
+  /// Rapports rédigés en ligne dont ce média est l'image de couverture.
+  couverturesDoc Document[]
 
   @@index([createdAt])
 }
@@ -843,6 +847,25 @@ enum DocumentType {
   AUTRE
 }
 
+/// Sur quoi repose la publication : un fichier déposé, ou un texte rédigé dans
+/// la console.
+///
+/// Le champ ne dit pas ce que la pièce EST — c'est le rôle de `DocumentType` —
+/// mais comment elle se lit. La distinction commande trois choses :
+///   · ce que le formulaire de la console demande (un téléversement, ou
+///     l'éditeur de texte et ses blocs) ;
+///   · ce qu'il faut avoir pour publier (un fichier, ou un corps non vide) ;
+///   · ce que le site sert — une fiche à télécharger, ou une page de lecture à
+///     l'adresse `/<lang>/resources/<slug>`.
+///
+/// Les deux ne s'excluent pas : une publication rédigée peut porter un fichier
+/// en pièce jointe (la version PDF signée d'une note, par exemple), et c'est
+/// pourquoi les colonnes de fichier restent renseignables dans les deux cas.
+enum DocumentSupport {
+  FICHIER
+  REDIGE
+}
+
 /// Catégorie ou thématique documentaire — sert aussi de filtre public.
 ///
 /// Table distincte d'`ArticleCategory` et d'`EvenementCategory`, pour la raison
@@ -869,9 +892,22 @@ model DocumentCategory {
 
 /// Un rapport, une étude, une analyse ou une pièce de référence.
 model Document {
-  id     String         @id @default(cuid())
-  status DocumentStatus @default(DRAFT)
-  type   DocumentType   @default(RAPPORT)
+  id      String          @id @default(cuid())
+  status  DocumentStatus  @default(DRAFT)
+  type    DocumentType    @default(RAPPORT)
+  support DocumentSupport @default(FICHIER)
+
+  /// Segment d'URL de la page de lecture — `/fr/resources/<slug>` comme
+  /// `/en/resources/<slug>`.
+  ///
+  /// UN SEUL slug pour les deux langues, contrairement aux articles qui en
+  /// portent un par traduction : une pièce documentaire est d'abord une
+  /// référence citée dans les échanges du projet, et lui donner deux adresses
+  /// selon la langue de lecture multiplierait les liens à corriger le jour où
+  /// le titre anglais arrive. Nullable pour les lignes antérieures à la page de
+  /// lecture : elles sont servies par leur identifiant tant qu'elles n'ont pas
+  /// été réenregistrées (cf. lib/docs/query.ts).
+  slug String? @unique
 
   titreFr String
   /// Vide, le titre français est servi dans les deux langues (cf. l'en-tête).
@@ -880,10 +916,21 @@ model Document {
   descriptionFr String?
   descriptionEn String?
 
+  /// Corps de la publication rédigée, HTML déjà assaini à l'écriture
+  /// (cf. src/lib/html/sanitize.ts). Jamais de HTML brut de l'éditeur en base.
+  /// Vide pour un document qui n'existe que par son fichier.
+  contenuFr String @default("")
+  /// Version anglaise du corps. Vide, la page anglaise sert le français en le
+  /// signalant — même règle que les titres, et pour la même raison : une pièce
+  /// d'intérêt public ne se cache pas derrière une traduction en attente.
+  contenuEn String @default("")
+
   /// Sigle documentaire (« MEP », « PPSD », « CGES »), quand il en existe un.
   /// C'est par lui que ces pièces sont désignées dans les échanges du projet.
   reference String?
-  /// Auteur ou organisme producteur, tel qu'il doit s'afficher.
+  /// Organisme producteur, tel qu'il doit s'afficher (direction, cabinet
+  /// d'études, institution). Distinct de la SIGNATURE ci-dessous : l'un dit
+  /// d'où vient la pièce, l'autre qui l'a écrite.
   auteur    String?
   /// Langue du FICHIER (« FR », « EN », « FR/EN ») — pas celle de la fiche.
   langue    String  @default("FR")
@@ -906,16 +953,41 @@ model Document {
   categoryId String?
   category   DocumentCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
+  /// Image de couverture de la page de lecture, issue de la bibliothèque.
+  /// Sans objet pour un document qui n'existe que par son fichier.
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation(fields: [coverMediaId], references: [id], onDelete: SetNull)
+
+  /// --- Signature : QUI a écrit, par opposition à qui a saisi --------------
+  /// La personne qui rédige n'est pas celle qui tient la console : un chargé
+  /// d'études écrit la note, un administrateur la met en ligne. Publier le nom
+  /// du second attribuerait le texte à quelqu'un qui ne l'a pas écrit.
+  ///
+  /// Même triplet que les articles, et pour la même raison : `authorId` quand
+  /// l'auteur a un compte, `authorName` quand il n'en a pas (« Cellule suivi &
+  /// évaluation »), `authorRole` pour la fonction affichée sous le nom.
+  authorId   String?
+  author     User?   @relation("DocumentAuteur", fields: [authorId], references: [id], onDelete: SetNull)
+  authorName String?
+  authorRole String?
+
   /// --- Fichier : RÉFÉRENCES Cloudinary, jamais d'octets -------------------
+  ///
+  /// ⚠️ Nullables depuis l'ouverture du module à la rédaction en ligne : un
+  /// rapport écrit dans la console n'a pas de fichier, et lui en inventer un
+  /// (chaîne vide) obligerait chaque lecture à distinguer « vide » de
+  /// « absent ». `null` dit ce qu'il en est. Une publication rédigée PEUT
+  /// néanmoins porter une pièce jointe, auquel cas ces colonnes la décrivent.
+  ///
   /// URL de diffusion HTTPS, telle que Cloudinary la renvoie. C'est elle que le
   /// site public sert au visiteur.
-  fileUrl      String
+  fileUrl      String?
   /// Identifiant Cloudinary — seule prise pour retirer le fichier du compte à
   /// la suppression du document ou au remplacement du fichier.
   filePublicId String?
   /// Nom d'origine, conservé pour la recherche et pour nommer le téléchargement.
-  fileName     String
-  fileMime     String
+  fileName     String?
+  fileMime     String?
   /// Poids rapporté par Cloudinary, seule source du « PDF · 4,2 Mo » affiché.
   fileSize     Int     @default(0)
   /// Extension normalisée (« pdf », « docx »), pour la pastille de format.
@@ -932,6 +1004,7 @@ model Document {
   @@index([categoryId])
   @@index([type])
   @@index([featured])
+  @@index([support])
 }
 
 /// Histoires & impact

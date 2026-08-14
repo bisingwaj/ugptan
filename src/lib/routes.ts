@@ -123,6 +123,20 @@ export const evenementRoute = (lang: Lang, slug: string) =>
   `/${lang}${NAV.evenements}/${slug}`;
 
 /**
+ * Page de lecture d'un rapport rédigé en ligne.
+ *
+ * Ici pour la même raison que ci-dessus : la liste des ressources est un
+ * composant client (elle porte le panneau de détail), et ne peut donc pas
+ * appeler une fonction exportée d'un module serveur.
+ *
+ * Le segment est le slug de la pièce, ou son identifiant à défaut : les fiches
+ * antérieures à la page de lecture n'ont pas de slug tant qu'elles n'ont pas
+ * été réenregistrées, et une adresse en identifiant vaut mieux qu'un lien mort.
+ */
+export const documentRoute = (lang: Lang, slug: string) =>
+  `/${lang}${NAV.ressources}/${slug}`;
+
+/**
  * Groupe de navigation : une entrée d'en-tête qui ouvre un sous-menu.
  * `labelKey` réutilise le libellé de la page mère (t.nav) ; les enfants
  * portent, si besoin, un libellé abrégé propre au sous-menu (t.navSub).

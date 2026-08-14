@@ -15,7 +15,6 @@
 import Link from "next/link";
 import type { EvtVue } from "@/lib/events/query";
 import { dict } from "@/content/i18n";
-import { sanitizeHtml } from "@/lib/html/sanitize";
 import { evenementRoute, NAV, route } from "@/lib/routes";
 import type { Lang } from "@/lib/pick";
 import { Photo } from "@/components/ui/Photo";
@@ -24,6 +23,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { PartageArticle } from "@/components/actus/PartageArticle";
 import { EventsGrid } from "@/components/events/EventsGrid";
 import { BoutonInscription } from "@/components/events/BoutonInscription";
+import { ProseRiche } from "@/components/prose/ProseRiche";
 
 type Props = {
   evt: EvtVue;
@@ -216,16 +216,9 @@ export function EvenementVue({ evt, lang, lies, precedent, suivant }: Props) {
             </div>
           )}
 
-          {/* Assainissement une seconde fois, à l'affichage : la description est
-              déjà nettoyée à l'écriture (cf. actions/admin-evenements.ts), mais
-              rien n'interdit qu'une ligne ait été insérée en base autrement que
-              par la console. Le coût est marginal, la page étant mise en cache. */}
+          {/* Assainissement et dessin des graphiques : cf. components/prose/ProseRiche.tsx. */}
           {evt.contentHtml && (
-            <div
-              className="actu-prose"
-              style={{ marginTop: 34 }}
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(evt.contentHtml) }}
-            />
+            <ProseRiche html={evt.contentHtml} lang={lang} style={{ marginTop: 34 }} />
           )}
 
           <PartageArticle lang={lang} titre={evt.title} />

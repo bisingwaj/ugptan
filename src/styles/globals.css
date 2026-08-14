@@ -18,6 +18,9 @@
 
 @import "tailwindcss/theme.css" layer(theme);
 @import "./tokens.css";
+/* Graphiques du corps rédigé — feuille partagée par le site et la console.
+   Elle porte sa propre couche `components` (cf. son en-tête). */
+@import "./prose-graphique.css";
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 
 /* Détection de sources cadrée sur le code applicatif. Laissée automatique,
@@ -1141,6 +1144,16 @@ a.actu-hero__crumb-lien:hover { color: #fff; border-bottom-color: #fff; }
 /* --- Corps rédigé depuis la console ---------------------------------------- */
 .actu-prose { font-size: 16.5px; line-height: 1.78; color: var(--c-80); }
 .actu-prose > * + * { margin-top: 22px; }
+
+/* Corps contenant un GRAPHIQUE. Le texte est alors rendu par morceaux, chacun
+   dans un `.prose-part`, les figures venant s'intercaler entre eux
+   (cf. components/prose/ProseRiche.tsx). Ce niveau supplémentaire casserait la
+   règle d'espacement ci-dessus : ces trois lignes la rétablissent, à
+   l'intérieur d'un morceau comme entre deux morceaux. Sans graphique, aucun
+   `.prose-part` n'est produit et rien de tout cela ne s'applique. */
+.actu-prose > .prose-part > * + * { margin-top: 22px; }
+.actu-prose > * + .prose-part { margin-top: 22px; }
+.actu-prose > .prose-part + * { margin-top: 22px; }
 .actu-prose h2, .actu-prose h3, .actu-prose h4, .actu-prose h5 {
   color: var(--c-black); font-weight: 600; letter-spacing: -0.02em; line-height: 1.22;
 }
@@ -1464,10 +1477,81 @@ a.actu-nav__lien:hover { background: var(--c-10); }
   padding: 18px clamp(20px, 2.6vw, 28px); border-top: 1px solid var(--c-20); background: var(--c-10);
 }
 
+/* --- Page de lecture d'une publication rédigée -----------------------------
+   Elle réutilise le gabarit de contenu du site (`.actu-hero`, `.actu-corps`,
+   `.actu-prose`), comme la fiche d'un événement. Ce qui suit ne couvre que ce
+   qu'une pièce documentaire a en propre. */
+
+/* Bandeau SANS image. Ce n'est pas un repli dégradé : un rapport n'a pas de
+   photographie, et lui en inventer une n'apprendrait rien au lecteur. Le
+   bandeau se tient alors sur son seul aplat, plus court qu'un duotone. */
+.doc-hero--sobre {
+  min-height: 0;
+  background: var(--c-black);
+  border-bottom: 3px solid var(--ac);
+}
+.doc-hero--sobre .actu-hero__inner { padding-top: clamp(34px, 5vw, 62px); }
+.doc-hero--sobre .actu-hero__titre { max-width: 26ch; }
+
+/* Pastille « à lire en ligne » de la carte : elle distingue, dans la grille,
+   la publication qui s'ouvre sur le site du fichier qui se télécharge. */
+.doc-card__ligne {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border: 1px solid var(--ac);
+  color: var(--ac);
+}
+
+/* Pièce jointe d'une publication rédigée. Posée APRÈS le texte : c'est un
+   complément, jamais la porte d'entrée. */
+.doc-piece {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 24px;
+  margin-top: 34px;
+  padding: clamp(18px, 2.4vw, 26px);
+  border: 1px solid var(--c-20);
+  background: var(--c-10);
+}
+.doc-piece__tete { display: flex; align-items: flex-start; gap: 16px; min-width: min(260px, 100%); flex: 1; }
+.doc-piece__titre { font-size: 15px; font-weight: 600; color: var(--c-black); }
+.doc-piece__note { margin: 6px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--c-70); }
+.doc-piece__meta { margin: 8px 0 0; font-size: 11.5px; color: var(--c-50); }
+.doc-piece__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Publications liées, en fin de page. Une carte de texte, sans visuel : ces
+   pièces n'en ont pas toutes, et une grille à moitié illustrée se lit mal. */
+.doc-lie { display: block; padding: 22px clamp(16px, 2vw, 22px); border-top: 3px solid var(--ac); background: #fff; }
+.doc-lie__kicker {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--c-50);
+}
+.doc-lie__titre {
+  display: block;
+  margin-top: 10px;
+  font-size: 16.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--c-black);
+  transition: color 0.2s;
+}
+a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
+.doc-lie__date { display: block; margin-top: 12px; font-size: 11.5px; color: var(--c-50); }
+
 @media (max-width: 760px) {
   .doc-grille { grid-template-columns: 1fr; }
   .doc-modal__cadre { height: 44vh; }
   .doc-card__pied .btn { flex: 1; justify-content: center; }
+  .doc-piece__actions { width: 100%; }
+  .doc-piece__actions .btn { flex: 1; justify-content: center; }
 }
 
 } /* fin @layer components */

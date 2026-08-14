@@ -21,6 +21,9 @@
 
 @import "tailwindcss/theme.css" layer(theme);
 @import "./tokens.css";
+/* Graphiques du corps rédigé — feuille partagée par le site et la console.
+   Elle porte sa propre couche `components` (cf. son en-tête). */
+@import "./prose-graphique.css";
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 
 /* Même cadrage que la feuille publique : cf. le commentaire de globals.css. */
@@ -559,6 +562,107 @@
   .adm-modal__barre { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
   .adm-modal__corps { flex: 1; overflow-y: auto; }
 
+  /* --- Modale de composition d'un graphique ----------------------------------
+     Deux colonnes : la saisie à gauche, l'aperçu à droite. L'aperçu est le
+     rendu RÉEL du site (cf. GraphiqueModal.tsx) ; ses styles viennent de la
+     feuille partagée `prose-graphique.css`, importée en tête de ce fichier. */
+  .adm-graph__panel { width: min(1180px, 100%); }
+  .adm-graph__corps {
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(18px, 2.4vw, 30px);
+    align-items: start;
+  }
+  .adm-graph__saisie { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .adm-graph__formes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+  .adm-graph__forme {
+    display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px;
+    border: 1px solid var(--c-20); background: #fff; cursor: pointer;
+  }
+  .adm-graph__forme:hover { border-color: var(--c-40); }
+  .adm-graph__forme.is-on { border-color: var(--ac); box-shadow: inset 0 0 0 1px var(--ac); }
+  .adm-graph__forme > span { display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; }
+  .adm-graph__forme input { margin-top: 3px; }
+
+  .adm-graph__series { display: flex; flex-direction: column; gap: 10px; }
+  .adm-graph__table { width: 100%; border-collapse: collapse; }
+  .adm-graph__table th {
+    padding: 0 0 6px; text-align: left; font-family: var(--font-mono);
+    font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-50);
+  }
+  .adm-graph__table td { padding: 0 6px 8px 0; vertical-align: top; }
+  .adm-graph__table td:last-child { width: 40px; padding-right: 0; }
+  .adm-graph__table td:nth-child(2) { width: 120px; }
+  .adm-graph__retirer {
+    width: 36px; height: 36px; border: 1px solid var(--c-20); color: var(--c-60); background: #fff;
+  }
+  .adm-graph__retirer:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+  .adm-graph__retirer:disabled { opacity: 0.4; cursor: not-allowed; }
+  .adm-graph__collage > summary {
+    cursor: pointer; font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-60);
+  }
+  .adm-graph__collage > summary:hover { color: var(--ac); }
+
+  .adm-graph__apercu {
+    display: flex; flex-direction: column; gap: 10px; min-width: 0;
+    position: sticky; top: 0;
+  }
+  .adm-graph__scene { background: var(--c-10); padding: clamp(10px, 1.6vw, 16px); }
+
+  @media (max-width: 900px) {
+    .adm-graph__corps { grid-template-columns: 1fr; }
+    .adm-graph__apercu { position: static; }
+  }
+
+  /* --- Choix du support d'une publication ------------------------------------ */
+  .adm-supports { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .adm-support {
+    display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px;
+    border: 1px solid var(--c-20); background: #fff; cursor: pointer;
+  }
+  .adm-support:hover { border-color: var(--c-40); }
+  .adm-support.is-on { border-color: var(--ac); box-shadow: inset 0 0 0 1px var(--ac); }
+  .adm-support > span { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+  .adm-support input { margin-top: 4px; }
+
+  /* --- Couverture d'une publication rédigée ---------------------------------- */
+  .adm-cover { display: flex; flex-direction: column; gap: 8px; }
+  .adm-cover__img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--c-10); }
+  .adm-cover__meta { display: flex; justify-content: space-between; gap: 10px; }
+
+  /* --- Prose de la console ---------------------------------------------------
+     Rendu du corps rédigé dans la PRÉVISUALISATION (cf. DocumentApercu.tsx).
+     Doublon assumé d'une partie de `.actu-prose` : la console ne charge pas la
+     feuille publique, et n'a besoin ici que de la typographie de lecture — pas
+     du bandeau, ni de la colonne, ni des blocs de fin de page. */
+  .adm-prose { font-size: 15px; line-height: 1.7; color: var(--c-80); }
+  .adm-prose > * + * { margin-top: 16px; }
+  .adm-prose > .prose-part > * + * { margin-top: 16px; }
+  .adm-prose > * + .prose-part, .adm-prose > .prose-part + * { margin-top: 16px; }
+  .adm-prose h2 { font-size: 21px; font-weight: 600; line-height: 1.25; margin-top: 24px; color: var(--c-black); }
+  .adm-prose h3 { font-size: 18px; font-weight: 600; line-height: 1.3; margin-top: 20px; color: var(--c-black); }
+  .adm-prose h4 { font-size: 16px; font-weight: 600; margin-top: 18px; color: var(--c-black); }
+  .adm-prose a { color: var(--ac); text-decoration: underline; }
+  .adm-prose strong { font-weight: 600; color: var(--c-black); }
+  .adm-prose ul { list-style: disc; padding-left: 22px; }
+  .adm-prose ol { list-style: decimal; padding-left: 22px; }
+  .adm-prose li + li { margin-top: 6px; }
+  .adm-prose blockquote { border-left: 3px solid var(--ac); padding-left: 16px; color: var(--c-black); }
+  .adm-prose pre { background: var(--c-10); border: 1px solid var(--c-20); padding: 12px; font-family: var(--font-mono); font-size: 12.5px; overflow-x: auto; }
+  .adm-prose img { width: 100%; height: auto; }
+  .adm-prose figure { margin-top: 22px; }
+  .adm-prose figcaption { margin-top: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--c-50); }
+  .adm-prose table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 13.5px; }
+  .adm-prose th, .adm-prose td { border: 1px solid var(--c-20); padding: 8px 11px; text-align: left; }
+  .adm-prose th { background: var(--c-10); font-weight: 600; }
+  .adm-prose hr { border-top: 1px solid var(--c-20); margin: 24px 0; }
+  .adm-prose .actu-embed { position: relative; aspect-ratio: 16 / 9; background: var(--c-black); }
+  .adm-prose .actu-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  /* Le graphique verrouillé de l'éditeur : on le désigne comme cliquable, c'est
+     le seul geste qui l'ouvre (cf. RichEditor.tsx). */
+  .rte__zone figure.prose-graphique { cursor: pointer; }
+  .rte__zone figure.prose-graphique:hover { box-shadow: 0 0 0 2px var(--ac); }
+
   .adm-medias { display: grid; grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); gap: 12px; margin-top: 10px; }
   .adm-media { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid var(--c-20); text-align: left; }
   .adm-media:hover { border-color: var(--ac); }
@@ -615,6 +719,12 @@
   .adm-doc__apercu-titre { font-size: 19px; font-weight: 600; line-height: 1.3; margin: 0; }
   .adm-doc__apercu-desc { font-size: 14px; line-height: 1.6; color: var(--c-70); margin: 0; }
   .adm-doc__apercu-fichier { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  /* Corps rédigé dans la prévisualisation : hauteur bornée et défilement
+     propre, pour qu'un rapport de vingt pages n'étire pas la modale. */
+  .adm-doc__apercu-prose {
+    max-height: min(58vh, 520px); overflow-y: auto;
+    border: 1px solid var(--c-20); background: #fff; padding: clamp(14px, 2vw, 22px);
+  }
   .adm-doc__apercu-cadre { width: 100%; height: min(58vh, 520px); border: 1px solid var(--c-20); background: var(--c-10); }
   .adm-doc__apercu-vide {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;

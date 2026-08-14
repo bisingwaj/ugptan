@@ -1,0 +1,234 @@
+/* ===========================================================================
+   GRAPHIQUES DU CORPS RÉDIGÉ
+
+   Feuille PARTAGÉE, importée par les deux entrées : globals.css (site public)
+   et dashboard.css (aperçu de la console). C'est la seule de ce dépôt à l'être,
+   et pour une raison précise : la console prévisualise le graphique avec le
+   composant DU SITE (cf. components/dashboard/actus/GraphiqueModal.tsx). Deux
+   copies de ces règles auraient fait mentir l'aperçu au premier ajustement.
+
+   Sélecteurs préfixés `figure.prose-graphique` là où la feuille publique
+   possède déjà une règle sur le même élément (`.actu-prose table`, `figcaption`) :
+   à spécificité égale, c'est l'ordre qui tranche, et cette feuille est importée
+   AVANT le gros des composants. Le préfixe rend la question sans objet.
+
+   Aucune couleur n'encode ici de sens en dehors de l'anneau : une série unique
+   porte l'accent de la page, et sa valeur est écrite en toutes lettres à côté
+   de la barre. La couleur distingue la donnée du fond, elle ne la remplace pas.
+=========================================================================== */
+
+@layer components {
+  /* --- Figure -------------------------------------------------------------- */
+  figure.prose-graphique {
+    margin: 34px 0 0;
+    border: 1px solid var(--c-20);
+    border-top: 3px solid var(--ac);
+    background: #fff;
+    padding: clamp(18px, 2.4vw, 26px);
+  }
+  .prose-graphique__titre {
+    margin: 0 0 20px;
+    font-size: 15.5px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--c-black);
+  }
+  figure.prose-graphique figcaption.prose-graphique__source {
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid var(--c-20);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--c-50);
+  }
+
+  /* --- Tableau des valeurs -------------------------------------------------
+     Replié, mais toujours présent : c'est lui que lit un lecteur d'écran, et
+     lui qui reste utile à qui ne distingue pas les teintes. */
+  .prose-graphique__donnees { margin-top: 18px; }
+  .prose-graphique__donnees > summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--c-60);
+  }
+  .prose-graphique__donnees > summary:hover { color: var(--ac); }
+  figure.prose-graphique .prose-graphique__donnees table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    margin-top: 14px;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  figure.prose-graphique .prose-graphique__donnees th,
+  figure.prose-graphique .prose-graphique__donnees td {
+    border: 1px solid var(--c-20);
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+    font-weight: 400;
+    color: var(--c-70);
+  }
+  figure.prose-graphique .prose-graphique__donnees thead th {
+    background: var(--c-10);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--c-60);
+  }
+
+  /* --- Barres horizontales -------------------------------------------------
+     Forme par défaut : les intitulés y tiennent en toutes lettres, et la
+     comparaison se lit sur un seul axe. */
+  .pg-barres { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .pg-barres__ligne {
+    display: grid;
+    grid-template-columns: minmax(84px, 26%) 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+  .pg-barres__label { font-size: 13.5px; line-height: 1.35; color: var(--c-70); }
+  .pg-barres__piste { position: relative; height: 14px; background: var(--c-10); }
+  .pg-barres__fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--ac);
+    border-radius: 0 3px 3px 0;
+  }
+  .pg-barres__valeur { font-size: 12.5px; color: var(--c-black); white-space: nowrap; }
+
+  /* --- Colonnes verticales -------------------------------------------------- */
+  .pg-colonnes {
+    display: flex;
+    align-items: flex-end;
+    gap: clamp(6px, 1.8vw, 20px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pg-colonnes__item {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .pg-colonnes__valeur { font-size: 12px; color: var(--c-black); white-space: nowrap; }
+  .pg-colonnes__piste {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 68px;
+    height: clamp(120px, 22vw, 190px);
+    background: var(--c-10);
+  }
+  .pg-colonnes__fill { width: 100%; background: var(--ac); border-radius: 3px 3px 0 0; }
+  .pg-colonnes__label {
+    font-size: 11.5px;
+    line-height: 1.3;
+    text-align: center;
+    color: var(--c-60);
+    overflow-wrap: anywhere;
+  }
+
+  /* --- Courbe --------------------------------------------------------------
+     Le tracé est étiré par `preserveAspectRatio="none"` ; les points et les
+     étiquettes sont des éléments HTML posés en pourcentage, qu'aucune
+     déformation n'atteint (cf. components/prose/Graphique.tsx). */
+  .pg-lignes { display: flex; flex-direction: column; gap: 12px; }
+  .pg-lignes__cadre { position: relative; height: clamp(150px, 25vw, 220px); }
+  .pg-lignes__trace { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pg-lignes__point {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    margin: 0 0 -4.5px -4.5px;
+    background: #fff;
+    border: 2px solid var(--ac);
+    border-radius: 50%;
+  }
+  .pg-lignes__valeur {
+    position: absolute;
+    margin-bottom: 15px;
+    padding: 1px 5px;
+    background: #fff;
+    font-size: 11.5px;
+    color: var(--c-black);
+    white-space: nowrap;
+  }
+  .pg-lignes__axe {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--c-50);
+  }
+
+  /* --- Anneau ---------------------------------------------------------------
+     Seule forme où la couleur porte l'identité d'une part. La légende la double
+     systématiquement : nom, valeur et pourcentage. */
+  .pg-anneau { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(18px, 3vw, 34px); }
+  .pg-anneau__disque { position: relative; flex: 0 0 auto; width: clamp(148px, 30vw, 186px); }
+  .pg-anneau__disque svg { display: block; width: 100%; height: auto; }
+  .pg-anneau__centre {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    text-align: center;
+  }
+  .pg-anneau__total { font-size: clamp(15px, 2.2vw, 19px); font-weight: 600; color: var(--c-black); }
+  .pg-anneau__total-label {
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-50);
+  }
+  .pg-anneau__legende {
+    flex: 1;
+    min-width: min(230px, 100%);
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pg-anneau__part {
+    display: grid;
+    grid-template-columns: 12px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+  }
+  .pg-anneau__puce { width: 12px; height: 12px; }
+  .pg-anneau__nom { color: var(--c-70); line-height: 1.35; }
+  .pg-anneau__valeur { font-size: 12.5px; color: var(--c-black); white-space: nowrap; }
+  .pg-anneau__pourcent { color: var(--c-50); }
+
+  @media (max-width: 560px) {
+    /* L'intitulé passe AU-DESSUS de sa barre : à cette largeur, une colonne de
+       26 % ne tient plus deux mots, et la barre n'aurait plus de course. */
+    .pg-barres__ligne {
+      grid-template-columns: 1fr auto;
+      grid-template-areas: "label valeur" "piste piste";
+      gap: 6px 10px;
+    }
+    .pg-barres__label { grid-area: label; }
+    .pg-barres__valeur { grid-area: valeur; }
+    .pg-barres__piste { grid-area: piste; }
+
+    .pg-colonnes { gap: 4px; }
+    .pg-colonnes__label { font-size: 10.5px; }
+    .pg-anneau { justify-content: center; }
+  }
+}

@@ -638,10 +638,10 @@ export const ADMIN_EVTS = {
  */
 export const ADMIN_DOCS = {
   title: "Rapports & analyses",
-  lead: "Rapports, études, analyses et pièces de référence publiés dans la section « Rapports & analyses » du site. Les fichiers sont déposés sur le stockage Cloudinary et servis par son réseau de diffusion ; la base ne conserve que leurs métadonnées et leur adresse.",
+  lead: "Rapports, études, analyses et pièces de référence de la section « Rapports & analyses » du site. Deux façons de publier : téléverser un fichier, ou rédiger la publication ici même — texte, visuels et graphiques — pour qu'elle se lise directement sur le site.",
 
   /* --- Liste --------------------------------------------------------------- */
-  nouveau: "Déposer un document",
+  nouveau: "Nouvelle publication",
   listeVide: "Aucun document pour le moment.",
   listeVideFiltre: "Aucun document ne correspond à ce filtre.",
   rechercher: "Rechercher un titre, un sigle, un organisme…",
@@ -657,8 +657,11 @@ export const ADMIN_DOCS = {
   colType: "Nature",
   colCategorie: "Catégorie",
   colDate: "Date",
-  colFichier: "Fichier",
+  colFichier: "Support",
   colOrdre: "Ordre",
+  tousSupports: "Tous les supports",
+  supportRedige: "Rédigé",
+  sansContenu: "Corps vide",
 
   sansCategorie: "Sans catégorie",
   sansDate: "Non datée",
@@ -692,8 +695,38 @@ export const ADMIN_DOCS = {
   champDescriptionEn: "Description (anglais)",
   champReference: "Sigle ou référence",
   champReferenceAide: "MEP, PPSD, CGES… Le code par lequel la pièce est désignée dans les échanges du projet.",
-  champAuteur: "Auteur ou organisme",
-  champAuteurAide: "Direction, cellule, cabinet d'études ou institution ayant produit le document.",
+  champAuteur: "Organisme producteur",
+  champAuteurAide: "Direction, cellule, cabinet d'études ou institution d'où vient la pièce. La personne qui l'a écrite se renseigne dans « Signature ».",
+
+  /* --- Rédaction ----------------------------------------------------------- */
+  blocSupport: "Support de la publication",
+  blocSupportAide: "Il décide de ce que le site sert au visiteur : un fichier à télécharger, ou une page à lire.",
+  blocCorps: "Corps de la publication",
+  blocCorpsAide:
+    "Titres, paragraphes, visuels, tableaux et graphiques. C'est ce texte qui se lit sur le site, à l'adresse de la publication.",
+  corpsFr: "Texte français",
+  corpsEn: "Texte anglais",
+  corpsEnAide: "Laissé vide, les lecteurs anglophones reçoivent le texte français, signalé comme tel.",
+  corpsPlaceholderFr: "Rédigez le rapport…",
+  corpsPlaceholderEn: "Write the English version…",
+  champSlugDoc: "Adresse de la page",
+  champSlugDocAide:
+    "Segment d'URL de la publication, commun aux deux langues. Déduit du titre s'il est laissé vide. Le modifier casse les liens déjà partagés.",
+
+  blocSignature: "Signature",
+  blocSignatureAide:
+    "Le nom qui paraît sur le site sous le titre. C'est celui de la personne qui a écrit, jamais celui du compte qui saisit la fiche.",
+  champCompteAuteur: "Compte auteur",
+  sansCompteAuteur: "Aucun compte",
+  champSignature: "Signature affichée",
+  champSignatureAide: "Prime sur le compte. À employer pour un service (« Cellule suivi & évaluation ») ou un auteur sans accès à la console.",
+  champFonction: "Fonction",
+
+  blocCouverture: "Couverture",
+  blocCouvertureAide: "Image d'en-tête de la page de lecture, reprise au partage sur les réseaux.",
+  couvertureChoisir: "Choisir un visuel",
+  couvertureRetirer: "Retirer",
+  couvertureAucune: "Aucune couverture : la page s'ouvre sur un bandeau sobre, sans image.",
 
   blocPublication: "Publication",
   champStatut: "État",
@@ -709,6 +742,8 @@ export const ADMIN_DOCS = {
   enregistrement: "Enregistrement…",
   deposer: "Déposer le document",
   depot: "Téléversement…",
+  creer: "Créer la publication",
+  creation: "Création…",
   voirSite: "Voir sur le site",
   voirSiteIndisponible: "La fiche publique sera accessible une fois le document publié.",
 
@@ -721,10 +756,18 @@ export const ADMIN_DOCS = {
 
   /* --- Fichier ------------------------------------------------------------- */
   blocFichier: "Fichier",
+  blocPieceJointe: "Pièce jointe",
   fichierAide:
     "PDF, Word, Excel, PowerPoint, CSV ou image. Le fichier part sur le stockage Cloudinary ; la base n'en garde que l'adresse et le poids.",
   fichierChoisir: "Fichier à téléverser",
   fichierAucun: "Aucun fichier attaché.",
+  fichierAttacher: "Attacher un fichier",
+  fichierAttachement: "Téléversement…",
+  fichierAttacherAide:
+    "Facultatif sur une publication rédigée : la version signée d'une note, le tableau de données qui l'accompagne.",
+  fichierRetirer: "Retirer la pièce jointe",
+  fichierRetirerConfirm:
+    "Retirer cette pièce jointe ? Le fichier sera supprimé du stockage et les liens déjà partagés cesseront de fonctionner. Le texte de la publication reste intact.",
   fichierOuvrir: "Ouvrir le fichier",
   fichierTelecharger: "Télécharger",
   fichierRemplacer: "Remplacer le fichier",
@@ -740,6 +783,8 @@ export const ADMIN_DOCS = {
   apercuOuvrir: "Prévisualiser",
   apercuFermer: "Fermer",
   apercuFichier: "Aperçu du fichier",
+  apercuCorps: "Corps de la publication",
+  apercuCorpsVide: "Aucun texte rédigé pour le moment.",
   apercuIndisponible:
     "Ce format ne s'affiche pas dans le navigateur. Ouvrez le fichier pour le vérifier avant publication.",
 

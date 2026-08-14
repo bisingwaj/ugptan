@@ -79,10 +79,16 @@ export default async function RessourcesPage(props: {
   const filtre = Boolean(categorie || type || q);
 
   /**
-   * Données structurées : la page est un CATALOGUE de pièces téléchargeables.
+   * Données structurées : la page est un CATALOGUE de pièces publiées.
    * `ItemList` de `DigitalDocument` est ce que les moteurs comprennent d'une
-   * telle liste — chaque entrée porte son URL de fichier, son format et sa date,
+   * telle liste — chaque entrée porte son adresse, sa date et son auteur,
    * exactement ce qui permet de la proposer en résultat direct.
+   *
+   * L'URL annoncée est celle de la PAGE pour une publication rédigée, celle du
+   * FICHIER pour une pièce téléversée : c'est là que le visiteur trouvera le
+   * contenu, et annoncer l'autre le ferait atterrir à côté. La signature de
+   * l'auteur prime sur l'organisme producteur, pour la même raison qu'à
+   * l'écran : c'est elle qui dit qui a écrit.
    */
   const jsonLd = {
     "@context": "https://schema.org",
@@ -99,11 +105,17 @@ export default async function RessourcesPage(props: {
         name: document.titre,
         ...(document.description ? { description: document.description } : {}),
         ...(document.dateISO ? { datePublished: document.dateISO } : {}),
-        ...(document.auteur ? { author: { "@type": "Organization", name: document.auteur } } : {}),
+        ...(document.signature
+          ? { author: { "@type": "Person", name: document.signature.nom } }
+          : document.auteur
+            ? { author: { "@type": "Organization", name: document.auteur } }
+            : {}),
         ...(document.categorie ? { genre: document.categorie.nom } : {}),
         inLanguage: lang,
-        encodingFormat: document.fichier.mime,
-        url: document.fichier.url,
+        ...(document.fichier ? { encodingFormat: document.fichier.mime } : {}),
+        url: document.redige
+          ? `${SITE_URL}${document.chemin}`
+          : (document.fichier?.url ?? `${SITE_URL}/${lang}${NAV.ressources}?doc=${document.id}`),
       },
     })),
   };

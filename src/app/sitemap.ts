@@ -3,15 +3,20 @@ import { SITE_URL, ALL_PATHS } from "@/lib/site";
 import { NAV } from "@/lib/routes";
 import { urlsArticles } from "@/lib/actus/query";
 import { urlsEvenements } from "@/lib/events/query";
+import { urlsDocuments } from "@/lib/docs/query";
+import { LOCALES } from "@/lib/params";
 
 /**
  * Servi sur /sitemap.xml — toutes les pages localisées (FR + EN), plus une
- * entrée par article et par événement publiés.
+ * entrée par article, par événement et par publication rédigée.
  *
- * Les deux étant écrits en base, le fichier est régénéré périodiquement et
- * invalidé à chaque publication (cf. lib/actus/cache.ts, lib/events/cache.ts).
- * Ni `urlsArticles()` ni `urlsEvenements()` ne lèvent : un sitemap amputé vaut
+ * Les trois étant écrits en base, le fichier est régénéré périodiquement et
+ * invalidé à chaque publication (cf. lib/actus/cache.ts, lib/events/cache.ts,
+ * lib/docs/cache.ts). Aucune de ces lectures ne lève : un sitemap amputé vaut
  * mieux qu'une erreur sur cette route.
+ *
+ * Les documents qui ne sont qu'un FICHIER n'y figurent pas : ils n'ont pas
+ * d'adresse propre — leur fiche est un panneau de la liste, déjà annoncée.
  */
 export const revalidate = 3600;
 
@@ -29,7 +34,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  const [lignesArticles, lignesEvenements] = await Promise.all([urlsArticles(), urlsEvenements()]);
+  const [lignesArticles, lignesEvenements, lignesDocuments] = await Promise.all([
+    urlsArticles(),
+    urlsEvenements(),
+    urlsDocuments(),
+  ]);
 
   const articles = lignesArticles.map((article) => ({
     url: `${SITE_URL}/${article.locale}${NAV.actualites}/${article.slug}`,
@@ -47,5 +56,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...pages, ...articles, ...evenements];
+  // Une entrée par langue : le slug d'une publication est commun aux deux, et
+  // les deux adresses existent réellement (cf. le modèle `Document` au schéma).
+  const documents = lignesDocuments.flatMap((doc) =>
+    LOCALES.map((locale) => ({
+      url: `${SITE_URL}/${locale}${NAV.ressources}/${doc.slug}`,
+      lastModified: doc.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+  );
+
+  return [...pages, ...articles, ...evenements, ...documents];
 }
