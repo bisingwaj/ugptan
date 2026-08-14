@@ -43,7 +43,7 @@ export function DocumentVue({
   const entete = (
     <div className="actu-hero__inner">
       <nav className="mono actu-hero__crumb" aria-label={t.breadcrumbLabel}>
-        <Link href={route(lang, NAV.ressources)} className="actu-hero__crumb-lien">{t.titre}</Link>
+        <Link href={route(lang, NAV.transparence)} className="actu-hero__crumb-lien">{t.titre}</Link>
         {document.categorie && <> / {document.categorie.nom}</>}
       </nav>
 
@@ -167,14 +167,20 @@ export function DocumentVue({
                 </div>
               </div>
               <div className="doc-piece__actions">
-                <a
-                  href={document.fichier.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn--outline btn--sm"
-                >
-                  {t.open} ↗
-                </a>
+                {/* Même règle que le panneau de la liste : « Ouvrir » suppose que
+                    le navigateur sache afficher le format. Sur une pièce jointe
+                    bureautique, il ne le sait pas, et le lien ne faisait que
+                    relancer un téléchargement sous un autre nom. */}
+                {document.fichier.apercu && (
+                  <a
+                    href={document.fichier.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn--outline btn--sm"
+                  >
+                    {t.open} ↗
+                  </a>
+                )}
                 {/* `download` seul ne suffit pas sur une origine tierce : c'est
                     l'URL qui porte la demande (cf. lib/docs/fichier.ts). */}
                 <a href={document.fichier.urlDl} className="btn btn--primary btn--sm" download>
@@ -187,7 +193,7 @@ export function DocumentVue({
           <PartageArticle lang={lang} titre={document.titre} />
 
           <p className="actu-retour">
-            <Link href={route(lang, NAV.ressources)} className="mono actu-retour__lien">
+            <Link href={route(lang, NAV.transparence)} className="mono actu-retour__lien">
               ← {t.backToList}
             </Link>
           </p>

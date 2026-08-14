@@ -39,7 +39,7 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
   const document = await getDocument(lang, params.slug);
 
   if (!document) {
-    return { title: dict(lang).nav.ressources, robots: { index: false, follow: true } };
+    return { title: dict(lang).ressources.titre, robots: { index: false, follow: true } };
   }
 
   const url = `${SITE_URL}${document.chemin}`;
@@ -56,13 +56,13 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
     // producteur à défaut. Jamais le compte qui a saisi la fiche.
     authors: [{ name: document.signature?.nom ?? document.auteur ?? meta.uniteLong }],
     alternates: {
-      canonical: `/${lang}${NAV.ressources}/${document.slug}`,
+      canonical: `/${lang}${NAV.transparence}/${document.slug}`,
       // Le slug est commun aux deux langues (cf. le modèle `Document`) : les
       // deux alternatives existent toujours, contrairement aux articles dont la
       // traduction porte sa propre adresse.
       languages: {
-        fr: `/fr${NAV.ressources}/${document.slug}`,
-        en: `/en${NAV.ressources}/${document.slug}`,
+        fr: `/fr${NAV.transparence}/${document.slug}`,
+        en: `/en${NAV.transparence}/${document.slug}`,
       },
     },
     openGraph: {

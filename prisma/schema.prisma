@@ -932,6 +932,18 @@ model Document {
   /// Sigle documentaire (« MEP », « PPSD », « CGES »), quand il en existe un.
   /// C'est par lui que ces pièces sont désignées dans les échanges du projet.
   reference String?
+  /// Version publiée (« v1.0 », « T2 2026 », « évolutif »).
+  ///
+  /// CHAÎNE LIBRE et non un numéro : les pièces du projet ne se versionnent pas
+  /// toutes de la même façon. Un cadre de sauvegardes porte un numéro d'édition,
+  /// un plan de passation se repère à son trimestre, et le PEES est déclaré
+  /// « évolutif » parce qu'il est révisé en continu. Imposer un format unique
+  /// obligerait à mentir sur l'un des trois.
+  ///
+  /// La page publique annonce que « le versionnage est explicite : une version
+  /// remplacée reste identifiable ». Cette colonne est ce qui rend cette phrase
+  /// vraie — la retirer reviendrait à retirer l'engagement avec elle.
+  version   String?
   /// Organisme producteur, tel qu'il doit s'afficher (direction, cabinet
   /// d'études, institution). Distinct de la SIGNATURE ci-dessous : l'un dit
   /// d'où vient la pièce, l'autre qui l'a écrite.

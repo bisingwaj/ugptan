@@ -21,7 +21,6 @@ export function dict(lang: Lang) {
       transparence: t("Transparence", "Transparency"),
       actualites: t("Actualités", "News"),
       resultats: t("Résultats", "Results"),
-      ressources: t("Rapports & analyses", "Reports & analyses"),
       evenements: t("Événements", "Events"),
       galerie: t("Vidéos & galeries", "Videos & galleries"),
       contact: t("Contact", "Contact"),
@@ -68,12 +67,8 @@ export function dict(lang: Lang) {
         "Open notices, procurement method, required documents and deadlines.",
       ),
       transparence: t(
-        "Dépôt officiel des documents divulgables, versionnés et datés.",
-        "Official repository of disclosable documents, versioned and dated.",
-      ),
-      ressources: t(
-        "Notes, études et rapports sur lesquels reposent les arbitrages.",
-        "Notes, studies and reports on which trade-offs rest.",
+        "Rapports, études et pièces de référence, versionnés et datés.",
+        "Reports, studies and reference material, versioned and dated.",
       ),
       mgp: t(
         "Déposer une plainte, suivre son traitement, canal confidentiel EAS/HS.",
@@ -141,7 +136,6 @@ export function dict(lang: Lang) {
       ),
     },
     foot: {
-      transparence: t("Transparence", "Transparency"),
       /* Provenance des données chiffrées, déplacée sous l'identité de l'Unité. */
       source: t(
         "Source de vérité : MEP du 23 juin 2025. Montants, dates et indicateurs conformes aux documents officiels du projet.",
@@ -181,7 +175,6 @@ export function dict(lang: Lang) {
       redevabilite: t("Redevabilité", "Accountability"),
       avant: t("Aujourd'hui", "Today"),
       apres: t("Avec le projet", "With the project"),
-      ressources: t("Rapports & analyses", "Reports & analyses"),
       views: t("Vues", "Views"),
       bidders_registered: t("Soumissionnaires enregistrés", "Registered bidders"),
       questions_received: t("Questions reçues", "Questions received"),
@@ -757,27 +750,6 @@ export function dict(lang: Lang) {
     },
 
     /* --- Transparence documentaire --------------------------------------- */
-    docs: {
-      heroTitle: t("Ce que nous publions, et pourquoi certaines pièces ne le sont pas.", "What we publish, and why some documents are not published."),
-      heroLead: t(
-        "Le dépôt officiel des documents divulgables du Projet, en application de la norme environnementale et sociale n°10 et de la politique d'accès à l'information de la Banque mondiale. Le versionnage est explicite : une version remplacée reste identifiable. Ne sont pas publiés les documents contenant des données personnelles, des informations commercialement sensibles avant attribution, ou des éléments couverts par une obligation de confidentialité.",
-        "The official repository of the Project's disclosable documents, under Environmental and Social Standard 10 and the World Bank's access-to-information policy. Versioning is explicit: a superseded version remains identifiable. Not published are documents containing personal data, commercially sensitive information ahead of award, or material covered by a confidentiality obligation.",
-      ),
-      search: t("Rechercher un document…", "Search a document…"),
-      sortBy: t("Trier par", "Sort by"),
-      sortRef: t("Référence", "Reference"),
-      sortSize: t("Taille", "Size"),
-      noResult: t("Aucun document ne correspond à votre recherche.", "No document matches your search."),
-      colDoc: t("Document", "Document"),
-      colMeta: t("Version · Date · Langue · Taille", "Version · Date · Language · Size"),
-      download: t("Télécharger", "Download"),
-      previewNote: t("Aperçu à l'écran — le fichier officiel est téléchargeable.", "On-screen preview — the official file is downloadable."),
-      disclaimer: t(
-        "Seuls les documents divulgables sont publiés ; aucun contenu confidentiel ou nominatif. Le versionnage est explicite. Conforme à la politique d'accès à l'information de la Banque mondiale.",
-        "Only disclosable documents are published; no confidential or personal content. Versioning is explicit. Compliant with the World Bank's access-to-information policy.",
-      ),
-    },
-
     /* --- Actualités ------------------------------------------------------- */
     actus: {
       heroTitle: t("Décisions, jalons et communiqués.", "Decisions, milestones and releases."),
@@ -866,16 +838,19 @@ export function dict(lang: Lang) {
 
     /* --- Ressources ------------------------------------------------------- */
     ressources: {
-      titre: t("Rapports & publications", "Reports & publications"),
-      hero: t("La production analytique qui précède les décisions.", "The analytical work that precedes decisions."),
+      titre: t("Documents publiés", "Published documents"),
+      hero: t(
+        "Ce que nous publions, et pourquoi certaines pièces ne le sont pas.",
+        "What we publish, and why some documents are not published.",
+      ),
       lead: t(
-        "Avant d'arbitrer un tracé, de calibrer un programme de formation ou de retenir une architecture, il faut avoir instruit la question. Ces notes, rapports et analyses sont les pièces sur lesquelles les décisions du Projet s'appuient — publiées pour être discutées.",
-        "Before choosing a route, calibrating a training programme or settling on an architecture, the question has to be worked through. These notes, reports and analyses are the material on which the Project's decisions rest — published so they can be debated.",
+        "Deux natures de pièces cohabitent ici. D'abord les instruments dont la publication s'impose au Projet (manuel d'exécution, plans de passation, cadres de sauvegardes environnementales et sociales), en application de la norme environnementale et sociale n°10 et de la politique d'accès à l'information de la Banque mondiale. Ensuite les notes, études et rapports sur lesquels les arbitrages s'appuient, publiés pour être discutés. Le versionnage est explicite : une version remplacée reste identifiable. Ne sont pas publiés les documents contenant des données personnelles, des informations commercialement sensibles avant attribution, ou des éléments couverts par une obligation de confidentialité.",
+        "Two kinds of material sit side by side here. First, the instruments the Project is required to disclose (project implementation manual, procurement plans, environmental and social safeguards frameworks), under Environmental and Social Standard 10 and the World Bank's access-to-information policy. Second, the notes, studies and reports on which trade-offs rest, published so they can be debated. Versioning is explicit: a superseded version remains identifiable. Not published are documents containing personal data, commercially sensitive information ahead of award, or material covered by a confidentiality obligation.",
       ),
       download: t("Télécharger", "Download"),
 
       /* Barre de recherche, filtres et tri de la liste dynamique. */
-      search: t("Rechercher un rapport, un sigle, un organisme…", "Search a report, an acronym, an organisation…"),
+      search: t("Rechercher un document, un sigle, un organisme…", "Search a document, an acronym, an organisation…"),
       searchAction: t("Rechercher", "Search"),
       filterCategory: t("Thématique", "Theme"),
       filterType: t("Nature", "Type"),
@@ -891,8 +866,8 @@ export function dict(lang: Lang) {
         t(`${n} document${n > 1 ? "s" : ""}`, `${n} document${n > 1 ? "s" : ""}`),
       noResult: t("Aucun document ne correspond à votre recherche.", "No document matches your search."),
       empty: t(
-        "Aucun rapport n'est publié pour le moment. Les analyses et études du Projet seront mises en ligne au fil de leur validation.",
-        "No report is published yet. The Project's analyses and studies will be posted as they are cleared for release.",
+        "Aucun document n'est publié pour le moment. Les pièces de référence, analyses et études du Projet seront mises en ligne au fil de leur validation.",
+        "No document is published yet. The Project's reference material, analyses and studies will be posted as they are cleared for release.",
       ),
 
       /* Panneau de détail. */
@@ -915,6 +890,7 @@ export function dict(lang: Lang) {
       labelAuthor: t("Organisme", "Organisation"),
       labelSignature: t("Rédigé par", "Written by"),
       labelReference: t("Référence", "Reference"),
+      labelVersion: t("Version", "Version"),
       labelFile: t("Fichier", "File"),
       featured: t("À la une", "Featured"),
 
@@ -929,7 +905,7 @@ export function dict(lang: Lang) {
         "Le document est également disponible en fichier, à consulter ou à télécharger.",
         "The document is also available as a file, to view or download.",
       ),
-      backToList: t("Tous les rapports", "All reports"),
+      backToList: t("Tous les documents", "All documents"),
       alsoRead: t("À lire également", "Also worth reading"),
       breadcrumbLabel: t("Fil d'Ariane", "Breadcrumb"),
       notTranslated: (langue: string) =>
@@ -938,8 +914,8 @@ export function dict(lang: Lang) {
           `This publication is not translated yet: the text below is served in ${langue === "en" ? "English" : "French"}.`,
         ),
       disclaimer: t(
-        "Seuls les documents divulgables sont publiés. Les fichiers sont hébergés sur le réseau de diffusion du Projet ; la date affichée est celle du document lorsqu'elle est connue, à défaut celle de sa mise en ligne.",
-        "Only disclosable documents are published. Files are hosted on the Project's delivery network; the date shown is the document's own where known, otherwise its date of publication.",
+        "Seuls les documents divulgables sont publiés ; aucun contenu confidentiel ou nominatif. Les fichiers sont hébergés sur le réseau de diffusion du Projet ; la date affichée est celle du document lorsqu'elle est connue, à défaut celle de sa mise en ligne. Conforme à la politique d'accès à l'information de la Banque mondiale.",
+        "Only disclosable documents are published; no confidential or personal content. Files are hosted on the Project's delivery network; the date shown is the document's own where known, otherwise its date of publication. Compliant with the World Bank's access-to-information policy.",
       ),
     },
 
