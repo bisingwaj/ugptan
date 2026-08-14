@@ -100,6 +100,17 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M3 5l9 7 9-7" />
     </>
   ),
+  /* L'équipe de l'Unité : deux personnes, celle de devant détachée.
+     Le buste plutôt que le portrait encadré : c'est un répertoire de personnes,
+     pas une bibliothèque de photographies. */
+  equipe: (
+    <>
+      <path d="M9 4h5v5H9z" />
+      <path d="M4.5 20v-3.5h14V20" />
+      <path d="M11.5 9v7.5" />
+      <path d="M16.5 4.5h3v4h-3z" />
+    </>
+  ),
   /* Gouvernance : l'organigramme des instances */
   gouvernance: (
     <>

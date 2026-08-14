@@ -350,12 +350,64 @@ export async function basculerMembreAction(
 }
 
 /**
+ * Délai laissé à une transaction de réordonnancement.
+ *
+ * Le défaut de Prisma est de 5 s, et il ne tient pas ici : chaque `update`
+ * traverse le WebSocket vers Neon, dont une poignée de main coûte déjà quelques
+ * centaines de millisecondes (cf. src/instrumentation-node.ts). Douze écritures
+ * séquentielles ont dépassé le plafond en conditions réelles — mesuré à 6341 ms
+ * pour douze fiches, transaction annulée et déplacement perdu.
+ *
+ * Ce plafond n'ATTEND rien : une transaction qui se termine en 200 ms se
+ * termine toujours en 200 ms. Il ne fait que cesser de couper une écriture
+ * légitime au moment où elle allait aboutir.
+ */
+const DELAI_REORDONNANCEMENT_MS = 20_000;
+
+/**
+ * Réécrit les positions d'une liste réordonnée, en ne touchant QUE les lignes
+ * qui changent réellement de rang.
+ *
+ * Réécrire toute la liste serait plus simple à lire, et c'est ce que faisait la
+ * première version — mais cela coûtait autant d'allers-retours que d'éléments,
+ * pour un déplacement qui n'en concerne que deux. Sur une liaison où chaque
+ * écriture coûte une centaine de millisecondes, la différence est celle d'un
+ * geste instantané et d'une transaction qui expire.
+ *
+ * La normalisation reste complète : les rangs écrits sont ceux de la liste
+ * ordonnée, `0..n-1`. Si des positions étaient dégénérées — deux fiches au même
+ * rang après un amorçage ou un import — ce sont toutes les lignes fautives qui
+ * sont corrigées, et non les deux déplacées.
+ */
+async function reordonner(
+  table: "teamMember" | "teamPole",
+  ordre: readonly { id: string; position: number }[],
+): Promise<void> {
+  const aEcrire = ordre
+    .map((ligne, rang) => ({ id: ligne.id, rang, actuelle: ligne.position }))
+    .filter(({ rang, actuelle }) => actuelle !== rang);
+
+  if (aEcrire.length === 0) return;
+
+  const client = db();
+  await client.$transaction(
+    aEcrire.map(({ id, rang }) =>
+      table === "teamMember"
+        ? client.teamMember.update({ where: { id }, data: { position: rang } })
+        : client.teamPole.update({ where: { id }, data: { position: rang } }),
+    ),
+    { timeout: DELAI_REORDONNANCEMENT_MS },
+  );
+}
+
+/**
  * Déplacement d'une fiche d'un rang dans la grille.
  *
- * Les positions sont RÉÉCRITES sur toute la liste, plutôt qu'incrémentées :
+ * Les positions sont RECALCULÉES sur la liste entière, plutôt qu'incrémentées :
  * deux fiches créées à la suite peuvent porter la même position (amorçage,
  * import), et un simple `position - 1` les ferait alors passer l'une devant
- * l'autre sans jamais les départager.
+ * l'autre sans jamais les départager. Seules les lignes dont le rang change
+ * sont écrites (cf. `reordonner`).
  */
 export async function deplacerMembreAction(
   _prev: EquipeFormState,
@@ -369,7 +421,7 @@ export async function deplacerMembreAction(
   if (sens !== "haut" && sens !== "bas") return { error: "Sens de déplacement inconnu.", ok: null };
 
   const membres = await db().teamMember.findMany({
-    select: { id: true },
+    select: { id: true, position: true },
     orderBy: [{ position: "asc" }, { createdAt: "asc" }],
   });
 
@@ -383,11 +435,7 @@ export async function deplacerMembreAction(
   const [deplace] = ordre.splice(index, 1);
   ordre.splice(cible, 0, deplace);
 
-  await db().$transaction(
-    ordre.map((membre, rang) =>
-      db().teamMember.update({ where: { id: membre.id }, data: { position: rang } }),
-    ),
-  );
+  await reordonner("teamMember", ordre);
 
   revalidatePath(EQUIPE_PATH);
   revaliderEquipe();
@@ -534,7 +582,8 @@ export async function enregistrerPoleAction(
 }
 
 /**
- * Déplacement d'un pôle d'un rang. Même réécriture complète que pour les fiches.
+ * Déplacement d'un pôle d'un rang. Même recalcul que pour les fiches, et mêmes
+ * écritures minimales (cf. `reordonner`).
  */
 export async function deplacerPoleAction(
   _prev: EquipeFormState,
@@ -548,7 +597,7 @@ export async function deplacerPoleAction(
   if (sens !== "haut" && sens !== "bas") return { error: "Sens de déplacement inconnu.", ok: null };
 
   const poles = await db().teamPole.findMany({
-    select: { id: true },
+    select: { id: true, position: true },
     orderBy: [{ position: "asc" }, { createdAt: "asc" }],
   });
 
@@ -562,11 +611,7 @@ export async function deplacerPoleAction(
   const [deplace] = ordre.splice(index, 1);
   ordre.splice(cible, 0, deplace);
 
-  await db().$transaction(
-    ordre.map((pole, rang) =>
-      db().teamPole.update({ where: { id: pole.id }, data: { position: rang } }),
-    ),
-  );
+  await reordonner("teamPole", ordre);
 
   revalidatePath(POLES_PATH);
   revaliderEquipe();
