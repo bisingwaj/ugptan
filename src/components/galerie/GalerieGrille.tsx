@@ -98,17 +98,27 @@ export function GalerieGrille({
    *
    * Un parcours qui bute est une impasse ; ici, arriver au bout de la sélection
    * en cours et repartir au début est ce qu'un visiteur attend d'une galerie.
+   *
+   * ⚠️ Le rang suivant se calcule ICI, et non dans une mise à jour fonctionnelle
+   * `setIndex(courant => …)`. React traite ces fonctions comme PURES : il les
+   * exécute pendant le rendu, et deux fois en mode strict. Y appeler
+   * `majAdresse` revenait donc à écrire l'historique en plein rendu, ce que le
+   * routeur de Next signale (« Cannot update a component while rendering a
+   * different component ») et ce qui, en mode strict, poussait deux entrées
+   * pour un seul clic.
+   *
+   * `deplacer` n'est déclenché que par un geste — les deux flèches du panneau et
+   * les touches directionnelles —, jamais pendant un rendu : lire `index` de la
+   * portée est donc sûr, et c'est déjà ce que font `ouvrir` et `fermer`.
    */
   const deplacer = useCallback(
     (pas: number) => {
-      setIndex((courant) => {
-        if (courant === null || items.length === 0) return courant;
-        const suivant = (courant + pas + items.length) % items.length;
-        majAdresse(items[suivant]?.id ?? null);
-        return suivant;
-      });
+      if (index === null || items.length === 0) return;
+      const suivant = (index + pas + items.length) % items.length;
+      setIndex(suivant);
+      majAdresse(items[suivant]?.id ?? null);
     },
-    [items, majAdresse],
+    [index, items, majAdresse],
   );
 
   useEffect(() => {
