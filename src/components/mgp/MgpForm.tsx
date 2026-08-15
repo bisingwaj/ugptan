@@ -34,6 +34,9 @@ export function MgpForm({ lang }: { lang: Lang }) {
   const [files, setFiles] = useState<{ name: string; size: number }[]>([]);
   const [contact, setContact] = useState<Contact>(EMPTY_CONTACT);
   const [ref, setRef] = useState<string | null>(null);
+  /** Vrai seulement si l'accusé de réception est bien parti : l'écran ne
+   *  promet pas un e-mail que le serveur n'a pas pu envoyer. */
+  const [mailed, setMailed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -45,7 +48,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
 
   const reset = () => {
     setRef(null); setStep(1); setCat(""); setMsg(""); setFiles([]);
-    setContact(EMPTY_CONTACT); setError(null); setCopied(false);
+    setContact(EMPTY_CONTACT); setError(null); setCopied(false); setMailed(false);
   };
 
   const submit = () => {
@@ -61,7 +64,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
         lang,
         attachments: files,
       });
-      if (result.ok) setRef(result.reference);
+      if (result.ok) { setRef(result.reference); setMailed(result.notified); }
       else setError(result.error);
     });
   };
@@ -91,6 +94,12 @@ export function MgpForm({ lang }: { lang: Lang }) {
               {t.refTrackCta} <span className="arrow">→</span>
             </Link>
           </div>
+          {mailed && (
+            <p style={{ display: "flex", gap: 9, margin: "14px 0 0", fontSize: 12.5, color: "var(--c-70)", lineHeight: 1.6 }}>
+              <span aria-hidden="true" style={{ color: "var(--ac)" }}>✉</span>
+              <span>{t.refMailed}</span>
+            </p>
+          )}
           <p style={{ margin: "14px 0 0", fontSize: 12.5, color: "var(--c-70)", lineHeight: 1.6 }}>{t.refKeep}</p>
           <button onClick={reset} className="mono" style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>↺ {t.newGrievance}</button>
         </div>
