@@ -18,25 +18,6 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M3 13h8v8H3z" />
     </>
   ),
-  /* Appels d'offres : la balance de l'évaluation comparative des offres */
-  marches: (
-    <>
-      <path d="M12 3v18" />
-      <path d="M5 7h14" />
-      <path d="M4 7l-2 6h4z" />
-      <path d="M20 7l-2 6h4z" />
-      <path d="M8 21h8" />
-    </>
-  ),
-  /* Soumissionnaires : l'entreprise candidate */
-  soumissionnaires: (
-    <>
-      <path d="M4 21V5h9v16" />
-      <path d="M13 11h7v10" />
-      <path d="M7 8.5h3M7 12.5h3M7 16.5h3" />
-      <path d="M16 14.5h1.5M16 17.5h1.5" />
-    </>
-  ),
   /* Actualités : le journal */
   actualites: (
     <>

@@ -1395,13 +1395,13 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     items: [{ key: "tableau-de-bord", label: "Tableau de bord", slug: "/dashboard" }],
   },
   {
-    key: "marches",
-    label: "Marchés & recours",
-    items: [
-      { key: "marches", label: "Appels d'offres", soon: true },
-      { key: "soumissionnaires", label: "Soumissionnaires", soon: true },
-      { key: "mgp", label: "Plaintes (MGP)", slug: "/grievances" },
-    ],
+    /* Les entrées « Appels d'offres » et « Soumissionnaires » ont été retirées :
+       la passation se tient sur la plateforme nationale, la console n'a pas
+       vocation à la doubler. Il ne reste donc ici que le traitement des
+       plaintes, d'où le nom de la section. */
+    key: "recours",
+    label: "Recours",
+    items: [{ key: "mgp", label: "Plaintes (MGP)", slug: "/grievances" }],
   },
   {
     key: "contenus",
@@ -1452,7 +1452,6 @@ export const MODULE_LABEL: Record<string, string> = Object.fromEntries(
 
 /** KPIs du tableau de bord (§8.2.1) — valeurs branchées au jalon Prisma. */
 export const ADMIN_KPIS = [
-  { key: "avis", label: "Avis ouverts" },
   { key: "plaintes", label: "Plaintes en cours" },
   { key: "articles", label: "Articles publiés" },
   { key: "events", label: "Événements à venir" },
