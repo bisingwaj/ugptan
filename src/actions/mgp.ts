@@ -16,7 +16,11 @@ import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { isValidEmail } from "@/lib/auth/validate";
 import { mgpCategory } from "@/content/mgp";
-import { LANGS, type Lang } from "@/lib/pick";
+import { LANGS, pick, type Lang } from "@/lib/pick";
+import { NAV, route } from "@/lib/routes";
+import { APP_ORIGIN, emailConfigured } from "@/lib/email/config";
+import { sendEmail } from "@/lib/email/send";
+import { grievanceReceiptEmail } from "@/lib/email/templates/grievance-receipt";
 import {
   LIMITS,
   daysUntil,
@@ -45,7 +49,10 @@ export type GrievanceDraft = {
 };
 
 export type SubmitResult =
-  | { ok: true; reference: string; submittedAt: string }
+  /** `notified` : l'accusé de réception est bien parti à l'adresse saisie. Faux
+   *  dès qu'aucune adresse n'a été donnée, que l'envoi n'est pas configuré ou
+   *  qu'il a échoué — l'écran de confirmation ne promet alors pas d'e-mail. */
+  | { ok: true; reference: string; submittedAt: string; notified: boolean }
   | { ok: false; error: string };
 
 /** Un dépôt légitime demande plusieurs minutes de saisie : cinq par quart
@@ -79,10 +86,13 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
     };
   }
 
-  const category = mgpCategory(clean(draft?.category, 60))?.code;
-  if (!category) {
+  // L'entrée entière, et non son seul code : l'accusé de réception nomme la
+  // catégorie dans la langue du dépôt, la base ne stocke que le code.
+  const categoryEntry = mgpCategory(clean(draft?.category, 60));
+  if (!categoryEntry) {
     return { ok: false, error: t("Choisissez une catégorie.", "Choose a category.") };
   }
+  const category = categoryEntry.code;
 
   const description = cleanText(draft?.description, LIMITS.description);
   if (description.length < LIMITS.descriptionMin) {
@@ -128,7 +138,8 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
       submittedAt.getFullYear(),
     );
 
-    await db().grievance.create({
+    const created = await db().grievance.create({
+      select: { id: true },
       data: {
         reference,
         category,
@@ -155,7 +166,21 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
       },
     });
 
-    return { ok: true, reference, submittedAt: submittedAt.toISOString() };
+    const notified = await sendReceipt({
+      grievanceId: created.id,
+      reference,
+      lang,
+      email,
+      categoryLabel: pick(categoryEntry, lang),
+      description,
+      fullName,
+      phone,
+      province,
+      attachments,
+      submittedAt,
+    });
+
+    return { ok: true, reference, submittedAt: submittedAt.toISOString(), notified };
   } catch (error) {
     // Le détail technique reste au serveur : il n'apprendrait rien d'utile à la
     // personne, et pourrait décrire l'infrastructure.
@@ -168,6 +193,87 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
       ),
     };
   }
+}
+
+/* --- Accusé de réception -------------------------------------------------- */
+
+/**
+ * Renvoie à la personne son numéro de référence et le contenu de son dépôt,
+ * dès lors qu'elle a laissé une adresse.
+ *
+ * ⚠️ NE LÈVE JAMAIS. Quand cette fonction s'exécute, la plainte est déjà écrite
+ * en base : une erreur qui remonterait ferait afficher « l'enregistrement a
+ * échoué » pour un dossier bel et bien ouvert, et la personne redéposerait.
+ * Tout incident finit donc au journal serveur, et le formulaire se borne à ne
+ * rien promettre.
+ *
+ * Envoi ATTENDU, et non lancé en arrière-plan : sur un hébergement sans état,
+ * une promesse encore en vol au retour de l'action est interrompue avec
+ * l'invocation. Le dépôt coûte quelques centaines de millisecondes de plus,
+ * l'accusé part réellement.
+ */
+async function sendReceipt(params: {
+  grievanceId: string;
+  reference: string;
+  lang: Lang;
+  email: string | null;
+  categoryLabel: string;
+  description: string;
+  fullName: string | null;
+  phone: string | null;
+  province: string | null;
+  attachments: { name: string; sizeKb: number }[];
+  submittedAt: Date;
+}): Promise<boolean> {
+  const { grievanceId, email, lang, reference, submittedAt, ...rest } = params;
+
+  // Dépôt sans adresse, ou envoi non configuré (cf. lib/email/config.ts) :
+  // aucun des deux n'est une anomalie, il n'y a rien à journaliser.
+  if (!email || !emailConfigured) return false;
+
+  try {
+    const sent = await sendEmail(
+      grievanceReceiptEmail({
+        ...rest,
+        reference,
+        lang,
+        email,
+        submittedAt,
+        dueAt: dueDateFrom(submittedAt),
+        // Numéro pré-rempli : le lien ouvre le dossier sans une seule saisie.
+        trackUrl: `${APP_ORIGIN}${route(lang, NAV.mgpSuivi)}?ref=${encodeURIComponent(reference)}`,
+      }),
+    );
+    if (!sent.ok) return false;
+  } catch (error) {
+    // `sendEmail` avale déjà ses erreurs ; reste la composition du message.
+    console.error("[mgp] échec de l'accusé de réception", error);
+    return false;
+  }
+
+  /* Trace au dossier. L'agent qui l'ouvre voit que la personne détient déjà son
+     numéro et le détail de son dépôt — il ne le lui redemande pas. Événement
+     interne : le suivi public n'a pas à rappeler au plaignant ce qu'il a reçu.
+     Son échec ne retire rien à l'envoi, qui a bien eu lieu. */
+  try {
+    await db().grievanceEvent.create({
+      data: {
+        grievanceId,
+        type: "CONTACT",
+        isPublic: false,
+        message: `Accusé de réception envoyé automatiquement à ${email}.`,
+        // Même vocabulaire que le formulaire de journalisation de la console
+        // (cf. `contactChannels` dans content/admin.ts) : un canal nommé
+        // autrement scinderait la lecture de l'historique.
+        toValue: "Courriel",
+        authorLabel: "Site public",
+      },
+    });
+  } catch (error) {
+    console.error("[mgp] accusé de réception envoyé mais non journalisé", error);
+  }
+
+  return true;
 }
 
 /* --- Suivi ---------------------------------------------------------------- */

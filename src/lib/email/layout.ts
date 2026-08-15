@@ -68,6 +68,12 @@ export const heading = (text: string): string =>
 /**
  * Tableau d'informations, étiquette à gauche et valeur à droite. C'est la
  * transposition de `.adm-defs` de la console : même hiérarchie, même filet.
+ *
+ * Les classes `dt-l` et `dt-v` n'ont d'effet que sur écran étroit : la requête
+ * média de `renderEmail` y empile la valeur SOUS son étiquette. Sans cela, une
+ * étiquette insécable de dix caractères ne laisse à la valeur qu'une colonne de
+ * quelques mots, et « Environnementale & sociale » se brise en trois lignes au
+ * milieu des mots.
  */
 export const dataTable = (rows: { label: string; value: string; mono?: boolean }[]): string => `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid ${PALETTE.grey20};border-collapse:collapse;margin:0 0 24px;">
@@ -75,8 +81,8 @@ export const dataTable = (rows: { label: string; value: string; mono?: boolean }
     .map(
       (row, index) => `
   <tr>
-    <td style="padding:14px 16px;border-bottom:${index === rows.length - 1 ? "none" : `1px solid ${PALETTE.grey20}`};font-family:${FONT_MONO};font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:${PALETTE.grey50};white-space:nowrap;vertical-align:top;">${esc(row.label)}</td>
-    <td style="padding:14px 16px;border-bottom:${index === rows.length - 1 ? "none" : `1px solid ${PALETTE.grey20}`};font-family:${row.mono ? FONT_MONO : FONT_SANS};font-size:14px;font-weight:600;color:${PALETTE.black};text-align:right;word-break:break-word;">${esc(row.value)}</td>
+    <td class="dt-l" style="padding:14px 16px;border-bottom:${index === rows.length - 1 ? "none" : `1px solid ${PALETTE.grey20}`};font-family:${FONT_MONO};font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:${PALETTE.grey50};white-space:nowrap;vertical-align:top;">${esc(row.label)}</td>
+    <td class="dt-v" style="padding:14px 16px;border-bottom:${index === rows.length - 1 ? "none" : `1px solid ${PALETTE.grey20}`};font-family:${row.mono ? FONT_MONO : FONT_SANS};font-size:14px;font-weight:600;color:${PALETTE.black};text-align:right;word-break:break-word;">${esc(row.value)}</td>
   </tr>`,
     )
     .join("")}
@@ -106,6 +112,56 @@ export const notice = (html: string): string => `
   <tr>
     <td style="border:1px solid ${PALETTE.accentLine};border-left:3px solid ${PALETTE.accent};background:${PALETTE.accentPale};padding:14px 16px;font-family:${FONT_SANS};font-size:13px;line-height:1.6;color:${PALETTE.grey70};">${html}</td>
   </tr>
+</table>`;
+
+/**
+ * Code que la personne devra recopier ou dicter — un numéro de référence, par
+ * exemple. Encadré pointillé d'accent et casse monospace : c'est la
+ * transposition du bloc de confirmation du formulaire de plainte, et un numéro
+ * isolé du texte se relit sans erreur, y compris imprimé.
+ */
+export const codeBox = (label: string, value: string): string => `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+  <tr>
+    <td align="center" style="border:1px dashed ${PALETTE.accent};background:${PALETTE.accentPale};padding:18px 16px;">
+      <div style="font-family:${FONT_MONO};font-size:10.5px;letter-spacing:0.08em;text-transform:uppercase;color:${PALETTE.grey60};margin:0 0 9px;">${esc(label)}</div>
+      <div style="font-family:${FONT_MONO};font-size:19px;font-weight:700;letter-spacing:0.04em;color:${PALETTE.accentDark};word-break:break-all;">${esc(value)}</div>
+    </td>
+  </tr>
+</table>`;
+
+/**
+ * Texte recopié tel que la personne l'a écrit. Les retours à la ligne sont
+ * conservés : un récit de faits se lit par paragraphes, et l'aplatir en un bloc
+ * continu trahirait ce que son auteur a mis en forme.
+ */
+export const textBlock = (label: string, text: string): string => `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+  <tr>
+    <td style="border:1px solid ${PALETTE.grey20};border-left:3px solid ${PALETTE.grey50};background:${PALETTE.grey10};padding:14px 16px;">
+      <div style="font-family:${FONT_MONO};font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:${PALETTE.grey50};margin:0 0 9px;">${esc(label)}</div>
+      <div style="font-family:${FONT_SANS};font-size:14px;line-height:1.65;color:${PALETTE.grey90};">${esc(text).replace(/\r?\n/g, "<br>")}</div>
+    </td>
+  </tr>
+</table>`;
+
+/**
+ * Liste numérotée, dans le même filet que `dataTable`. Les puces natives sont
+ * évitées : leur retrait varie d'un client à l'autre, et un `<li>` long finit
+ * décalé sous son propre marqueur dans Outlook.
+ */
+export const numberedList = (items: string[]): string => `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid ${PALETTE.grey20};border-collapse:collapse;margin:0 0 24px;">
+  ${items
+    .map((item, index) => {
+      const border = index === items.length - 1 ? "none" : `1px solid ${PALETTE.grey20}`;
+      return `
+  <tr>
+    <td width="34" style="padding:12px 0 12px 16px;border-bottom:${border};font-family:${FONT_MONO};font-size:12px;color:${PALETTE.accent};vertical-align:top;">${index + 1}.</td>
+    <td style="padding:12px 16px 12px 6px;border-bottom:${border};font-family:${FONT_SANS};font-size:13.5px;line-height:1.55;color:${PALETTE.grey70};word-break:break-word;">${esc(item)}</td>
+  </tr>`;
+    })
+    .join("")}
 </table>`;
 
 /* --- Enveloppe ------------------------------------------------------------ */
@@ -184,6 +240,12 @@ export function renderEmail({
   @media only screen and (max-width:620px) {
     .wrap { width:100% !important; }
     .pad { padding-left:22px !important; padding-right:22px !important; }
+    /* Étiquette au-dessus de sa valeur : sur un téléphone, deux colonnes ne
+       laissent à la seconde que quelques caractères. Le filet horizontal reste
+       porté par la valeur, qui ferme la ligne. */
+    .dt-l, .dt-v { display:block !important; width:auto !important; text-align:left !important; }
+    .dt-l { border-bottom:none !important; padding:12px 16px 0 !important; white-space:normal !important; }
+    .dt-v { padding:5px 16px 12px !important; }
   }
 </style>
 </head>

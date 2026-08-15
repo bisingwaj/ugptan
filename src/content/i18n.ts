@@ -1147,6 +1147,10 @@ export function dict(lang: Lang) {
         "Conservez-le : c'est le seul justificatif de votre dépôt, et il donne accès au suivi de votre dossier. Il ne contient aucune information sur vous. Un retour vous est adressé à la clôture, dans un délai visé de 30 jours.",
         "Keep it: it is the only proof of your submission, and it opens access to your case tracking. It contains no information about you. Feedback is provided at closure, within a target of 30 days.",
       ),
+      refMailed: t(
+        "Un accusé de réception vient de partir vers votre adresse e-mail : il reprend ce numéro, le détail de votre dépôt et le lien de suivi.",
+        "An acknowledgement has just been sent to your email address: it carries this number, the details of your submission and the tracking link.",
+      ),
       refCopy: t("Copier le numéro", "Copy the number"),
       refCopied: t("Numéro copié", "Number copied"),
       refTrackCta: t("Suivre mon dossier", "Track my case"),
