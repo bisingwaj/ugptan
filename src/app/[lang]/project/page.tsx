@@ -3,14 +3,16 @@ import Link from "next/link";
 import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { composantes, odp, intermediaires } from "@/content/data";
+import { composantes } from "@/content/data";
 import { projetPersonas, citoyenFaq } from "@/content/carbon";
-import { NAV, route, compRoute } from "@/lib/routes";
-import { compVar } from "@/lib/comp";
+import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
-import { Counter } from "@/components/ui/Counter";
 import { Accordion } from "@/components/ui/Accordion";
 import { PageHero } from "@/components/ui/PageHero";
+import { FilAriane } from "@/components/ui/FilAriane";
+import { CtaFin } from "@/components/ui/CtaFin";
+import { CompRow } from "@/components/composantes/CompRow";
+import { GrilleODP } from "@/components/resultats/GrilleODP";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
@@ -22,7 +24,18 @@ export const revalidate = 120;
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
-  return { title: dict(asLang(params.lang)).projet.titre };
+  const lang = asLang(params.lang);
+  const p = dict(lang).projet;
+  const path = `/${lang}${NAV.projet}`;
+  return {
+    title: p.titre,
+    description: p.metaDesc,
+    alternates: {
+      canonical: path,
+      languages: { fr: `/fr${NAV.projet}`, en: `/en${NAV.projet}` },
+    },
+    openGraph: { title: p.titre, description: p.metaDesc, url: path, type: "website" },
+  };
 }
 
 export default async function ProjetPage(props: { params: Promise<{ lang: string }> }) {
@@ -34,7 +47,16 @@ export default async function ProjetPage(props: { params: Promise<{ lang: string
 
   return (
     <div>
-      <PageHero crumb={`UGPTN / ${p.titre}`} title={p.titre} lead={p.lead} />
+      <PageHero
+        crumb={
+          <FilAriane
+            label={t.lbl.ariane}
+            items={[{ label: t.nav.accueil, href: route(lang) }, { label: p.titre }]}
+          />
+        }
+        title={p.h1}
+        lead={p.lead}
+      />
 
       {/* Contexte */}
       <section className="section">
@@ -51,12 +73,18 @@ export default async function ProjetPage(props: { params: Promise<{ lang: string
               ))}
             </RevealGroup>
           </div>
+          {/* L'aplat portait un badge « C1 » qui n'était cliquable nulle part et
+              n'annonçait rien de ce que la section dit. */}
           <div style={{ aspectRatio: "4/3", background: "linear-gradient(140deg, #0a1330 0%, #16315f 55%, #0f62fe 130%)", border: "1px solid var(--c-20)", position: "relative", overflow: "hidden", display: "flex", alignItems: "flex-end", padding: 22 }}>
-            <span className="mono" style={{ position: "absolute", top: 18, right: 20, fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.85)" }}>C1</span>
             <span className="mono" style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(255,255,255,.9)", lineHeight: 1.5 }}>{lang === "en" ? "Fibre rollout · digital inclusion" : "Déploiement fibre optique · inclusion numérique"}</span>
           </div>
         </div>
       </section>
+
+      {/* Jalons — la frise administrée depuis la console porte désormais aussi
+          les deux signatures de financement, qu'une section « Engagements
+          fondateurs » réaffichait en dur huit cents pixels plus bas. */}
+      <SectionsImpact emplacement="PROJET_JALONS" lang={lang} />
 
       {/* Ce que ça change — administré depuis la console (module « Histoires &
           impact »). Le dessin du diptyque vit dans
@@ -82,86 +110,44 @@ export default async function ProjetPage(props: { params: Promise<{ lang: string
         </div>
       </section>
 
-      {/* Engagements fondateurs */}
+      {/* Composantes — aperçu. Le détail des sous-composantes vit sur l'index
+          et sur chaque page dédiée : le recopier ici retirait toute raison de
+          cliquer. */}
       <section className="section section--grey">
         <div className="section__inner">
-          <Reveal>
-            <Kicker>{p.engLabel}</Kicker>
-            <h2 className="h2--sm" style={{ margin: "0 0 40px" }}>{p.engTitle}</h2>
-          </Reveal>
-          <RevealGroup className="cols2" style={{ gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }} gap={0.045}>
-            {p.eng.map((e, i) => (
-              <RevealItem key={i} style={{ background: "#fff", padding: "30px", display: "flex", gap: 22, alignItems: "flex-start" }}>
-                <span className="mono" style={{ fontSize: 13, color: "#fff", background: "var(--ac)", padding: "6px 10px", whiteSpace: "nowrap" }}>{e.d}</span>
-                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.55 }}>{e.t}</p>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
-
-      {/* Composantes */}
-      <section className="section">
-        <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 20, margin: "0 0 48px" }}>
-            <div>
-              <Kicker>{t.sec.composantes}</Kicker>
+          <Reveal style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 20, margin: "0 0 40px" }}>
+            <div style={{ maxWidth: 640 }}>
+              <Kicker>{p.compLabel}</Kicker>
               <h2 className="h2--sm" style={{ margin: 0 }}>{t.comp.indexTitle}</h2>
+              <p className="lead" style={{ marginTop: 16 }}>{p.compLead}</p>
             </div>
             <Link href={route(lang, NAV.composantes)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.comp.seeAll} <span className="arrow">→</span></Link>
           </Reveal>
-          <RevealGroup style={{ display: "flex", flexDirection: "column", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-black)", borderTopWidth: 2 }} gap={0.045}>
+          <RevealGroup style={{ borderTop: "2px solid var(--c-black)" }} gap={0.045}>
             {composantes.map((comp) => (
               <RevealItem key={comp.code}>
-                <Link href={compRoute(lang, comp.code)} className="comp-row comp-row--link" style={{ ...compVar(comp.code), display: "block", background: "#fff", padding: "30px clamp(20px,3vw,36px)" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 30px", gap: "clamp(16px,3vw,40px)", alignItems: "baseline" }} className="comp-head">
-                    <div className="mono" style={{ fontWeight: 600, fontSize: 30, color: "var(--comp)" }}>{comp.code}</div>
-                    <div><h3 className="comp-row__titre" style={{ margin: 0, fontSize: "clamp(19px,2.1vw,26px)", fontWeight: 600, letterSpacing: "-0.01em" }}>{pick(comp.titre, lang)}</h3><p style={{ margin: "8px 0 0", fontSize: 14.5, lineHeight: 1.55, color: "var(--c-70)", maxWidth: 720 }}>{pick(comp.desc, lang)}</p></div>
-                    <span className="comp-row__go" aria-hidden>→</span>
-                  </div>
-                  {comp.sous.length > 0 && (
-                    <div style={{ marginTop: 22, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
-                      {comp.sous.map((s) => (
-                        <div key={s.ref} style={{ background: "#fafafa", padding: "14px 16px" }}><div className="mono" style={{ fontSize: 11, color: "var(--ac)" }}>{s.ref}</div><div style={{ fontSize: 13, color: "var(--c-80)", marginTop: 7, lineHeight: 1.4 }}>{pick(s.text, lang)}</div></div>
-                      ))}
-                    </div>
-                  )}
-                </Link>
+                <CompRow comp={comp} lang={lang} />
               </RevealItem>
             ))}
           </RevealGroup>
         </div>
       </section>
 
-      {/* Résultats / ODP */}
+      {/* Résultats — aperçu seulement. Le point de départ, la part de femmes et
+          les sept indicateurs intermédiaires sont l'apport propre de la page
+          « Résultats », qui ne recevait jusqu'ici qu'un seul lien du site. */}
       <section className="section section--dark">
         <div className="section__inner">
-          <Reveal>
-            <Kicker light>{t.sec.resultats}</Kicker>
-            <h2 className="h2--sm" style={{ margin: "0 0 44px", maxWidth: 680 }}>{t.home.resultatsTitle}</h2>
+          <Reveal style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 20, margin: "0 0 40px" }}>
+            <div style={{ maxWidth: 680 }}>
+              <Kicker light>{p.mesureLabel}</Kicker>
+              <h2 className="h2--sm" style={{ margin: 0 }}>{p.mesureTitle}</h2>
+            </div>
+            <Link href={route(lang, NAV.resultats)} className="btn btn--on-dark" style={{ whiteSpace: "nowrap" }}>{t.cta.resultats} <span className="arrow">→</span></Link>
           </Reveal>
-          <RevealGroup className="grid-4 celled--dark" gap={0.045}>
-            {odp.map((o) => (
-              <RevealItem key={o.code} className="cell" style={{ display: "flex", flexDirection: "column", minHeight: 210 }}>
-                <div className="mono" style={{ fontSize: 12, color: "var(--ac-light)" }}>{o.code}</div>
-                <div style={{ marginTop: "auto" }}><div className="mono" style={{ fontWeight: 600, fontSize: "clamp(30px,4vw,50px)", lineHeight: 1, letterSpacing: "-0.03em" }}><span className="stat__approx">{t.lbl.approx}</span><Counter to={o.value} dur={1300} /><span style={{ fontSize: 15, color: "var(--c-40)", marginLeft: 6 }}>{o.unit}</span></div></div>
-                <div style={{ marginTop: 12, fontSize: 13.5, color: "var(--c-20)", lineHeight: 1.4 }}>{pick(o.label, lang)}</div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-          <RevealGroup style={{ marginTop: 1, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 1, background: "var(--c-80)", border: "1px solid var(--c-80)", borderTop: "none" }} gap={0.045}>
-            {intermediaires.map((x, i) => (
-              <RevealItem key={i} style={{ background: "var(--c-black)", padding: "18px 20px" }}><div className="mono" style={{ fontWeight: 600, fontSize: 22 }}><span className="stat__approx">{t.lbl.approx}</span>{x.value}<span style={{ fontSize: 12, color: "var(--ac-light)", marginLeft: 4 }}>{x.unit}</span></div><div style={{ fontSize: 12, color: "var(--c-40)", marginTop: 6, lineHeight: 1.4 }}>{pick(x.text, lang)}</div></RevealItem>
-            ))}
-          </RevealGroup>
-          <p className="stat__note stat__note--dark">{t.lbl.indicatif}</p>
+          <GrilleODP lang={lang} variante="apercu" />
         </div>
       </section>
-
-      {/* Jalons — frise administrée depuis la console. Les dates sont désormais
-          de vraies dates : elles ordonnent la frise et se mettent en forme dans
-          la langue de lecture. */}
-      <SectionsImpact emplacement="PROJET_JALONS" lang={lang} />
 
       {/* Le projet & vous */}
       <section className="section section--grey">
@@ -174,20 +160,15 @@ export default async function ProjetPage(props: { params: Promise<{ lang: string
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="section--dark" style={{ padding: "clamp(56px,7vw,104px) var(--pad-x)" }}>
-        <div className="section__inner" style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 28 }}>
-          <Reveal>
-            <h2 className="h2--sm" style={{ maxWidth: "16ch" }}>{p.ctaTitle}</h2>
-            <p style={{ margin: "18px 0 0", fontSize: 16, lineHeight: 1.6, color: "var(--c-40)", maxWidth: 520 }}>{p.ctaLead}</p>
-          </Reveal>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <Link href={route(lang, NAV.marches)} className="btn btn--primary">{t.cta.marches} <span className="arrow">→</span></Link>
-            <Link href={route(lang, NAV.actualites)} className="btn btn--on-dark">{t.sec.actus}</Link>
-            <Link href={route(lang, NAV.mgp)} className="btn btn--on-dark">{t.cta.mgp}</Link>
-          </div>
-        </div>
-      </section>
+      <CtaFin
+        titre={p.ctaTitle}
+        lead={p.ctaLead}
+        liens={[
+          { href: route(lang, NAV.marches), label: t.cta.marches },
+          { href: route(lang, NAV.actualites), label: t.sec.actus },
+          { href: route(lang, NAV.mgp), label: t.cta.mgp },
+        ]}
+      />
     </div>
   );
 }

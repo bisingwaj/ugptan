@@ -37,7 +37,12 @@ export const PERMISSIONS = [
   "equipe",
   "videos",
   "newsletter",
-  "gouvernance",
+  /* Renommée depuis « gouvernance » en même temps que l'entrée de la barre
+     latérale : le module couvre les deux pages du groupe « L'UGPTN ». Le module
+     n'étant pas encore ouvert, aucun droit effectif n'était accordé sous
+     l'ancien nom ; un `gouvernance` resté en base ne correspond simplement plus
+     à aucun module et reste sans effet. */
+  "ugptn",
   "projet",
   "mgp",
   "reglages",
@@ -72,7 +77,7 @@ const ROLE_BASE: Record<AdminRole, readonly Permission[] | "*"> = {
     "histoires",
     "equipe",
     "videos",
-    "gouvernance",
+    "ugptn",
     "projet",
     "mgp",
   ],

@@ -2,15 +2,17 @@ import type { Metadata } from "next";
 import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { odp, intermediaires } from "@/content/data";
+import { intermediaires } from "@/content/data";
+import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
-import { Counter } from "@/components/ui/Counter";
 import { FlowLines, FlowLinesDefs } from "@/components/ui/FlowLines";
 import { PageHero } from "@/components/ui/PageHero";
+import { FilAriane } from "@/components/ui/FilAriane";
+import { CtaFin } from "@/components/ui/CtaFin";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
-import { ProjVideos } from "@/components/resultats/ProjVideos";
+import { GrilleODP } from "@/components/resultats/GrilleODP";
 
 /** Cache aligné sur l'accueil : la page sert deux blocs administrés depuis la
  *  console (dialogues sectoriels, témoignages), invalidés par les écritures du
@@ -19,7 +21,20 @@ export const revalidate = 120;
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
-  return { title: dict(asLang(params.lang)).nav.resultats };
+  const lang = asLang(params.lang);
+  const r = dict(lang).resultats;
+  const path = `/${lang}${NAV.resultats}`;
+  return {
+    /* Le titre d'onglet reprenait le libellé de menu (« Résultats ») pendant
+       que le H1 disait autre chose : deux noms pour une page. */
+    title: r.titre,
+    description: r.metaDesc,
+    alternates: {
+      canonical: path,
+      languages: { fr: `/fr${NAV.resultats}`, en: `/en${NAV.resultats}` },
+    },
+    openGraph: { title: r.titre, description: r.metaDesc, url: path, type: "website" },
+  };
 }
 
 export default async function ResultatsPage(props: { params: Promise<{ lang: string }> }) {
@@ -31,31 +46,34 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
   return (
     <div>
       <FlowLinesDefs />
-      <PageHero crumb={`UGPTN / ${t.sec.resultats}`} title={r.heroTitle} lead={r.heroLead} />
+      <PageHero
+        crumb={
+          <FilAriane
+            label={t.lbl.ariane}
+            items={[
+              { label: t.nav.accueil, href: route(lang) },
+              { label: t.nav.projet, href: route(lang, NAV.projet) },
+              { label: r.titre },
+            ]}
+          />
+        }
+        title={r.heroTitle}
+        lead={r.heroLead}
+      />
 
-      {/* ODP */}
+      {/* ODP — version complète. C'est ici, et nulle part ailleurs désormais,
+          que se lisent le point de départ et la part de femmes. */}
       <section className="section section--dark">
         <div className="section__inner">
           <Reveal><Kicker light>{r.odpLabel}</Kicker></Reveal>
-          <RevealGroup className="grid-4 celled--dark" gap={0.05} style={{ marginTop: 14 }}>
-            {odp.map((o, i) => (
-              <RevealItem fade key={o.code} className="cell cell--fx" style={{ display: "flex", flexDirection: "column", minHeight: 236 }}>
-                <FlowLines variant={i} />
-                <div className="mono" style={{ fontSize: 12, color: "var(--ac-light)" }}>{o.code}</div>
-                <div style={{ marginTop: "auto" }}><div className="mono" style={{ fontWeight: 600, fontSize: "clamp(34px,4.4vw,56px)", lineHeight: 1, letterSpacing: "-0.03em" }}><span className="stat__approx">{t.lbl.approx}</span><Counter to={o.value} dur={1300} /><span style={{ fontSize: 16, color: "var(--c-40)", marginLeft: 7 }}>{o.unit}</span></div></div>
-                <div style={{ marginTop: 14, fontSize: 14, lineHeight: 1.45, color: "var(--c-20)" }}>{pick(o.label, lang)}</div>
-                <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  <span className="mono" style={{ fontSize: 10.5, color: "var(--c-50)", border: "1px solid var(--c-80)", padding: "3px 7px" }}>{t.lbl.baseline}: {o.baseline}</span>
-                  {o.femmes && <span className="mono" style={{ fontSize: 10.5, color: "var(--ac-light)", border: "1px solid var(--acd)", padding: "3px 7px" }}>{o.femmes}</span>}
-                </div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-          <p className="stat__note stat__note--dark">{t.lbl.indicatif}</p>
+          <div style={{ marginTop: 14 }}>
+            <GrilleODP lang={lang} variante="complet" />
+          </div>
         </div>
       </section>
 
-      {/* Intermédiaires */}
+      {/* Intermédiaires — seule occurrence du site, après allègement de
+          l'accueil et de « Le Projet ». */}
       <section className="section">
         <div className="section__inner">
           <Reveal><Kicker>{r.interLabel}</Kicker></Reveal>
@@ -67,17 +85,9 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
         </div>
       </section>
 
-      {/* Le projet en vidéos */}
-      <section className="section section--dark">
-        <div className="section__inner">
-          <Reveal>
-            <Kicker light>{r.projVideosLabel}</Kicker>
-            <h2 className="h2--sm" style={{ margin: "0 0 14px" }}>{r.projVideosTitle}</h2>
-            <p style={{ margin: "0 0 44px", fontSize: 16, lineHeight: 1.6, color: "var(--c-40)", maxWidth: 700 }}>{r.projVideosLead}</p>
-          </Reveal>
-          <ProjVideos lang={lang} />
-        </div>
-      </section>
+      {/* La section « Le projet en vidéos » a été retirée : cinq cartes portant
+          un bouton de lecture et une durée devant des films qui ne sont pas
+          fournis, et dont le clic menait, pour C5, à une ancre inexistante. */}
 
       {/* Dialogues sectoriels — administré depuis la console. */}
       <SectionsImpact emplacement="RESULTATS_DIALOGUES" lang={lang} />
@@ -85,6 +95,16 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
       {/* Histoires — la collection de référence des témoignages, dont l'accueil
           reprend les entrées (cf. le module « Histoires & impact »). */}
       <SectionsImpact emplacement="RESULTATS_HISTOIRES" lang={lang} />
+
+      <CtaFin
+        titre={r.ctaTitle}
+        lead={r.ctaLead}
+        liens={[
+          { href: route(lang, NAV.composantes), label: t.comp.titre },
+          { href: route(lang, NAV.transparence), label: t.nav.transparence },
+          { href: route(lang, NAV.projet), label: t.nav.projet },
+        ]}
+      />
     </div>
   );
 }

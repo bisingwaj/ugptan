@@ -13,6 +13,9 @@ import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { FilAriane } from "@/components/ui/FilAriane";
+import { CtaFin } from "@/components/ui/CtaFin";
+import { GrilleODP } from "@/components/resultats/GrilleODP";
 import { CompSubNav, type SubNavAnchor } from "@/components/composantes/CompSubNav";
 import { AnchorLink } from "@/components/composantes/AnchorLink";
 import { CompProblematique } from "@/components/composantes/CompProblematique";
@@ -107,13 +110,19 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
         <div className="section__inner comp-hero__inner">
           <div>
             <Reveal variant="fade">
-              <div className="comp-hero__crumb mono">
-                <Link href={route(lang)}>UGPTN</Link>
-                <span aria-hidden> / </span>
-                <Link href={route(lang, NAV.composantes)}>{c.titre}</Link>
-                <span aria-hidden> / </span>
-                <span>{c.one} {num}</span>
-              </div>
+              {/* Le fil sautait « Le Projet », alors que les composantes en
+                  relèvent dans la navigation, et sa première maille s'appelait
+                  « UGPTN » alors qu'une page porte ce nom. */}
+              <FilAriane
+                label={t.lbl.ariane}
+                className="comp-hero__crumb mono"
+                items={[
+                  { label: t.nav.accueil, href: route(lang) },
+                  { label: t.nav.projet, href: route(lang, NAV.projet) },
+                  { label: c.titre, href: route(lang, NAV.composantes) },
+                  { label: `${c.one} ${num}` },
+                ]}
+              />
             </Reveal>
 
             <Reveal variant="fade" delay={0.05}>
@@ -149,7 +158,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
           {/* Encart chiffres */}
           <Reveal variant="fade" delay={0.12} className="comp-hero__figures">
             <div className="mono comp-hero__figures-head">
-              <span>{c.budget}</span>
+              <span>{c.perimetre}</span>
               <span style={{ color: "var(--ac-light)" }}>{detail.code}</span>
             </div>
             <div className="comp-hero__figure comp-hero__figure--big">
@@ -295,24 +304,12 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
                 <Reveal>
                   <Kicker light>{c.secIndicateurs}</Kicker>
                 </Reveal>
-                <RevealGroup className="comp-odp__grid celled--dark" gap={0.045}>
-                  {odpLies.map((o) => (
-                    <RevealItem key={o.code} className="cell comp-odp__cell">
-                      <div className="mono comp-odp__code">{o.code}</div>
-                      <div className="stat__num comp-odp__val">
-                        <span className="stat__approx">{t.lbl.approx}</span>
-                        <Counter to={o.value} dur={1300} />
-                        <span className="comp-odp__unit">{o.unit}</span>
-                      </div>
-                      <div className="comp-odp__label">{pick(o.label, lang)}</div>
-                      <div className="comp-odp__tags">
-                        <span className="mono comp-odp__tag">{t.lbl.baseline}: {o.baseline}</span>
-                        {o.femmes && <span className="mono comp-odp__tag comp-odp__tag--ac">{o.femmes}</span>}
-                      </div>
-                    </RevealItem>
-                  ))}
-                </RevealGroup>
-                <p className="stat__note stat__note--dark">{t.lbl.indicatif}</p>
+                {/* Quatrième copie de la même grille jusqu'ici, avec ses propres
+                    tailles : le composant partagé la sert désormais partout. */}
+                <GrilleODP lang={lang} variante="complet" codes={detail.odp} />
+                <Link href={route(lang, NAV.resultats)} className="mono comp-aside__link">
+                  {t.cta.resultats} →
+                </Link>
               </div>
             )}
           </div>
@@ -346,9 +343,11 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
       {/* ===== CONTENUS RATTACHÉS ===== */}
       <CompLies code={detail.code} lang={lang} />
 
-      {/* ===== PAGER + CTA ===== */}
-      <section className="section--dark comp-pager-wrap">
-        <div className="section__inner">
+      {/* ===== PAGER + CTA =====
+          Le pager passe en `avant` du bloc partagé : il reste dans la même
+          bande sombre plutôt que d'en ouvrir une seconde. */}
+      <CtaFin
+        avant={
           <div className={prev && next ? "comp-pager" : "comp-pager comp-pager--single"}>
             {prev ? (
               <Link href={compRoute(lang, prev.slug)} className="comp-pager__link">
@@ -369,16 +368,13 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
               </Link>
             ) : null}
           </div>
-
-          <div className="comp-cta">
-            <Link href={route(lang, NAV.marches)} className="btn btn--primary">
-              {t.cta.marches} <span className="arrow">→</span>
-            </Link>
-            <Link href={route(lang, NAV.actualites)} className="btn btn--on-dark">{t.sec.actus}</Link>
-            <Link href={route(lang, NAV.contact)} className="btn btn--on-dark">{t.nav.contact}</Link>
-          </div>
-        </div>
-      </section>
+        }
+        liens={[
+          { href: route(lang, NAV.marches), label: t.cta.marches },
+          { href: route(lang, NAV.actualites), label: t.sec.actus },
+          { href: route(lang, NAV.contact), label: t.nav.contact },
+        ]}
+      />
     </div>
   );
 }

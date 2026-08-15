@@ -1428,7 +1428,12 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     label: "Institution",
     items: [
       { key: "equipe", label: "L'équipe de l'Unité", slug: "/equipe" },
-      { key: "gouvernance", label: "Gouvernance", soon: true },
+      /* Le module s'appelait « Gouvernance », du nom d'une seule des deux pages
+         qu'il administrera. Côté public, ces pages forment le groupe « L'UGPTN »
+         (mandat, principes, pôles, puis les organes de gouvernance) : la console
+         reprend ce découpage, sans quoi l'éditeur cherche où se modifie la page
+         « L'UGPTN » et ne trouve qu'une entrée nommée autrement. */
+      { key: "ugptn", label: "L'UGPTN", soon: true },
       { key: "projet", label: "Le projet", soon: true },
     ],
   },

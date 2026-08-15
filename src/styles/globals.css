@@ -104,6 +104,15 @@ html.scroll-locked body {
 /* Page hero (inner pages) */
 .page-hero { padding: clamp(54px, 7vw, 92px) max(var(--pad-x), var(--sa-r)) clamp(38px, 4vw, 56px) max(var(--pad-x), var(--sa-l)); border-bottom: 1px solid var(--c-20); }
 .page-hero__crumb { font-family: var(--font-mono); font-size: 12px; color: var(--c-50); letter-spacing: 0.05em; margin-bottom: 22px; }
+
+/* Fil d'Ariane sémantique (composant FilAriane). Le reset du site remet marges
+   et rembourrages à zéro mais NE retire PAS `list-style` : sans la règle
+   ci-dessous, l'<ol> afficherait ses numéros devant chaque maille. */
+.crumb { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; list-style: none; }
+.crumb li { display: inline-flex; align-items: baseline; gap: 6px; }
+.crumb a { color: inherit; transition: color 0.2s; }
+.crumb a:hover { color: var(--ac); }
+.crumb [aria-current="page"] { color: var(--c-70); }
 .page-hero h1 { font-weight: 600; font-size: clamp(34px, 5.2vw, 68px); line-height: 1.0; letter-spacing: -0.03em; max-width: 16ch; }
 .page-hero__lead { margin-top: 24px; max-width: 680px; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.6; color: var(--c-70); }
 
@@ -312,7 +321,6 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 @media (max-width: 760px) {
   .pole-row { grid-template-columns: 1fr !important; }
 }
-@media (max-width: 640px) { .comp-head { grid-template-columns: 1fr !important; } }
 @media (max-width: 680px) { .gov-act { grid-template-columns: 1fr !important; } }
 
 /* `.blur-sm` a été retirée : Tailwind génère un utilitaire du même nom, mais
@@ -614,15 +622,20 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 
 /* ------------------------------------------------------- INDICATEURS ----- */
 .comp-odp--after { margin-top: clamp(42px, 4.6vw, 72px); padding-top: clamp(32px, 3.2vw, 48px); border-top: 1px solid var(--c-80); }
-.comp-odp__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1px; margin-top: 24px; }
-.comp-odp__cell { display: flex; flex-direction: column; min-height: 196px; }
-.comp-odp__code { font-size: 11.5px; color: var(--ac-light); letter-spacing: 0.08em; }
-.comp-odp__val { margin-top: auto; font-size: clamp(29px, 3.6vw, 46px); color: #fff; }
-.comp-odp__unit { font-size: 14px; color: var(--c-40); margin-left: 7px; letter-spacing: 0; }
-.comp-odp__label { margin-top: 12px; font-size: 13.5px; line-height: 1.45; color: var(--c-20); }
-.comp-odp__tags { margin-top: 13px; display: flex; flex-wrap: wrap; gap: 6px; }
-.comp-odp__tag { font-size: 10px; color: var(--c-50); border: 1px solid var(--c-80); padding: 3px 7px; }
-.comp-odp__tag--ac { color: var(--ac-light); border-color: var(--acd); }
+/* Cellules d'indicateur (composant GrilleODP). Le préfixe est neutre : le même
+   dessin sert l'accueil, « Le Projet », « Résultats » et les indicateurs
+   rattachés d'une page de composante, qui l'écrivaient chacun de leur côté.
+   `odp__grid` s'ajuste au nombre d'indicateurs — `grid-4` laisserait deux
+   colonnes vides pour une composante qui n'en porte que deux. */
+.odp__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1px; margin-top: 24px; }
+.odp__cell { display: flex; flex-direction: column; min-height: 214px; }
+.odp__code { font-size: 11.5px; color: var(--ac-light); letter-spacing: 0.08em; }
+.odp__val { margin-top: auto; font-size: clamp(30px, 4vw, 52px); letter-spacing: -0.03em; color: #fff; }
+.odp__unit { font-size: 15px; color: var(--c-40); margin-left: 7px; letter-spacing: 0; }
+.odp__label { margin-top: 13px; font-size: 13.5px; line-height: 1.45; color: var(--c-20); }
+.odp__tags { margin-top: 13px; display: flex; flex-wrap: wrap; gap: 6px; }
+.odp__tag { font-size: 10px; color: var(--c-50); border: 1px solid var(--c-80); padding: 3px 7px; }
+.odp__tag--ac { color: var(--ac-light); border-color: var(--acd); }
 
 /* ----------------------------------------------------------- FINALITÉ ---- */
 .comp-finalite { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; padding: 1px; }
@@ -698,18 +711,94 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .comp-card:hover .bar { background: rgba(255, 255, 255, 0.28); }
 .comp-card:hover .bar__fill { background: #fff; }
 
-/* Lecture transversale (tableau) */
-.comp-table { display: flex; flex-direction: column; border-top: 2px solid var(--c-black); margin-top: 28px; }
-.comp-table__row { display: grid; grid-template-columns: 54px minmax(0, 1fr) 150px 116px 24px; gap: clamp(12px, 2vw, 28px); align-items: center; padding: 19px 0; border-bottom: 1px solid var(--c-20); transition: background 0.25s, padding 0.25s; }
-.comp-table__code { justify-self: start; font-size: 12px; font-weight: 600; padding: 5px 9px; }
-.comp-table__t { display: flex; flex-direction: column; gap: 5px; font-size: 15.5px; }
-.comp-table__d { font-size: 13px; line-height: 1.45; color: var(--c-60); }
-.comp-table__n, .comp-table__m { font-size: 12px; color: var(--c-60); }
-.comp-table__m { color: var(--c-black); font-weight: 600; text-align: right; }
-.comp-table__go { color: var(--ac); text-align: right; }
-.comp-table__row:hover { background: #fff; padding-left: 12px; padding-right: 12px; }
+/* ------------------- CHAÎNE DES DÉPENDANCES (index des composantes) ------ */
+/* Une carte par composante, teintée de sa couleur, listant ce qu'elle attend
+   des autres. Chaque ligne mène à la composante citée : c'est la seule section
+   du site qui rende visible le fait que les cinq volets se conditionnent. */
+/* `celled-flow` (filet porté par chaque cellule) et fond blanc sur le bloc
+   entier : cinq cartes ne remplissent jamais une grille à trois colonnes, et la
+   place restée libre laissait voir le gris de la section, ce qui se lisait
+   comme une carte manquante. Le panneau est blanc de bout en bout, seules les
+   cellules occupées portent un filet. */
+.chaine { grid-template-columns: repeat(auto-fit, minmax(min(100%, 336px), 1fr)); background: #fff; }
+.chaine__bloc { background: #fff; display: flex; flex-direction: column; padding: 0 clamp(20px, 2.2vw, 26px) 8px; }
+.chaine__head { display: flex; align-items: center; gap: 12px; padding: 22px 0 16px; }
+.chaine__code { flex: 0 0 auto; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; padding: 5px 9px; }
+.chaine__titre { margin: 0; font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
+.chaine__k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-50); padding-bottom: 6px; border-bottom: 1px solid var(--c-20); }
+.chaine__liste { list-style: none; }
+.chaine__liste li + li { border-top: 1px solid var(--c-20); }
+.chaine__lien { display: grid; grid-template-columns: 30px minmax(0, 1fr) 16px; gap: 10px; align-items: baseline; padding: 15px 0; font-size: 13.5px; line-height: 1.5; color: var(--c-70); transition: color 0.25s, padding 0.25s; }
+a.chaine__lien:hover { color: var(--c-black); padding-left: 6px; }
+.chaine__vers { font-size: 11.5px; font-weight: 600; }
+.chaine__go { font-family: var(--font-mono); font-size: 13px; color: var(--c-30); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s; }
+a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px); }
+.chaine__lien--inerte .chaine__go { display: none; }
+
+/* ------------------------- ORGANES DE GOUVERNANCE (accueil / gouvernance) */
+/* Une seule carte pour les deux pages. L'accueil n'affiche que la nature,
+   « Gouvernance » ajoute présidence, règle de décision et fréquence : sans ce
+   partage, suivre « en savoir plus » ramenait aux mêmes trois cartes. */
+/* La cellule devient une colonne pour que la carte s'y étire sans déborder :
+   `height: 100%` sur la carte poussait le lien de pied hors de la cellule, que
+   `.cell` rogne (`overflow: hidden`). */
+.organe-cell { display: flex; flex-direction: column; }
+.organe { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.organe__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.organe__sigle { font-weight: 700; font-size: clamp(24px, 2.6vw, 30px); }
+.organe__effectif { font-size: 11px; color: #fff; background: var(--ac); padding: 4px 10px; white-space: nowrap; }
+.organe__nom { font-size: 14.5px; color: var(--c-70); margin-top: 9px; line-height: 1.4; }
+.organe__attrs { margin-top: 22px; border-top: 1px solid var(--c-20); padding-top: 18px; display: flex; flex-direction: column; gap: 14px; }
+.organe--complet .organe__attrs { margin-top: 26px; }
+.organe__k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-50); }
+.organe__v { font-size: 14.5px; margin-top: 4px; }
+.organe__lien { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 22px; font-size: 12.5px; color: var(--ac); transition: gap 0.25s; }
+.organe__lien:hover { gap: 12px; }
+
+/* ------------------------------------------------ PAGE « L'UGPTN » ------- */
+/* Sous-titre d'une rangée secondaire, à l'intérieur d'une section. Sert à
+   tenir deux propos liés sous un seul <h2>, là où la page ouvrait auparavant
+   une seconde section pour dire la suite de la même chose. */
+.unite-sub { margin: clamp(40px, 4.4vw, 68px) 0 26px; font-size: clamp(19px, 2vw, 24px); font-weight: 600; letter-spacing: -0.015em; }
+
+/* Repères de l'Unité — deux valeurs dérivées des données, une date d'arrêté. */
+.unite-reperes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--c-20); border: 1px solid var(--c-black); border-top-width: 2px; margin-bottom: clamp(34px, 3.6vw, 52px); }
+.unite-repere { padding: 24px 22px; }
+.unite-repere__v { font-weight: 600; font-size: clamp(28px, 3.4vw, 42px); line-height: 1; }
+.unite-repere__l { margin-top: 10px; font-size: 13px; line-height: 1.4; color: var(--c-70); }
+
+/* Pôles : une ligne par pôle, qui porte l'organigramme ET le dossier en cours.
+   Les deux vivaient dans deux sections distinctes, avec des noms différents
+   pour les mêmes cinq pôles. */
+.poles { display: flex; flex-direction: column; gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
+.pole-row { background: #fff; padding: 24px clamp(20px, 3vw, 32px); display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: clamp(16px, 3vw, 40px); align-items: start; }
+.pole-row__mission { margin: 14px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--c-70); }
+.pole-row__dossier { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-20); display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; line-height: 1.5; color: var(--c-80); }
+.pole-row__dossier .blink { width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; flex: 0 0 auto; }
+.pole-row__k { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-50); margin-bottom: 3px; }
+
+/* Glossaire replié. Le marqueur natif est masqué au profit d'un chevron, pour
+   rester dans la grammaire du site (angles vifs, mono, filets). */
+.glossaire { margin-top: clamp(34px, 3.6vw, 52px); border-top: 1px solid var(--c-20); }
+.glossaire__sum { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0; cursor: pointer; font-size: clamp(17px, 1.8vw, 21px); font-weight: 600; letter-spacing: -0.015em; list-style: none; }
+.glossaire__sum::-webkit-details-marker { display: none; }
+.glossaire__sum::after { content: "+"; font-family: var(--font-mono); font-size: 22px; font-weight: 400; color: var(--ac); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.glossaire[open] .glossaire__sum::after { transform: rotate(45deg); }
+.glossaire__lead { margin: 0 0 26px; max-width: 68ch; font-size: 15px; line-height: 1.6; color: var(--c-70); }
+.glossaire__grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); margin-bottom: 30px; }
+.glossaire__item { background: #fff; padding: 18px 20px; display: flex; gap: 16px; align-items: baseline; }
+.glossaire__s { font-weight: 600; font-size: 14px; color: var(--ac); min-width: 68px; }
+.glossaire__d { font-size: 14px; line-height: 1.5; color: var(--c-80); }
 
 /* --------------------------------- LIGNES CLIQUABLES (accueil / projet) -- */
+/* La grille vivait en style inline sur deux pages, dans deux dessins
+   différents pour la même liste. Elle est ici, en un seul endroit — d'où la
+   règle de repli à 860 px qui la battait à coups de `!important`. */
+.comp-row { display: grid; grid-template-columns: 88px minmax(0, 1fr) 34px; gap: clamp(14px, 2vw, 32px); align-items: baseline; padding: 26px 0; border-bottom: 1px solid var(--c-20); }
+.comp-row__code { font-weight: 600; font-size: 22px; color: var(--comp, var(--ac)); }
+.comp-row__corps { display: flex; flex-direction: column; gap: 9px; }
+.comp-row__titre { font-size: clamp(18px, 1.9vw, 23px); font-weight: 600; letter-spacing: -0.01em; }
+.comp-row__desc { font-size: 14.5px; line-height: 1.55; color: var(--c-70); max-width: 62ch; }
 .comp-row--link::before { background: var(--comp, var(--ac)); opacity: 0.09; }
 .comp-row--link .comp-row__go { display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); color: var(--comp, var(--ac)); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 .comp-row--link:hover .comp-row__go { transform: translateX(6px); }
@@ -798,7 +887,7 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
   .comp-eco__row:hover { padding-left: 0; }
   .comp-eco__t { font-size: 16.5px; }
   .comp-eco__d { font-size: 14px; }
-  .comp-odp__cell { min-height: 0; }
+  .odp__cell { min-height: 0; }
 
   /* Responsable : portrait au-dessus, pleine largeur maîtrisée */
   .comp-resp { grid-template-columns: 1fr; padding: 20px; gap: 20px; }
@@ -818,10 +907,9 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
   /* Index des composantes */
   .comp-card { min-height: 0; padding: 22px 20px; }
   .comp-card__titre { margin-top: 18px; font-size: 20px; }
-  .comp-table__row { grid-template-columns: 44px minmax(0, 1fr) auto; padding: 15px 0; gap: 12px; }
-  .comp-table__n, .comp-table__go { display: none; }
-  .comp-table__t { font-size: 15px; }
-  .comp-table__row:hover { padding-inline: 0; }
+  /* Chaîne des dépendances : une colonne, et la flèche cède la place au texte */
+  .chaine__lien { grid-template-columns: 30px minmax(0, 1fr); }
+  .chaine__go { display: none; }
 }
 
 /* Carte de composante : filet de couleur (remplace l'ancienne barre budgétaire) */

@@ -42,13 +42,12 @@ export const videoSlots: VideoSlot[] = [
     ratio: "16:9", duree: "60–90 s", count: 4, status: "a_fournir",
     note: { fr: "Une vidéo par bénéficiaire (Esther, Jean-Pierre, Dr Mwamba, Mama Kavira). Tournage terrain, sous-titres FR/EN.", en: "One video per beneficiary. Field shoot, FR/EN subtitles." },
   },
-  {
-    key: "projvideos",
-    page: { fr: "Résultats", en: "Results" },
-    zone: { fr: "« Le projet en vidéos » — une vidéo par composante (C1 → C5)", en: "« The project in videos » — one video per component (C1 → C5)" },
-    ratio: "16:9", duree: "2–5 min", count: 5, status: "a_fournir",
-    note: { fr: "Films thématiques : accès & inclusion, fondations, compétences, coordination, réponse d'urgence.", en: "Thematic films: access & inclusion, foundations, skills, coordination, emergency response." },
-  },
+  /* ⚠️ L'emplacement « projvideos » a été retiré : il annonçait cinq films
+     thématiques, un par composante, que l'emplacement « composante-presentation »
+     ci-dessous annonçait déjà. Le plan média comptait donc dix tournages pour
+     cinq. La section « Le projet en vidéos » de « Résultats », qui portait cet
+     emplacement, a elle aussi disparu — elle affichait un bouton de lecture
+     devant une vidéo inexistante. */
   {
     key: "composante-presentation",
     page: { fr: "Composantes (page dédiée C1 → C5)", en: "Components (dedicated page C1 → C5)" },
