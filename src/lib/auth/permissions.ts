@@ -29,8 +29,6 @@ export const ROLE_HINT: Record<AdminRole, string> = {
 /** Une permission = un module de la console. */
 export const PERMISSIONS = [
   "tableau-de-bord",
-  "marches",
-  "soumissionnaires",
   "actualites",
   "documents",
   "medias",
@@ -67,7 +65,6 @@ const ROLE_BASE: Record<AdminRole, readonly Permission[] | "*"> = {
   ADMIN: "*",
   EDITOR: [
     "tableau-de-bord",
-    "marches",
     "actualites",
     "documents",
     "medias",
