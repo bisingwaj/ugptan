@@ -84,8 +84,8 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M16.5 4.5h3v4h-3z" />
     </>
   ),
-  /* Gouvernance : l'organigramme des instances */
-  gouvernance: (
+  /* L'UGPTN : l'organigramme de l'Unité et de ses instances */
+  ugptn: (
     <>
       <path d="M9 3h6v4H9z" />
       <path d="M2.5 17h6v4h-6z" />

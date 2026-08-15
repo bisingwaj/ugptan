@@ -3,9 +3,9 @@
    renderVals() codé en dur (cf. guide §6/§8 : une seule source de vérité).
    ========================================================================== */
 import type {
-  ProjVideo, Evenement, GouvActivite, MissionItem,
-  PoleAction, MethodeEtape, EngagementItem, GlossaireItem, FaqItem, Partner,
-  Ressource, UniteStat, GalleryItem, Persona, Contact,
+  Evenement, GouvActivite,
+  MethodeEtape, EngagementItem, GlossaireItem, FaqItem, Partner,
+  Ressource, GalleryItem, Persona, Contact,
 } from "./types";
 
 /* ⚠️ Quatre jeux de données ont quitté ce fichier : les témoignages de
@@ -15,14 +15,15 @@ import type {
    `src/content/impact.ts`. En garder une copie ici aurait garanti la dérive :
    deux sources pour un même texte, dont une seule est corrigée. */
 
-/* --- Résultats : une vidéo par composante ---------------------------------- */
-export const projVideos: ProjVideo[] = [
-  { comp: "C1", titre: { fr: "Accès & inclusion numériques", en: "Digital access & inclusion" }, color: "#0f62fe", img: "fibre", dur: "4:12" },
-  { comp: "C2", titre: { fr: "Fondations numériques", en: "Digital foundations" }, color: "#009d9a", img: "datacenter", dur: "3:38" },
-  { comp: "C3", titre: { fr: "Compétences & innovation", en: "Skills & innovation" }, color: "#8a3ffc", img: "formation", dur: "5:01" },
-  { comp: "C4", titre: { fr: "Coordination & gestion", en: "Coordination & management" }, color: "#ee5396", img: "hub", dur: "2:54" },
-  { comp: "C5", titre: { fr: "Réponse d'urgence (CERC)", en: "Emergency response (CERC)" }, color: "#198038", img: "tour", dur: "3:20" },
-];
+/* ⚠️ `projVideos` a également quitté ce fichier. La section « Le projet en
+   vidéos » de « Résultats » affichait cinq cartes portant un gros bouton de
+   lecture et une durée, alors qu'aucune vidéo n'est fournie : le clic menait à
+   l'ancre `#video` d'une page de composante, où s'affiche « à venir » — et pour
+   C5, à une ancre qui n'existe pas, la composante n'ayant pas de bloc vidéo. La
+   table recopiait par ailleurs `composantes[].titre`, `compColors` et `compImg`,
+   avec deux valeurs qui avaient déjà divergé (C5 en vert au lieu du gris, durée
+   3:20 introuvable ailleurs). L'emplacement des films reste celui de chaque page
+   de composante, suivi par `content/videos.ts`. */
 
 /* --- Événements ------------------------------------------------------------ */
 export const events: Evenement[] = [
@@ -50,21 +51,18 @@ export const gouvActivites: GouvActivite[] = [
    passation et le suivi-évaluation, déjà présents dans la grille de l'accueil
    sous un intitulé voisin. */
 
-/* --- UGPTN : mission (coordonner / exécuter / rendre compte) ---------------- */
-export const ugptnMission: MissionItem[] = [
-  { t: { fr: "Coordonner", en: "Coordinate" }, d: { fr: "Tenir un calendrier unique là où chaque institution a le sien, et arbitrer l'ordre des chantiers quand ils se conditionnent mutuellement.", en: "Holding one schedule where each institution has its own, and arbitrating the order of workstreams when they condition one another." } },
-  { t: { fr: "Exécuter", en: "Deliver" }, d: { fr: "Conduire chaque marché de la spécification à la réception, en tenant les délais de revue du bailleur qui rythment l'ensemble.", en: "Running each contract from specification to acceptance, holding to the donor review timelines that set the overall pace." } },
-  { t: { fr: "Rendre compte", en: "Account" }, d: { fr: "Publier ce qui est décidé et mesuré, y compris les retards, pour que l'exécution reste contestable pendant qu'elle peut encore être corrigée.", en: "Publishing what is decided and measured, including delays, so that delivery stays contestable while it can still be corrected." } },
-];
+/* ⚠️ `ugptnMission` et `polesAction` ont quitté ce fichier, pour la même raison
+   que ci-dessus : ils décrivaient une seconde fois ce que `data.ts` décrivait
+   déjà, dans une autre section de la même page.
 
-/* --- UGPTN : mission + activité en cours par pôle -------------------------- */
-export const polesAction: PoleAction[] = [
-  { pole: { fr: "Coordination & administration", en: "Coordination & administration" }, color: "#0f62fe", mission: { fr: "Arbitre les priorités entre composantes et tient la relation avec les ministères bénéficiaires et les cofinanceurs.", en: "Arbitrates priorities between components and holds the relationship with beneficiary ministries and co-financiers." }, act: { fr: "En cours : plan de travail glissant 18 mois & reporting bailleurs.", en: "Now: rolling 18-month work plan & donor reporting." } },
-  { pole: { fr: "Passation des marchés", en: "Procurement" }, color: "#009d9a", mission: { fr: "Traduit un besoin technique en dossier d'appel d'offres défendable, et conduit la mise en concurrence jusqu'à l'attribution.", en: "Translates a technical need into a defensible bidding document, and runs the competition through to award." }, act: { fr: "En cours : appel d'offres pour le backbone fibre des provinces de l'Est (AOI/C1).", en: "Now: tender for the Eastern provinces' fibre backbone (AOI/C1)." } },
-  { pole: { fr: "Technique & normes", en: "Technical & standards" }, color: "#8a3ffc", mission: { fr: "Fixe les spécifications et les normes en amont, puis vérifie la conformité des livrables avant réception.", en: "Sets specifications and standards upstream, then verifies deliverables against them before acceptance." }, act: { fr: "En cours : architecture d'identité numérique & interopérabilité.", en: "Now: digital identity & interoperability architecture." } },
-  { pole: { fr: "Gestion fiduciaire", en: "Fiduciary management" }, color: "#ee5396", mission: { fr: "Tient la traçabilité de chaque dépense, du compte désigné au justificatif, et prépare la revue des auditeurs externes.", en: "Maintains the traceability of every expenditure, from designated account to supporting document, and prepares external audit review." }, act: { fr: "En cours : compte désigné & rapports financiers trimestriels.", en: "Now: designated account & quarterly financial reports." } },
-  { pole: { fr: "Suivi-évaluation & sauvegardes", en: "M&E & safeguards" }, color: "#198038", mission: { fr: "Documente l'état initial avant travaux, mesure l'écart ensuite, et traite les effets sociaux et environnementaux du chantier.", en: "Documents the baseline before works, measures the gap afterwards, and handles the social and environmental effects of the worksite." }, act: { fr: "En cours : étude de référence & déploiement du MGP dans les provinces.", en: "Now: baseline study & rollout of the GRM across the provinces." } },
-];
+   · `ugptnMission` reprenait le mandat sous trois verbes, dont deux (coordonner,
+     exécuter) étaient les intitulés 01 et 02 de `mandat`. Le troisième, rendre
+     compte, y est désormais la fonction 05.
+   · `polesAction` nommait CINQ pôles différents des cinq de l'organigramme, si
+     bien que la page en annonçait cinq, puis cinq autres. Mission et dossier en
+     cours sont maintenant portés par `poles[]` dans `data.ts`, seule taxonomie
+     de référence. Le préfixe « En cours : » a quitté les textes pour devenir un
+     libellé traduisible (`t.ugptn.orgEnCours`). */
 
 /* --- UGPTN : « Du financement aux résultats » (5 étapes) -------------------- */
 export const methode: MethodeEtape[] = [
@@ -78,12 +76,15 @@ export const methode: MethodeEtape[] = [
 /* --- UGPTN : engagements / standards --------------------------------------- */
 export const engagementsList: EngagementItem[] = [
   { t: { fr: "Transparence", en: "Transparency" }, d: { fr: "Chaque avis publié, chaque attribution rendue publique — y compris quand le résultat ne nous arrange pas.", en: "Every notice published, every award made public — including when the outcome is inconvenient." }, color: "#0f62fe" },
-  { t: { fr: "Traçabilité", en: "Traceability" }, d: { fr: "Toute décision se rattache à une pièce datée : un auditeur doit pouvoir la reconstituer sans nous.", en: "Every decision is attached to a dated record: an auditor must be able to reconstruct it without us." }, color: "#009d9a" },
   { t: { fr: "Réactivité", en: "Responsiveness" }, d: { fr: "Chaque plainte instruite, avec un délai de traitement visé de 30 jours.", en: "Every grievance investigated, with a target handling time of 30 days." }, color: "#8a3ffc" },
   { t: { fr: "Sauvegardes", en: "Safeguards" }, d: { fr: "Les instruments environnementaux et sociaux sont consultés et divulgués avant les travaux, jamais régularisés après.", en: "Environmental and social instruments are consulted and disclosed before works, never regularised afterwards." }, color: "#198038" },
   { t: { fr: "Protection des données", en: "Data protection" }, d: { fr: "Accès limité au strict nécessaire et cloisonnement des canaux : les données du canal confidentiel ne circulent nulle part ailleurs.", en: "Access limited to what is strictly necessary and channels kept separate: data from the confidential channel travels nowhere else." }, color: "#ee5396" },
-  { t: { fr: "Conformité", en: "Compliance" }, d: { fr: "Aucune dépense engagée avant l'avis de non-objection requis, quelle que soit l'urgence invoquée.", en: "No expenditure committed before the required no-objection, whatever urgency is invoked." }, color: "#ff832b" },
 ];
+/* Deux engagements ont été retirés parce qu'ils redisaient les principes
+   directeurs affichés dans la même section : « Traçabilité » recouvrait la
+   règle du MEP comme source de vérité et la reconstitution par un auditeur ;
+   « Conformité » recouvrait l'avis de non-objection qui conditionne
+   l'engagement de la dépense. */
 
 /* --- UGPTN : glossaire des sigles ------------------------------------------ */
 export const glossaire: GlossaireItem[] = [
@@ -103,7 +104,11 @@ export const glossaire: GlossaireItem[] = [
 export const ugptnFaq: FaqItem[] = [
   { q: { fr: "Qu'est-ce que l'UGPTN, exactement ?", en: "What exactly is the UGPTN?" }, r: { fr: "Une structure d'exécution à durée déterminée, créée par arrêté pour conduire un projet précis. Elle n'a pas de compétence réglementaire, ne délivre aucun service au public et disparaîtra avec le projet : sa raison d'être est de porter une capacité de gestion que l'administration ordinaire n'a pas vocation à maintenir en permanence.", en: "A time-limited delivery structure, created by ministerial order to run one specific project. It holds no regulatory powers, delivers no service to the public, and will end with the project: its purpose is to carry a management capacity that the ordinary administration is not meant to maintain permanently." } },
   { q: { fr: "Quelle différence avec le Ministère ?", en: "How is it different from the Ministry?" }, r: { fr: "Le ministère décide de la politique, fixe les priorités et exerce la tutelle ; l'Unité met en œuvre ce qui a été décidé et en rend compte. Concrètement : un ministère peut demander qu'un chantier soit engagé ; l'Unité ne peut pas décider qu'il le soit.", en: "The ministry sets policy, defines priorities and exercises oversight; the Unit implements what has been decided and accounts for it. Concretely: a ministry can require that a workstream be launched; the Unit cannot decide that it should be." } },
-  { q: { fr: "Qui dirige l'Unité ?", en: "Who leads the Unit?" }, r: { fr: "Un Coordonnateur national, sous la supervision du Comité de Pilotage. L'organisation compte cinq pôles — Direction, Composantes, Fiduciaire, Passation, Sauvegardes & transversal — et vingt-et-un sous-rôles, dont des agents de liaison en province : l'exécution ne se pilote pas uniquement depuis Kinshasa.", en: "A National Coordinator, under the supervision of the Steering Committee. The organisation has five clusters — Management, Components, Fiduciary, Procurement, Safeguards & cross-cutting — and twenty-one sub-roles, including provincial liaison officers: delivery cannot be steered from Kinshasa alone." } },
+  /* Le nombre de sous-rôles a été retiré de cette réponse : elle annonçait
+     vingt-et-un là où l'organigramme publié plus haut sur la même page en
+     détaille dix-neuf. L'écart appelle un arbitrage de l'Unité ; en attendant,
+     la page n'avance aucun total (cf. `polesSousRoles` dans data.ts). */
+  { q: { fr: "Qui dirige l'Unité ?", en: "Who leads the Unit?" }, r: { fr: "Un Coordonnateur national, sous la supervision du Comité de Pilotage. L'organisation compte cinq pôles — Direction, Composantes, Fiduciaire, Passation, Sauvegardes & transversal — et des agents de liaison en province : l'exécution ne se pilote pas uniquement depuis Kinshasa.", en: "A National Coordinator, under the supervision of the Steering Committee. The organisation has five clusters — Management, Components, Fiduciary, Procurement, Safeguards & cross-cutting — and provincial liaison officers: delivery cannot be steered from Kinshasa alone." } },
   { q: { fr: "Comment est-elle financée ?", en: "How is it financed?" }, r: { fr: "Par le Projet lui-même, cofinancé par la Banque mondiale (IDA) et l'Agence Française de Développement. Le fonctionnement de l'Unité relève de la composante de coordination et de gestion.", en: "Through the Project itself, co-financed by the World Bank (IDA) and the French Development Agency. The Unit's own operating costs fall under the coordination and management component." } },
   { q: { fr: "L'Unité décide-t-elle des attributions ?", en: "Does the Unit decide who wins contracts?" }, r: { fr: "Non, pas seule. L'évaluation applique les critères publiés dans le dossier d'appel d'offres, elle est conduite par une commission et son résultat est soumis à l'avis de non-objection du bailleur avant toute notification. C'est ce triple verrou — critères annoncés, évaluation collégiale, revue externe — qui rend une attribution contestable et défendable.", en: "No, not alone. Evaluation applies the criteria published in the bidding document, is conducted by a committee, and its result is submitted for the donor's no-objection before any notification. It is this triple lock — announced criteria, collegial evaluation, external review — that makes an award both challengeable and defensible." } },
   { q: { fr: "Comment travailler avec l'Unité ?", en: "How can I work with the Unit?" }, r: { fr: "Selon ce que vous êtes. Une entreprise crée un compte vérifié et répond aux avis publiés. Une institution bénéficiaire passe par le comité technique. Un chercheur ou un journaliste trouve les documents divulgables dans le dépôt public. Un citoyen peut assister aux consultations, ou saisir le mécanisme de plaintes s'il constate une difficulté.", en: "It depends who you are. A company creates a verified account and responds to published notices. A beneficiary institution goes through the technical committee. A researcher or journalist finds disclosable documents in the public repository. A citizen can attend consultations, or use the grievance mechanism if they encounter a difficulty." } },
@@ -134,15 +139,17 @@ export const ressources: Ressource[] = [
   { k: { fr: "Note d'orientation", en: "Sector note" }, color: "#009d9a", pole: { fr: "Passation & fiduciaire", en: "Procurement & fiduciary" }, comp: "C4", date: { fr: "Janvier 2026", en: "Jan 2026" }, titre: { fr: "Passation ouverte et traçable : application des règles de la Banque mondiale", en: "Open, traceable procurement: applying World Bank rules" }, meta: "PDF · 1,1 Mo" },
 ];
 
-/* --- UGPTN : chiffres de l'Unité ------------------------------------------- */
-export const uniteStats: UniteStat[] = [
-  { v: "5", l: { fr: "pôles", en: "clusters" } },
-  { v: "21", l: { fr: "sous-rôles", en: "sub-roles" } },
-  { v: "2025", l: { fr: "créée par arrêté", en: "created by order" } },
-  { v: "3", l: { fr: "niveaux de gouvernance", en: "levels of governance" } },
-  { v: "26", l: { fr: "provinces", en: "provinces" } },
-  { v: "2029", l: { fr: "horizon de livraison", en: "delivery horizon" } },
-];
+/* ⚠️ `uniteStats` a quitté ce fichier. Les six tuiles « L'Unité en bref »
+   répétaient ce que la page disait déjà autour d'elles : « 5 pôles » et
+   « 21 sous-rôles » figuraient dans les deux sections voisines, « 2025 créée
+   par arrêté » dans le bandeau d'engagement, tandis que « 26 provinces » et
+   « 2029 » relèvent du projet et non de l'Unité, et sont servis par l'accueil,
+   « Le Projet » et chaque page de composante.
+
+   Les deux valeurs qui restaient utiles sont désormais DÉRIVÉES, dans la page :
+   `poles.length` et `gouvernance.length`. Le total de sous-rôles n'est plus
+   affiché du tout, faute d'un chiffre que les données confirment (cf. la note
+   de `polesSousRoles` dans `data.ts`). */
 
 /* --- Accueil : galerie par province ---------------------------------------- */
 export const galleryProvinces: GalleryItem[] = [

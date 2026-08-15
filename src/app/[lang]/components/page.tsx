@@ -1,26 +1,31 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { asLang } from "@/lib/params";
-import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { composantes } from "@/content/data";
 import { composantesDetail } from "@/content/composantes-detail";
 import { NAV, route } from "@/lib/routes";
-import { compColor, onComp } from "@/lib/comp";
 import { PageHero } from "@/components/ui/PageHero";
+import { FilAriane } from "@/components/ui/FilAriane";
+import { CtaFin } from "@/components/ui/CtaFin";
 import { Kicker } from "@/components/ui/Kicker";
 import { CompCard } from "@/components/composantes/CompCard";
+import { CompChaine } from "@/components/composantes/CompChaine";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const t = dict(lang).comp;
+  const c = dict(lang).comp;
+  const path = `/${lang}${NAV.composantes}`;
   return {
-    title: t.titre,
-    description: t.indexLead,
-    alternates: { canonical: `/${lang}${NAV.composantes}` },
+    title: c.titre,
+    description: c.metaDesc,
+    alternates: {
+      canonical: path,
+      languages: { fr: `/fr${NAV.composantes}`, en: `/en${NAV.composantes}` },
+    },
+    openGraph: { title: c.titre, description: c.metaDesc, url: path, type: "website" },
   };
 }
 
@@ -34,7 +39,16 @@ export default async function ComposantesPage(props: { params: Promise<{ lang: s
   return (
     <div>
       <PageHero
-        crumb={`UGPTN / ${c.titre}`}
+        crumb={
+          <FilAriane
+            label={t.lbl.ariane}
+            items={[
+              { label: t.nav.accueil, href: route(lang) },
+              { label: t.nav.projet, href: route(lang, NAV.projet) },
+              { label: c.titre },
+            ]}
+          />
+        }
         title={c.indexTitle}
         lead={c.indexLead}
       />
@@ -52,57 +66,30 @@ export default async function ComposantesPage(props: { params: Promise<{ lang: s
         </div>
       </section>
 
-      {/* Lecture transversale : ce que chaque composante apporte */}
+      {/* Lecture transversale — les dépendances entre composantes.
+          Cette section remplace un tableau qui relistait les cinq mêmes
+          composantes juste sous les cartes, avec un titre qui paraphrasait le
+          chapeau du héros. */}
       <section className="section section--grey">
         <div className="section__inner">
           <Reveal>
-            <Kicker>{t.sec.composantes}</Kicker>
-            <h2 className="h2--sm comp-h2">{t.comp.rowsNote}</h2>
+            <Kicker>{c.liensLabel}</Kicker>
+            <h2 className="h2--sm comp-h2">{c.liensTitle}</h2>
+            <p className="lead comp-lead">{c.liensLead}</p>
           </Reveal>
-          <RevealGroup className="comp-table" gap={0.04}>
-            {composantes.map((comp) => {
-              const d = detailOf(comp.code);
-              return (
-                <RevealItem key={comp.code}>
-                  <Link href={`${route(lang, NAV.composantes)}/${comp.code.toLowerCase()}`} className="comp-table__row">
-                    <span className="mono comp-table__code" style={{ background: compColor(comp.code), color: onComp(comp.code) }}>
-                      {comp.code}
-                    </span>
-                    <span className="comp-table__t">
-                      <strong>{pick(comp.titre, lang)}</strong>
-                      <span className="comp-table__d">{d ? pick(d.titreLong, lang) : pick(comp.desc, lang)}</span>
-                    </span>
-                    <span className="mono comp-table__n">
-                      {comp.sous.length > 0 ? `${comp.sous.length} ${c.sousTitle.toLowerCase()}` : "—"}
-                    </span>
-                    <span className="mono comp-table__m">
-                      {d && d.projets.length > 0 ? `${d.projets.length} ${c.projets}` : "—"}
-                    </span>
-                    <span className="mono comp-table__go" aria-hidden>→</span>
-                  </Link>
-                </RevealItem>
-              );
-            })}
-          </RevealGroup>
+          <CompChaine lang={lang} />
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="section--dark comp-pager-wrap">
-        <div className="section__inner comp-cta-split">
-          <Reveal>
-            <h2 className="h2--sm" style={{ maxWidth: "16ch" }}>{t.projet.ctaTitle}</h2>
-            <p className="comp-cta__lead">{t.projet.ctaLead}</p>
-          </Reveal>
-          <div className="comp-cta">
-            <Link href={route(lang, NAV.projet)} className="btn btn--primary">
-              {t.nav.projet} <span className="arrow">→</span>
-            </Link>
-            <Link href={route(lang, NAV.marches)} className="btn btn--on-dark">{t.cta.marches}</Link>
-            <Link href={route(lang, NAV.resultats)} className="btn btn--on-dark">{t.nav.resultats}</Link>
-          </div>
-        </div>
-      </section>
+      <CtaFin
+        titre={t.projet.ctaTitle}
+        lead={t.projet.ctaLead}
+        liens={[
+          { href: route(lang, NAV.projet), label: t.nav.projet },
+          { href: route(lang, NAV.marches), label: t.cta.marches },
+          { href: route(lang, NAV.resultats), label: t.nav.resultats },
+        ]}
+      />
     </div>
   );
 }

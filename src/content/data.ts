@@ -107,9 +107,9 @@ export const composantes: Composante[] = [
 export const composanteMax = Math.max(...composantes.map((c) => c.montant));
 
 export const gouvernance: GouvBody[] = [
-  { sigle: "COPIL", nom: { fr: "Comité de Pilotage", en: "Steering Committee" }, nature: { fr: "Stratégique / décisionnel", en: "Strategic / decision-making" }, effectif: "8 membres", presidence: "MPTN", decision: { fr: "Consensus → majorité simple", en: "Consensus → simple majority" }, frequence: { fr: "Semestrielle (min.)", en: "Semi-annual (min.)" } },
-  { sigle: "CTP", nom: { fr: "Comité Technique du Projet", en: "Project Technical Committee" }, nature: { fr: "Technique / coordination", en: "Technical / coordination" }, effectif: "12 représentants", presidence: "MPTN", decision: { fr: "Consensus → majorité 2/3", en: "Consensus → two-thirds majority" }, frequence: { fr: "Trimestrielle (min.)", en: "Quarterly (min.)" } },
-  { sigle: "UGPTN", nom: { fr: "Unité de Gestion du Projet", en: "Project Management Unit" }, nature: { fr: "Exécution / gestion", en: "Execution / management" }, effectif: "~21 sous-rôles", presidence: { fr: "Coordonnateur", en: "Coordinator" }, decision: { fr: "Application des décisions", en: "Implementation of decisions" }, frequence: { fr: "Permanente", en: "Permanent" } },
+  { sigle: "COPIL", nom: { fr: "Comité de Pilotage", en: "Steering Committee" }, nature: { fr: "Stratégique / décisionnel", en: "Strategic / decision-making" }, effectif: { fr: "8 membres", en: "8 members" }, presidence: "MPTN", decision: { fr: "Consensus → majorité simple", en: "Consensus → simple majority" }, frequence: { fr: "Semestrielle (min.)", en: "Semi-annual (min.)" } },
+  { sigle: "CTP", nom: { fr: "Comité Technique du Projet", en: "Project Technical Committee" }, nature: { fr: "Technique / coordination", en: "Technical / coordination" }, effectif: { fr: "12 représentants", en: "12 representatives" }, presidence: "MPTN", decision: { fr: "Consensus → majorité 2/3", en: "Consensus → two-thirds majority" }, frequence: { fr: "Trimestrielle (min.)", en: "Quarterly (min.)" } },
+  { sigle: "UGPTN", nom: { fr: "Unité de Gestion du Projet", en: "Project Management Unit" }, nature: { fr: "Exécution / gestion", en: "Execution / management" }, effectif: { fr: "5 pôles", en: "5 clusters" }, presidence: { fr: "Coordonnateur", en: "Coordinator" }, decision: { fr: "Application des décisions", en: "Implementation of decisions" }, frequence: { fr: "Permanente", en: "Permanent" } },
 ];
 
 export const mandat: Mandat[] = [
@@ -117,6 +117,11 @@ export const mandat: Mandat[] = [
   { n: "02", titre: { fr: "Exécution", en: "Execution" }, desc: { fr: "Transformer un plan en contrats exécutables : programmation annuelle (PTBA), préparation des dossiers d'appel d'offres, mise en concurrence, attribution après non-objection, puis suivi de l'exécution jusqu'à la réception.", en: "Turning a plan into executable contracts: annual programming (AWPB), preparation of bidding documents, competition, award after no-objection, then monitoring delivery through to acceptance." } },
   { n: "03", titre: { fr: "Supervision technique", en: "Technical supervision" }, desc: { fr: "Vérifier que ce qui est livré correspond à ce qui a été spécifié, et que les normes structurantes — interopérabilité, identité, cybersécurité — sont respectées avant réception, pas constatées après.", en: "Checking that what is delivered matches what was specified, and that the structuring standards — interoperability, identity, cybersecurity — are met before acceptance, not observed afterwards." } },
   { n: "04", titre: { fr: "Supervision fiduciaire", en: "Fiduciary supervision" }, desc: { fr: "Tenir la chaîne de la dépense de bout en bout — compte désigné, justification des décaissements, comptabilité, rapports périodiques — de sorte qu'un auditeur externe puisse reconstituer chaque opération sans reconstitution a posteriori.", en: "Holding the expenditure chain end to end — designated account, justification of disbursements, accounting, periodic reports — so that an external auditor can reconstruct every transaction without after-the-fact reconstruction." } },
+  /* Cinquième fonction reprise de l'ancien triptyque « Coordonner / Exécuter /
+     Rendre compte », qui redisait ce mandat autrement cinq sections plus bas.
+     Les deux premiers verbes étaient déjà couverts par 01 et 02 ; la reddition
+     de comptes, elle, ne figurait nulle part ici. */
+  { n: "05", titre: { fr: "Reddition de comptes", en: "Accountability" }, desc: { fr: "Publier ce qui est décidé et mesuré, y compris les retards, pour que l'exécution reste contestable pendant qu'elle peut encore être corrigée.", en: "Publishing what is decided and measured, including delays, so that delivery stays contestable while it can still be corrected." } },
 ];
 
 export const principes: Principe[] = [
@@ -125,13 +130,81 @@ export const principes: Principe[] = [
   { titre: { fr: "Les bailleurs gardent la main.", en: "Donors keep control." }, desc: { fr: "L'avis de non-objection n'est pas une formalité : c'est un point de passage qui conditionne l'engagement de la dépense. La supervision conjointe et l'audit externe s'exercent en cours de projet, pas seulement à la clôture.", en: "A no-objection is not a formality: it is a checkpoint that conditions the commitment of expenditure. Joint supervision and external audit are exercised during the project, not only at closure." } },
 ];
 
+/**
+ * Les cinq pôles de l'arrêté, avec ce que chacun porte en ce moment.
+ *
+ * `mission`, `dossier` et `color` proviennent de l'ancien `polesAction` de
+ * `carbon.ts` : la même organisation y était décrite une seconde fois, sous
+ * cinq intitulés différents, dans une autre section de la même page. La
+ * correspondance retenue est indiquée ligne par ligne ci-dessous.
+ *
+ * ⚠️ Deux rattachements restent À VALIDER par l'Unité, marqués en commentaire.
+ */
 export const poles: Pole[] = [
-  { nom: { fr: "Direction", en: "Management" }, role: { fr: "Pilotage, arbitrage, contrôle interne", en: "Steering, arbitration, internal control" }, roles: ["Coordonnateur", "Coordonnateur Adjoint", "Auditeur Interne"] },
-  { nom: { fr: "Composantes", en: "Components" }, role: { fr: "Mise en œuvre technique des activités", en: "Technical implementation of activities" }, roles: ["Responsable Composante 1 (RC1)", "Responsable Composante 2 (RC2)", "Responsable Composante 3 (RC3)"] },
-  { nom: { fr: "Fiduciaire", en: "Fiduciary" }, role: { fr: "Gestion financière et comptable", en: "Financial and accounting management" }, roles: ["Responsable Administratif et Financier (RAF)", "Comptable", "Caissier", "Logisticien"] },
-  { nom: { fr: "Passation", en: "Procurement" }, role: { fr: "Marchés publics et ANO", en: "Public procurement and NOL" }, roles: ["Responsable Passation des Marchés (RPM)", "Chargé de Passation des Marchés"] },
-  { nom: { fr: "Sauvegardes & transversal", en: "Safeguards & cross-cutting" }, role: { fr: "Conformité E&S, suivi, communication, systèmes", en: "E&S compliance, M&E, communication, systems" }, roles: ["Spécialiste Environnement", "Spécialiste Développement Social", "Spécialiste VBG/EAS", "Spécialiste Suivi & Évaluation", "Spécialiste Communication", "Responsable Informatique (IT)", "Agent de liaison provincial"] },
+  {
+    /* ← « Coordination & administration ». Sûr sur l'arbitrage et la relation
+       aux cofinanceurs ; le contrôle interne porté par l'Auditeur n'apparaît
+       pas dans la mission reprise. */
+    nom: { fr: "Direction", en: "Management" },
+    role: { fr: "Pilotage, arbitrage, contrôle interne", en: "Steering, arbitration, internal control" },
+    mission: { fr: "Arbitre les priorités entre composantes et tient la relation avec les ministères bénéficiaires et les cofinanceurs.", en: "Arbitrates priorities between components and holds the relationship with beneficiary ministries and co-financiers." },
+    dossier: { fr: "Plan de travail glissant 18 mois et reporting bailleurs.", en: "Rolling 18-month work plan and donor reporting." },
+    color: "#0f62fe",
+    roles: ["Coordonnateur", "Coordonnateur Adjoint", "Auditeur Interne"],
+  },
+  {
+    /* ⚠️ À VALIDER — rattaché à l'ancien « Technique & normes ». Le dossier en
+       cours (identité, interopérabilité) relève bien du RC2, mais l'intitulé
+       d'origine décrivait la supervision technique, qui est une fonction de
+       l'Unité entière et non d'un pôle. */
+    nom: { fr: "Composantes", en: "Components" },
+    role: { fr: "Mise en œuvre technique des activités", en: "Technical implementation of activities" },
+    mission: { fr: "Fixe les spécifications et les normes en amont, puis vérifie la conformité des livrables avant réception.", en: "Sets specifications and standards upstream, then verifies deliverables against them before acceptance." },
+    dossier: { fr: "Architecture d'identité numérique et interopérabilité.", en: "Digital identity and interoperability architecture." },
+    color: "#8a3ffc",
+    roles: ["Responsable Composante 1 (RC1)", "Responsable Composante 2 (RC2)", "Responsable Composante 3 (RC3)"],
+  },
+  {
+    /* ← « Gestion fiduciaire ». Rattachement direct. */
+    nom: { fr: "Fiduciaire", en: "Fiduciary" },
+    role: { fr: "Gestion financière et comptable", en: "Financial and accounting management" },
+    mission: { fr: "Tient la traçabilité de chaque dépense, du compte désigné au justificatif, et prépare la revue des auditeurs externes.", en: "Maintains the traceability of every expenditure, from designated account to supporting document, and prepares external audit review." },
+    dossier: { fr: "Compte désigné et rapports financiers trimestriels.", en: "Designated account and quarterly financial reports." },
+    color: "#ee5396",
+    roles: ["Responsable Administratif et Financier (RAF)", "Comptable", "Caissier", "Logisticien"],
+  },
+  {
+    /* ← « Passation des marchés ». Rattachement direct. */
+    nom: { fr: "Passation", en: "Procurement" },
+    role: { fr: "Marchés publics et ANO", en: "Public procurement and NOL" },
+    mission: { fr: "Traduit un besoin technique en dossier d'appel d'offres défendable, et conduit la mise en concurrence jusqu'à l'attribution.", en: "Translates a technical need into a defensible bidding document, and runs the competition through to award." },
+    dossier: { fr: "Appel d'offres pour le backbone fibre des provinces de l'Est (AOI/C1).", en: "Tender for the Eastern provinces' fibre backbone (AOI/C1)." },
+    color: "#009d9a",
+    roles: ["Responsable Passation des Marchés (RPM)", "Chargé de Passation des Marchés"],
+  },
+  {
+    /* ⚠️ À VALIDER — rattaché à l'ancien « Suivi-évaluation & sauvegardes ».
+       Le pôle couvre en plus la communication et l'informatique, que la
+       mission reprise n'évoque pas. */
+    nom: { fr: "Sauvegardes & transversal", en: "Safeguards & cross-cutting" },
+    role: { fr: "Conformité E&S, suivi, communication, systèmes", en: "E&S compliance, M&E, communication, systems" },
+    mission: { fr: "Documente l'état initial avant travaux, mesure l'écart ensuite, et traite les effets sociaux et environnementaux du chantier.", en: "Documents the baseline before works, measures the gap afterwards, and handles the social and environmental effects of the worksite." },
+    dossier: { fr: "Étude de référence et déploiement du MGP dans les provinces.", en: "Baseline study and rollout of the GRM across the provinces." },
+    color: "#198038",
+    roles: ["Spécialiste Environnement", "Spécialiste Développement Social", "Spécialiste VBG/EAS", "Spécialiste Suivi & Évaluation", "Spécialiste Communication", "Responsable Informatique (IT)", "Agent de liaison provincial"],
+  },
 ];
+
+/**
+ * Nombre de sous-rôles publiés, dérivé plutôt qu'écrit.
+ *
+ * ⚠️ Il vaut 19, alors que les textes du site annoncent 21 depuis l'origine.
+ * L'écart n'est pas une erreur de calcul : la table ci-dessus ne liste qu'un
+ * agent de liaison provincial et n'inclut aucun poste d'appui. Tant que
+ * l'arbitrage n'est pas rendu, le site n'affiche AUCUN total de sous-rôles :
+ * mieux vaut ne rien annoncer qu'annoncer un chiffre que la liste dément.
+ */
+export const polesSousRoles = poles.reduce((n, p) => n + p.roles.length, 0);
 
 /* ⚠️ Les membres de l'équipe ne sont plus ici : ils sont administrés depuis la
    console (module « L'équipe de l'Unité »), et leur état initial vit dans
