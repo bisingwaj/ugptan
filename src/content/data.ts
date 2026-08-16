@@ -3,7 +3,7 @@
    Montants, dates, indicateurs et structures IMMUABLES (conformité MEP).
    ========================================================================== */
 import type {
-  Meta, Chiffre, Repere, Odp, Intermediaire, Composante, GouvBody, Mandat, Principe,
+  Meta, Chiffre, Repere, Odp, Intermediaire, Composante, GouvBody,
   Pole, Province, Langue, Profil, CompColorMap,
 } from "./types";
 import type { Bilingual } from "@/lib/pick";
@@ -112,23 +112,11 @@ export const gouvernance: GouvBody[] = [
   { sigle: "UGPTN", nom: { fr: "Unité de Gestion du Projet", en: "Project Management Unit" }, nature: { fr: "Exécution / gestion", en: "Execution / management" }, effectif: { fr: "5 pôles", en: "5 clusters" }, presidence: { fr: "Coordonnateur", en: "Coordinator" }, decision: { fr: "Application des décisions", en: "Implementation of decisions" }, frequence: { fr: "Permanente", en: "Permanent" } },
 ];
 
-export const mandat: Mandat[] = [
-  { n: "01", titre: { fr: "Coordination", en: "Coordination" }, desc: { fr: "Faire tenir ensemble des chantiers qui dépendent les uns des autres : arbitrer les séquences entre composantes, tenir le calendrier commun avec les ministères bénéficiaires, et porter une seule version des faits devant les partenaires et les bailleurs.", en: "Holding together workstreams that depend on one another: arbitrating sequences between components, keeping a common schedule with beneficiary ministries, and presenting one single account of the facts to partners and donors." } },
-  { n: "02", titre: { fr: "Exécution", en: "Execution" }, desc: { fr: "Transformer un plan en contrats exécutables : programmation annuelle (PTBA), préparation des dossiers d'appel d'offres, mise en concurrence, attribution après non-objection, puis suivi de l'exécution jusqu'à la réception.", en: "Turning a plan into executable contracts: annual programming (AWPB), preparation of bidding documents, competition, award after no-objection, then monitoring delivery through to acceptance." } },
-  { n: "03", titre: { fr: "Supervision technique", en: "Technical supervision" }, desc: { fr: "Vérifier que ce qui est livré correspond à ce qui a été spécifié, et que les normes structurantes — interopérabilité, identité, cybersécurité — sont respectées avant réception, pas constatées après.", en: "Checking that what is delivered matches what was specified, and that the structuring standards — interoperability, identity, cybersecurity — are met before acceptance, not observed afterwards." } },
-  { n: "04", titre: { fr: "Supervision fiduciaire", en: "Fiduciary supervision" }, desc: { fr: "Tenir la chaîne de la dépense de bout en bout — compte désigné, justification des décaissements, comptabilité, rapports périodiques — de sorte qu'un auditeur externe puisse reconstituer chaque opération sans reconstitution a posteriori.", en: "Holding the expenditure chain end to end — designated account, justification of disbursements, accounting, periodic reports — so that an external auditor can reconstruct every transaction without after-the-fact reconstruction." } },
-  /* Cinquième fonction reprise de l'ancien triptyque « Coordonner / Exécuter /
-     Rendre compte », qui redisait ce mandat autrement cinq sections plus bas.
-     Les deux premiers verbes étaient déjà couverts par 01 et 02 ; la reddition
-     de comptes, elle, ne figurait nulle part ici. */
-  { n: "05", titre: { fr: "Reddition de comptes", en: "Accountability" }, desc: { fr: "Publier ce qui est décidé et mesuré, y compris les retards, pour que l'exécution reste contestable pendant qu'elle peut encore être corrigée.", en: "Publishing what is decided and measured, including delays, so that delivery stays contestable while it can still be corrected." } },
-];
-
-export const principes: Principe[] = [
-  { titre: { fr: "Le MEP reste la source de vérité.", en: "The PIM remains the source of truth." }, desc: { fr: "Un manuel validé par les trois parties fixe les règles avant les difficultés. L'Unité l'applique et, si une règle doit évoluer, elle le fait par avenant tracé — jamais par interprétation en cours d'exécution.", en: "A manual validated by the three parties sets the rules before difficulties arise. The Unit applies it and, where a rule must change, does so through a traceable amendment — never by interpretation mid-delivery." } },
-  { titre: { fr: "Les acteurs restent décisionnaires.", en: "Stakeholders remain the decision-makers." }, desc: { fr: "Un système d'information prépare, calcule et journalise ; il ne signe pas. L'attribution d'un marché, la validation d'un livrable ou la clôture d'une plainte relèvent de personnes identifiées et responsables de leur décision.", en: "An information system prepares, computes and logs; it does not sign. Awarding a contract, accepting a deliverable or closing a grievance rests with identified people, accountable for their decision." } },
-  { titre: { fr: "Les bailleurs gardent la main.", en: "Donors keep control." }, desc: { fr: "L'avis de non-objection n'est pas une formalité : c'est un point de passage qui conditionne l'engagement de la dépense. La supervision conjointe et l'audit externe s'exercent en cours de projet, pas seulement à la clôture.", en: "A no-objection is not a formality: it is a checkpoint that conditions the commitment of expenditure. Joint supervision and external audit are exercised during the project, not only at closure." } },
-];
+/* ⚠️ Le MANDAT et les PRINCIPES ne sont plus ici : ils sont administrés
+   depuis la console (module « L'UGPTN »), et leur état initial vit dans
+   `src/content/impact/ugptn.ts`. Les retirer de ce fichier évite qu'une
+   correction faite en console laisse derrière elle une seconde version,
+   toujours lisible dans le code et démentie par la page. */
 
 /**
  * Les cinq pôles de l'arrêté, avec ce que chacun porte en ce moment.

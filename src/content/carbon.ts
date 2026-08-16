@@ -3,9 +3,8 @@
    renderVals() codé en dur (cf. guide §6/§8 : une seule source de vérité).
    ========================================================================== */
 import type {
-  Evenement, GouvActivite,
-  MethodeEtape, EngagementItem, GlossaireItem, FaqItem, Partner,
-  Ressource, GalleryItem, Persona, Contact,
+  Evenement, GouvActivite, Partner,
+  Ressource, GalleryItem, Contact,
 } from "./types";
 
 /* ⚠️ Quatre jeux de données ont quitté ce fichier : les témoignages de
@@ -64,56 +63,10 @@ export const gouvActivites: GouvActivite[] = [
      de référence. Le préfixe « En cours : » a quitté les textes pour devenir un
      libellé traduisible (`t.ugptn.orgEnCours`). */
 
-/* --- UGPTN : « Du financement aux résultats » (5 étapes) -------------------- */
-export const methode: MethodeEtape[] = [
-  { t: { fr: "Planifier", en: "Plan" }, d: { fr: "Traduire le manuel en plan daté (PTBA / PPM), en plaçant les revues du bailleur sur le calendrier plutôt qu'en les découvrant en route.", en: "Translating the manual into a dated plan (AWPB / PP), placing donor reviews on the schedule rather than discovering them en route." } },
-  { t: { fr: "Passer les marchés", en: "Procure" }, d: { fr: "Publier un dossier complet dès la première fois : une relance pour cause de pièce manquante coûte une saison de travaux.", en: "Publishing a complete file first time round: a relaunch caused by a missing document costs a construction season." } },
-  { t: { fr: "Contractualiser", en: "Contract" }, d: { fr: "Évaluer selon les critères annoncés, obtenir l'avis de non-objection, puis engager — l'ordre compte et n'admet pas de raccourci.", en: "Evaluating against the announced criteria, obtaining the no-objection, then committing — the order matters and admits no shortcut." } },
-  { t: { fr: "Exécuter & superviser", en: "Deliver & supervise" }, d: { fr: "Contrôler sur site et sur pièces, traiter les plaintes riveraines à mesure, et refuser une réception non conforme tant qu'elle l'est.", en: "Checking on site and on record, handling neighbouring communities’ grievances as they arise, and refusing acceptance while a deliverable remains non-compliant." } },
-  { t: { fr: "Mesurer & rendre compte", en: "Measure & account" }, d: { fr: "Rapporter l'avancement province par province, publier les écarts au plan, et alimenter la revue suivante avec ce qui n'a pas fonctionné.", en: "Reporting progress province by province, publishing gaps against plan, and feeding the next review with what did not work." } },
-];
-
-/* --- UGPTN : engagements / standards --------------------------------------- */
-export const engagementsList: EngagementItem[] = [
-  { t: { fr: "Transparence", en: "Transparency" }, d: { fr: "Chaque avis publié, chaque attribution rendue publique — y compris quand le résultat ne nous arrange pas.", en: "Every notice published, every award made public — including when the outcome is inconvenient." }, color: "#0f62fe" },
-  { t: { fr: "Réactivité", en: "Responsiveness" }, d: { fr: "Chaque plainte instruite, avec un délai de traitement visé de 30 jours.", en: "Every grievance investigated, with a target handling time of 30 days." }, color: "#8a3ffc" },
-  { t: { fr: "Sauvegardes", en: "Safeguards" }, d: { fr: "Les instruments environnementaux et sociaux sont consultés et divulgués avant les travaux, jamais régularisés après.", en: "Environmental and social instruments are consulted and disclosed before works, never regularised afterwards." }, color: "#198038" },
-  { t: { fr: "Protection des données", en: "Data protection" }, d: { fr: "Accès limité au strict nécessaire et cloisonnement des canaux : les données du canal confidentiel ne circulent nulle part ailleurs.", en: "Access limited to what is strictly necessary and channels kept separate: data from the confidential channel travels nowhere else." }, color: "#ee5396" },
-];
-/* Deux engagements ont été retirés parce qu'ils redisaient les principes
-   directeurs affichés dans la même section : « Traçabilité » recouvrait la
-   règle du MEP comme source de vérité et la reconstitution par un auditeur ;
-   « Conformité » recouvrait l'avis de non-objection qui conditionne
-   l'engagement de la dépense. */
-
-/* --- UGPTN : glossaire des sigles ------------------------------------------ */
-export const glossaire: GlossaireItem[] = [
-  { s: "MEP", d: { fr: "Manuel d'Exécution du Projet — la source de vérité.", en: "Project Implementation Manual — the source of truth." } },
-  { s: "COPIL", d: { fr: "Comité de Pilotage — orientation stratégique.", en: "Steering Committee — strategic orientation." } },
-  { s: "CTP", d: { fr: "Comité Technique du Projet — préparation et suivi techniques.", en: "Technical Committee — technical preparation & follow-up." } },
-  { s: "ANO", d: { fr: "Avis de Non-Objection — l'accord préalable du bailleur.", en: "No-Objection — the donor's prior clearance." } },
-  { s: "PPM", d: { fr: "Plan de Passation des Marchés — le calendrier des marchés.", en: "Procurement Plan — the schedule of contracts." } },
-  { s: "PTBA", d: { fr: "Plan de Travail et Budget Annuel.", en: "Annual Work Plan & Budget." } },
-  { s: "STEP", d: { fr: "Système de suivi des marchés de la Banque mondiale.", en: "World Bank procurement tracking system." } },
-  { s: "NES", d: { fr: "Normes Environnementales et Sociales.", en: "Environmental & Social Standards." } },
-  { s: "MGP", d: { fr: "Mécanisme de Gestion des Plaintes.", en: "Grievance Redress Mechanism." } },
-  { s: "IDA / AFD", d: { fr: "Les deux cofinanceurs du projet.", en: "The project's two co-financiers." } },
-];
-
-/* --- UGPTN : FAQ sur l'Unité ----------------------------------------------- */
-export const ugptnFaq: FaqItem[] = [
-  { q: { fr: "Qu'est-ce que l'UGPTN, exactement ?", en: "What exactly is the UGPTN?" }, r: { fr: "Une structure d'exécution à durée déterminée, créée par arrêté pour conduire un projet précis. Elle n'a pas de compétence réglementaire, ne délivre aucun service au public et disparaîtra avec le projet : sa raison d'être est de porter une capacité de gestion que l'administration ordinaire n'a pas vocation à maintenir en permanence.", en: "A time-limited delivery structure, created by ministerial order to run one specific project. It holds no regulatory powers, delivers no service to the public, and will end with the project: its purpose is to carry a management capacity that the ordinary administration is not meant to maintain permanently." } },
-  { q: { fr: "Quelle différence avec le Ministère ?", en: "How is it different from the Ministry?" }, r: { fr: "Le ministère décide de la politique, fixe les priorités et exerce la tutelle ; l'Unité met en œuvre ce qui a été décidé et en rend compte. Concrètement : un ministère peut demander qu'un chantier soit engagé ; l'Unité ne peut pas décider qu'il le soit.", en: "The ministry sets policy, defines priorities and exercises oversight; the Unit implements what has been decided and accounts for it. Concretely: a ministry can require that a workstream be launched; the Unit cannot decide that it should be." } },
-  /* Le nombre de sous-rôles a été retiré de cette réponse : elle annonçait
-     vingt-et-un là où l'organigramme publié plus haut sur la même page en
-     détaille dix-neuf. L'écart appelle un arbitrage de l'Unité ; en attendant,
-     la page n'avance aucun total (cf. `polesSousRoles` dans data.ts). */
-  { q: { fr: "Qui dirige l'Unité ?", en: "Who leads the Unit?" }, r: { fr: "Un Coordonnateur national, sous la supervision du Comité de Pilotage. L'organisation compte cinq pôles — Direction, Composantes, Fiduciaire, Passation, Sauvegardes & transversal — et des agents de liaison en province : l'exécution ne se pilote pas uniquement depuis Kinshasa.", en: "A National Coordinator, under the supervision of the Steering Committee. The organisation has five clusters — Management, Components, Fiduciary, Procurement, Safeguards & cross-cutting — and provincial liaison officers: delivery cannot be steered from Kinshasa alone." } },
-  { q: { fr: "Comment est-elle financée ?", en: "How is it financed?" }, r: { fr: "Par le Projet lui-même, cofinancé par la Banque mondiale (IDA) et l'Agence Française de Développement. Le fonctionnement de l'Unité relève de la composante de coordination et de gestion.", en: "Through the Project itself, co-financed by the World Bank (IDA) and the French Development Agency. The Unit's own operating costs fall under the coordination and management component." } },
-  { q: { fr: "L'Unité décide-t-elle des attributions ?", en: "Does the Unit decide who wins contracts?" }, r: { fr: "Non, pas seule. L'évaluation applique les critères publiés dans le dossier d'appel d'offres, elle est conduite par une commission et son résultat est soumis à l'avis de non-objection du bailleur avant toute notification. C'est ce triple verrou — critères annoncés, évaluation collégiale, revue externe — qui rend une attribution contestable et défendable.", en: "No, not alone. Evaluation applies the criteria published in the bidding document, is conducted by a committee, and its result is submitted for the donor's no-objection before any notification. It is this triple lock — announced criteria, collegial evaluation, external review — that makes an award both challengeable and defensible." } },
-  { q: { fr: "Comment travailler avec l'Unité ?", en: "How can I work with the Unit?" }, r: { fr: "Selon ce que vous êtes. Une entreprise crée un compte vérifié et répond aux avis publiés. Une institution bénéficiaire passe par le comité technique. Un chercheur ou un journaliste trouve les documents divulgables dans le dépôt public. Un citoyen peut assister aux consultations, ou saisir le mécanisme de plaintes s'il constate une difficulté.", en: "It depends who you are. A company creates a verified account and responds to published notices. A beneficiary institution goes through the technical committee. A researcher or journalist finds disclosable documents in the public repository. A citizen can attend consultations, or use the grievance mechanism if they encounter a difficulty." } },
-];
-
+/* ⚠️ Les blocs de la page « L'UGPTN » (méthode, engagements, glossaire, foire
+   aux questions) et ceux de la page « Le projet » (publics visés, questions
+   citoyennes) ne sont plus ici : ils sont administrés depuis la console, et
+   leur état initial vit dans `src/content/impact/`. */
 /* --- Accueil : partenaires (logos placeholders) ---------------------------- */
 export const partners: Partner[] = [
   { name: "Banque mondiale", kind: { fr: "Bailleur · IDA", en: "Donor · IDA" }, logo: "/partenaires/banque-mondiale.png" },
@@ -161,24 +114,6 @@ export const galleryProvinces: GalleryItem[] = [
   { nom: "Ituri · Bunia", img: "citoyens" },
   { nom: "Kasaï · Kananga", img: "formation" },
   { nom: "Sud-Kivu · Bukavu", img: "femmes" },
-];
-
-/* --- Projet : pour qui (bénéficiaires) ------------------------------------- */
-export const projetPersonas: Persona[] = [
-  { k: { fr: "Citoyens", en: "Citizens" }, d: { fr: "Moins de pièces à réunir et moins de déplacements — à condition que les registres publics puissent se parler et qu'une identité fiable existe.", en: "Fewer documents to gather and fewer journeys — provided public registries can talk to each other and a reliable identity exists." } },
-  { k: { fr: "Jeunes & étudiants", en: "Youth & students" }, d: { fr: "Des parcours techniques alignés sur les métiers qui recrutent, dans des établissements équipés et raccordés — la qualification vaut par le signal qu'elle donne à l'employeur.", en: "Technical pathways aligned with the trades that are hiring, in equipped and connected institutions — a qualification is worth the signal it sends to employers." } },
-  { k: { fr: "Femmes", en: "Women" }, d: { fr: "Une part suivie et rapportée dans la formation comme dans l'entrepreneuriat : l'inclusion est une cible mesurée, pas une intention affichée.", en: "A share that is tracked and reported, in training as in entrepreneurship: inclusion is a measured target, not a stated intention." } },
-  { k: { fr: "Entrepreneurs & startups", en: "Entrepreneurs & startups" }, d: { fr: "Un financement versé au fil de jalons atteints, et des équipements mutualisés en centre d'innovation plutôt qu'à acquérir seul.", en: "Financing released as milestones are met, and equipment pooled in innovation centres rather than bought alone." } },
-  { k: { fr: "Communautés rurales", en: "Rural communities" }, d: { fr: "Une couverture là où le calcul commercial ne mène pas, et une consultation préalable lorsque les travaux traversent leurs terres.", en: "Coverage where commercial logic does not lead, and prior consultation where works cross their land." } },
-  { k: { fr: "Services publics", en: "Public services" }, d: { fr: "Des briques communes — identité, échange de données, hébergement, sécurité — qui évitent à chaque ministère de reconstruire les mêmes fonctions.", en: "Shared building blocks — identity, data exchange, hosting, security — that spare each ministry from rebuilding the same functions." } },
-];
-
-/* --- Projet : FAQ citoyen -------------------------------------------------- */
-export const citoyenFaq: FaqItem[] = [
-  { q: { fr: "En quoi ce projet me concerne-t-il, concrètement ?", en: "How does this project concern me, concretely?" }, r: { fr: "De trois façons, selon votre situation : le réseau se rapproche de chez vous, les démarches qui exigeaient un déplacement passent progressivement en ligne, et des formations techniques s'ouvrent dans les établissements du pays. L'effet n'arrive pas partout en même temps : le déploiement suit un ordre de priorité publié.", en: "In three ways, depending on your situation: the network moves closer to you, procedures that required travel move progressively online, and technical training opens in the country's institutions. The effect does not reach everywhere at once: deployment follows a published order of priority." } },
-  { q: { fr: "Quand verra-t-on les premiers effets ?", en: "When will the first effects be visible?" }, r: { fr: "Par étapes, et pas dans le même ordre partout. Un marché d'infrastructure se prépare, se met en concurrence, s'attribue puis s'exécute : entre la publication d'un avis et la mise en service d'un tronçon, il s'écoule normalement plusieurs saisons. Les premiers marchés structurants sont lancés ; leur calendrier prévisionnel est publié sur la page Marchés.", en: "In stages, and not in the same order everywhere. An infrastructure contract is prepared, competed, awarded and then delivered: between the publication of a notice and a section entering service, several seasons normally pass. The first structuring contracts are under way; their indicative schedules are published on the Tenders page." } },
-  { q: { fr: "Je vis loin d'une grande ville — suis-je concerné ?", en: "I live far from a big city — am I included?" }, r: { fr: "Oui, et c'est même le sens de l'intervention publique : les zones que le marché dessert déjà n'ont pas besoin d'être subventionnées. La couverture vise les 26 provinces, avec une priorité donnée aux dix provinces du Cadre de Partenariat-Pays et aux localités non desservies.", en: "Yes — and that is precisely the point of public action: areas the market already serves do not need subsidising. Coverage targets all 26 provinces, with priority given to the ten Country Partnership Framework provinces and to underserved localities." } },
-  { q: { fr: "Que puis-je faire si quelque chose ne va pas ?", en: "What can I do if something goes wrong?" }, r: { fr: "Saisissez le Mécanisme de Gestion des Plaintes : formulaire en ligne, SMS, numéro vert gratuit, e-mail ou point focal en province. Le dépôt est gratuit, possible en plusieurs langues, et peut rester anonyme. Vous recevez un numéro de référence horodaté qui permet de suivre l'instruction ; l'Unité vise une réponse dans un délai de 30 jours. Un canal confidentiel distinct traite les cas de violences basées sur le genre.", en: "Use the Grievance Redress Mechanism: online form, SMS, free toll-free number, email or a provincial focal point. Filing is free, available in several languages, and may remain anonymous. You receive a timestamped reference number to follow the case; the Unit aims to reply within 30 days. A separate confidential channel handles gender-based violence cases." } },
 ];
 
 /* --- Contact + footer : coordonnées officielles ---------------------------- */
