@@ -11,6 +11,7 @@
  * est repris à l'identique ; seule la source change.
  */
 import { initials } from "@/lib/format";
+import { plafondRole } from "@/lib/equipe/affichage";
 import type { MembreEquipe } from "@/lib/equipe/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
@@ -81,7 +82,12 @@ export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
             </div>
 
             <div style={{ padding: "18px 18px 22px", flex: 1, display: "flex", flexDirection: "column" }}>
-              <div style={{ fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{membre.role}</div>
+              <div
+                title={membre.role}
+                style={{ fontSize: 15.5, fontWeight: 600, lineHeight: 1.3, ...plafondRole }}
+              >
+                {membre.role}
+              </div>
               {membre.pole && (
                 <span
                   className="mono"

@@ -33,7 +33,10 @@ export function MembreProfilChamps({ valeurs }: { valeurs: TraductionMembreSaisi
           type="text"
           className="field"
           defaultValue={valeurs.role}
-          maxLength={160}
+          /* 90 caractères : de quoi écrire « Responsable de la Composante 3 —
+             Compétences, innovation et entrepreneuriat » (84), pas de quoi
+             loger les deux langues dans le même champ. */
+          maxLength={90}
           required
         />
         <p className="adm-hint" style={{ marginTop: 6 }}>{TEAM_CHAMPS.role.hint}</p>

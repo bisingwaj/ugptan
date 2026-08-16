@@ -107,7 +107,10 @@ export const TEAM_CHAMPS = {
   },
   role: {
     label: "Fonction",
-    hint: "L'intitulé du poste, tel qu'il s'affiche sur toutes les cartes. Seul champ obligatoire.",
+    hint:
+      "L'intitulé du poste, tel qu'il s'affiche sur toutes les cartes. Seul champ obligatoire. " +
+      "Gardez-le court : la grille de l'équipe le coupe au-delà de trois lignes. " +
+      "N'écrivez ici que la langue de l'onglet ouvert ; la version anglaise se saisit sur son propre onglet.",
   },
   mandat: {
     label: "Responsabilités",
