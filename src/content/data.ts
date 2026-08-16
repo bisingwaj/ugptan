@@ -186,11 +186,14 @@ export const poles: Pole[] = [
 /**
  * Nombre de sous-rôles publiés, dérivé plutôt qu'écrit.
  *
- * ⚠️ Il vaut 19, alors que les textes du site annoncent 21 depuis l'origine.
- * L'écart n'est pas une erreur de calcul : la table ci-dessus ne liste qu'un
- * agent de liaison provincial et n'inclut aucun poste d'appui. Tant que
- * l'arbitrage n'est pas rendu, le site n'affiche AUCUN total de sous-rôles :
- * mieux vaut ne rien annoncer qu'annoncer un chiffre que la liste dément.
+ * ⚠️ Il vaut 19, alors que l'Unité en compte 21. L'écart est connu et assumé :
+ * les deux rôles manquants seront saisis depuis la console, sur la section de
+ * l'organigramme (module « L'UGPTN »). D'ici là, le site n'affiche AUCUN total
+ * de sous-rôles — mieux vaut ne rien annoncer qu'annoncer un chiffre que la
+ * liste publiée dément.
+ *
+ * Cette table ne sert plus la page « L'UGPTN », qui lit désormais la base ;
+ * elle reste ici pour l'accueil, qui compte encore les pôles.
  */
 export const polesSousRoles = poles.reduce((n, p) => n + p.roles.length, 0);
 

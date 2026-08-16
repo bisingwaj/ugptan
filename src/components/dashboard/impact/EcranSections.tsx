@@ -74,7 +74,7 @@ export async function EcranListeSections({
     () => db().impactSection.findMany({
       where,
       select: {
-        id: true, status: true, emplacement: true, layout: true, position: true,
+        id: true, status: true, emplacement: true, layout: true, position: true, enchaine: true,
         sourceId: true,
         source: { select: { translations: { where: { locale: "fr" }, select: { kicker: true, titre: true } } } },
         translations: { select: { locale: true, kicker: true, titre: true } },
@@ -194,7 +194,7 @@ export async function EcranListeSections({
                           <span className="adm-langues">
                             {LOCALES.map((locale) => {
                               const tr = section.translations.find((item) => item.locale === locale);
-                              const complete = Boolean(tr && sectionTraduite(tr));
+                              const complete = Boolean(tr && sectionTraduite(tr, section));
                               const etat = !tr ? t.tradManquante : complete ? t.tradPresente : t.tradIncomplete;
                               return (
                                 <span

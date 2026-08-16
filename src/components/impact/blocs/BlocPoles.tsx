@@ -10,10 +10,12 @@
    listes sont tenues séparément, à dessein : les confondre obligerait à trancher
    ici un arbitrage qui appartient à l'Unité.
 
-   Le compte de sous-rôles affiché est celui des pastilles réellement saisies.
-   La page n'a jamais avancé de total au-delà de cette ligne, et ne le fait
-   toujours pas : les textes du site en annonçaient vingt et un là où la table
-   en listait dix-neuf, écart non tranché à ce jour. */
+   Le compte de sous-rôles affiché est celui des pastilles réellement saisies,
+   pôle par pôle. La page n'avance aucun total général, et n'a pas à en avancer :
+   l'Unité compte vingt et un rôles, dix-neuf sont renseignés à ce jour, et les
+   deux manquants s'ajouteront depuis la console. Un total écrit en dur aurait
+   annoncé vingt et un au-dessus d'une liste qui en montre dix-neuf ; un total
+   calculé se corrige tout seul le jour où les fiches arrivent. */
 import type { ImpactItemVue } from "@/lib/impact/query";
 import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
