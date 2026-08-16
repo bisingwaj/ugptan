@@ -266,7 +266,14 @@
   /* --- Tableaux ------------------------------------------------------------ */
   /* Le conteneur porte le défilement horizontal : sur mobile, c'est le tableau
      qui glisse, jamais la page. */
-  .adm-table-wrap { @apply w-full overflow-x-auto border border-c-20 bg-white; }
+  /* `relative` n'est pas décoratif : il donne un bloc conteneur aux descendants
+     en `position:absolute`, à commencer par le `.sr-only` de l'en-tête
+     « Actions ». Sans lui, ce libellé escamoté se réfère au bloc conteneur
+     initial et se pose à sa position statique — tout à droite d'un tableau plus
+     large que l'écran. Le débordement du tableau, lui, est bien absorbé ici,
+     mais celui du `.sr-only` échappait au conteneur et étirait la PAGE : la
+     console entière défilait vers la droite. */
+  .adm-table-wrap { @apply relative w-full overflow-x-auto border border-c-20 bg-white; }
   .adm-table { @apply w-full border-collapse text-[14px]; min-width: 720px; }
   .adm-table th {
     @apply text-left font-mono text-[10.5px] tracking-[0.08em] uppercase text-c-60 font-normal
@@ -276,6 +283,12 @@
   .adm-table tr:last-child td { @apply border-b-0; }
   .adm-table__sub { @apply block text-[12.5px] text-c-60; }
   .adm-table__meta { @apply text-[12.5px] text-c-60 whitespace-nowrap; }
+  /* Même ton que `.adm-table__meta`, mais le texte y revient à la ligne.
+     `nowrap` va à une date ou à un compteur ; appliqué à « Coordonnateur
+     national du Projet de Transformation Numérique », il réclame 400 px de
+     colonne, pousse le tableau bien au-delà de l'écran et laisse 100 px au nom
+     du membre. Les colonnes de texte libre prennent donc cette classe. */
+  .adm-table__texte { @apply text-[12.5px] leading-[1.45] text-c-60; }
 
   .adm-link { @apply font-medium text-ac; }
   .adm-link:hover { @apply underline underline-offset-2; }

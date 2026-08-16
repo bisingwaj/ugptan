@@ -160,16 +160,20 @@ export default async function EquipeAdminPage(props: { searchParams: Promise<Rec
                         </Link>
                         {!nom && <span className="adm-table__sub">{fonction}</span>}
                       </td>
-                      <td className="adm-table__meta">{fonction}</td>
+                      {/* `__texte` et non `__meta` : une fonction s'écrit en
+                          toutes lettres et doit pouvoir revenir à la ligne,
+                          sinon la colonne réclame 400 px et le tableau part
+                          hors de l'écran. */}
+                      <td className="adm-table__texte">{fonction}</td>
                       <td>
                         <span className={`adm-badge adm-statut adm-statut--${publie ? "published" : "draft"}`}>
                           {TEAM_STATUT_LABEL[membre.status as TeamStatut]}
                         </span>
                       </td>
-                      <td className="adm-table__meta">
+                      <td className="adm-table__texte">
                         {membre.pole?.translations[0]?.nom || t.sansPole}
                       </td>
-                      <td className="adm-table__meta">{ou.length > 0 ? ou.join(" · ") : "—"}</td>
+                      <td className="adm-table__texte">{ou.length > 0 ? ou.join(" · ") : "—"}</td>
                       <td>
                         <span className="adm-langues">
                           {LOCALES.map((locale) => {
