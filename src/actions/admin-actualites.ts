@@ -51,7 +51,7 @@ import { composantes } from "@/content/data";
 /** État partagé par tous les formulaires du module. */
 export type ActuFormState = { error: string | null; ok: string | null };
 
-const ACTUS_PATH = adminPath("/actualites");
+const ACTUS_PATH = adminPath("/news");
 
 const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 

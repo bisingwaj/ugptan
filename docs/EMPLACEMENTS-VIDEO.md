@@ -24,7 +24,6 @@ Deux façons :
 | Héros — film du projet (fond + lightbox) | Accueil | 16:9 | 60–90 s | Provisoire |
 | Héros de page — intro courte (optionnel) | Toutes | 16:9 | 15–30 s | Optionnel |
 | Cartes « Histoires & impact » (×4) | Accueil + Résultats | 16:9 | 60–90 s | À fournir |
-| « Le projet en vidéos » (×5, par composante) | Résultats | 16:9 | 2–5 min | À fournir |
 | Vidéo de présentation d'une composante (×5) | Composantes (C1 → C5) | 16:9 | 2–4 min | À fournir |
 | Bannière de la fiche d'avis | Marchés | 16:9 | 30–90 s | Optionnel |
 | Vidéo associée à un article | Actualités | 16:9 | variable | Optionnel |

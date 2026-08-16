@@ -1,6 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 import { ADMIN_BASE, ADMIN_LOGIN, ADMIN_SET_PASSWORD, NEXT_PARAM } from "@/lib/admin";
+/* `cheminActuel` et sa table vivent dans `lib/routes.ts`, avec les chemins
+   publics dont ils dérivent : le rendu s'en sert aussi, pour rattraper les
+   liens saisis en console avant le renommage. Ce module n'a aucune dépendance
+   d'exécution, il peut donc être lu depuis la middleware. */
+import { cheminActuel } from "@/lib/routes";
 
 const locales = ["fr", "en"];
 const defaultLocale = "fr";
@@ -55,12 +60,23 @@ export async function proxy(req: NextRequest) {
   }
 
   // --- Site public ---------------------------------------------------------
-  const hasLocale = locales.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
-  if (hasLocale) return;
+  /* Deux corrections possibles, traitées ensemble pour n'imposer qu'un seul
+     aller-retour : le préfixe de langue absent, et l'ancien chemin français. */
+  const locale = locales.find((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
+  const reste = locale ? pathname.slice(locale.length + 1) : pathname === "/" ? "" : pathname;
+  const actuel = cheminActuel(reste);
+  const ancien = actuel !== reste;
+
+  // Adresse déjà correcte dans les deux dimensions : rien à faire.
+  if (locale && !ancien) return;
 
   const url = req.nextUrl.clone();
-  url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
-  return NextResponse.redirect(url);
+  url.pathname = `/${locale ?? defaultLocale}${actuel}`;
+  /* 308 dès qu'une ancienne adresse est en jeu : elle ne reviendra pas, et le
+     dire permanent transfère le référencement. Le simple ajout du préfixe de
+     langue reste un 307 — la langue servie peut changer, l'adresse sans
+     préfixe n'est pas périmée pour autant. */
+  return NextResponse.redirect(url, ancien ? 308 : 307);
 }
 
 function redirectTo(req: NextRequest, pathname: string, next?: string) {

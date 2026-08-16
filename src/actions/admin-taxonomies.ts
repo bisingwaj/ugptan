@@ -18,8 +18,17 @@ import { slugify } from "@/lib/actus/slug";
 import { revaliderActualites } from "@/lib/actus/cache";
 import type { ActuFormState } from "@/actions/admin-actualites";
 
-const CATEGORIES_PATH = adminPath("/actualites/categories");
-const ETIQUETTES_PATH = adminPath("/actualites/etiquettes");
+const CATEGORIES_PATH = adminPath("/news/categories");
+/**
+ * Les étiquettes n'ont PAS d'écran à elles : elles se gèrent en bas de celui des
+ * catégories (cf. app/(dashboard)/…/news/categories/page.tsx).
+ *
+ * ⚠️ Cette constante a longtemps désigné `/news/tags`, une route qui n'a jamais
+ * existé. `revalidatePath` ne lève pas sur un chemin inexistant — il n'invalide
+ * rien, sans le dire : créer ou supprimer une étiquette laissait donc l'écran
+ * qui les liste sur sa version en cache.
+ */
+const ETIQUETTES_PATH = CATEGORIES_PATH;
 
 const texte = (formData: FormData, key: string): string => String(formData.get(key) ?? "").trim();
 

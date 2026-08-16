@@ -10,6 +10,7 @@
    en ligne qui bloque le `:hover` (cf. le commentaire de RevealItem). */
 import type { Lang } from "@/lib/pick";
 import type { ImpactItemVue } from "@/lib/impact/query";
+import { lienPublic } from "@/lib/routes";
 import { CellBloom } from "@/components/ui/CellBloom";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
@@ -68,7 +69,7 @@ export function BlocCartes({ items, lang }: { items: ImpactItemVue[]; lang: Lang
             )}
             {item.lienUrl && item.lienLabel && (
               <a
-                href={item.lienUrl.startsWith("/") ? `/${lang}${item.lienUrl}` : item.lienUrl}
+                href={lienPublic(item.lienUrl, lang)}
                 className="mono"
                 style={{ marginTop: 14, fontSize: 12, color: accent }}
               >

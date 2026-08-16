@@ -75,9 +75,20 @@ export const cloudinaryCloudName = (): string | null => identifiants()?.cloud_na
  * pipeline d'images. C'est délibéré : un PDF déposé en `image` est rasterisé
  * par Cloudinary, et sa diffusion dépend d'un réglage de compte désactivé par
  * défaut. En `raw`, le fichier ressort octet pour octet.
+ *
+ * Les VIDÉOS, elles, partent en `video` et non en `raw`, et la distinction est
+ * loin d'être formelle : c'est ce type qui donne accès au transcodage, à la
+ * diffusion adaptative et à la lecture en continu du service. Une vidéo déposée
+ * en `raw` se télécharge intégralement avant de commencer, ce qui rend un film
+ * de quelques minutes inregardable sur une liaison ordinaire. C'est aussi ce
+ * type qu'il faut redonner pour la SUPPRIMER : `destroy` sur le mauvais type
+ * répond « not found » et laisse le fichier en place.
  */
-export const typeRessource = (mimeType: string): "image" | "raw" =>
-  mimeType.startsWith("image/") ? "image" : "raw";
+export const typeRessource = (mimeType: string): "image" | "video" | "raw" => {
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("video/")) return "video";
+  return "raw";
+};
 
 /**
  * Nom de dépôt : celui du fichier d'origine, débarrassé de son extension et de
@@ -92,7 +103,10 @@ export const typeRessource = (mimeType: string): "image" | "raw" =>
  * renverrait l'adresse du PREMIER fichier — l'article publié changerait
  * silencieusement d'illustration. Quatre octets tirés au sort écartent le cas.
  */
-export function nomDeDepot(filename: string, resourceType: "image" | "raw" = "image"): string {
+export function nomDeDepot(
+  filename: string,
+  resourceType: "image" | "video" | "raw" = "image",
+): string {
   const sansExtension = filename.replace(/\.[^.]+$/, "");
   // NFD sépare la lettre de son accent, le filtre ASCII ne laisse que la lettre :
   // « Réunion » devient « reunion » plutôt que « r-union ».
@@ -149,7 +163,13 @@ export type DepotResultat = {
   /** Poids réellement stocké, tel que Cloudinary le rapporte. */
   size: number;
   format: string | null;
-  resourceType: "image" | "raw";
+  /**
+   * Durée en secondes, arrondie. Renseignée pour les seules vidéos : le service
+   * la relève au transcodage. La lire ici évite de la faire saisir à la main,
+   * où elle se désaccorderait du fichier au premier remplacement.
+   */
+  duree: number | null;
+  resourceType: "image" | "video" | "raw";
 };
 
 /** Champs du SDK effectivement lus. Le reste de la réponse ne nous sert pas. */
@@ -160,6 +180,7 @@ type ReponseUpload = {
   height?: number;
   bytes?: number;
   format?: string;
+  duration?: number;
   resource_type?: string;
 };
 
@@ -211,7 +232,11 @@ export function deposerFichier(
           height: r.height ?? null,
           size: r.bytes ?? octets.byteLength,
           format: r.format ?? null,
-          resourceType: r.resource_type === "raw" ? "raw" : resourceType,
+          duree: typeof r.duration === "number" ? Math.round(r.duration) : null,
+          resourceType:
+            r.resource_type === "raw" || r.resource_type === "video" || r.resource_type === "image"
+              ? r.resource_type
+              : resourceType,
         });
       },
     );

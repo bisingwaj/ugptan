@@ -194,7 +194,7 @@ export function ImpactReglagesChamps({ section, referentiels, creation = false }
             name="ctaUrl"
             type="text"
             className="field"
-            placeholder="/projet"
+            placeholder="/project"
             defaultValue={section.ctaUrl}
           />
           <p className="adm-hint" style={{ marginTop: 6 }}>{t.champCtaUrlAide}</p>
