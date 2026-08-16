@@ -6,10 +6,12 @@
  * façon d'invalider les deux langues d'un coup — et DÉRIVÉS de `NAV` plutôt
  * qu'écrits en toutes lettres (cf. `patronRoute` dans lib/routes.ts).
  *
- * Les trois pages sont invalidées ensemble, sans regarder l'emplacement touché.
+ * Les quatre pages sont invalidées ensemble, sans regarder l'emplacement touché.
  * Distinguer coûterait une condition à tenir à jour à chaque nouvel
- * emplacement, pour économiser deux revalidations sur une écriture qui n'a lieu
- * que quelques fois par mois.
+ * emplacement, pour économiser trois revalidations sur une écriture qui n'a lieu
+ * que quelques fois par mois. C'est aussi ce qui permet aux modules « L'UGPTN »
+ * et « Le projet », qui partagent ce moteur, de réutiliser cette fonction sans
+ * l'adapter.
  *
  * ⚠️ Ces appels ne produisent AUCUN effet sous `next start` : le serveur
  * autonome sert les pages pré-rendues au build depuis son cache mémoire et ne
@@ -26,4 +28,5 @@ export function revaliderImpact(): void {
   revalidatePath(patronRoute(NAV.accueil), "page");
   revalidatePath(patronRoute(NAV.resultats), "page");
   revalidatePath(patronRoute(NAV.projet), "page");
+  revalidatePath(patronRoute(NAV.ugptn), "page");
 }

@@ -34,7 +34,7 @@ import {
   type ImpactSeedItem, type ImpactSeedSection,
 } from "@/content/impact";
 import {
-  itemTraduit, sectionTraduite,
+  itemTraduit, layoutSansItems, sectionTraduite,
   type ImpactEmplacement, type ImpactLayout, type ImpactTheme,
 } from "@/lib/impact/statut";
 
@@ -60,6 +60,7 @@ const itemSelect = {
   videoYt: true,
   lienUrl: true,
   dateAt: true,
+  tags: true,
   coverKey: true,
   coverMedia: { select: mediaSelect },
   translations: {
@@ -80,9 +81,12 @@ const sectionSelect = {
   numero: true,
   compact: true,
   grandTitre: true,
+  enchaine: true,
   ctaUrl: true,
   limite: true,
-  translations: { select: { locale: true, kicker: true, titre: true, lead: true, ctaLabel: true } },
+  translations: {
+    select: { locale: true, kicker: true, titre: true, lead: true, ctaLabel: true, note: true },
+  },
   items: { where: { status: "PUBLISHED" as const }, orderBy: { position: "asc" as const }, select: itemSelect },
   /** Entrées reprises d'une autre section (cf. le commentaire du modèle). */
   source: {
@@ -113,6 +117,8 @@ export type ImpactItemVue = {
   titre: string | null;
   texte: string | null;
   texteSecondaire: string | null;
+  /** Pastilles du gabarit POLES. Hors traduction. */
+  tags: string[];
 };
 
 /** Une section résolue dans une langue, prête à l'affichage. */
@@ -124,9 +130,13 @@ export type ImpactSectionVue = {
   numero: string | null;
   compact: boolean;
   grandTitre: boolean;
+  /** La section poursuit la précédente : elle ne rouvre pas de bande. */
+  enchaine: boolean;
   kicker: string | null;
   titre: string | null;
   lead: string | null;
+  /** Ligne courte que seuls certains gabarits dessinent. */
+  note: string | null;
   /** Lien du bouton d'en-tête, déjà préfixé de la langue s'il est interne. */
   ctaHref: string | null;
   ctaLabel: string | null;
@@ -163,6 +173,7 @@ type ItemBrut = {
   videoYt: string | null;
   lienUrl: string | null;
   dateAt: Date | null;
+  tags: string[];
   coverKey: string | null;
   coverMedia: MediaRef | null;
   translations: {
@@ -201,13 +212,17 @@ function resoudreItem(item: ItemBrut, layout: ImpactLayout, lang: Lang): ImpactI
     titre,
     texte: vide(tr.texte),
     texteSecondaire: vide(tr.texteSecondaire),
+    tags: item.tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0),
   };
 }
 
 type SectionBrute = {
   id: string; key: string; layout: string; theme: string; numero: string | null;
-  compact: boolean; grandTitre: boolean; ctaUrl: string | null; limite: number | null;
-  translations: { locale: string; kicker: string | null; titre: string | null; lead: string | null; ctaLabel: string | null }[];
+  compact: boolean; grandTitre: boolean; enchaine: boolean; ctaUrl: string | null; limite: number | null;
+  translations: {
+    locale: string; kicker: string | null; titre: string | null; lead: string | null;
+    ctaLabel: string | null; note: string | null;
+  }[];
   items: ItemBrut[];
   source: { items: ItemBrut[] } | null;
 };
@@ -227,8 +242,10 @@ function resoudreSection(section: SectionBrute, lang: Lang): ImpactSectionVue | 
 
   const items = section.limite && section.limite > 0 ? resolus.slice(0, section.limite) : resolus;
   // Une grille vide laisserait un en-tête suivi de rien : la section entière
-  // s'efface plutôt que d'annoncer un contenu absent.
-  if (items.length === 0) return null;
+  // s'efface plutôt que d'annoncer un contenu absent. Sauf pour les gabarits
+  // qui n'ont pas d'entrées par construction — une citation, l'en-tête d'une
+  // grille tenue ailleurs : les taire reviendrait à ne jamais les afficher.
+  if (items.length === 0 && !layoutSansItems(layout)) return null;
 
   const ctaHref = href(section.ctaUrl, lang);
   const ctaLabel = vide(tr.ctaLabel);
@@ -241,9 +258,11 @@ function resoudreSection(section: SectionBrute, lang: Lang): ImpactSectionVue | 
     numero: vide(section.numero),
     compact: section.compact,
     grandTitre: section.grandTitre,
+    enchaine: section.enchaine,
     kicker: vide(tr.kicker),
     titre: vide(tr.titre),
     lead: vide(tr.lead),
+    note: vide(tr.note),
     // Le bouton n'a de sens qu'avec ses deux moitiés : une adresse sans libellé
     // ne se clique pas, un libellé sans adresse ne mène nulle part.
     ctaHref: ctaHref && ctaLabel ? ctaHref : null,
@@ -278,13 +297,14 @@ function resoudreSeedItem(item: ImpactSeedItem, index: number, lang: Lang): Impa
     titre: textes.titre ?? null,
     texte: textes.texte ?? null,
     texteSecondaire: textes.texteSecondaire ?? null,
+    tags: item.tags ?? [],
   };
 }
 
 function resoudreSeedSection(section: ImpactSeedSection, lang: Lang): ImpactSectionVue | null {
   const entete = lang === "en" ? section.en : section.fr;
   const items = seedItems(section).map((item, index) => resoudreSeedItem(item, index, lang));
-  if (items.length === 0) return null;
+  if (items.length === 0 && !layoutSansItems(section.layout)) return null;
 
   const ctaHref = href(section.ctaUrl ?? null, lang);
 
@@ -296,9 +316,11 @@ function resoudreSeedSection(section: ImpactSeedSection, lang: Lang): ImpactSect
     numero: section.numero ?? null,
     compact: section.compact ?? false,
     grandTitre: section.grandTitre ?? false,
+    enchaine: section.enchaine ?? false,
     kicker: entete.kicker ?? null,
     titre: entete.titre ?? null,
     lead: entete.lead ?? null,
+    note: entete.note ?? null,
     ctaHref: ctaHref && entete.ctaLabel ? ctaHref : null,
     ctaLabel: ctaHref && entete.ctaLabel ? entete.ctaLabel : null,
     items,
