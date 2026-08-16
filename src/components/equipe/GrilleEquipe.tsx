@@ -14,6 +14,7 @@
  */
 import type { CSSProperties } from "react";
 import { initials } from "@/lib/format";
+import { plafondRole } from "@/lib/equipe/affichage";
 import type { MembreEquipe } from "@/lib/equipe/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
@@ -59,7 +60,10 @@ export function GrilleEquipe({ membres, variante = "accueil" }: Props) {
         const photo = membre.portrait.src;
 
         return (
-          <RevealItem key={membre.id} style={{ background: "#fff" }}>
+          <RevealItem
+            key={membre.id}
+            style={{ background: "#fff", display: "flex", flexDirection: "column" }}
+          >
             <div
               style={{
                 aspectRatio: "1/1",
@@ -116,18 +120,35 @@ export function GrilleEquipe({ membres, variante = "accueil" }: Props) {
               </span>
             </div>
 
-            <div style={{ padding: "16px 16px 20px" }}>
-              <div style={{ fontSize: tailleRole, fontWeight: 600, lineHeight: 1.25 }}>{membre.role}</div>
-              {membre.pole && (
-                <div style={{ fontSize: 12, color: "var(--c-60)", marginTop: 6 }}>{membre.pole}</div>
-              )}
+            <div
+              style={{
+                padding: "16px 16px 20px",
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+              }}
+            >
+              <div style={{ marginBottom: 12 }}>
+                <div
+                  title={membre.role}
+                  style={{ fontSize: tailleRole, fontWeight: 600, lineHeight: 1.25, ...plafondRole }}
+                >
+                  {membre.role}
+                </div>
+                {membre.pole && (
+                  <div style={{ fontSize: 12, color: "var(--c-60)", marginTop: 6 }}>{membre.pole}</div>
+                )}
+              </div>
               {membre.nom && (
                 <div
                   style={{
                     fontSize: 13,
                     fontWeight: 600,
                     color: "var(--c-black)",
-                    marginTop: 12,
+                    /* Colle le nom au bas de la carte : les cellules d'une même
+                       rangée ayant la même hauteur, les filets s'alignent quelle
+                       que soit la longueur des intitulés au-dessus. */
+                    marginTop: "auto",
                     borderTop: "1px solid var(--c-10)",
                     paddingTop: 10,
                   }}
