@@ -34,7 +34,7 @@ const mediaSelect = {
 /* -------------------------------------------------------------------------- */
 
 const traductionSectionVide = (): TraductionSectionSaisie => ({
-  kicker: "", titre: "", lead: "", ctaLabel: "",
+  kicker: "", titre: "", lead: "", ctaLabel: "", note: "",
   existe: false, complete: false, majLe: null,
 });
 
@@ -59,6 +59,7 @@ export const sectionVierge = (): SectionSaisie => ({
   compact: false,
   grandTitre: false,
   ctaUrl: "",
+  enchaine: false,
   sourceId: "",
   limite: 0,
   traductions: parLangue(traductionSectionVide),
@@ -142,16 +143,16 @@ export async function chargerSectionImpact(
       where: { id },
       select: {
         id: true, key: true, emplacement: true, layout: true, theme: true, status: true,
-        position: true, numero: true, compact: true, grandTitre: true, ctaUrl: true,
+        position: true, numero: true, compact: true, grandTitre: true, enchaine: true, ctaUrl: true,
         sourceId: true, limite: true,
         translations: {
-          select: { locale: true, kicker: true, titre: true, lead: true, ctaLabel: true, updatedAt: true },
+          select: { locale: true, kicker: true, titre: true, lead: true, ctaLabel: true, note: true, updatedAt: true },
         },
         items: {
           orderBy: { position: "asc" },
           select: {
             id: true, position: true, status: true, featured: true, valeur: true, color: true,
-            videoYt: true, lienUrl: true, dateAt: true, coverKey: true, coverMediaId: true,
+            videoYt: true, lienUrl: true, dateAt: true, tags: true, coverKey: true, coverMediaId: true,
             coverMedia: { select: mediaSelect },
             translations: {
               select: {
@@ -181,6 +182,7 @@ export async function chargerSectionImpact(
       titre: tr.titre ?? "",
       lead: tr.lead ?? "",
       ctaLabel: tr.ctaLabel ?? "",
+      note: tr.note ?? "",
       existe: true,
       complete: sectionTraduite(tr),
       majLe: formatDateTime(tr.updatedAt),
@@ -221,6 +223,8 @@ export async function chargerSectionImpact(
       videoYt: item.videoYt ?? "",
       lienUrl: item.lienUrl ?? "",
       dateAt: toDateInput(item.dateAt),
+      // Une pastille par ligne, comme dans le formulaire (cf. `lireTags`).
+      tags: item.tags.join("\n"),
       coverMediaId: item.coverMediaId ?? "",
       coverKey: item.coverKey ?? "",
       coverSrc,
@@ -240,6 +244,7 @@ export async function chargerSectionImpact(
     compact: section.compact,
     grandTitre: section.grandTitre,
     ctaUrl: section.ctaUrl ?? "",
+    enchaine: section.enchaine,
     sourceId: section.sourceId ?? "",
     limite: section.limite ?? 0,
     traductions,

@@ -5,10 +5,9 @@ import { EcranNouvelleSection } from "@/components/dashboard/impact/EcranSection
 
 export const metadata: Metadata = { title: ADMIN_IMPACT.nouveau };
 
-export default async function NouvelleSectionImpactPage() {
-  // Indispensable en plus du garde du layout : pages et layouts rendent en
-  // parallèle (cf. lib/auth/guard.ts).
-  await requirePermission("histoires");
+export default async function NouvelleSectionUgptnPage() {
+  // Indispensable en plus du garde du layout (cf. lib/auth/guard.ts).
+  await requirePermission("ugptn");
 
-  return <EcranNouvelleSection module="histoires" />;
+  return <EcranNouvelleSection module="ugptn" />;
 }

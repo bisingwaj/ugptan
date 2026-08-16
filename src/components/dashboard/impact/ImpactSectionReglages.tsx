@@ -13,6 +13,7 @@ import { useActionState } from "react";
 import { enregistrerSectionAction, type ImpactFormState } from "@/actions/admin-impact";
 import { ADMIN_IMPACT } from "@/content/admin";
 import type { ReferentielsImpact, SectionSaisie } from "@/lib/impact/saisie";
+import type { ImpactEmplacement } from "@/lib/impact/statut";
 import { ImpactReglagesChamps } from "@/components/dashboard/impact/ImpactReglagesChamps";
 
 const etatInitial: ImpactFormState = { error: null, ok: null };
@@ -20,10 +21,13 @@ const etatInitial: ImpactFormState = { error: null, ok: null };
 export function ImpactSectionReglages({
   section,
   referentiels,
+  emplacements,
   apercuUrl,
 }: {
   section: SectionSaisie & { id: string };
   referentiels: ReferentielsImpact;
+  /** Emplacements du module qui ouvre cet écran. */
+  emplacements: readonly ImpactEmplacement[];
   apercuUrl: string | null;
 }) {
   const t = ADMIN_IMPACT;
@@ -36,7 +40,7 @@ export function ImpactSectionReglages({
       {etat.error && <div className="auth-error" role="alert">{etat.error}</div>}
       {etat.ok && <div className="adm-ok" role="status">{etat.ok}</div>}
 
-      <ImpactReglagesChamps section={section} referentiels={referentiels} />
+      <ImpactReglagesChamps section={section} referentiels={referentiels} emplacements={emplacements} />
 
       {/* Barre d'enregistrement collante : la colonne fait plusieurs écrans de
           haut, le bouton ne doit pas se chercher. */}

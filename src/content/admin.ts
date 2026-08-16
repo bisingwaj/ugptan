@@ -1070,9 +1070,31 @@ export const ADMIN_GALERIE = {
  * geste est le même (publier, dupliquer, traduire) : deux modules qui se
  * ressemblent doivent se dire pareil, sinon la console s'apprend deux fois.
  */
+/**
+ * Titre et chapô des trois écrans qui partagent le moteur de sections.
+ *
+ * Le reste du vocabulaire (colonnes, champs, messages) est commun : ce sont les
+ * mêmes formulaires, sur les mêmes tables. Seule change la page administrée, et
+ * donc ce qu'on annonce en l'ouvrant.
+ */
+export const ADMIN_SECTIONS_MODULE = {
+  histoires: {
+    title: "Histoires & impact",
+    lead: "Les blocs qui racontent d'où vient le Projet et ce qu'il change : chiffres d'impact, témoignages, dialogues sectoriels, diptyques avant/après et frise des jalons. Chaque section existe en français et en anglais ; une langue non traduite est signalée et n'est jamais servie au public.",
+  },
+  ugptn: {
+    title: "L'UGPTN",
+    lead: "La page de l'Unité, bloc par bloc : la citation d'engagement, le mandat, les règles qui bornent ses décisions, l'organigramme des pôles, la méthode, puis les questions et le glossaire. Les fiches de l'équipe se tiennent depuis le module « L'équipe de l'Unité » ; cet écran n'en règle que l'en-tête.",
+  },
+  projet: {
+    title: "Le projet",
+    lead: "La page du Projet, bloc par bloc : le contexte et ses chiffres, les publics visés, les en-têtes des aperçus et la foire aux questions citoyenne. La frise des jalons et le diptyque « Ce que ça change » relèvent du module « Histoires & impact ». Les cinq composantes et les indicateurs ODP sont des données de structure : ils ne se rédigent pas.",
+  },
+} as const;
+
 export const ADMIN_IMPACT = {
-  title: "Histoires & impact",
-  lead: "Les blocs qui racontent d'où vient le Projet et ce qu'il change : chiffres d'impact, témoignages, dialogues sectoriels, diptyques avant/après et frise des jalons. Chaque section existe en français et en anglais ; une langue non traduite est signalée et n'est jamais servie au public.",
+  title: ADMIN_SECTIONS_MODULE.histoires.title,
+  lead: ADMIN_SECTIONS_MODULE.histoires.lead,
 
   /* --- Liste --------------------------------------------------------------- */
   nouveau: "Nouvelle section",
@@ -1154,6 +1176,9 @@ export const ADMIN_IMPACT = {
   champCompactAide: "Réduit l'espace vertical autour de la section.",
   champGrandTitre: "Grand titre",
   champGrandTitreAide: "La taille des titres majeurs de l'accueil, plutôt que celle des sections secondaires.",
+  champEnchaine: "Poursuivre la section précédente",
+  champEnchaineAide:
+    "La section s'ajoute dans la bande du dessus au lieu d'en ouvrir une nouvelle, et son titre s'y affiche en sous-titre. Sans effet sur la première section d'un emplacement.",
 
   blocLien: "Bouton d'en-tête",
   champCtaUrl: "Lien",
@@ -1188,6 +1213,9 @@ export const ADMIN_IMPACT = {
   itemVideoAide: "Identifiant YouTube. Le portrait devient alors cliquable et ouvre la vidéo.",
   itemDate: "Date du jalon",
   itemDateAide: "Sert à ranger la frise et s'affiche dans la langue de lecture.",
+  itemTags: "Sous-rôles",
+  itemTagsAide:
+    "Une pastille par ligne. Ces intitulés ne se traduisent pas : le site les affiche à l'identique dans les deux langues.",
   itemLien: "Lien sortant",
   itemLienLabel: "Libellé du lien",
   itemVisuel: "Visuel",
@@ -1433,8 +1461,8 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
          (mandat, principes, pôles, puis les organes de gouvernance) : la console
          reprend ce découpage, sans quoi l'éditeur cherche où se modifie la page
          « L'UGPTN » et ne trouve qu'une entrée nommée autrement. */
-      { key: "ugptn", label: "L'UGPTN", soon: true },
-      { key: "projet", label: "Le projet", soon: true },
+      { key: "ugptn", label: "L'UGPTN", slug: "/ugptn" },
+      { key: "projet", label: "Le projet", slug: "/project" },
     ],
   },
   {

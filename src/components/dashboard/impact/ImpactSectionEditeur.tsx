@@ -23,6 +23,7 @@ import { adminPath } from "@/lib/admin";
 import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import type { ReferentielsImpact, SectionSaisie } from "@/lib/impact/saisie";
+import { layoutSansItems, type ImpactEmplacement } from "@/lib/impact/statut";
 import type { MediaRef } from "@/lib/medias";
 import { ImpactItemCarte } from "@/components/dashboard/impact/ImpactItemCarte";
 import { ImpactSectionEntete } from "@/components/dashboard/impact/ImpactSectionEntete";
@@ -36,10 +37,18 @@ type Props = {
   section: SectionSaisie & { id: string };
   referentiels: ReferentielsImpact;
   assets: MediaRef[];
+  /** Emplacements du module qui ouvre cet écran. */
+  emplacements: readonly ImpactEmplacement[];
   /** Nom de la section dont les entrées sont reprises, le cas échéant. */
   sourceNom: string | null;
-  /** Identifiant de cette source, pour y renvoyer d'un clic. */
-  sourceId: string | null;
+  /**
+   * Fiche de cette source, pour y renvoyer d'un clic.
+   *
+   * Une adresse complète et non un identifiant : la source peut vivre dans un
+   * AUTRE module que celui d'où on la consulte, et son écran n'est donc pas
+   * déductible d'ici.
+   */
+  sourceHref: string | null;
   apercuUrl: string | null;
 };
 
@@ -47,8 +56,9 @@ export function ImpactSectionEditeur({
   section,
   referentiels,
   assets,
+  emplacements,
   sourceNom,
-  sourceId,
+  sourceHref,
   apercuUrl,
 }: Props) {
   const t = ADMIN_IMPACT;
@@ -56,6 +66,10 @@ export function ImpactSectionEditeur({
   const [etatAjout, ajouter, ajoutEnCours] = useActionState(ajouterItemAction, etatInitial);
 
   const reprend = Boolean(section.sourceId);
+  /* Certains gabarits ne dessinent aucune entrée : tout ce qu'ils affichent
+     tient dans l'en-tête, ou vient d'un autre module. Leur montrer une liste
+     vide et un bouton « Ajouter » promettrait une saisie sans effet. */
+  const sansItems = layoutSansItems(section.layout);
 
   return (
     <div className="adm-edit">
@@ -90,12 +104,13 @@ export function ImpactSectionEditeur({
             key={lang}
             sectionId={section.id}
             lang={lang}
+            layout={section.layout}
             valeurs={section.traductions[lang]}
             visible={langue === lang}
           />
         ))}
 
-        <div className="adm-items">
+        <div className="adm-items" hidden={sansItems}>
           <div className="adm-items__tete">
             <h2 className="adm__section-title" style={{ margin: 0 }}>{t.itemsTitle}</h2>
             {!reprend && (
@@ -115,10 +130,10 @@ export function ImpactSectionEditeur({
             <div className="adm-list">
               <div className="adm-list__row">
                 {t.itemsReprise}
-                {sourceNom && sourceId && (
+                {sourceNom && sourceHref && (
                   <>
                     {" "}
-                    <Link href={adminPath(`/stories/${sourceId}`)} className="adm-link">
+                    <Link href={sourceHref} className="adm-link">
                       {sourceNom} →
                     </Link>
                   </>
@@ -150,6 +165,7 @@ export function ImpactSectionEditeur({
         <ImpactSectionReglages
           section={section}
           referentiels={referentiels}
+          emplacements={emplacements}
           apercuUrl={apercuUrl}
         />
       </aside>
