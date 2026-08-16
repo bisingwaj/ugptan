@@ -87,10 +87,10 @@ const ENTETE: Record<ImpactLayout, Entete> = {
   GLOSSAIRE: INTEGREE,
 
   /* Repris de `app/[lang]/ugptn/page.tsx`, bloc par bloc. */
-  ETAPES: { titreMaxWidth: "20ch", marginBottom: 44, titreMargin: 18, chapoLead: true },
+  ETAPES: { blocMaxWidth: 760, titreMaxWidth: "20ch", marginBottom: 44, titreMargin: 18, chapoLead: true },
   PRINCIPES: { marginBottom: 40, titreMargin: 0, chapoLead: true },
   ENGAGEMENTS: { marginBottom: 0, titreMargin: 0, chapoLead: true },
-  REPERES: { marginBottom: 40, titreMargin: 14, chapoLead: true },
+  REPERES: { blocMaxWidth: 720, marginBottom: 40, titreMargin: 14, chapoLead: true },
   POLES: { marginBottom: 0, titreMargin: 0, chapoLead: true },
   FAQ: { marginBottom: 38, titreMargin: 0, chapoLead: true },
 
@@ -99,6 +99,28 @@ const ENTETE: Record<ImpactLayout, Entete> = {
   COMPOSANTES: { blocMaxWidth: 640, marginBottom: 40, titreMargin: 16, chapoLead: true, gapBouton: 20 },
   INDICATEURS: { blocMaxWidth: 680, marginBottom: 40, titreMargin: 0, chapoLead: true, gapBouton: 20 },
 };
+
+/**
+ * En-tête de la méthode, seule variante de gabarit du module.
+ *
+ * `ETAPES` sert deux blocs de la page « L'UGPTN », que le fond distingue : le
+ * mandat sur clair, la méthode sur sombre. Leurs GRILLES sont identiques — d'où
+ * un seul gabarit — mais leurs en-têtes ne l'ont jamais été : le titre de la
+ * méthode se replie plus tôt, et son chapô n'est pas un `.lead`, dont le gris
+ * serait illisible sur fond noir.
+ */
+const ENTETE_ETAPES_SOMBRE: Entete = {
+  titreMaxWidth: "18ch",
+  marginBottom: 44,
+  titreMargin: 14,
+  chapoLead: false,
+  chapoMaxWidth: 720,
+  chapoTaille: 16,
+  chapoInterligne: 1.6,
+};
+
+const entetePour = (layout: ImpactLayout, sombre: boolean): Entete =>
+  layout === "ETAPES" && sombre ? ENTETE_ETAPES_SOMBRE : ENTETE[layout];
 
 export async function SectionsImpact({
   emplacement,
@@ -174,8 +196,8 @@ function BandeImpact({ groupe, lang }: { groupe: ImpactSectionVue[]; lang: Lang 
  * sous-titre (`.unite-sub`), parce qu'une bande n'a qu'un seul H2.
  */
 function EnteteImpact({ section }: { section: ImpactSectionVue }) {
-  const entete = ENTETE[section.layout];
   const sombre = themeSombre(section.theme);
+  const entete = entetePour(section.layout, sombre);
 
   if (enteteIntegree(section.layout)) return null;
 

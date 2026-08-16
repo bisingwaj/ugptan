@@ -10,6 +10,7 @@
 
    Les guillemets sont posés par le dessin, non par le texte : la rédaction
    saisit la phrase seule, comme dans le contenu d'origine. */
+import { Fragment } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 
 export function BlocCitation({ citation, note }: { citation: string | null; note: string | null }) {
@@ -49,11 +50,14 @@ export function BlocCitation({ citation, note }: { citation: string | null; note
               color: "var(--ac-line)",
             }}
           >
+            {/* Un fragment et non un conteneur : les segments et leurs
+                séparateurs sont les enfants directs de la boîte flexible, comme
+                dans le contenu d'origine. Les envelopper les regrouperait. */}
             {segments.map((segment, index) => (
-              <span key={segment} style={{ display: "contents" }}>
+              <Fragment key={segment}>
                 {index > 0 && <span style={{ opacity: 0.6 }}>·</span>}
                 <span>{segment}</span>
-              </span>
+              </Fragment>
             ))}
           </div>
         )}
