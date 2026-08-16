@@ -29,17 +29,20 @@ export const ROLE_HINT: Record<AdminRole, string> = {
 /** Une permission = un module de la console. */
 export const PERMISSIONS = [
   "tableau-de-bord",
-  "marches",
-  "soumissionnaires",
   "actualites",
   "documents",
   "medias",
   "evenements",
   "histoires",
+  "equipe",
   "videos",
-  "ressources",
   "newsletter",
-  "gouvernance",
+  /* Renommée depuis « gouvernance » en même temps que l'entrée de la barre
+     latérale : le module couvre les deux pages du groupe « L'UGPTN ». Le module
+     n'étant pas encore ouvert, aucun droit effectif n'était accordé sous
+     l'ancien nom ; un `gouvernance` resté en base ne correspond simplement plus
+     à aucun module et reste sans effet. */
+  "ugptn",
   "projet",
   "mgp",
   "reglages",
@@ -67,15 +70,14 @@ const ROLE_BASE: Record<AdminRole, readonly Permission[] | "*"> = {
   ADMIN: "*",
   EDITOR: [
     "tableau-de-bord",
-    "marches",
     "actualites",
     "documents",
     "medias",
     "evenements",
     "histoires",
+    "equipe",
     "videos",
-    "ressources",
-    "gouvernance",
+    "ugptn",
     "projet",
     "mgp",
   ],

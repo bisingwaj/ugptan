@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
-import { asLang, LOCALES } from "@/lib/params";
+import { notFound } from "next/navigation";
+import { asLang, estLocale, LOCALES } from "@/lib/params";
 import { SITE_URL } from "@/lib/site";
 import { dict } from "@/content/i18n";
 import { meta } from "@/content/data";
@@ -54,6 +55,22 @@ export default async function LangLayout(props: { children: React.ReactNode; par
   const {
     children
   } = props;
+
+  /**
+   * ⚠️ `dynamicParams = false` ne suffit pas : il ne ferme la porte qu'aux pages
+   * PRÉRENDUES. Celles qui sont rendues à la demande — actualités, événements,
+   * ressources — acceptaient donc n'importe quel premier segment, et `asLang`
+   * les servait en français sans broncher.
+   *
+   * Conséquence observée : `/<slug-console>/actualites` renvoyait le site
+   * public à l'intérieur du sous-arbre d'administration, chrome comprise. Le
+   * proxy ne pouvait pas l'empêcher — il laisse passer ce sous-arbre sans le
+   * réécrire, faute de connaître la table des routes de la console.
+   *
+   * Une langue inconnue n'est pas une langue à corriger : c'est une adresse qui
+   * n'existe pas.
+   */
+  if (!estLocale(params.lang)) notFound();
 
   const lang = asLang(params.lang);
   return (

@@ -87,7 +87,14 @@ export function Header({ lang }: { lang: Lang }) {
 
   const rest = pathname.replace(/^\/(fr|en)/, "");
   const localePath = (l: Lang) => `/${l}${rest || ""}`;
-  const isActive = (slug: string) => pathname === route(lang, slug);
+  /* Correspondance par préfixe, et pas égalité stricte : sans elle, aucune page
+     de détail n'éclaire l'entrée de menu dont elle relève. Les dix pages de
+     composante, les articles, les événements, les albums et les publications
+     laissaient donc la navigation entièrement éteinte. L'accueil garde
+     l'égalité — son slug est vide, un préfixe correspondrait à tout. */
+  const isActive = (slug: string) =>
+    pathname === route(lang, slug) ||
+    (slug !== "" && pathname.startsWith(`${route(lang, slug)}/`));
   /* Le libellé abrégé prime dans les sous-menus, sinon celui de la page. */
   const subLabel = (key: NavKey) => t.navSub[key] ?? t.nav[key];
 

@@ -10,6 +10,7 @@
    du CMS : ce sont des repères de lecture du gabarit, pas du contenu. */
 import type { Lang } from "@/lib/pick";
 import type { ImpactItemVue } from "@/lib/impact/query";
+import { lienPublic } from "@/lib/routes";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function BlocAvantApres({
@@ -77,7 +78,7 @@ export function BlocAvantApres({
 
             {item.lienUrl && item.lienLabel && (
               <a
-                href={item.lienUrl.startsWith("/") ? `/${lang}${item.lienUrl}` : item.lienUrl}
+                href={lienPublic(item.lienUrl, lang)}
                 className="mono"
                 style={{ marginTop: 18, fontSize: 12, color: accent }}
               >

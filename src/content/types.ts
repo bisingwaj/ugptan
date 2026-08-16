@@ -37,14 +37,36 @@ export type Composante = {
 };
 
 export type GouvBody = {
-  sigle: string; nom: Bilingual; nature: Bilingual; effectif: string;
+  sigle: string; nom: Bilingual; nature: Bilingual;
+  /** Bilingue : « 8 membres » restait en français sur la version anglaise. */
+  effectif: Bilingual;
   presidence: Localizable; decision: Bilingual; frequence: Bilingual;
 };
 
 export type Mandat = { n: string; titre: Bilingual; desc: Bilingual };
 export type Principe = { titre: Bilingual; desc: Bilingual };
-export type Pole = { nom: Bilingual; role: Bilingual; roles: string[] };
-export type Membre = { role: Bilingual; pole: Bilingual; nom?: string; img?: string };
+/**
+ * Pôle de l'Unité — taxonomie de référence, celle de l'arrêté.
+ *
+ * `mission`, `dossier` et `color` viennent de l'ancien `polesAction` de
+ * `carbon.ts`, qui décrivait la MÊME organisation sous cinq autres intitulés.
+ * La page « L'UGPTN » affichait les deux listes à quatre sections d'intervalle,
+ * si bien qu'un lecteur croyait lire deux organisations différentes. Une seule
+ * table, donc, et c'est celle-ci.
+ */
+export type Pole = {
+  nom: Bilingual;
+  /** Une ligne : ce dont le pôle répond. */
+  role: Bilingual;
+  /** Deux à trois lignes : comment il l'exerce. */
+  mission: Bilingual;
+  /** Dossier en cours, sans préfixe : le libellé « En cours » est traduit. */
+  dossier: Bilingual;
+  /** Accent de la ligne. */
+  color: string;
+  /** Intitulés des sous-rôles, tels qu'ils figurent à l'arrêté. */
+  roles: string[];
+};
 export type Province = { nom: string; x: number; y: number; prio: boolean };
 export type Langue = { code: string; label: string; greeting: string };
 export type Profil = { label: Bilingual; page: Bilingual };
@@ -71,12 +93,10 @@ export type Marche = {
 export type MethodePassation = { sigle: string; label: Bilingual };
 export type EtapeCandidature = { n: string; titre: Bilingual; desc: Bilingual };
 
-export type DocCat = "reference" | "passation" | "sauvegardes" | "fiduciaire";
-export type Document = {
-  sigle: string; titre: string; cat: DocCat;
-  version: string; date: string; langue: string; taille: string;
-};
-export type DocumentCategorie = { code: DocCat; label: Bilingual };
+/* `DocCat`, `Document` et `DocumentCategorie` ont disparu d'ici : le fonds
+   documentaire est tenu en base et typé par Prisma (modèles `Document` et
+   `DocumentCategory`). Un second type portant le même nom aurait fini par
+   diverger de la table. */
 
 export type MgpFaqItem = { q: Bilingual; r: Bilingual };
 
@@ -92,23 +112,18 @@ export type Media = {
 
 /* ---- Migrated Carbon-specific content (was hard-coded in renderVals) ------- */
 
-export type ProjVideo = { comp: string; titre: Bilingual; color: string; img: ImgKey; dur: string };
 export type EventStatut = "avenir" | "passe";
 export type Evenement = {
   id: string; date: Bilingual; type: Bilingual; lieu: Bilingual; color: string;
   statut: EventStatut; img: ImgKey; titre: Bilingual; desc: Bilingual; places: Bilingual;
 };
 export type GouvActivite = { date: Bilingual; org: string; color: string; titre: Bilingual; note: Bilingual };
-export type GouvLead = { role: Bilingual; pole: Bilingual; color: string; mandate: Bilingual; nom?: string; img?: string };
-export type MissionItem = { t: Bilingual; d: Bilingual };
-export type PoleAction = { pole: Bilingual; color: string; mission: Bilingual; act: Bilingual };
 export type MethodeEtape = { t: Bilingual; d: Bilingual };
 export type EngagementItem = { t: Bilingual; d: Bilingual; color: string };
 export type GlossaireItem = { s: string; d: Bilingual };
 export type FaqItem = { q: Bilingual; r: Bilingual };
 export type Partner = { name: string; kind: Bilingual; logo?: string };
 export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: string; comp?: string };
-export type UniteStat = { v: string; u?: string; l: Bilingual };
 export type GalleryItem = { nom: string; img: ImgKey };
 export type Persona = { k: Bilingual; d: Bilingual };
 
@@ -150,16 +165,6 @@ export type CompProjet = {
   points?: Bilingual[];
   chute?: Bilingual;
   img?: ImgKey;
-};
-
-/** Responsable de la composante. Sans `nom`, une pastille d'initiales s'affiche. */
-export type CompResponsable = {
-  nom?: string;
-  role: Bilingual;
-  img?: string;
-  bio?: Bilingual;
-  verbatim?: Bilingual;
-  email?: string;
 };
 
 /** Une brique de l'écosystème de la composante (section sombre). */
@@ -214,7 +219,6 @@ export type ComposanteDetail = {
   projets: CompProjet[];
   ecosysteme?: { titre: Bilingual; lead: Bilingual; couches: CompCouche[] };
   finalite?: { titre: Bilingual; lead: Bilingual; points: Bilingual[] };
-  responsable?: CompResponsable;
   video?: CompVideoSlot;
   odp?: string[];            // indicateurs ODP rattachés
   img: ImgKey;               // visuel du héros

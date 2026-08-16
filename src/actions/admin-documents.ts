@@ -10,12 +10,15 @@
  *
  * ─── Le fichier et la fiche s'enregistrent SÉPARÉMENT ────────────────────────
  *
- *   · `deposerDocumentAction`      → création : le fichier ET la fiche, en une
- *                                    fois, parce qu'un document sans fichier
- *                                    n'a pas d'existence ;
- *   · `enregistrerDocumentAction`  → la fiche seule : titre, description, type,
- *                                    catégorie, dates, auteur, ordre ;
- *   · `remplacerFichierDocAction`  → le fichier seul, métadonnées conservées.
+ *   · `deposerDocumentAction`      → création. Le fichier ET la fiche pour un
+ *                                    document téléversé ; la fiche seule pour
+ *                                    une publication rédigée, dont le corps
+ *                                    s'écrit ensuite dans l'éditeur ;
+ *   · `enregistrerDocumentAction`  → la fiche : titre, description, corps,
+ *                                    type, catégorie, dates, signature, ordre ;
+ *   · `remplacerFichierDocAction`  → le fichier seul, métadonnées conservées ;
+ *   · `retirerFichierDocAction`    → détache la pièce jointe d'une publication
+ *                                    rédigée.
  *
  * Les confondre ferait repartir un téléversement de plusieurs mégaoctets à
  * chaque correction de virgule, et — plus grave — un formulaire unique
@@ -44,11 +47,12 @@ import { adminPath } from "@/lib/admin";
 import { assertPermission, type AdminUser } from "@/lib/auth/guard";
 import { cloudinaryActif, deposerFichier, supprimerFichier } from "@/lib/cloudinary";
 import { fromDateInput } from "@/lib/format";
-import { slugify } from "@/lib/actus/slug";
+import { isEmptyHtml, sanitizeHtml } from "@/lib/html/sanitize";
+import { slugify, uniqueSlug } from "@/lib/actus/slug";
 import { composantes } from "@/content/data";
 import { revaliderDocuments } from "@/lib/docs/cache";
 import { estMimeDoc, poidsLisible, tailleMaxPour } from "@/lib/docs/fichier";
-import { isDocLangue, isDocStatut, isDocType } from "@/lib/docs/statut";
+import { isDocLangue, isDocStatut, isDocSupport, isDocType } from "@/lib/docs/statut";
 
 /** État partagé par tous les formulaires du module. */
 export type DocFormState = { error: string | null; ok: string | null };
@@ -92,6 +96,22 @@ function lireComposantes(formData: FormData): string[] {
 }
 
 /**
+ * Corps rédigé, assaini AVANT écriture.
+ *
+ * ⚠️ Barrière de référence : le HTML qui entre en base est celui-ci, jamais
+ * celui du navigateur. L'éditeur assainit déjà à la saisie, mais ce nettoyage
+ * est un confort de rédaction — il est produit par le navigateur de l'auteur, ce
+ * qui n'en fait pas une donnée de confiance. Même règle que les articles.
+ */
+const lireCorps = (formData: FormData, champ: string): string => {
+  const html = sanitizeHtml(String(formData.get(champ) ?? ""));
+  // Un corps réduit à des balises vides vaut une chaîne vide : c'est ce que
+  // teste `consultable` côté lecture publique, et « <p><br></p> » n'est pas un
+  // texte.
+  return isEmptyHtml(html) ? "" : html;
+};
+
+/**
  * Champs de la fiche, hors fichier et hors statut.
  *
  * Le titre anglais et la description anglaise peuvent rester vides : la lecture
@@ -110,14 +130,52 @@ function lireFiche(formData: FormData) {
     descriptionFr: optionnel(texte(formData, "descriptionFr")),
     descriptionEn: optionnel(texte(formData, "descriptionEn")),
     reference: optionnel(texte(formData, "reference").toUpperCase()),
+    /* Pas de normalisation de casse, contrairement au sigle : « v1.0 » et
+       « T2 2026 » n'ont pas la même graphie, et « évolutif » est un mot. */
+    version: optionnel(texte(formData, "version")),
     auteur: optionnel(texte(formData, "auteur")),
     langue: isDocLangue(langueBrute) ? langueBrute : ("FR" as const),
+    // La signature de l'auteur, distincte du compte qui saisit : c'est elle qui
+    // paraît sur le site (cf. le modèle `Document` au schéma).
+    authorId: optionnel(texte(formData, "authorId")),
+    authorName: optionnel(texte(formData, "authorName")),
+    authorRole: optionnel(texte(formData, "authorRole")),
+    coverMediaId: optionnel(texte(formData, "coverMediaId")),
     documentDate: fromDateInput(texte(formData, "documentDate")),
     featured: coche(formData, "featured"),
     position: lireEntier(texte(formData, "position")),
     categoryId: optionnel(texte(formData, "categoryId")),
     comps: lireComposantes(formData),
   };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Adresse publique                                                            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Segment d'URL de la page de lecture, unique en base.
+ *
+ * Déduit du titre français quand le champ est laissé vide — c'est le cas
+ * ordinaire. L'unicité est vérifiée ICI plutôt que rattrapée sur l'erreur de
+ * contrainte : la collision est banale (deux « Note de cadrage »), et la
+ * résoudre par un suffixe vaut mieux que de renvoyer le rédacteur à un message
+ * qu'il ne peut pas comprendre.
+ *
+ * ⚠️ Le slug n'est PAS recalculé quand il existe déjà et que le formulaire le
+ * renvoie inchangé : une adresse publiée, citée dans un courrier ou indexée, ne
+ * doit pas se déplacer parce qu'on a corrigé une faute dans le titre.
+ */
+async function resoudreSlug(saisie: string, titre: string, id: string | null): Promise<string> {
+  const base = slugify(saisie || titre);
+  if (!base) return "";
+
+  const pris = await db().document.findMany({
+    where: { slug: { startsWith: base }, ...(id ? { NOT: { id } } : {}) },
+    select: { slug: true },
+  });
+
+  return uniqueSlug(base, pris.map((ligne) => ligne.slug).filter((slug): slug is string => slug !== null));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -200,12 +258,21 @@ async function deposer(formData: FormData): Promise<{ fichier: Fichier } | { err
 /* -------------------------------------------------------------------------- */
 
 /**
- * Dépose un document : le fichier chez l'hébergeur, la fiche en base.
+ * Crée un document : la fiche en base, et le fichier chez l'hébergeur quand il
+ * y en a un.
  *
- * Le document naît en BROUILLON, quel que soit le formulaire : la
- * prévisualisation de la fiche avant publication fait partie de ce qu'on attend
- * du module, et publier d'un même geste que déposer la rendrait impossible. La
- * mise en ligne se fait depuis la fiche, une fois les métadonnées relues.
+ * Deux chemins, selon le SUPPORT choisi à l'écran de création :
+ *
+ *   · `FICHIER` — le fichier est obligatoire, et il part chez l'hébergeur AVANT
+ *     l'écriture en base (cf. l'en-tête du module) ;
+ *   · `REDIGE`  — rien n'est téléversé. La fiche naît avec ses métadonnées, et
+ *     le corps s'écrit dans l'éditeur de l'écran suivant. Demander le texte dès
+ *     la création obligerait à tout rédiger d'une traite, sans pouvoir
+ *     enregistrer entre-temps.
+ *
+ * Le document naît en BROUILLON dans les deux cas : la relecture avant mise en
+ * ligne fait partie de ce qu'on attend du module, et publier d'un même geste
+ * que créer la rendrait impossible.
  */
 export async function deposerDocumentAction(
   _prev: DocFormState,
@@ -213,8 +280,26 @@ export async function deposerDocumentAction(
 ): Promise<DocFormState> {
   const acteur: AdminUser = await assertPermission("documents");
 
+  const supportBrut = texte(formData, "support");
+  const support = isDocSupport(supportBrut) ? supportBrut : ("FICHIER" as const);
+
   const fiche = lireFiche(formData);
   if (!fiche.titreFr) return { error: "Le titre français est obligatoire.", ok: null };
+
+  const slug = await resoudreSlug(texte(formData, "slug"), fiche.titreFr, null);
+
+  // Publication rédigée : aucun téléversement. La fiche suffit à exister, le
+  // corps vient ensuite.
+  if (support === "REDIGE") {
+    const document = await db().document.create({
+      data: { ...fiche, support, slug, status: "DRAFT", createdById: acteur.id },
+      select: { id: true },
+    });
+
+    revalidatePath(DOCS_PATH);
+    // redirect() lève NEXT_REDIRECT : appelé en dernier, hors de tout try/catch.
+    redirect(`${DOCS_PATH}/${document.id}?depose=1`);
+  }
 
   const depot = await deposer(formData);
   if ("error" in depot) return { error: depot.error, ok: null };
@@ -222,7 +307,7 @@ export async function deposerDocumentAction(
   let document;
   try {
     document = await db().document.create({
-      data: { ...fiche, ...depot.fichier, status: "DRAFT", createdById: acteur.id },
+      data: { ...fiche, ...depot.fichier, support, slug, status: "DRAFT", createdById: acteur.id },
       select: { id: true },
     });
   } catch (erreur) {
@@ -233,7 +318,6 @@ export async function deposerDocumentAction(
   }
 
   revalidatePath(DOCS_PATH);
-  // redirect() lève NEXT_REDIRECT : appelé en dernier, hors de tout try/catch.
   redirect(`${DOCS_PATH}/${document.id}?depose=1`);
 }
 
@@ -242,12 +326,44 @@ export async function deposerDocumentAction(
 /* -------------------------------------------------------------------------- */
 
 /**
- * Enregistre les métadonnées, fichier inchangé.
+ * Ce qu'il faut pour qu'un document parte en ligne.
+ *
+ * La règle dépend du support, et il n'y en a qu'une par support : un fichier
+ * pour une pièce téléversée, un corps pour une publication rédigée. Sans elle,
+ * le visiteur trouverait une fiche complète et rien derrière — un lien mort
+ * dans un cas, une page blanche dans l'autre.
+ *
+ * Renvoie le motif du refus, ou `null` si la publication est possible.
+ */
+function motifNonPubliable(document: {
+  support: string;
+  fileUrl: string | null;
+  contenuFr: string;
+  contenuEn: string;
+}): string | null {
+  if (document.support === "REDIGE") {
+    return document.contenuFr.trim() || document.contenuEn.trim()
+      ? null
+      : "Rien à lire : rédigez le corps de la publication avant de la mettre en ligne.";
+  }
+  return document.fileUrl
+    ? null
+    : "Aucun fichier attaché : téléversez-le avant de publier.";
+}
+
+/**
+ * Enregistre les métadonnées et le corps, fichier inchangé.
  *
  * `publishedAt` est traité à part : le champ est proposé au rédacteur, mais s'il
  * le laisse vide sur un document déjà en ligne, la date déjà posée est
  * CONSERVÉE. L'effacer reviendrait à sortir la pièce de tout classement
  * chronologique sans que personne l'ait demandé.
+ *
+ * Les DEUX langues du corps partent dans le même envoi, contrairement aux
+ * articles où chaque langue a son formulaire. C'est le parti déjà retenu par ce
+ * module pour les titres et les descriptions (cf. lib/docs/saisie.ts) : une
+ * pièce documentaire est traduite par la même personne, en une fois, et non
+ * suivie en parallèle par un rédacteur et un traducteur.
  */
 export async function enregistrerDocumentAction(
   _prev: DocFormState,
@@ -262,14 +378,28 @@ export async function enregistrerDocumentAction(
   if (!isDocStatut(statutBrut)) return { error: "Statut inconnu.", ok: null };
   const statut = statutBrut;
 
+  const supportBrut = texte(formData, "support");
+  const support = isDocSupport(supportBrut) ? supportBrut : ("FICHIER" as const);
+
   const fiche = lireFiche(formData);
   if (!fiche.titreFr) return { error: "Le titre français est obligatoire.", ok: null };
 
+  const contenuFr = lireCorps(formData, "contenuFr");
+  const contenuEn = lireCorps(formData, "contenuEn");
+
   const existant = await db().document.findUnique({
     where: { id },
-    select: { publishedAt: true },
+    select: { publishedAt: true, fileUrl: true, slug: true },
   });
   if (!existant) return { error: "Document introuvable.", ok: null };
+
+  // Le passage en ligne depuis ce formulaire obéit à la même règle que le
+  // bouton « Publier » de l'en-tête : les deux écrivent le même champ, ils ne
+  // peuvent pas avoir deux exigences différentes.
+  if (statut === "PUBLISHED") {
+    const refus = motifNonPubliable({ support, fileUrl: existant.fileUrl, contenuFr, contenuEn });
+    if (refus) return { error: refus, ok: null };
+  }
 
   const saisie = fromDateInput(texte(formData, "publishedAt"));
   // Publier sans date de mise en ligne : elle est posée à l'instant. Un document
@@ -277,7 +407,16 @@ export async function enregistrerDocumentAction(
   // situer la pièce.
   const publishedAt = saisie ?? existant.publishedAt ?? (statut === "PUBLISHED" ? new Date() : null);
 
-  await db().document.update({ where: { id }, data: { ...fiche, status: statut, publishedAt } });
+  const slugSaisi = texte(formData, "slug");
+  const slug =
+    slugSaisi && slugify(slugSaisi) !== existant.slug
+      ? await resoudreSlug(slugSaisi, fiche.titreFr, id)
+      : existant.slug || (await resoudreSlug("", fiche.titreFr, id));
+
+  await db().document.update({
+    where: { id },
+    data: { ...fiche, support, slug, contenuFr, contenuEn, status: statut, publishedAt },
+  });
 
   revalidatePath(`${DOCS_PATH}/${id}`);
   revalidatePath(DOCS_PATH);
@@ -290,12 +429,17 @@ export async function enregistrerDocumentAction(
 /* -------------------------------------------------------------------------- */
 
 /**
- * Remplace le fichier en conservant toutes les métadonnées.
+ * Attache un fichier, ou remplace celui qui est déjà là.
  *
- * C'est le geste de la version corrigée : même rapport, même fiche, même place
- * dans la liste, nouveau PDF. L'ancien fichier est retiré du compte APRÈS la
- * bascule de la ligne — jamais avant, sans quoi la fiche publique désignerait
- * pendant quelques instants un fichier déjà effacé.
+ * Une seule action pour les deux gestes : ce qui se passe en base est le même
+ * mouvement — la fiche désigne un nouveau fichier —, et la seule différence est
+ * qu'il y a, ou non, un ancien à retirer ensuite. Le remplacement est le geste
+ * de la version corrigée : même rapport, même fiche, même place dans la liste,
+ * nouveau PDF.
+ *
+ * L'ancien fichier est retiré du compte APRÈS la bascule de la ligne — jamais
+ * avant, sans quoi la fiche publique désignerait pendant quelques instants un
+ * fichier déjà effacé.
  */
 export async function remplacerFichierDocAction(
   _prev: DocFormState,
@@ -322,15 +466,67 @@ export async function remplacerFichierDocAction(
     throw erreur;
   }
 
-  if (ancien.filePublicId) await supprimerFichier(ancien.filePublicId, ancien.fileMime);
+  if (ancien.filePublicId) await supprimerFichier(ancien.filePublicId, ancien.fileMime ?? "");
 
   revalidatePath(`${DOCS_PATH}/${id}`);
   revalidatePath(DOCS_PATH);
   revaliderDocuments();
   return {
     error: null,
-    ok: `Fichier remplacé : « ${depot.fichier.fileName} » succède à « ${ancien.fileName} ».`,
+    ok: ancien.fileName
+      ? `Fichier remplacé : « ${depot.fichier.fileName} » succède à « ${ancien.fileName} ».`
+      : `Fichier « ${depot.fichier.fileName} » attaché.`,
   };
+}
+
+/**
+ * Détache la pièce jointe d'une publication rédigée.
+ *
+ * Réservé au support `REDIGE` : sur un document téléversé, retirer le fichier
+ * ne laisserait rien à consulter — c'est une suppression, et elle a son propre
+ * bouton. Ici, le texte reste, seule la pièce jointe s'en va.
+ *
+ * Base d'abord, hébergeur ensuite : un échec réseau laisse un fichier orphelin,
+ * gênant mais sans effet visible, là où l'ordre inverse effacerait un fichier
+ * encore désigné par une fiche en ligne.
+ */
+export async function retirerFichierDocAction(
+  _prev: DocFormState,
+  formData: FormData,
+): Promise<DocFormState> {
+  await assertPermission("documents");
+
+  const id = texte(formData, "id");
+  if (!id) return { error: "Document introuvable.", ok: null };
+
+  const document = await db().document.findUnique({
+    where: { id },
+    select: { support: true, filePublicId: true, fileMime: true, fileName: true },
+  });
+  if (!document) return { error: "Document introuvable.", ok: null };
+  if (!document.fileName) return { error: "Aucun fichier à retirer.", ok: null };
+
+  if (document.support !== "REDIGE") {
+    return {
+      error: "Ce document n'existe que par son fichier. Remplacez-le, ou supprimez le document.",
+      ok: null,
+    };
+  }
+
+  await db().document.update({
+    where: { id },
+    data: {
+      fileUrl: null, filePublicId: null, fileName: null, fileMime: null,
+      fileSize: 0, fileFormat: null,
+    },
+  });
+
+  if (document.filePublicId) await supprimerFichier(document.filePublicId, document.fileMime ?? "");
+
+  revalidatePath(`${DOCS_PATH}/${id}`);
+  revalidatePath(DOCS_PATH);
+  revaliderDocuments();
+  return { error: null, ok: `Pièce jointe « ${document.fileName} » retirée.` };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -354,16 +550,20 @@ export async function basculerPublicationDocAction(
 
   const document = await db().document.findUnique({
     where: { id },
-    select: { status: true, titreFr: true, publishedAt: true, fileUrl: true },
+    select: {
+      status: true, titreFr: true, publishedAt: true, support: true,
+      fileUrl: true, contenuFr: true, contenuEn: true,
+    },
   });
   if (!document) return { error: "Document introuvable.", ok: null };
 
   const enLigne = document.status === "PUBLISHED";
 
-  // Un document dont le fichier a disparu ne doit pas partir en ligne : le
-  // visiteur y trouverait une fiche complète et un lien mort.
-  if (!enLigne && !document.fileUrl) {
-    return { error: "Aucun fichier attaché : téléversez-le avant de publier.", ok: null };
+  // Une pièce sans fichier ni texte ne doit pas partir en ligne : le visiteur y
+  // trouverait une fiche complète et rien derrière.
+  if (!enLigne) {
+    const refus = motifNonPubliable(document);
+    if (refus) return { error: refus, ok: null };
   }
 
   await db().document.update({
@@ -450,7 +650,7 @@ export async function supprimerDocumentAction(
   if (!document) return { error: "Document introuvable.", ok: null };
 
   await db().document.delete({ where: { id } });
-  if (document.filePublicId) await supprimerFichier(document.filePublicId, document.fileMime);
+  if (document.filePublicId) await supprimerFichier(document.filePublicId, document.fileMime ?? "");
 
   revaliderDocuments();
   redirect(`${DOCS_PATH}?supprime=1`);

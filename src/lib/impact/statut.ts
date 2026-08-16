@@ -92,14 +92,20 @@ export const IMPACT_EMPLACEMENT_HINT: Record<ImpactEmplacement, string> = {
   PROJET_JALONS: "Entre les indicateurs et la foire aux questions citoyenne.",
 };
 
-/** Chemin de la page publique concernée — lien « Voir sur le site ». */
+/**
+ * Chemin de la page publique concernée — lien « Voir sur le site ».
+ *
+ * ⚠️ Ces chemins DOIVENT rester alignés sur `NAV.resultats` et `NAV.projet`
+ * (`lib/routes.ts`), qui en est la source. Ils sont recopiés plutôt qu'importés
+ * pour tenir l'invariant du module — aucun import, cf. l'en-tête.
+ */
 export const IMPACT_EMPLACEMENT_PATH: Record<ImpactEmplacement, string> = {
   ACCUEIL_IMPACT: "",
   ACCUEIL_HISTOIRES: "",
-  RESULTATS_DIALOGUES: "/resultats",
-  RESULTATS_HISTOIRES: "/resultats",
-  PROJET_CHANGEMENTS: "/projet",
-  PROJET_JALONS: "/projet",
+  RESULTATS_DIALOGUES: "/results",
+  RESULTATS_HISTOIRES: "/results",
+  PROJET_CHANGEMENTS: "/project",
+  PROJET_JALONS: "/project",
 };
 
 /* -------------------------------------------------------------------------- */

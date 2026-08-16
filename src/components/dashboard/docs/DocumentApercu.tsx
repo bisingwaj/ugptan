@@ -21,6 +21,7 @@ import { ADMIN_DOCS } from "@/content/admin";
 import type { DocumentSaisie } from "@/lib/docs/saisie";
 import { apercuPossible, formatLisible, ligneTechnique } from "@/lib/docs/fichier";
 import { DOC_TYPE_LABEL } from "@/lib/docs/statut";
+import { ProseRiche } from "@/components/prose/ProseRiche";
 
 /** Date d'un `<input type="date">` (« 2026-03-18 ») en toutes lettres. */
 const dateFr = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" });
@@ -109,9 +110,18 @@ export function DocumentApercu({
                         <dd className="adm-defs__val">{date}</dd>
                       </div>
                     )}
+                    {document.authorName && (
+                      <div className="adm-defs__row">
+                        <dt>Signature</dt>
+                        <dd className="adm-defs__val">
+                          {document.authorName}
+                          {document.authorRole && ` — ${document.authorRole}`}
+                        </dd>
+                      </div>
+                    )}
                     {document.auteur && (
                       <div className="adm-defs__row">
-                        <dt>Auteur</dt>
+                        <dt>Organisme</dt>
                         <dd className="adm-defs__val">{document.auteur}</dd>
                       </div>
                     )}
@@ -137,9 +147,29 @@ export function DocumentApercu({
                   )}
                 </div>
 
+                {/* Le corps rédigé, dessiné par les composants du SITE — c'est
+                    la seule façon de prévisualiser ce qui sera publié, tableaux
+                    et graphiques compris (cf. components/prose/ProseRiche.tsx). */}
+                {document.support === "REDIGE" ? (
+                  <div className="adm-doc__apercu-fichier">
+                    <div className="label-mono">{t.apercuCorps}</div>
+                    {document.contenuFr.trim() || document.contenuEn.trim() ? (
+                      <div className="adm-doc__apercu-prose">
+                        <ProseRiche
+                          html={document.contenuFr || document.contenuEn}
+                          lang="fr"
+                          className="adm-prose"
+                        />
+                      </div>
+                    ) : (
+                      <p className="adm-hint">{t.apercuCorpsVide}</p>
+                    )}
+                  </div>
+                ) : null}
+
                 {/* Le fichier, quand le navigateur sait le rendre. */}
                 <div className="adm-doc__apercu-fichier">
-                  <div className="label-mono">{t.apercuFichier}</div>
+                  <div className="label-mono">{document.support === "REDIGE" ? t.blocPieceJointe : t.apercuFichier}</div>
                   {!fichier ? (
                     <p className="adm-hint">{t.fichierAucun}</p>
                   ) : apercuPossible(fichier.mime, fichier.url) ? (

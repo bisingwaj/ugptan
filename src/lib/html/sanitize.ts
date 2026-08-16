@@ -1,7 +1,7 @@
 /**
  * Assainisseur HTML de l'éditeur d'articles.
  *
- * Aucune dépendance, aucun import `node:` : le module tourne AUX DEUX BOUTS —
+ * Aucune dépendance externe, aucun import `node:` : le module tourne AUX DEUX BOUTS —
  * côté serveur avant écriture en base (barrière de référence), et côté client
  * dans l'éditeur pour nettoyer un collage venu de Word ou d'une page web.
  *
@@ -19,9 +19,26 @@
  *   3. texte : réémis échappé, les entités valides étant préservées telles
  *      quelles pour ne pas afficher « &amp;amp; » au lecteur.
  */
+import { EST_BASE64, GRAPHIQUE_ATTR, GRAPHIQUE_CLASSE } from "@/lib/html/graphique";
 
-/** Balises sans contenu : jamais empilées, jamais refermées. */
-const VOID_TAGS = new Set(["br", "hr", "img", "source", "col", "wbr"]);
+/**
+ * Balises sans contenu : jamais empilées, jamais refermées.
+ *
+ * ⚠️ La liste doit couvrir TOUTES les balises orphelines du HTML, y compris
+ * celles que l'on jette (`meta`, `link`, `base`, `input`…), et pas seulement
+ * celles que l'on autorise. La raison tient à la façon dont un sous-arbre est
+ * écarté : faute de trouver la fermeture d'une balise qui n'en a pas,
+ * `skipSubtree` saute jusqu'à la FIN du fragment.
+ *
+ * Le cas n'a rien de théorique : Chrome, Safari et Google Docs préfixent le
+ * presse-papiers HTML d'un `<meta charset="utf-8">`. Absent d'ici, ce `<meta>`
+ * faisait disparaître tout le contenu collé — l'éditeur paraissait refuser le
+ * collage alors qu'il assainissait le fragment jusqu'au dernier caractère.
+ */
+const VOID_TAGS = new Set([
+  "br", "hr", "img", "source", "col", "wbr",
+  "meta", "link", "base", "input", "embed", "area", "param", "track",
+]);
 
 /**
  * Balises jetées AVEC leur contenu. Les conserver en texte échappé serait sûr
@@ -51,7 +68,11 @@ const ALLOWED_TAGS: Record<string, readonly string[]> = {
   dl: [], dt: [], dd: [],
   a: ["href", "title", "target", "rel"],
   img: ["src", "alt", "title", "width", "height", "loading"],
-  figure: [], figcaption: [],
+  /* `data-graphique` porte la DESCRIPTION d'un graphique — jamais son dessin
+     (cf. lib/html/graphique.ts). Admis sur `figure` et sur elle seule, et
+     réduit au jeu de caractères du base64 quelques lignes plus bas : c'est une
+     donnée encodée, pas un attribut de présentation. */
+  figure: [GRAPHIQUE_ATTR], figcaption: [],
   table: [], thead: [], tbody: [], tfoot: [], caption: [], colgroup: [], col: ["span"],
   tr: [], th: ["colspan", "rowspan", "scope"], td: ["colspan", "rowspan"],
   div: [], span: [],
@@ -70,6 +91,7 @@ const GLOBAL_ATTRS = new Set(["class", "style", "dir", "lang"]);
 const ALLOWED_CLASSES = new Set([
   "ta-left", "ta-center", "ta-right", "ta-justify",
   "actu-embed", "actu-figure", "actu-figure--wide", "actu-table",
+  GRAPHIQUE_CLASSE,
   "mono", "lead",
 ]);
 
@@ -378,6 +400,17 @@ function buildAttributes(name: string, attrs: [string, string][]): string | null
 
     if (attrName === "rel") continue; // recalculé
 
+    if (attrName === GRAPHIQUE_ATTR) {
+      // La description d'un graphique est du base64, et rien d'autre. Contrôler
+      // le JEU DE CARACTÈRES ici plutôt que de faire confiance au décodage en
+      // aval : ce qui ne peut pas s'écrire ne peut pas se glisser dans la page,
+      // quelle que soit la suite du traitement.
+      const donnees = decodeEntities(rawValue).trim();
+      if (!EST_BASE64.test(donnees)) continue;
+      parts.push(`${GRAPHIQUE_ATTR}="${donnees}"`);
+      continue;
+    }
+
     if (attrName === "colspan" || attrName === "rowspan" || attrName === "width" ||
         attrName === "height" || attrName === "start" || attrName === "span") {
       const numeric = decodeEntities(rawValue).trim();
@@ -504,7 +537,9 @@ export function htmlToText(html: string): string {
   return decodeEntities(
     html
       .replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ")
-      .replace(/<\/(p|div|li|h[1-6]|tr|blockquote|figcaption)>/gi, " ")
+      // `td` et `th` compris : sans eux, deux cellules voisines se collent
+      // (« Kinshasa42,5 ») dans les résumés et les descriptions SEO.
+      .replace(/<\/(p|div|li|h[1-6]|tr|td|th|blockquote|figcaption)>/gi, " ")
       .replace(/<br\s*\/?>/gi, " ")
       .replace(/<[^>]*>/g, ""),
   )
@@ -532,3 +567,10 @@ export function isEmptyHtml(html: string): boolean {
   if (/<(img|iframe|table|hr)\b/i.test(html)) return false;
   return htmlToText(html).length === 0;
 }
+
+/**
+ * Un corps réduit à une figure de graphique n'est pas vide : `<table>` figure
+ * déjà dans le test ci-dessus, le repli de la figure en porte un. Aucune règle
+ * supplémentaire n'est donc nécessaire — cette note existe pour qu'on ne la
+ * cherche pas (cf. lib/html/graphique.ts).
+ */

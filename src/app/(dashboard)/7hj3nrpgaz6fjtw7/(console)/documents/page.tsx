@@ -107,9 +107,15 @@ export default async function DocumentsAdminPage(props: { searchParams: Promise<
       db().document.findMany({
         where,
         select: {
-          id: true, status: true, type: true, titreFr: true, reference: true, auteur: true,
+          id: true, status: true, type: true, support: true, titreFr: true,
+          reference: true, auteur: true, authorName: true,
           publishedAt: true, documentDate: true, featured: true, position: true,
           fileName: true, fileFormat: true, fileSize: true,
+          // ⚠️ Les CORPS ne sont pas relus : deux HTML complets par ligne, pour
+          // n'afficher qu'un libellé de support, feraient payer à cet écran le
+          // poids de vingt rapports. L'état de la rédaction se lit sur la fiche,
+          // et le refus de publier un corps vide vient du serveur
+          // (cf. actions/admin-documents.ts).
           category: { select: { nomFr: true, color: true } },
         },
         orderBy: ordreConsole(tri),
@@ -135,7 +141,7 @@ export default async function DocumentsAdminPage(props: { searchParams: Promise<
           <p className="adm__lead">{t.lead}</p>
         </div>
         <div className="adm-entete__actions">
-          <Link href={adminPath("/documents/nouveau")} className="btn btn--primary">
+          <Link href={adminPath("/documents/new")} className="btn btn--primary">
             {t.nouveau}<span className="arrow">→</span>
           </Link>
           <Link href={adminPath("/documents/categories")} className="btn btn--outline btn--sm">
@@ -218,9 +224,11 @@ export default async function DocumentsAdminPage(props: { searchParams: Promise<
                         {document.titreFr}
                       </Link>
                       {document.featured && <span className="adm-badge adm-badge--self">{t.une}</span>}
+                      {/* La SIGNATURE prime sur l'organisme : c'est le nom qui
+                          paraît sur le site, donc celui qu'on cherche ici. */}
                       <span className="adm-table__sub">
                         {document.reference ? `${document.reference} · ` : ""}
-                        {document.auteur || "Auteur non précisé"}
+                        {document.authorName || document.auteur || "Auteur non précisé"}
                       </span>
                     </td>
                     <td>
@@ -246,10 +254,19 @@ export default async function DocumentsAdminPage(props: { searchParams: Promise<
                       {date ? formatDate(date) : t.sansDate}
                       {date && <span className="adm-table__sub">{dateSource}</span>}
                     </td>
+                    {/* Le support, et non plus le seul format de fichier : une
+                        publication rédigée n'en a pas, et la colonne doit dire
+                        ce qu'on va trouver derrière la fiche. */}
                     <td className="mono adm-table__meta">
-                      {formatLisible(document.fileName, document.fileFormat)}
-                      {document.fileSize > 0 && (
-                        <span className="adm-table__sub">{poidsLisible(document.fileSize)}</span>
+                      {document.fileName ? (
+                        <>
+                          {formatLisible(document.fileName, document.fileFormat)}
+                          {document.fileSize > 0 && (
+                            <span className="adm-table__sub">{poidsLisible(document.fileSize)}</span>
+                          )}
+                        </>
+                      ) : (
+                        t.supportRedige
                       )}
                     </td>
                     <td>

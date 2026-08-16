@@ -12,11 +12,11 @@
  * confondre ferait repartir un téléversement de plusieurs mégaoctets à chaque
  * correction de virgule.
  */
-import type { DocLangue, DocStatut, DocType } from "@/lib/docs/statut";
+import type { DocLangue, DocStatut, DocSupport, DocType } from "@/lib/docs/statut";
 
 /** Le fichier attaché, tel que la console l'affiche. */
 export type FichierSaisie = {
-  /** Adresse de diffusion. Toujours renseignée : un document sans fichier n'existe pas. */
+  /** Adresse de diffusion. */
   url: string;
   /** Identifiant chez l'hébergeur. Nul pour une reprise dont on n'a que l'adresse. */
   publicId: string | null;
@@ -32,15 +32,37 @@ export type DocumentSaisie = {
   id: string | null;
   status: DocStatut;
   type: DocType;
+  /** Fichier téléversé, ou texte rédigé dans la console. */
+  support: DocSupport;
+  /** Segment d'URL de la page de lecture. Vide tant que la fiche n'a pas de titre. */
+  slug: string;
 
   titreFr: string;
   titreEn: string;
   descriptionFr: string;
   descriptionEn: string;
 
+  /** Corps rédigé, HTML assaini. Vide pour un document qui n'est qu'un fichier. */
+  contenuFr: string;
+  contenuEn: string;
+
   reference: string;
+  /** Version publiée, telle qu'elle s'affiche (« v1.0 », « T2 2026 »). */
+  version: string;
+  /** Organisme producteur — la structure d'où vient la pièce. */
   auteur: string;
   langue: DocLangue;
+
+  /** --- Signature affichée : qui a ÉCRIT, et non qui a saisi ------------- */
+  /** Identifiant du compte auteur, quand il en a un. */
+  authorId: string;
+  /** Signature libre, quand l'auteur n'a pas de compte. Prime sur le compte. */
+  authorName: string;
+  /** Fonction affichée sous le nom. */
+  authorRole: string;
+
+  /** Image de couverture de la page de lecture. */
+  coverMediaId: string;
 
   /** Format `<input type="date">`, heure de Kinshasa. */
   publishedAt: string;
@@ -62,4 +84,6 @@ export type DocumentSaisie = {
 export type ReferentielsDocSaisie = {
   categories: { id: string; nom: string }[];
   composantes: { code: string; titre: string }[];
+  /** Comptes de la console proposés à la signature. */
+  auteurs: { id: string; nom: string }[];
 };

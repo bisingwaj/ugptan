@@ -15,8 +15,17 @@
  * Le panneau reste ADRESSABLE malgré tout : `?doc=<id>` l'ouvre au chargement, et
  * l'ouverture met l'adresse à jour. C'est ce lien que la console donne à suivre
  * depuis la fiche d'un document publié.
+ *
+ * ─── Deux gestes, selon ce qu'est la pièce ──────────────────────────────────
+ *
+ * Une publication RÉDIGÉE se lit sur le site : sa carte mène à sa page, et le
+ * panneau n'est plus qu'un résumé qui invite à l'ouvrir. Un fichier TÉLÉVERSÉ
+ * n'a pas de page — le panneau EST sa fiche, avec l'aperçu du document et son
+ * téléchargement. Proposer « Lire » sur un PDF, ou « Télécharger » sur un texte
+ * qui n'a pas de fichier, promettrait ce qui n'existe pas.
  */
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import type { DocVue } from "@/lib/docs/query";
 import { dict } from "@/content/i18n";
 import type { Lang } from "@/lib/pick";
@@ -79,11 +88,16 @@ export function RessourcesListe({
         {documents.map((document) => (
           <RevealItem as="li" key={document.id} className="doc-card">
             <div className="doc-card__top">
-              <span className="doc-card__ext mono" aria-hidden="true">{document.fichier.format}</span>
+              {/* Pastille de format, ou pastille de lecture : dans les deux cas
+                  elle annonce ce qui attend le visiteur au bout du clic. */}
+              <span className="doc-card__ext mono" aria-hidden="true">
+                {document.fichier ? document.fichier.format : "TXT"}
+              </span>
               <span className="doc-card__kicker mono">
                 {document.typeLabel}
                 {document.categorie ? ` · ${document.categorie.nom}` : ""}
               </span>
+              {document.redige && <span className="doc-card__ligne mono">{t.onlineBadge}</span>}
               {document.featured && <span className="doc-card__une mono">{t.featured}</span>}
             </div>
 
@@ -94,23 +108,42 @@ export function RessourcesListe({
 
             {document.description && <p className="doc-card__desc">{document.description}</p>}
 
+            {/* La version précède la date : c'est elle qui distingue deux
+                éditions d'une même pièce, et le lecteur qui revient cherche
+                d'abord à savoir si le document a changé depuis sa dernière
+                visite. */}
             <div className="doc-card__meta mono">
+              {document.version ? `${document.version} · ` : ""}
               {document.dateLabel ? `${document.dateLabel} · ` : ""}
-              {document.technique}
+              {document.technique ||
+                (document.lecture ? `${document.lecture} ${t.minutes}` : "")}
             </div>
 
-            {document.auteur && <div className="doc-card__auteur">{document.auteur}</div>}
+            {(document.signature || document.auteur) && (
+              <div className="doc-card__auteur">
+                {document.signature?.nom ?? document.auteur}
+              </div>
+            )}
 
             <div className="doc-card__pied">
               <button type="button" className="btn btn--outline btn--sm" onClick={() => ouvrir(document)}>
                 {t.details}
               </button>
-              {/* `download` seul ne suffit pas sur une origine tierce : c'est
-                  l'URL qui porte la demande d'enregistrement
-                  (cf. lib/docs/fichier.ts). */}
-              <a href={document.fichier.urlDl} className="btn btn--primary btn--sm" download>
-                <span className="arrow">↓</span> {t.download}
-              </a>
+
+              {document.redige ? (
+                <Link href={document.chemin} className="btn btn--primary btn--sm">
+                  {t.readShort} <span className="arrow">→</span>
+                </Link>
+              ) : (
+                document.fichier && (
+                  // `download` seul ne suffit pas sur une origine tierce : c'est
+                  // l'URL qui porte la demande d'enregistrement
+                  // (cf. lib/docs/fichier.ts).
+                  <a href={document.fichier.urlDl} className="btn btn--primary btn--sm" download>
+                    <span className="arrow">↓</span> {t.download}
+                  </a>
+                )
+              )}
             </div>
           </RevealItem>
         ))}
@@ -149,10 +182,25 @@ export function RessourcesListe({
                     <dd className="mono">{ouvert.reference}</dd>
                   </div>
                 )}
+                {ouvert.version && (
+                  <div className="doc-modal__row">
+                    <dt>{t.labelVersion}</dt>
+                    <dd className="mono">{ouvert.version}</dd>
+                  </div>
+                )}
                 {ouvert.dateLabel && (
                   <div className="doc-modal__row">
                     <dt>{ouvert.dateSource === "document" ? t.labelDocDate : t.labelPublished}</dt>
                     <dd>{ouvert.dateLabel}</dd>
+                  </div>
+                )}
+                {ouvert.signature && (
+                  <div className="doc-modal__row">
+                    <dt>{t.labelSignature}</dt>
+                    <dd>
+                      {ouvert.signature.nom}
+                      {ouvert.signature.role && ` — ${ouvert.signature.role}`}
+                    </dd>
                   </div>
                 )}
                 {ouvert.auteur && (
@@ -161,49 +209,89 @@ export function RessourcesListe({
                     <dd>{ouvert.auteur}</dd>
                   </div>
                 )}
-                <div className="doc-modal__row">
-                  <dt>{t.labelFile}</dt>
-                  <dd className="mono">{ouvert.technique}</dd>
-                </div>
+                {ouvert.fichier ? (
+                  <div className="doc-modal__row">
+                    <dt>{t.labelFile}</dt>
+                    <dd className="mono">{ouvert.technique}</dd>
+                  </div>
+                ) : (
+                  ouvert.lecture !== null && (
+                    <div className="doc-modal__row">
+                      <dt>{t.read}</dt>
+                      <dd className="mono">{ouvert.lecture} {t.minutes}</dd>
+                    </div>
+                  )
+                )}
               </dl>
 
-              <div className="doc-modal__apercu">
-                <div className="label-mono">{t.preview}</div>
-                {ouvert.fichier.apercu ? (
-                  <>
-                    <object
-                      data={ouvert.fichier.url}
-                      type={ouvert.fichier.mime}
-                      className="doc-modal__cadre"
-                      aria-label={`${t.preview} : ${ouvert.titre}`}
-                    >
-                      {/* Repli quand le moteur de rendu refuse l'objet — le cas
-                          d'un PDF sur la plupart des navigateurs mobiles. */}
+              {/* L'aperçu n'a de sens que pour un fichier : une publication
+                  rédigée se lit sur sa page, et en incruster le début ici
+                  ferait un second gabarit de lecture à maintenir. */}
+              {ouvert.fichier && (
+                <div className="doc-modal__apercu">
+                  <div className="label-mono">{t.preview}</div>
+                  {ouvert.fichier.apercu ? (
+                    <>
+                      <object
+                        data={ouvert.fichier.url}
+                        type={ouvert.fichier.mime}
+                        className="doc-modal__cadre"
+                        aria-label={`${t.preview} : ${ouvert.titre}`}
+                      >
+                        {/* Repli quand le moteur de rendu refuse l'objet — le cas
+                            d'un PDF sur la plupart des navigateurs mobiles. */}
+                        <p className="doc-modal__note">{t.previewUnavailable}</p>
+                      </object>
+                      <p className="doc-modal__note">{t.previewNote}</p>
+                    </>
+                  ) : (
+                    <div className="doc-modal__vide">
+                      <span className="doc-card__ext mono" aria-hidden="true">{ouvert.fichier.format}</span>
                       <p className="doc-modal__note">{t.previewUnavailable}</p>
-                    </object>
-                    <p className="doc-modal__note">{t.previewNote}</p>
-                  </>
-                ) : (
-                  <div className="doc-modal__vide">
-                    <span className="doc-card__ext mono" aria-hidden="true">{ouvert.fichier.format}</span>
-                    <p className="doc-modal__note">{t.previewUnavailable}</p>
-                  </div>
-                )}
-              </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="doc-modal__pied">
-              <a
-                href={ouvert.fichier.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn--outline btn--sm"
-              >
-                {t.open} ↗
-              </a>
-              <a href={ouvert.fichier.urlDl} className="btn btn--primary btn--sm" download>
-                <span className="arrow">↓</span> {t.download}
-              </a>
+              {ouvert.fichier && (
+                <>
+                  {/* « Ouvrir » n'est proposé que si le navigateur sait AFFICHER
+                      le fichier — la même condition qui commande l'aperçu
+                      ci-dessus. Sur un DOCX ou un XLSX, aucun navigateur ne rend
+                      le format : le lien déclenchait un téléchargement muet, si
+                      bien que le panneau disait « ce format ne s'affiche pas »
+                      tout en proposant de l'afficher. Le bouton promettait ce
+                      qu'il ne pouvait pas tenir. */}
+                  {ouvert.fichier.apercu && (
+                    <a
+                      href={ouvert.fichier.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--outline btn--sm"
+                    >
+                      {t.open} ↗
+                    </a>
+                  )}
+                  {/* Un seul bouton principal par pied de panneau : sur une
+                      publication rédigée, c'est la LECTURE, et le fichier
+                      redescend au rang d'annexe. */}
+                  <a
+                    href={ouvert.fichier.urlDl}
+                    className={`btn btn--sm ${ouvert.redige ? "btn--outline" : "btn--primary"}`}
+                    download
+                  >
+                    <span className="arrow">↓</span> {t.download}
+                  </a>
+                </>
+              )}
+
+              {ouvert.redige && (
+                <Link href={ouvert.chemin} className="btn btn--primary btn--sm">
+                  {t.read} <span className="arrow">→</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

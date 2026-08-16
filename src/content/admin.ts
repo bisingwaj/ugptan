@@ -619,14 +619,18 @@ export const ADMIN_EVTS = {
 } as const;
 
 /**
- * Module « Rapports & analyses ».
+ * Module « Ressources & publications ».
  *
- * ⚠️ Le module porte EXACTEMENT le nom de la section publique qu'il alimente
- * (cf. `nav.ressources` dans content/i18n.ts). Deux noms pour une même chose —
- * « Documents & transparence » côté console, « Rapports & analyses » côté site —
- * obligeaient à faire la traduction de tête à chaque échange. Les identifiants
- * techniques, eux, restent `documents` : la permission, la route de la console
- * et les tables sont des clés stables, pas des libellés.
+ * ⚠️ Le module alimente UNE seule section publique, « Documents publiés »
+ * (/transparency). Les deux noms diffèrent volontairement, ce qui n'était pas
+ * le cas avant la fusion : la console gère un FONDS — rapports, études, notes,
+ * pièces de référence, publiés ou non —, tandis que la page publique n'en
+ * montre que la part publiée, et l'annonce comme telle au visiteur. Nommer
+ * l'écran de saisie « Documents publiés » aurait promis que tout ce qui s'y
+ * trouve est en ligne, alors qu'un brouillon y vit aussi.
+ *
+ * Les identifiants techniques, eux, restent `documents` : la permission, la
+ * route de la console et les tables sont des clés stables, pas des libellés.
  *
  * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` et
  * `ADMIN_EVTS` : il est lu par des composants clients (formulaire de dépôt,
@@ -637,11 +641,11 @@ export const ADMIN_EVTS = {
  * ressemblent doivent se dire pareil, sinon la console s'apprend deux fois.
  */
 export const ADMIN_DOCS = {
-  title: "Rapports & analyses",
-  lead: "Rapports, études, analyses et pièces de référence publiés dans la section « Rapports & analyses » du site. Les fichiers sont déposés sur le stockage Cloudinary et servis par son réseau de diffusion ; la base ne conserve que leurs métadonnées et leur adresse.",
+  title: "Ressources & publications",
+  lead: "Rapports, études, analyses et pièces de référence. Ce qui est publié ici alimente la page « Documents publiés » du site. Deux façons de publier : téléverser un fichier, ou rédiger la publication ici même (texte, visuels et graphiques) pour qu'elle se lise directement sur le site.",
 
   /* --- Liste --------------------------------------------------------------- */
-  nouveau: "Déposer un document",
+  nouveau: "Nouvelle publication",
   listeVide: "Aucun document pour le moment.",
   listeVideFiltre: "Aucun document ne correspond à ce filtre.",
   rechercher: "Rechercher un titre, un sigle, un organisme…",
@@ -657,8 +661,11 @@ export const ADMIN_DOCS = {
   colType: "Nature",
   colCategorie: "Catégorie",
   colDate: "Date",
-  colFichier: "Fichier",
+  colFichier: "Support",
   colOrdre: "Ordre",
+  tousSupports: "Tous les supports",
+  supportRedige: "Rédigé",
+  sansContenu: "Corps vide",
 
   sansCategorie: "Sans catégorie",
   sansDate: "Non datée",
@@ -692,8 +699,40 @@ export const ADMIN_DOCS = {
   champDescriptionEn: "Description (anglais)",
   champReference: "Sigle ou référence",
   champReferenceAide: "MEP, PPSD, CGES… Le code par lequel la pièce est désignée dans les échanges du projet.",
-  champAuteur: "Auteur ou organisme",
-  champAuteurAide: "Direction, cellule, cabinet d'études ou institution ayant produit le document.",
+  champVersion: "Version",
+  champVersionAide: "v1.0, T2 2026, évolutif… Telle qu'elle doit s'afficher. Une pièce révisée garde son sigle et change de version, ce qui permet au lecteur de repérer celle qu'il a déjà lue.",
+  champAuteur: "Organisme producteur",
+  champAuteurAide: "Direction, cellule, cabinet d'études ou institution d'où vient la pièce. La personne qui l'a écrite se renseigne dans « Signature ».",
+
+  /* --- Rédaction ----------------------------------------------------------- */
+  blocSupport: "Support de la publication",
+  blocSupportAide: "Il décide de ce que le site sert au visiteur : un fichier à télécharger, ou une page à lire.",
+  blocCorps: "Corps de la publication",
+  blocCorpsAide:
+    "Titres, paragraphes, visuels, tableaux et graphiques. C'est ce texte qui se lit sur le site, à l'adresse de la publication.",
+  corpsFr: "Texte français",
+  corpsEn: "Texte anglais",
+  corpsEnAide: "Laissé vide, les lecteurs anglophones reçoivent le texte français, signalé comme tel.",
+  corpsPlaceholderFr: "Rédigez le rapport…",
+  corpsPlaceholderEn: "Write the English version…",
+  champSlugDoc: "Adresse de la page",
+  champSlugDocAide:
+    "Segment d'URL de la publication, commun aux deux langues. Déduit du titre s'il est laissé vide. Le modifier casse les liens déjà partagés.",
+
+  blocSignature: "Signature",
+  blocSignatureAide:
+    "Le nom qui paraît sur le site sous le titre. C'est celui de la personne qui a écrit, jamais celui du compte qui saisit la fiche.",
+  champCompteAuteur: "Compte auteur",
+  sansCompteAuteur: "Aucun compte",
+  champSignature: "Signature affichée",
+  champSignatureAide: "Prime sur le compte. À employer pour un service (« Cellule suivi & évaluation ») ou un auteur sans accès à la console.",
+  champFonction: "Fonction",
+
+  blocCouverture: "Couverture",
+  blocCouvertureAide: "Image d'en-tête de la page de lecture, reprise au partage sur les réseaux.",
+  couvertureChoisir: "Choisir un visuel",
+  couvertureRetirer: "Retirer",
+  couvertureAucune: "Aucune couverture : la page s'ouvre sur un bandeau sobre, sans image.",
 
   blocPublication: "Publication",
   champStatut: "État",
@@ -709,6 +748,8 @@ export const ADMIN_DOCS = {
   enregistrement: "Enregistrement…",
   deposer: "Déposer le document",
   depot: "Téléversement…",
+  creer: "Créer la publication",
+  creation: "Création…",
   voirSite: "Voir sur le site",
   voirSiteIndisponible: "La fiche publique sera accessible une fois le document publié.",
 
@@ -721,10 +762,18 @@ export const ADMIN_DOCS = {
 
   /* --- Fichier ------------------------------------------------------------- */
   blocFichier: "Fichier",
+  blocPieceJointe: "Pièce jointe",
   fichierAide:
     "PDF, Word, Excel, PowerPoint, CSV ou image. Le fichier part sur le stockage Cloudinary ; la base n'en garde que l'adresse et le poids.",
   fichierChoisir: "Fichier à téléverser",
   fichierAucun: "Aucun fichier attaché.",
+  fichierAttacher: "Attacher un fichier",
+  fichierAttachement: "Téléversement…",
+  fichierAttacherAide:
+    "Facultatif sur une publication rédigée : la version signée d'une note, le tableau de données qui l'accompagne.",
+  fichierRetirer: "Retirer la pièce jointe",
+  fichierRetirerConfirm:
+    "Retirer cette pièce jointe ? Le fichier sera supprimé du stockage et les liens déjà partagés cesseront de fonctionner. Le texte de la publication reste intact.",
   fichierOuvrir: "Ouvrir le fichier",
   fichierTelecharger: "Télécharger",
   fichierRemplacer: "Remplacer le fichier",
@@ -740,6 +789,8 @@ export const ADMIN_DOCS = {
   apercuOuvrir: "Prévisualiser",
   apercuFermer: "Fermer",
   apercuFichier: "Aperçu du fichier",
+  apercuCorps: "Corps de la publication",
+  apercuCorpsVide: "Aucun texte rédigé pour le moment.",
   apercuIndisponible:
     "Ce format ne s'affiche pas dans le navigateur. Ouvrez le fichier pour le vérifier avant publication.",
 
@@ -759,6 +810,252 @@ export const ADMIN_DOCS = {
   colUsage: "Documents",
   supprimerCategorieConfirm:
     "Supprimer cette catégorie ? Les documents concernés resteront en ligne, sans catégorie.",
+} as const;
+
+/**
+ * Module « Vidéos & galeries ».
+ *
+ * Séparé de l'objet `ADMIN` pour la même raison que `ADMIN_ACTUS` et
+ * `ADMIN_DOCS` : il est lu par des composants clients qu'on ne veut pas voir
+ * embarquer le vocabulaire des autres écrans.
+ *
+ * Le vocabulaire reprend celui des documents là où le geste est le même —
+ * déposer, classer, mettre en avant, ranger par rubrique : deux modules qui se
+ * ressemblent doivent se dire pareil, sinon la console s'apprend deux fois. Il
+ * s'en écarte sur un point, et volontairement : on n'y « publie » pas, on rend
+ * VISIBLE. Un rapport se publie parce qu'il fait foi ; une photographie se
+ * montre ou ne se montre pas.
+ */
+export const ADMIN_GALERIE = {
+  title: "Vidéos & galeries",
+  lead: "La bibliothèque de contenus visuels publiables : photographies et vidéos des activités, événements, projets et actualités du Projet, telles qu'elles paraissent dans la galerie du site. Les fichiers sont déposés sur le stockage Cloudinary et servis par son réseau de diffusion ; la base ne conserve que leurs métadonnées et leur adresse.",
+  distinction:
+    "À ne pas confondre avec le module « Médias », qui tient les visuels réutilisés à l'intérieur des contenus du site (couvertures d'articles, affiches d'événements, portraits). Ici, chaque entrée est une publication à part entière : elle a son titre, sa rubrique, sa date et son propre état de visibilité.",
+
+  /* --- Liste --------------------------------------------------------------- */
+  nouvellePhoto: "Ajouter une photo",
+  nouvelleVideo: "Ajouter une vidéo",
+  listeVide: "Aucun contenu dans la galerie pour le moment.",
+  listeVideFiltre: "Aucun contenu ne correspond à ce filtre.",
+  rechercher: "Rechercher un titre, une légende, un lieu…",
+  filtrer: "Filtrer",
+  reinitialiser: "Tout afficher",
+  tousStatuts: "Tous les états",
+  toutesRubriques: "Toutes les rubriques",
+  tousTypes: "Photos et vidéos",
+  trierPar: "Trier par",
+
+  colMedia: "Contenu",
+  colStatut: "État",
+  colType: "Nature",
+  colRubrique: "Rubrique",
+  colDate: "Date",
+  colLieu: "Lieu",
+
+  sansRubrique: "Sans rubrique",
+  sansDate: "Non datée",
+  sansLieu: "Lieu non précisé",
+  une: "En avant",
+  datePrise: "Prise de vue",
+  datePublication: "Mise en ligne",
+  vignetteAbsente: "Sans vignette",
+
+  publier: "Rendre visible",
+  depublier: "Masquer",
+  supprimer: "Supprimer",
+  supprimerConfirm:
+    "Supprimer définitivement ce contenu ? Le fichier sera retiré du stockage et les liens déjà partagés cesseront de fonctionner. Pour le retirer du site sans l'effacer, utilisez « Masquer ».",
+  modifier: "Modifier le contenu",
+  retourListe: "Retour à la galerie",
+
+  ajouteOk: "Contenu ajouté, masqué pour l'instant. Vérifiez la fiche et le rendu, puis rendez-le visible.",
+  supprimeOk: "Contenu supprimé.",
+
+  /* --- Fiche --------------------------------------------------------------- */
+  blocIdentite: "Ce qui se lit",
+  champTitreFr: "Titre (français)",
+  champTitreFrAide: "Il coiffe la vignette dans la galerie et l'écran de la visionneuse.",
+  champTitreEn: "Titre (anglais)",
+  champTitreEnAide: "Laissé vide, le titre français est servi aux lecteurs anglophones — mieux vaut un titre français qu'une image muette.",
+  champDescriptionFr: "Légende (français)",
+  champDescriptionPlaceholder: "Une ou deux phrases : ce que montre l'image, et pourquoi elle compte.",
+  champDescriptionEn: "Légende (anglais)",
+  champLieu: "Lieu",
+  champLieuAide: "Kinshasa, Nord-Kivu, Matadi… Affiché sous le titre et cherché par la recherche.",
+
+  blocAccessibilite: "Accessibilité",
+  blocAccessibiliteAide:
+    "Le texte alternatif décrit l'image à qui ne la voit pas. Il n'est pas le titre : le titre nomme la scène, l'alternatif la décrit. Laissé vide, le titre en tient lieu.",
+  champAltFr: "Texte alternatif (français)",
+  champAltEn: "Texte alternatif (anglais)",
+
+  blocPublication: "Visibilité",
+  champStatut: "État",
+  champDatePublication: "Date de mise en ligne",
+  champDatePublicationAide: "Laissée vide, elle est posée à la première mise en visibilité.",
+  champDatePrise: "Date de prise de vue",
+  champDatePriseAide: "Le jour où l'image a été faite. C'est elle qui prime dans le classement public.",
+  champUne: "Mettre en avant",
+  champUneAide: "Le contenu remonte en tête de la galerie et occupe une cellule double dans la mosaïque.",
+  champPosition: "Ordre d'affichage",
+  champPositionAide: "Plus petit, plus haut. Départage les contenus de même mise en avant.",
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  ajouter: "Ajouter à la galerie",
+  ajout: "Téléversement…",
+  voirSite: "Voir dans la galerie",
+  voirSiteIndisponible: "La galerie publique montrera ce contenu une fois qu'il sera visible.",
+
+  blocClassement: "Classement",
+  champType: "Nature",
+  champRubrique: "Rubrique",
+  gererRubriques: "Gérer les rubriques →",
+  champComposantes: "Composantes rattachées",
+  champComposantesAide: "Le contenu est alors rattaché aux composantes concernées.",
+
+  /* --- Visuel -------------------------------------------------------------- */
+  blocVisuel: "Visuel",
+  visuelChoisir: "Image à téléverser",
+  visuelAide:
+    "JPEG, PNG, WebP, AVIF ou GIF. Cadrez avant de déposer : la galerie respecte le format d'origine, elle ne recadre pas.",
+  visuelVignetteAide:
+    "Facultative pour une vidéo, mais vivement conseillée : sans elle, la vignette de la galerie n'affiche qu'une plaque d'accent et le titre.",
+  visuelVignette: "Vignette d'attente",
+  visuelAucun: "Aucun visuel attaché.",
+  visuelAjouter: "Ajouter le visuel",
+  visuelRemplacer: "Remplacer le visuel",
+  visuelRemplacement: "Remplacement…",
+  visuelRemplacerAide:
+    "Le nouveau visuel prend la place de l'ancien, qui est retiré du stockage. Toutes les informations de la fiche sont conservées, et l'adresse publique change.",
+  stockageAbsent:
+    "Stockage des fichiers non configuré : le dépôt est indisponible tant que CLOUDINARY_URL n'est pas renseignée dans l'environnement.",
+
+  /* --- Vidéo ---------------------------------------------------------------
+     Une seule voie : le fichier téléversé. L'identifiant YouTube et l'adresse
+     saisie à la main ont été retirés — ils demandaient une saisie par vidéo, ce
+     que le module refuse par principe, et n'ont jamais servi. */
+  blocVideo: "Fichier vidéo",
+  champVideoFichier: "Vidéo à téléverser",
+  champVideoFichierAide: (max: string) =>
+    `MP4 ou WebM · ${max} maximum. La vignette d'attente et la durée sont relevées automatiquement — rien à saisir.`,
+  videoSourceActuelle: "Fichier en place",
+  videoSourceAucune: "Aucun fichier : la vidéo ne peut pas être rendue visible.",
+  videoSourceFichier: "Vidéo téléversée",
+  videoEnregistrer: "Téléverser la vidéo",
+  videoRemplacer: "Remplacer la vidéo",
+  videoEnregistrement: "Téléversement…",
+  videoOuvrir: "Ouvrir la vidéo",
+  videoDuree: "Durée",
+
+  /* --- Albums --------------------------------------------------------------
+     Un album est un REPORTAGE : les photos et les vidéos d'un même événement,
+     d'une même mission, d'un même chantier. À ne pas confondre avec la rubrique,
+     qui est une nomenclature stable et sert de filtre : l'album « Atelier de
+     Goma, mars 2026 » se range DANS la rubrique « Événements ». */
+  albumsTitle: "Albums",
+  albumsLead:
+    "Les reportages de la galerie : un album rassemble les photos et les vidéos d'un même événement. Il porte sa date, son lieu et sa propre page sur le site. Une entrée peut aussi vivre hors de tout album — la photo isolée d'un chantier n'a pas besoin d'un reportage autour d'elle.",
+  albumsVide: "Aucun album pour le moment.",
+  albumNouveau: "Créer un album",
+  albumModifier: "Modifier l'album",
+  albumRetour: "Retour aux albums",
+  albumCreeOk: "Album créé, masqué pour l'instant. Versez-y vos photos, puis publiez-le.",
+  albumSupprimerConfirm:
+    "Supprimer cet album ? Les photos et vidéos qu'il contient NE sont pas supprimées : elles restent dans la galerie, sans album.",
+  albumSupprimer: "Supprimer l'album",
+  albumVoirSite: "Voir l'album sur le site",
+  albumVoirSiteIndisponible: "La page de l'album sera accessible une fois qu'il sera publié.",
+  albumSansContenu: "Cet album est encore vide. Versez-y vos photos et vidéos ci-dessus.",
+  albumCompte: (n: number) => `${n} contenu${n > 1 ? "s" : ""}`,
+
+  champAlbumTitreFr: "Titre de l'album (français)",
+  champAlbumTitreFrAide: "Le nom de l'événement couvert : « Atelier régional de Goma ».",
+  champAlbumTitreEn: "Titre de l'album (anglais)",
+  champAlbumDescriptionFr: "Présentation (français)",
+  champAlbumDescriptionPlaceholder: "Deux ou trois phrases : ce qui s'est passé, et pourquoi cela compte.",
+  champAlbumDescriptionEn: "Présentation (anglais)",
+  champAlbumDate: "Date de l'événement",
+  champAlbumDateAide: "Elle situe le reportage et ordonne les albums entre eux.",
+  champAlbumDateFin: "Fin de la période",
+  champAlbumDateFinAide:
+    "À renseigner seulement si le reportage s'étale sur plusieurs jours : le site affiche alors « 12 – 14 mars 2026 ».",
+  champAlbumSlug: "Identifiant d'URL",
+  champAlbumSlugAide:
+    "Il forme l'adresse publique de l'album (/gallery/…). Laissé vide, il est déduit du titre. Le modifier casse les liens déjà partagés.",
+  champAlbumUne: "Mettre l'album en avant",
+  champAlbumUneAide: "L'album remonte en tête du bandeau de la galerie.",
+  champAlbumStatutAide:
+    "Un album ne peut être publié que s'il contient au moins un média visible : une page d'album vide n'aurait rien à montrer.",
+
+  /* --- Contenus d'un album --------------------------------------------------
+     ⚠️ Aucun libellé de SAISIE ici, et ce n'est pas un oubli : les informations
+     vivent sur l'album. Les médias ne portent que des gestes d'accrochage. */
+  contenuTitre: "Contenus de l'album",
+  contenuLead:
+    "Dans l'ordre où ils paraîtront. Rien à saisir : les informations sont celles de l'album. Survolez une vignette pour la déplacer, la choisir en couverture, la masquer ou la retirer.",
+  contenuResume: (total: number, videos: number, masques: number) => {
+    const parts = [`${total} média${total > 1 ? "s" : ""}`];
+    if (videos > 0) parts.push(`dont ${videos} vidéo${videos > 1 ? "s" : ""}`);
+    if (masques > 0) parts.push(`${masques} masqué${masques > 1 ? "s" : ""}`);
+    return parts.join(" · ");
+  },
+  contenuCouverture: "Couverture",
+  contenuDefinirCouverture: "Choisir comme couverture",
+  contenuCouvertureAuto: "Couverture automatique",
+  contenuCouvertureAutoAide:
+    "Sans choix explicite, la couverture est le premier média de l'album.",
+  contenuMonter: "Monter",
+  contenuDescendre: "Descendre",
+  contenuMasque: "Masqué",
+  contenuMasquer: "Masquer ce média",
+  contenuMontrer: "Remontrer ce média",
+  contenuRetirer: "Retirer de l'album",
+  contenuRetirerConfirm:
+    "Retirer ce contenu de l'album ? Il n'est pas supprimé : il reste dans la galerie, sans album.",
+  contenuDetails: "Détails (facultatif)",
+  contenuSansSource: "Vidéo sans source",
+
+  /* --- Versement en série --------------------------------------------------- */
+  versementTitre: "Verser des médias dans l'album",
+  versementAide:
+    "Sélectionnez d'un coup autant de photos et de vidéos que vous voulez, mélangées. Elles partent trois à la fois, une par envoi : un fichier lourd ne bloque pas les autres, et un échec ne fait perdre que le sien. Aucune information à saisir — chaque média hérite de la rubrique, de la date, du lieu et des composantes de l'album, et devient visible dès que l'album l'est.",
+  versementChoisir: "Photos et vidéos à verser",
+  versementFormats: (maxImage: string, maxVideo: string) =>
+    `Photos JPEG, PNG, WebP, AVIF ou GIF · ${maxImage} maximum. Vidéos MP4 ou WebM · ${maxVideo} maximum — compressez les films plus lourds avant de les verser.`,
+  versementLancer: "Verser dans l'album",
+  versementVider: "Vider la liste",
+  versementEnCours: (fait: number, total: number) => `Versement… ${fait} / ${total}`,
+  versementCompte: (termines: number, restants: number, erreurs: number, total: number) => {
+    const parts = [`${termines} / ${total} versé${termines > 1 ? "s" : ""}`];
+    if (restants > 0) parts.push(`${restants} restant${restants > 1 ? "s" : ""}`);
+    if (erreurs > 0) parts.push(`${erreurs} en erreur`);
+    return parts.join(" · ");
+  },
+  versementPhotoTag: "Photo",
+  versementVideoTag: "Vidéo",
+
+  champAlbum: "Album",
+  champAlbumAide: "Le reportage auquel ce contenu appartient. Facultatif.",
+  sansAlbum: "Hors album",
+  gererAlbums: "Gérer les albums →",
+
+  /* --- Rubriques ----------------------------------------------------------- */
+  rubriquesTitle: "Rubriques de la galerie",
+  rubriquesLead: "Une seule par contenu. Elles alimentent les filtres et la pastille des vignettes sur la page publique.",
+  rubriquesVide: "Aucune rubrique.",
+  champNomFr: "Libellé français",
+  champNomEn: "Libellé anglais",
+  champNomEnAide: "Laissé vide, le libellé français est repris.",
+  champSlug: "Identifiant d'URL",
+  champSlugAide: "Il apparaît dans l'adresse du filtre public (?rubrique=…). Laissé vide, il est déduit du libellé.",
+  champCouleur: "Couleur",
+  champCouleurAide: "Hexadécimal (#0f62fe). Vide : l'accent du site.",
+  champOrdre: "Ordre",
+  /** Bouton d'ajout d'une rubrique — distinct de l'ajout d'un contenu. */
+  ajouterRubrique: "Ajouter",
+  colUsage: "Contenus",
+  supprimerRubriqueConfirm:
+    "Supprimer cette rubrique ? Les contenus concernés resteront en ligne, sans rubrique.",
 } as const;
 
 /**
@@ -908,6 +1205,143 @@ export const ADMIN_IMPACT = {
   voirSiteIndisponible: "La page publique s'ouvrira une fois la section publiée et traduite.",
 } as const;
 
+/* ===========================================================================
+   Module « L'équipe de l'Unité »
+   =========================================================================== */
+
+export const ADMIN_EQUIPE = {
+  title: "L'équipe de l'Unité",
+  lead: "Les personnes et les postes de l'Unité. Une fiche vaut pour les quatre endroits où le site montre l'équipe : la grille de l'accueil, la page « L'Unité », les cartes de coordination de « Gouvernance » et le profil du responsable d'une composante. Chaque fiche existe en français et en anglais ; une langue non traduite est signalée et n'est jamais servie au public.",
+
+  /* --- Liste --------------------------------------------------------------- */
+  nouveau: "Nouveau membre",
+  listeVide: "Aucune fiche pour le moment.",
+  listeVideFiltre: "Aucune fiche ne correspond à ce filtre.",
+  filtrer: "Filtrer",
+  reinitialiser: "Tout afficher",
+  tousStatuts: "Tous les états",
+  tousPoles: "Tous les pôles",
+  toutesComposantes: "Toutes les composantes",
+
+  colMembre: "Membre",
+  colStatut: "État",
+  colPole: "Pôle",
+  colFonction: "Fonction",
+  colLangues: "Langues",
+  colOu: "Affiché sur",
+  colOrdre: "Ordre",
+
+  posteVacant: "Poste à pourvoir",
+  sansPole: "Sans pôle",
+  sansFonction: "(fonction non renseignée)",
+
+  /* Où la fiche s'affiche, déduit de son état plutôt que coché à la main. */
+  ouGrille: "Grille",
+  ouGrilleAide: "Accueil et page « L'Unité ».",
+  ouCoordination: "Coordination",
+  ouCoordinationAide: "Cartes de la page « Gouvernance ».",
+  ouComposante: (code: string) => `Composante ${code}`,
+  ouRien: "Nulle part tant que la fiche est masquée.",
+
+  publier: "Publier",
+  depublier: "Retirer du site",
+  supprimer: "Supprimer",
+  supprimerConfirm:
+    "Supprimer définitivement cette fiche et toutes ses traductions ? Elle disparaîtra des quatre emplacements du site. Cette action est irréversible.",
+  retourListe: "Retour à l'équipe",
+
+  creeOk: "Fiche créée. Complétez-la puis publiez-la.",
+  supprimeOk: "Fiche supprimée.",
+
+  monter: "Monter",
+  descendre: "Descendre",
+  ordreAide:
+    "L'ordre de la grille porte la hiérarchie de l'Unité : il ne se déduit ni de l'alphabet ni de la date de saisie.",
+
+  /* --- Langues ------------------------------------------------------------- */
+  langueRedaction: "Langue de rédaction",
+  langueRedactionAide:
+    "La fiche naît dans cette langue. L'autre version s'ajoute ensuite depuis la fiche, enregistrée séparément.",
+  tradPresente: "traduit",
+  tradManquante: "à traduire",
+  tradNouvelle: (langue: string) =>
+    `Cette version ${langue} n'existe pas encore. Renseignez-la puis enregistrez-la : elle ne touchera à aucune autre langue.`,
+  enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
+  enregistrerFiche: "Enregistrer les réglages",
+  supprimerTraduction: "Supprimer cette traduction",
+  supprimerTraductionConfirm:
+    "Supprimer cette version linguistique ? La fiche restera en ligne dans les autres langues.",
+  majLe: "Modifié le",
+  creer: "Créer la fiche",
+  creation: "Création…",
+
+  /* --- Profil (par langue) ------------------------------------------------- */
+  blocProfil: "Profil",
+
+  /* --- Réglages de la fiche ------------------------------------------------ */
+  blocPublication: "Publication",
+  champStatut: "État",
+  champNom: "Nom",
+  champNomAide:
+    "Le nom d'usage, identique dans les deux langues. Laissé vide, la fiche décrit un poste à pourvoir : le site affiche l'intitulé et une pastille d'initiales.",
+  champPosition: "Ordre",
+  champPositionAide: "Le plus petit passe en premier dans la grille.",
+
+  blocRattachement: "Rattachement",
+  champPole: "Pôle",
+  champPoleAide: "Le libellé affiché sous la fonction, dans la grille comme sur les cartes.",
+  champComposante: "Responsable d'une composante",
+  champComposanteAide:
+    "Installe cette fiche sur la page publique de la composante choisie, avec sa biographie et sa citation. Une seule fiche par composante.",
+  sansComposante: "Aucune",
+
+  blocMiseEnAvant: "Mise en avant",
+  champFeatured: "Afficher parmi les cartes de coordination",
+  champFeaturedAide:
+    "Ajoute la fiche à la page « Gouvernance », avec ses responsabilités. Sa place dans la grille ne change pas.",
+  champCouleur: "Couleur d'accent",
+  champCouleurAide: "Liseré de la carte de coordination. Sans couleur, celle du pôle, puis l'accent du site.",
+
+  blocContact: "Contact",
+  champEmail: "Adresse de contact",
+  champEmailAide:
+    "Publiée sur la fiche de composante. Vide, l'adresse générale de l'Unité s'affiche à la place.",
+
+  blocPortrait: "Portrait",
+  champPhotoPath: "Chemin du portrait",
+  champPhotoPathAide:
+    "Pour les portraits servis depuis le dossier public (« /portraits/… »). Un portrait choisi dans la bibliothèque l'emporte sur ce champ.",
+  aucunPortrait: "Aucun portrait",
+  choisirPortrait: "Choisir un portrait",
+  changerPortrait: "Changer",
+  retirerPortrait: "Retirer",
+  portraitPartage:
+    "Le portrait vaut pour toutes les langues. Sans portrait, les cartes affichent les initiales de la fonction — c'est un état prévu par le dessin du site.",
+
+  /* --- Pôles --------------------------------------------------------------- */
+  polesTitle: "Pôles",
+  polesLead:
+    "Les pôles regroupent les fiches et donnent la ligne affichée sous chaque fonction. Les modifier ne touche pas aux fiches qui s'y rattachent.",
+  polesLien: "Gérer les pôles",
+  polesRetour: "Retour aux fiches",
+  poleNouveau: "Nouveau pôle",
+  poleNom: "Nom",
+  poleMission: "Mission",
+  poleMissionAide: "Ce dont le pôle répond, en une ligne. Affiché sur la page « L'Unité ».",
+  poleCouleur: "Couleur d'accent",
+  poleMembres: "Fiches rattachées",
+  poleSupprimer: "Supprimer le pôle",
+  poleSupprimerConfirm: "Supprimer ce pôle ? Les fiches rattachées le perdront sans être supprimées.",
+  poleVide: "Aucun pôle pour le moment.",
+  poleFr: "Français",
+  poleEn: "English",
+  poleEnAide: "Nom anglais effacé, le pôle n'apparaît plus sur la version anglaise du site.",
+
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  voirSite: "Voir la grille sur le site",
+} as const;
+
 /**
  * Accents proposés par le sélecteur de couleur de la console.
  *
@@ -958,28 +1392,30 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
     key: "pilotage",
     label: "Pilotage",
-    items: [{ key: "tableau-de-bord", label: "Tableau de bord", slug: "/tableau-de-bord" }],
+    items: [{ key: "tableau-de-bord", label: "Tableau de bord", slug: "/dashboard" }],
   },
   {
-    key: "marches",
-    label: "Marchés & recours",
-    items: [
-      { key: "marches", label: "Appels d'offres", soon: true },
-      { key: "soumissionnaires", label: "Soumissionnaires", soon: true },
-      { key: "mgp", label: "Plaintes (MGP)", slug: "/plaintes" },
-    ],
+    /* Les entrées « Appels d'offres » et « Soumissionnaires » ont été retirées :
+       la passation se tient sur la plateforme nationale, la console n'a pas
+       vocation à la doubler. Il ne reste donc ici que le traitement des
+       plaintes, d'où le nom de la section. */
+    key: "recours",
+    label: "Recours",
+    items: [{ key: "mgp", label: "Plaintes (MGP)", slug: "/grievances" }],
   },
   {
     key: "contenus",
     label: "Contenus",
     items: [
-      { key: "actualites", label: "Actualités", slug: "/actualites" },
-      { key: "documents", label: "Rapports & analyses", slug: "/documents" },
-      { key: "medias", label: "Médias", slug: "/medias" },
-      { key: "evenements", label: "Événements", slug: "/evenements" },
-      { key: "histoires", label: "Histoires & impact", slug: "/histoires" },
-      { key: "videos", label: "Vidéos & galerie", soon: true },
-      { key: "ressources", label: "Ressources & publications", soon: true },
+      { key: "actualites", label: "Actualités", slug: "/news" },
+      /* L'entrée « Ressources & publications » a longtemps figuré ici en
+         attente, à côté d'un module « Rapports & analyses » qui faisait déjà le
+         travail. Les deux ont fusionné : un seul module, sous le nom attendu. */
+      { key: "documents", label: "Ressources & publications", slug: "/documents" },
+      { key: "medias", label: "Médias", slug: "/media" },
+      { key: "evenements", label: "Événements", slug: "/events" },
+      { key: "histoires", label: "Histoires & impact", slug: "/stories" },
+      { key: "videos", label: "Vidéos & galeries", slug: "/gallery" },
     ],
   },
   {
@@ -991,7 +1427,13 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     key: "institution",
     label: "Institution",
     items: [
-      { key: "gouvernance", label: "Gouvernance", soon: true },
+      { key: "equipe", label: "L'équipe de l'Unité", slug: "/equipe" },
+      /* Le module s'appelait « Gouvernance », du nom d'une seule des deux pages
+         qu'il administrera. Côté public, ces pages forment le groupe « L'UGPTN »
+         (mandat, principes, pôles, puis les organes de gouvernance) : la console
+         reprend ce découpage, sans quoi l'éditeur cherche où se modifie la page
+         « L'UGPTN » et ne trouve qu'une entrée nommée autrement. */
+      { key: "ugptn", label: "L'UGPTN", soon: true },
       { key: "projet", label: "Le projet", soon: true },
     ],
   },
@@ -999,7 +1441,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     key: "administration",
     label: "Administration",
     items: [
-      { key: "utilisateurs", label: "Utilisateurs", slug: "/utilisateurs" },
+      { key: "utilisateurs", label: "Utilisateurs", slug: "/users" },
       { key: "reglages", label: "i18n & réglages", soon: true },
     ],
   },
@@ -1015,7 +1457,6 @@ export const MODULE_LABEL: Record<string, string> = Object.fromEntries(
 
 /** KPIs du tableau de bord (§8.2.1) — valeurs branchées au jalon Prisma. */
 export const ADMIN_KPIS = [
-  { key: "avis", label: "Avis ouverts" },
   { key: "plaintes", label: "Plaintes en cours" },
   { key: "articles", label: "Articles publiés" },
   { key: "events", label: "Événements à venir" },

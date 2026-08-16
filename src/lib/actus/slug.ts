@@ -31,15 +31,15 @@ export function slugify(input: string): string {
 }
 
 /**
- * Segments réservés sous `/actualites/`.
+ * Segments réservés sous `/news/`.
  *
- * `apercu` porte la route de prévisualisation
- * (`src/app/[lang]/actualites/apercu/page.tsx`) : un segment statique l'emporte
+ * `preview` porte la route de prévisualisation
+ * (`src/app/[lang]/news/preview/page.tsx`) : un segment statique l'emporte
  * sur `[slug]` dans l'App Router, un article ainsi nommé deviendrait donc
  * inatteignable. On écarte le nom à la source plutôt que de laisser découvrir
  * la collision en production.
  */
-const RESERVES = ["apercu"];
+const RESERVES = ["preview"];
 
 /**
  * Rend un slug unique en lui ajoutant un suffixe numérique.

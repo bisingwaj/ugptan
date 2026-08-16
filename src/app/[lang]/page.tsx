@@ -3,22 +3,25 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import {
-  meta, reperes, composantes, odp, intermediaires, gouvernance,
-  equipe, profils, question,
+  meta, reperes, composantes, gouvernance, poles,
+  profils, question,
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
 import { prochainsEvenements } from "@/lib/events/query";
+import { membresEquipe } from "@/lib/equipe/query";
 import { galleryProvinces, partners } from "@/content/carbon";
 import { media } from "@/content/media";
-import { NAV, route, compRoute } from "@/lib/routes";
-import { compVar } from "@/lib/comp";
-import { initials } from "@/lib/format";
+import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
 import { Photo } from "@/components/ui/Photo";
 import { HeroVideo } from "@/components/home/HeroVideo";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
+import { GrilleEquipe } from "@/components/equipe/GrilleEquipe";
+import { CarteOrgane } from "@/components/equipe/CarteOrgane";
+import { CompRow } from "@/components/composantes/CompRow";
+import { GrilleODP } from "@/components/resultats/GrilleODP";
 import { EventsGrid } from "@/components/events/EventsGrid";
 import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
@@ -36,9 +39,10 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
   const t = dict(lang);
   // Deux lectures indépendantes, menées de front : aucune ne conditionne
   // l'autre, et les enchaîner ajouterait un aller-retour à la base pour rien.
-  const [actualites, upcoming] = await Promise.all([
+  const [actualites, upcoming, equipe] = await Promise.all([
     derniersArticles(lang, 4),
     prochainsEvenements(lang, 3),
+    membresEquipe(lang),
   ]);
 
   return (
@@ -105,35 +109,23 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== COMPOSANTES ===== */}
+      {/* ===== COMPOSANTES =====
+          Aperçu : la colonne des sous-composantes a été retirée. Elle recopiait
+          ici le détail que portent l'index et chaque page dédiée, si bien que
+          l'accueil disait tout et qu'il n'y avait plus de raison de cliquer. */}
       <section className="section">
         <div className="section__inner">
           <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 48 }}>
             <div>
               <Kicker n="02">{t.sec.composantes}</Kicker>
-              <h2 className="h2">{t.comp.indexTitle}</h2>
+              <h2 className="h2">{t.home.composantesTitle}</h2>
             </div>
-            <p className="mono" style={{ fontSize: 12, color: "var(--c-60)", textAlign: "right", maxWidth: 260, lineHeight: 1.6, margin: 0 }}>{t.comp.rowsNote}</p>
+            <p className="mono" style={{ fontSize: 12, color: "var(--c-60)", textAlign: "right", maxWidth: 260, lineHeight: 1.6, margin: 0 }}>{t.home.composantesNote}</p>
           </Reveal>
           <RevealGroup style={{ borderTop: "1px solid var(--c-black)" }} gap={0.05}>
             {composantes.map((comp) => (
               <RevealItem key={comp.code}>
-                <Link href={compRoute(lang, comp.code)} className="comp-row comp-row--link" style={{ ...compVar(comp.code), borderBottom: "1px solid var(--c-20)", display: "grid", gridTemplateColumns: "88px 1.15fr 1fr 34px", gap: "clamp(14px,2vw,32px)", padding: "26px 0", alignItems: "start" }}>
-                  <div className="mono" style={{ fontWeight: 600, fontSize: 22, color: "var(--comp)" }}>{comp.code}</div>
-                  <div>
-                    <h3 className="comp-row__titre" style={{ margin: 0, fontSize: "clamp(18px,1.9vw,23px)", fontWeight: 600, letterSpacing: "-0.01em" }}>{pick(comp.titre, lang)}</h3>
-                    <p style={{ margin: "9px 0 0", fontSize: 14.5, lineHeight: 1.55, color: "var(--c-70)", maxWidth: 440 }}>{pick(comp.desc, lang)}</p>
-                  </div>
-                  <div>
-                    {comp.sous.map((s) => (
-                      <div key={s.ref} style={{ display: "flex", gap: 10, padding: "6px 0", fontSize: 13, color: "var(--c-80)", borderBottom: "1px dotted var(--c-20)" }}>
-                        <span className="mono" style={{ color: "var(--comp)", flex: "0 0 28px" }}>{s.ref}</span>
-                        <span style={{ flex: 1 }}>{pick(s.text, lang)}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <span className="comp-row__go" aria-hidden>→</span>
-                </Link>
+                <CompRow comp={comp} lang={lang} />
               </RevealItem>
             ))}
           </RevealGroup>
@@ -143,37 +135,21 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== RÉSULTATS / ODP ===== */}
+      {/* ===== RÉSULTATS / ODP =====
+          Aperçu : les quatre indicateurs d'objectif, sans le point de départ ni
+          la part de femmes, et sans les sept indicateurs intermédiaires. Tout
+          cela est l'apport propre de la page « Résultats », qui ne recevait
+          jusqu'ici qu'un seul lien de tout le site. */}
       <section className="section section--dark">
         <div className="section__inner">
-          <Reveal>
-            <Kicker light n="03">{t.sec.resultats}</Kicker>
-            <h2 className="h2" style={{ margin: "0 0 50px", maxWidth: 700 }}>{t.home.resultatsTitle}</h2>
+          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 50 }}>
+            <div style={{ maxWidth: 700 }}>
+              <Kicker light n="03">{t.sec.resultats}</Kicker>
+              <h2 className="h2" style={{ margin: 0 }}>{t.home.resultatsTitle}</h2>
+            </div>
+            <Link href={route(lang, NAV.resultats)} className="mono" style={{ fontSize: 13, color: "var(--ac-light)", display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>{t.cta.resultats} →</Link>
           </Reveal>
-          <RevealGroup className="grid-4 celled--dark" gap={0.05}>
-            {odp.map((o) => (
-              <RevealItem key={o.code} className="cell" style={{ display: "flex", flexDirection: "column", minHeight: 230 }}>
-                <div className="mono" style={{ fontSize: 12, color: "var(--ac-light)", letterSpacing: "0.08em" }}>{o.code}</div>
-                <div style={{ marginTop: "auto" }}>
-                  <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,56px)" }}><span className="stat__approx">{t.lbl.approx}</span><Counter to={o.value} dur={1300} /><span style={{ fontSize: 16, color: "var(--c-40)", marginLeft: 7, letterSpacing: 0 }}>{o.unit}</span></div>
-                </div>
-                <div style={{ marginTop: 14, fontSize: 14, lineHeight: 1.45, color: "var(--c-20)" }}>{pick(o.label, lang)}</div>
-                <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  <span className="mono" style={{ fontSize: 10.5, color: "var(--c-50)", border: "1px solid var(--c-80)", padding: "3px 7px" }}>{t.lbl.baseline}: {o.baseline}</span>
-                  {o.femmes && <span className="mono" style={{ fontSize: 10.5, color: "var(--ac-light)", border: "1px solid var(--acd)", padding: "3px 7px" }}>{o.femmes}</span>}
-                </div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-          <RevealGroup gap={0.05} style={{ marginTop: 1, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 1, background: "var(--c-80)", border: "1px solid var(--c-80)", borderTop: "none" }}>
-            {intermediaires.map((x, i) => (
-              <RevealItem key={i} style={{ background: "var(--c-black)", padding: "20px 22px" }}>
-                <div className="mono" style={{ fontWeight: 600, fontSize: 24 }}><span className="stat__approx">{t.lbl.approx}</span>{x.value}<span style={{ fontSize: 13, color: "var(--ac-light)", marginLeft: 4 }}>{x.unit}</span></div>
-                <div style={{ fontSize: 12.5, color: "var(--c-40)", marginTop: 7, lineHeight: 1.45 }}>{pick(x.text, lang)}</div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-          <p className="stat__note stat__note--dark">{t.lbl.indicatif}</p>
+          <GrilleODP lang={lang} variante="apercu" />
         </div>
       </section>
 
@@ -203,26 +179,21 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== GOUVERNANCE ===== */}
+      {/* ===== GOUVERNANCE =====
+          Aperçu : la nature de chaque organe. Qui préside, à quelle majorité et
+          à quelle fréquence reste l'apport de la page « Gouvernance », qu'on
+          retrouvait sinon à l'identique en suivant « en savoir plus ». */}
       <section className="section section--grey">
         <div className="section__inner">
-          <Reveal>
+          <Reveal style={{ marginBottom: 48, maxWidth: 720 }}>
             <Kicker n="05">{t.sec.gouvernance}</Kicker>
-            <h2 className="h2" style={{ margin: "0 0 48px" }}>COPIL · CTP · UGPTN</h2>
+            <h2 className="h2" style={{ margin: 0 }}>COPIL · CTP · UGPTN</h2>
+            <p style={{ margin: "18px 0 0", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.gouvLead}</p>
           </Reveal>
           <RevealGroup className="grid-3" gap={0.05}>
             {gouvernance.map((g) => (
-              <RevealItem key={g.sigle} className="cell" style={{ padding: "30px 28px", display: "flex", flexDirection: "column", minHeight: 300 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <span style={{ fontWeight: 700, fontSize: 26, letterSpacing: "0.01em" }}>{g.sigle}</span>
-                  <span className="mono" style={{ fontSize: 11, color: "#fff", background: "var(--ac)", padding: "3px 9px" }}>{g.effectif}</span>
-                </div>
-                <div style={{ fontSize: 14.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.4 }}>{pick(g.nom, lang)}</div>
-                <div style={{ marginTop: 24, borderTop: "1px solid var(--c-20)", paddingTop: 18, display: "flex", flexDirection: "column", gap: 13 }}>
-                  {[[t.gouv.bodyLabels.nature, pick(g.nature, lang)], [t.gouv.bodyLabels.presidence, pick(g.presidence, lang)], [t.gouv.bodyLabels.frequence, pick(g.frequence, lang)]].map(([k, v], i) => (
-                    <div key={i}><div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--c-50)" }}>{k}</div><div style={{ fontSize: 14, marginTop: 3 }}>{v}</div></div>
-                  ))}
-                </div>
+              <RevealItem key={g.sigle} className="cell" style={{ padding: "30px 28px" }}>
+                <CarteOrgane organe={g} lang={lang} champs="court" />
               </RevealItem>
             ))}
           </RevealGroup>
@@ -232,33 +203,20 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== ÉQUIPE ===== */}
+      {/* ===== ÉQUIPE =====
+          Le titre annonçait « 21 rôles · 5 pôles » en dur au-dessus d'une grille
+          qui vient de la base. Le nombre de pôles est désormais dérivé, et le
+          total de sous-rôles n'est plus avancé : les données n'en listent que
+          dix-neuf (cf. `polesSousRoles` dans content/data.ts). */}
       <section className="section">
         <div className="section__inner">
           <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 46 }}>
-            <div><Kicker n="06">{t.sec.equipe}</Kicker><h2 className="h2">21 {t.words.roles} · 5 {t.words.poles}</h2></div>
+            <div><Kicker n="06">{t.sec.equipe}</Kicker><h2 className="h2">{poles.length} {t.words.poles}</h2></div>
             <p style={{ maxWidth: 340, fontSize: 14.5, lineHeight: 1.55, color: "var(--c-60)", margin: 0 }}>{t.home.equipeLead}</p>
           </Reveal>
-          <RevealGroup gap={0.05} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(212px,1fr))" }}>
-            {equipe.map((m, i) => (
-              <RevealItem key={i} style={{ background: "#fff" }}>
-                <div style={{ aspectRatio: "1/1", backgroundColor: m.img ? "#e8ebf0" : "#eef1f7", position: "relative", overflow: "hidden", display: "flex", alignItems: m.img ? "flex-end" : "center", justifyContent: "center", padding: 14 }}>
-                  {m.img ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={m.img} alt={m.nom ? `${m.nom} — ${pick(m.role, lang)}` : pick(m.role, lang)} loading="lazy" decoding="async" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 18%" }} />
-                  ) : (
-                    <span className="mono" style={{ fontSize: "clamp(30px,5vw,44px)", fontWeight: 600, color: "var(--c-30)", letterSpacing: "0.02em" }}>{initials(pick(m.role, lang))}</span>
-                  )}
-                  <span className="mono" style={{ position: "absolute", top: 12, left: 14, fontSize: 10, color: m.img ? "#fff" : "var(--ac)", textShadow: m.img ? "0 1px 3px rgba(0,0,0,.55)" : undefined }}>{String(i + 1).padStart(2, "0")}</span>
-                </div>
-                <div style={{ padding: "16px 16px 20px" }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>{pick(m.role, lang)}</div>
-                  <div style={{ fontSize: 12, color: "var(--c-60)", marginTop: 6 }}>{pick(m.pole, lang)}</div>
-                  {m.nom && <div style={{ fontSize: 13, fontWeight: 600, color: "var(--c-black)", marginTop: 12, borderTop: "1px solid var(--c-10)", paddingTop: 10 }}>{m.nom}</div>}
-                </div>
-              </RevealItem>
-            ))}
-          </RevealGroup>
+          {/* Grille administrée depuis la console (cf. src/lib/equipe/query.ts).
+              Le même bloc sert la page « L'Unité », à l'habillage près. */}
+          <GrilleEquipe membres={equipe} variante="accueil" />
         </div>
       </section>
 

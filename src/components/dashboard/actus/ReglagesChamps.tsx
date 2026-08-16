@@ -148,7 +148,7 @@ export function ReglagesChamps({ article, referentiels, assets }: Props) {
             ))}
           </select>
           <p className="adm-hint" style={{ marginTop: 6 }}>
-            <Link href={adminPath("/actualites/categories")} className="adm-link">{t.gererCategories}</Link>
+            <Link href={adminPath("/news/categories")} className="adm-link">{t.gererCategories}</Link>
           </p>
         </div>
 

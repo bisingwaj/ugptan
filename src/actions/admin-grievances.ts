@@ -62,7 +62,7 @@ const eventData = (grievanceId: string, actor: AdminUser, event: EventInput) => 
 
 function refresh(id: string) {
   revalidatePath(ADMIN_GRIEVANCES);
-  revalidatePath(adminPath(`/plaintes/${id}`));
+  revalidatePath(adminPath(`/grievances/${id}`));
 }
 
 const readText = (formData: FormData, field: string, max: number): string =>

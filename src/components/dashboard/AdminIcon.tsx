@@ -18,25 +18,6 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M3 13h8v8H3z" />
     </>
   ),
-  /* Appels d'offres : la balance de l'évaluation comparative des offres */
-  marches: (
-    <>
-      <path d="M12 3v18" />
-      <path d="M5 7h14" />
-      <path d="M4 7l-2 6h4z" />
-      <path d="M20 7l-2 6h4z" />
-      <path d="M8 21h8" />
-    </>
-  ),
-  /* Soumissionnaires : l'entreprise candidate */
-  soumissionnaires: (
-    <>
-      <path d="M4 21V5h9v16" />
-      <path d="M13 11h7v10" />
-      <path d="M7 8.5h3M7 12.5h3M7 16.5h3" />
-      <path d="M16 14.5h1.5M16 17.5h1.5" />
-    </>
-  ),
   /* Actualités : le journal */
   actualites: (
     <>
@@ -85,14 +66,6 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M10 8.5l5.5 3.5-5.5 3.5z" />
     </>
   ),
-  /* Ressources & publications : les volumes rangés */
-  ressources: (
-    <>
-      <path d="M3 4h5v16H3z" />
-      <path d="M9.5 4h5v16h-5z" />
-      <path d="M16 7h5v13h-5z" />
-    </>
-  ),
   /* Newsletter : l'enveloppe et son rabat */
   newsletter: (
     <>
@@ -100,8 +73,19 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M3 5l9 7 9-7" />
     </>
   ),
-  /* Gouvernance : l'organigramme des instances */
-  gouvernance: (
+  /* L'équipe de l'Unité : deux personnes, celle de devant détachée.
+     Le buste plutôt que le portrait encadré : c'est un répertoire de personnes,
+     pas une bibliothèque de photographies. */
+  equipe: (
+    <>
+      <path d="M9 4h5v5H9z" />
+      <path d="M4.5 20v-3.5h14V20" />
+      <path d="M11.5 9v7.5" />
+      <path d="M16.5 4.5h3v4h-3z" />
+    </>
+  ),
+  /* L'UGPTN : l'organigramme de l'Unité et de ses instances */
+  ugptn: (
     <>
       <path d="M9 3h6v4H9z" />
       <path d="M2.5 17h6v4h-6z" />

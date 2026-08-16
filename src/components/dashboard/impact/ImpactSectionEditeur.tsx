@@ -118,7 +118,7 @@ export function ImpactSectionEditeur({
                 {sourceNom && sourceId && (
                   <>
                     {" "}
-                    <Link href={adminPath(`/histoires/${sourceId}`)} className="adm-link">
+                    <Link href={adminPath(`/stories/${sourceId}`)} className="adm-link">
                       {sourceNom} →
                     </Link>
                   </>

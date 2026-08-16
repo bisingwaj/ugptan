@@ -8,11 +8,13 @@
  * `DocumentStatus` et `DocumentType` du schéma Prisma — les deux doivent rester
  * alignées.
  *
- * Deux axes, à ne pas confondre :
+ * Trois axes, à ne pas confondre :
  *   · le STATUT dit si la pièce est servie au public (brouillon, publié,
  *     archivé). C'est une décision de l'Unité ;
  *   · le TYPE dit ce qu'elle est (rapport, étude, note…). C'est une nature, et
- *     elle ne change pas parce qu'on dépublie.
+ *     elle ne change pas parce qu'on dépublie ;
+ *   · le SUPPORT dit comment elle se lit — fichier téléchargeable, ou page
+ *     rédigée dans la console.
  *
  * La CATÉGORIE, troisième axe, n'est pas ici : c'est une table, parce que les
  * thématiques du projet évoluent (cf. `DocumentCategory` au schéma).
@@ -43,6 +45,42 @@ export const DOC_STATUT_HINT: Record<DocStatut, string> = {
 
 /** Un document est-il servi au public ? Unique définition, lue partout. */
 export const estPublieDoc = (statut: DocStatut): boolean => statut === "PUBLISHED";
+
+/* -------------------------------------------------------------------------- */
+/* Support : fichier déposé, ou texte rédigé                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Sur quoi repose la publication.
+ *
+ * Troisième axe, à ne confondre ni avec le statut ni avec la nature : il ne dit
+ * pas si la pièce est en ligne, ni ce qu'elle est, mais COMMENT elle se lit —
+ * un fichier qu'on télécharge, ou une page qu'on lit sur le site.
+ *
+ * Les deux ne s'excluent pas : une publication rédigée peut porter un fichier
+ * en pièce jointe. Le support dit ce qui est PRINCIPAL, donc ce que le site met
+ * en avant et ce qu'il faut avoir pour publier.
+ */
+export const DOC_SUPPORTS = ["FICHIER", "REDIGE"] as const;
+export type DocSupport = (typeof DOC_SUPPORTS)[number];
+
+export const isDocSupport = (value: string): value is DocSupport =>
+  (DOC_SUPPORTS as readonly string[]).includes(value);
+
+export const DOC_SUPPORT_LABEL: Record<DocSupport, string> = {
+  FICHIER: "Fichier téléversé",
+  REDIGE: "Publication rédigée",
+};
+
+export const DOC_SUPPORT_HINT: Record<DocSupport, string> = {
+  FICHIER:
+    "Un fichier (PDF, Word, tableur…) déposé sur le stockage du projet. La fiche publique le présente et propose son téléchargement.",
+  REDIGE:
+    "Un texte écrit dans la console, avec ses images, ses tableaux et ses graphiques. Il se lit sur le site, à sa propre adresse, et peut porter un fichier en pièce jointe.",
+};
+
+/** Le document a-t-il une page de lecture sur le site ? */
+export const estRedige = (support: DocSupport): boolean => support === "REDIGE";
 
 /* -------------------------------------------------------------------------- */
 /* Nature du document                                                          */
