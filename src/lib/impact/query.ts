@@ -229,8 +229,17 @@ type SectionBrute = {
 
 /** `null` quand la section n'a rien à servir dans cette langue. */
 function resoudreSection(section: SectionBrute, lang: Lang): ImpactSectionVue | null {
-  const tr = section.translations.find((t) => t.locale === lang);
-  if (!tr || !sectionTraduite(tr)) return null;
+  const trouvee = section.translations.find((t) => t.locale === lang);
+
+  /* Une section ENCHAÎNÉE se passe de ligne de traduction : elle n'a pas
+     d'en-tête propre, et tout ce qu'elle montre vit dans ses entrées. Sans
+     cette exception, l'organigramme des pôles disparaîtrait de la page, faute
+     d'un titre que son dessin n'a jamais porté. */
+  if (!section.enchaine && (!trouvee || !sectionTraduite(trouvee))) return null;
+
+  const tr = trouvee ?? {
+    locale: lang, kicker: null, titre: null, lead: null, ctaLabel: null, note: null,
+  };
 
   const layout = section.layout as ImpactLayout;
   // Une section qui reprend une autre n'a pas d'entrées propres : c'est la

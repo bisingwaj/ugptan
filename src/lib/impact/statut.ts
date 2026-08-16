@@ -658,6 +658,18 @@ export function itemTraduit(
  * Un kicker suffit : la frise des jalons de la page « Le projet » n'affiche que
  * cela, et lui imposer un titre ajouterait au site un H2 que son dessin n'a
  * jamais porté.
+ *
+ * ⚠️ Une section ENCHAÎNÉE échappe à la règle, et c'est le cas de l'organigramme
+ * des pôles : il poursuit le bandeau de repères, sous l'en-tête de celui-ci.
+ * Lui réclamer un titre reviendrait à en ajouter un second à la même bande —
+ * exactement ce que l'enchaînement sert à éviter. Tout ce qu'une telle section
+ * affiche vit dans ses entrées, et ce sont elles qui décident si elle a quelque
+ * chose à dire dans la langue de lecture.
  */
-export const sectionTraduite = (valeurs: { kicker?: string | null; titre?: string | null }): boolean =>
-  (valeurs.kicker ?? "").trim().length > 0 || (valeurs.titre ?? "").trim().length > 0;
+export const sectionTraduite = (
+  valeurs: { kicker?: string | null; titre?: string | null },
+  section?: { enchaine?: boolean },
+): boolean =>
+  section?.enchaine === true ||
+  (valeurs.kicker ?? "").trim().length > 0 ||
+  (valeurs.titre ?? "").trim().length > 0;

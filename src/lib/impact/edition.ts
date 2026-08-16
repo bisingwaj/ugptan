@@ -184,7 +184,7 @@ export async function chargerSectionImpact(
       ctaLabel: tr.ctaLabel ?? "",
       note: tr.note ?? "",
       existe: true,
-      complete: sectionTraduite(tr),
+      complete: sectionTraduite(tr, section),
       majLe: formatDateTime(tr.updatedAt),
     };
   }

@@ -206,8 +206,9 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
       {/* ===== ÉQUIPE =====
           Le titre annonçait « 21 rôles · 5 pôles » en dur au-dessus d'une grille
           qui vient de la base. Le nombre de pôles est désormais dérivé, et le
-          total de sous-rôles n'est plus avancé : les données n'en listent que
-          dix-neuf (cf. `polesSousRoles` dans content/data.ts). */}
+          total de sous-rôles n'est plus avancé : l'Unité en compte vingt et un,
+          dix-neuf sont renseignés, et les deux derniers s'ajouteront depuis la
+          console (cf. `polesSousRoles` dans content/data.ts). */}
       <section className="section">
         <div className="section__inner">
           <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 46 }}>

@@ -334,9 +334,14 @@ export async function enregistrerSectionAction(
     }
   }
 
-  // La complétude se lit EN BASE et non dans le formulaire : cet envoi ne porte
-  // aucune langue, et l'état des traductions a pu changer depuis l'affichage.
-  if (statut === "PUBLISHED" && !section.translations.some(sectionTraduite)) {
+  /* La complétude se lit EN BASE et non dans le formulaire : cet envoi ne porte
+     aucune langue, et l'état des traductions a pu changer depuis l'affichage.
+
+     L'enchaînement se lit sur CE formulaire, en revanche : c'est lui qu'on est
+     en train d'enregistrer, et cocher « poursuit la précédente » dispense
+     aussitôt la section d'un en-tête. */
+  const enchaine = coche(formData, "enchaine");
+  if (statut === "PUBLISHED" && !section.translations.some((tr) => sectionTraduite(tr, { enchaine }))) {
     return {
       error: "Aucune langue renseignée : ajoutez un libellé ou un titre dans au moins une langue avant de publier.",
       ok: null,
@@ -472,7 +477,7 @@ export async function basculerSectionAction(
   const section = await db().impactSection.findUnique({
     where: { id },
     select: {
-      status: true, sourceId: true, emplacement: true, layout: true,
+      status: true, sourceId: true, emplacement: true, layout: true, enchaine: true,
       translations: { select: { kicker: true, titre: true } },
       _count: { select: { items: true } },
     },
@@ -485,7 +490,7 @@ export async function basculerSectionAction(
   const enLigne = section.status === "PUBLISHED";
 
   if (!enLigne) {
-    if (!section.translations.some(sectionTraduite)) {
+    if (!section.translations.some((tr) => sectionTraduite(tr, section))) {
       return { error: "Aucune langue renseignée : ajoutez un libellé ou un titre avant de publier.", ok: null };
     }
     if (
