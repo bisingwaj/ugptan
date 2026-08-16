@@ -1076,6 +1076,32 @@ enum ImpactEmplacement {
   RESULTATS_HISTOIRES
   PROJET_CHANGEMENTS
   PROJET_JALONS
+
+  /// Page « L'UGPTN » — la citation qui suit le héros.
+  UGPTN_ENGAGEMENT
+  /// Page « L'UGPTN » — les fonctions de l'Unité.
+  UGPTN_MANDAT
+  /// Page « L'UGPTN » — les règles, puis les engagements qui en découlent.
+  UGPTN_PRINCIPES
+  /// Page « L'UGPTN » — repères et organigramme des pôles.
+  UGPTN_ORGANISATION
+  /// Page « L'UGPTN » — le cycle répété marché après marché.
+  UGPTN_METHODE
+  /// Page « L'UGPTN » — l'en-tête de la grille des fiches.
+  UGPTN_EQUIPE
+  /// Page « L'UGPTN » — questions fréquentes, puis glossaire replié.
+  UGPTN_QUESTIONS
+
+  /// Page « Le projet » — contexte, chiffres d'entrée et aplat.
+  PROJET_CONTEXTE
+  /// Page « Le projet » — les publics visés.
+  PROJET_POUR_QUI
+  /// Page « Le projet » — l'en-tête de l'aperçu des composantes.
+  PROJET_COMPOSANTES
+  /// Page « Le projet » — l'en-tête de l'aperçu des indicateurs.
+  PROJET_RESULTATS
+  /// Page « Le projet » — la foire aux questions citoyenne.
+  PROJET_QUESTIONS
 }
 
 /// Dessin des entrées d'une section. Chaque gabarit reproduit à l'identique un
@@ -1091,6 +1117,41 @@ enum ImpactLayout {
   AVANT_APRES
   /// Frise verticale : date puis fait marquant.
   JALONS
+
+  /// Bande d'accent : une citation, puis une ligne de références.
+  /// Sans entrées — la citation est le titre de la section, les références
+  /// sont sa note.
+  CITATION
+  /// Grille de cinq cartes numérotées : numéro en accent, titre, description.
+  /// Sur fond sombre, le numéro passe en pastille pleine.
+  ETAPES
+  /// Grille de trois cartes : numéro d'ordre calculé, titre, description.
+  PRINCIPES
+  /// Grille de quatre cartes à filet supérieur coloré : titre, description.
+  ENGAGEMENTS
+  /// Bandeau de repères chiffrés : une valeur, un libellé.
+  REPERES
+  /// Organigramme : par pôle, sa responsabilité, sa mission, ses sous-rôles et
+  /// le dossier qu'il porte.
+  ///
+  /// ⚠️ Ces pôles sont ceux de l'arrêté ministériel, et NON ceux du module
+  /// « L'équipe », qui classe les fiches selon un découpage opérationnel plus
+  /// fin. Deux nomenclatures distinctes, tenues séparément à dessein.
+  POLES
+  /// En-tête à deux colonnes, puis la grille des fiches publiées. Sans entrées.
+  EQUIPE
+  /// Accordéon de questions et de réponses.
+  FAQ
+  /// Bloc dépliant de sigles : sigle, puis ce qu'il recouvre.
+  GLOSSAIRE
+  /// Deux colonnes : texte et chiffres à gauche, aplat légendé à droite.
+  CONTEXTE
+  /// Cartes à trait d'accent : public visé, puis ce que le Projet lui apporte.
+  PERSONAS
+  /// En-tête à bouton, puis l'aperçu des cinq composantes. Sans entrées.
+  COMPOSANTES
+  /// En-tête à bouton, puis l'aperçu des indicateurs ODP. Sans entrées.
+  INDICATEURS
 }
 
 /// Fond de la section, repris du design system (cf. `.section--*`).
@@ -1127,6 +1188,16 @@ model ImpactSection {
 
   /// Section resserrée (`.section--sm`) : moins d'air vertical.
   compact    Boolean @default(false)
+  /// La section POURSUIT la précédente : elle ne rouvre pas de bande, elle
+  /// s'ajoute dans celle du dessus et son titre se rend en sous-titre.
+  ///
+  /// Deux blocs du site sont dans ce cas et l'ont toujours été : les
+  /// engagements, sous les principes de la page « L'UGPTN », et le glossaire,
+  /// sous la foire aux questions. En faire des sections à part entière
+  /// doublerait l'espace vertical qui les sépare.
+  ///
+  /// Sans effet sur la première section d'un emplacement : rien ne la précède.
+  enchaine   Boolean @default(false)
   /// Titre à la taille des grandes sections d'accueil (`.h2`) plutôt qu'à celle
   /// des sections secondaires (`.h2--sm`).
   grandTitre Boolean @default(false)
@@ -1184,6 +1255,10 @@ model ImpactSectionTranslation {
   lead     String?
   /// Libellé du bouton d'en-tête. Sans `ctaUrl` sur la fiche, il ne s'affiche pas.
   ctaLabel String?
+  /// Ligne courte que seuls certains gabarits affichent, et à un endroit qui
+  /// leur est propre : les références sous une citation, la légende de l'aplat
+  /// d'une section de contexte. Ailleurs, elle n'est pas demandée.
+  note     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1219,6 +1294,15 @@ model ImpactItem {
   videoYt String?
   /// Lien sortant de l'entrée.
   lienUrl String?
+
+  /// Étiquettes affichées en pastilles par le seul gabarit POLES : les
+  /// sous-rôles rattachés au pôle.
+  ///
+  /// Hors traduction, et c'est le contenu d'origine qui le veut : « Responsable
+  /// Passation des Marchés (RPM) » s'affichait déjà à l'identique dans les deux
+  /// langues (cf. `Pole.roles` dans src/content/data.ts, seule liste du site
+  /// qui n'était pas bilingue).
+  tags String[] @default([])
 
   /// Date réelle d'un jalon. Elle sert à ORDONNER et à afficher la date dans la
   /// langue de lecture ; un libellé saisi dans la traduction la remplace quand

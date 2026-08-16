@@ -1,76 +1,15 @@
 /* ============================================================================
-   « Histoires & impact » — contenu d'origine du site, repris à l'identique.
+   « Histoires & impact » — contenu d'origine de l'accueil et de la page
+   « Résultats », repris à l'identique.
 
-   Ce fichier joue DEUX rôles, et un seul à la fois :
-
-     1. il AMORCE la base à la première ouverture du module dans la console
-        (cf. src/lib/impact/bootstrap.ts) : la rédaction récupère l'existant au
-        lieu de le ressaisir ;
-     2. il sert de REPLI tant qu'aucune section n'est publiée pour un
-        emplacement (cf. src/lib/impact/query.ts). Sans lui, une base neuve ou
-        une console jamais ouverte videraient trois pages publiques de leurs
-        blocs — ce qui est exactement ce qu'on ne veut pas d'une mise en ligne.
-
-   ⚠️ Dès qu'une section publiée existe pour un emplacement, c'est elle qui fait
-   foi, et ce fichier n'est plus lu pour cet emplacement. Il n'est donc pas du
-   contenu « codé en dur » : c'est l'état initial d'un contenu administrable.
+   Rôle et invariants : cf. l'en-tête de `index.ts`, qui rassemble les trois
+   jeux de sections d'origine.
 
    Les textes proviennent de `content/carbon.ts` (témoignages, impact humain,
    avant/après, dialogues), de `content/data.ts` (jalons) et des en-têtes de
    section de `content/i18n.ts`.
    ========================================================================== */
-import type { ImgKey } from "./types";
-import type { ImpactEmplacement, ImpactLayout, ImpactTheme } from "@/lib/impact/statut";
-
-/** Textes d'une entrée dans une langue. */
-export type ImpactSeedTextes = {
-  surtitre?: string;
-  titre?: string;
-  texte?: string;
-  texteSecondaire?: string;
-  mediaAlt?: string;
-  lienLabel?: string;
-};
-
-export type ImpactSeedItem = {
-  valeur?: string;
-  color?: string;
-  videoYt?: string;
-  lienUrl?: string;
-  /** Jalons : la date réelle, mise en forme dans la langue de lecture. */
-  dateISO?: string;
-  coverKey?: ImgKey;
-  fr: ImpactSeedTextes;
-  en: ImpactSeedTextes;
-};
-
-/** En-tête d'une section dans une langue. */
-export type ImpactSeedEntete = {
-  kicker?: string;
-  titre?: string;
-  lead?: string;
-  ctaLabel?: string;
-};
-
-export type ImpactSeedSection = {
-  /** Identifiant stable. C'est lui qui rend l'amorçage rejouable sans doublon. */
-  key: string;
-  emplacement: ImpactEmplacement;
-  layout: ImpactLayout;
-  theme: ImpactTheme;
-  position: number;
-  numero?: string;
-  compact?: boolean;
-  grandTitre?: boolean;
-  /** Chemin interne : la langue est ajoutée à l'affichage (« /project »). */
-  ctaUrl?: string;
-  /** `key` de la section dont les entrées sont reprises. */
-  sourceKey?: string;
-  limite?: number;
-  fr: ImpactSeedEntete;
-  en: ImpactSeedEntete;
-  items: ImpactSeedItem[];
-};
+import type { ImpactSeedItem, ImpactSeedSection } from "./types";
 
 /* -------------------------------------------------------------------------- */
 /* Témoignages — partagés par l'accueil et la page « Résultats »               */
@@ -135,7 +74,7 @@ const temoignages: ImpactSeedItem[] = [
 /* Sections                                                                    */
 /* -------------------------------------------------------------------------- */
 
-export const impactSeed: ImpactSeedSection[] = [
+export const histoiresSeed: ImpactSeedSection[] = [
   /* --- Accueil : impact humain (chiffres) --------------------------------- */
   {
     key: "accueil-impact-humain",
@@ -478,16 +417,3 @@ export const impactSeed: ImpactSeedSection[] = [
     ],
   },
 ];
-
-/** Sections d'amorçage d'un emplacement donné, dans l'ordre d'affichage. */
-export const seedPourEmplacement = (emplacement: ImpactEmplacement): ImpactSeedSection[] =>
-  impactSeed.filter((s) => s.emplacement === emplacement).sort((a, b) => a.position - b.position);
-
-/** Entrées effectives d'une section d'amorçage, reprise comprise. */
-export function seedItems(section: ImpactSeedSection): ImpactSeedItem[] {
-  const source = section.sourceKey
-    ? impactSeed.find((s) => s.key === section.sourceKey)
-    : section;
-  const items = source?.items ?? [];
-  return section.limite && section.limite > 0 ? items.slice(0, section.limite) : items;
-}

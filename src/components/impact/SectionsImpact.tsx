@@ -14,19 +14,33 @@
    bouge pas d'un pixel. Les exposer en console reviendrait à laisser régler une
    maquette depuis un formulaire.
    ========================================================================== */
+import { Fragment } from "react";
 import Link from "next/link";
 import { dict } from "@/content/i18n";
 import type { Lang } from "@/lib/pick";
 import { sectionsImpact, type ImpactSectionVue } from "@/lib/impact/query";
 import {
-  IMPACT_THEME_CLASS, themeSombre,
+  IMPACT_THEME_CLASS, enteteIntegree, layoutAutonome, themeSombre,
   type ImpactEmplacement, type ImpactLayout,
 } from "@/lib/impact/statut";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 import { BlocAvantApres } from "@/components/impact/blocs/BlocAvantApres";
 import { BlocCartes } from "@/components/impact/blocs/BlocCartes";
+import { BlocCitation } from "@/components/impact/blocs/BlocCitation";
+import { BlocComposantes } from "@/components/impact/blocs/BlocComposantes";
+import { BlocContexte } from "@/components/impact/blocs/BlocContexte";
+import { BlocEngagements } from "@/components/impact/blocs/BlocEngagements";
+import { BlocEquipe } from "@/components/impact/blocs/BlocEquipe";
+import { BlocEtapes } from "@/components/impact/blocs/BlocEtapes";
+import { BlocFaq } from "@/components/impact/blocs/BlocFaq";
+import { BlocGlossaire } from "@/components/impact/blocs/BlocGlossaire";
+import { BlocIndicateurs } from "@/components/impact/blocs/BlocIndicateurs";
 import { BlocJalons } from "@/components/impact/blocs/BlocJalons";
+import { BlocPersonas } from "@/components/impact/blocs/BlocPersonas";
+import { BlocPoles } from "@/components/impact/blocs/BlocPoles";
+import { BlocPrincipes } from "@/components/impact/blocs/BlocPrincipes";
+import { BlocReperes } from "@/components/impact/blocs/BlocReperes";
 import { BlocStats } from "@/components/impact/blocs/BlocStats";
 import { BlocTemoignages } from "@/components/impact/blocs/BlocTemoignages";
 
@@ -53,7 +67,12 @@ type Entete = {
   chapoMaxWidth?: number;
   chapoTaille?: number;
   chapoInterligne?: number;
+  /** Écartement entre le bloc titre et le bouton, quand il y en a un. */
+  gapBouton?: number;
 };
+
+/** Gabarits dont l'en-tête est dessiné par le bloc : rien à régler ici. */
+const INTEGREE: Entete = { marginBottom: 0, titreMargin: 0, chapoLead: true };
 
 const ENTETE: Record<ImpactLayout, Entete> = {
   STATS: { blocMaxWidth: 760, marginBottom: 48, titreMargin: 18, chapoLead: true },
@@ -61,6 +80,24 @@ const ENTETE: Record<ImpactLayout, Entete> = {
   CARTES: { marginBottom: 42, titreMargin: 14, chapoLead: false, chapoMaxWidth: 700, chapoTaille: 16, chapoInterligne: 1.6 },
   AVANT_APRES: { titreMaxWidth: "18ch", marginBottom: 44, titreMargin: 22, chapoLead: false, chapoMaxWidth: 720, chapoTaille: 16, chapoInterligne: 1.65 },
   JALONS: { marginBottom: 0, titreMargin: 14, chapoLead: false, chapoMaxWidth: 700, chapoTaille: 16, chapoInterligne: 1.6 },
+
+  CITATION: INTEGREE,
+  CONTEXTE: INTEGREE,
+  EQUIPE: INTEGREE,
+  GLOSSAIRE: INTEGREE,
+
+  /* Repris de `app/[lang]/ugptn/page.tsx`, bloc par bloc. */
+  ETAPES: { titreMaxWidth: "20ch", marginBottom: 44, titreMargin: 18, chapoLead: true },
+  PRINCIPES: { marginBottom: 40, titreMargin: 0, chapoLead: true },
+  ENGAGEMENTS: { marginBottom: 0, titreMargin: 0, chapoLead: true },
+  REPERES: { marginBottom: 40, titreMargin: 14, chapoLead: true },
+  POLES: { marginBottom: 0, titreMargin: 0, chapoLead: true },
+  FAQ: { marginBottom: 38, titreMargin: 0, chapoLead: true },
+
+  /* Repris de `app/[lang]/project/page.tsx`. */
+  PERSONAS: { marginBottom: 44, titreMargin: 0, chapoLead: true },
+  COMPOSANTES: { blocMaxWidth: 640, marginBottom: 40, titreMargin: 16, chapoLead: true, gapBouton: 20 },
+  INDICATEURS: { blocMaxWidth: 680, marginBottom: 40, titreMargin: 0, chapoLead: true, gapBouton: 20 },
 };
 
 export async function SectionsImpact({
@@ -73,23 +110,82 @@ export async function SectionsImpact({
   const sections = await sectionsImpact(emplacement, lang);
   if (sections.length === 0) return null;
 
+  /* Les sections qui « enchaînent » ne rouvrent pas de bande : elles s'ajoutent
+     dans celle de la section qu'elles suivent. Un groupe vaut donc une bande.
+     Une section autonome dessine la sienne et ferme le groupe en cours. */
+  const groupes: ImpactSectionVue[][] = [];
+  for (const section of sections) {
+    const precedent = groupes[groupes.length - 1];
+    const suit =
+      section.enchaine &&
+      precedent !== undefined &&
+      !layoutAutonome(precedent[0].layout) &&
+      !layoutAutonome(section.layout);
+
+    if (suit) precedent.push(section);
+    else groupes.push([section]);
+  }
+
   return (
     <>
-      {sections.map((section) => (
-        <SectionImpact key={section.id} section={section} lang={lang} />
+      {groupes.map((groupe) => (
+        <BandeImpact key={groupe[0].id} groupe={groupe} lang={lang} />
       ))}
     </>
   );
 }
 
-function SectionImpact({ section, lang }: { section: ImpactSectionVue; lang: Lang }) {
-  const t = dict(lang);
+/**
+ * Une bande de page : sa `<section>`, son fond, et les sections qu'elle porte.
+ *
+ * Un gabarit autonome dessine sa bande lui-même — il est alors seul dans son
+ * groupe, et cette fonction s'efface devant lui.
+ */
+function BandeImpact({ groupe, lang }: { groupe: ImpactSectionVue[]; lang: Lang }) {
+  const premiere = groupe[0];
+
+  if (layoutAutonome(premiere.layout)) {
+    return <CorpsImpact section={premiere} lang={lang} />;
+  }
+
+  const classes = ["section", premiere.compact ? "section--sm" : "", IMPACT_THEME_CLASS[premiere.theme]]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <section className={classes}>
+      <div className="section__inner">
+        {groupe.map((section) => (
+          <Fragment key={section.id}>
+            <EnteteImpact section={section} />
+            <CorpsImpact section={section} lang={lang} />
+          </Fragment>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * En-tête d'une section, tel que le rendu commun le pose au-dessus de la grille.
+ *
+ * Deux cas s'en dispensent : les gabarits qui dessinent leur en-tête eux-mêmes,
+ * et les sections qui en poursuivent une autre — leur titre devient alors un
+ * sous-titre (`.unite-sub`), parce qu'une bande n'a qu'un seul H2.
+ */
+function EnteteImpact({ section }: { section: ImpactSectionVue }) {
   const entete = ENTETE[section.layout];
   const sombre = themeSombre(section.theme);
 
-  const classes = ["section", section.compact ? "section--sm" : "", IMPACT_THEME_CLASS[section.theme]]
-    .filter(Boolean)
-    .join(" ");
+  if (enteteIntegree(section.layout)) return null;
+
+  if (section.enchaine) {
+    return section.titre ? (
+      <Reveal>
+        <h3 className="unite-sub">{section.titre}</h3>
+      </Reveal>
+    ) : null;
+  }
 
   const titre = section.titre && (
     <h2
@@ -127,63 +223,107 @@ function SectionImpact({ section, lang }: { section: ImpactSectionVue; lang: Lan
    */
   const avecBouton = Boolean(section.ctaHref && section.ctaLabel);
 
+  if (!section.kicker && !titre && !chapo) return null;
+
   return (
-    <section className={classes}>
-      <div className="section__inner">
-        {(section.kicker || titre || chapo) && (
-          <Reveal
-            style={
-              avecBouton
-                ? {
-                    display: "flex",
-                    flexWrap: "wrap",
-                    justifyContent: "space-between",
-                    alignItems: "flex-end",
-                    gap: 24,
-                    marginBottom: entete.marginBottom,
-                  }
-                : { maxWidth: entete.blocMaxWidth, marginBottom: entete.marginBottom }
+    <Reveal
+      style={
+        avecBouton
+          ? {
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              gap: entete.gapBouton ?? 24,
+              marginBottom: entete.marginBottom,
             }
-          >
-            <div style={avecBouton ? { maxWidth: entete.blocMaxWidth } : undefined}>
-              {section.kicker && (
-                <Kicker n={section.numero ?? undefined} light={sombre}>{section.kicker}</Kicker>
-              )}
-              {titre}
-              {chapo}
-            </div>
-
-            {avecBouton && (
-              <Link
-                href={section.ctaHref!}
-                className={sombre ? "btn btn--on-dark" : "btn btn--outline"}
-                style={{ whiteSpace: "nowrap" }}
-              >
-                {section.ctaLabel} <span className="arrow">→</span>
-              </Link>
-            )}
-          </Reveal>
+          : { maxWidth: entete.blocMaxWidth, marginBottom: entete.marginBottom }
+      }
+    >
+      <div style={avecBouton ? { maxWidth: entete.blocMaxWidth } : undefined}>
+        {section.kicker && (
+          <Kicker n={section.numero ?? undefined} light={sombre}>{section.kicker}</Kicker>
         )}
-
-        {section.layout === "STATS" && (
-          <BlocStats items={section.items} approx={t.lbl.approx} theme={section.theme} />
-        )}
-        {section.layout === "TEMOIGNAGES" && (
-          <BlocTemoignages items={section.items} lang={lang} watchLabel={t.home.watchStory} />
-        )}
-        {section.layout === "CARTES" && <BlocCartes items={section.items} lang={lang} />}
-        {section.layout === "AVANT_APRES" && (
-          <BlocAvantApres
-            items={section.items}
-            lang={lang}
-            avantLabel={t.words.avant}
-            apresLabel={t.words.apres}
-          />
-        )}
-        {section.layout === "JALONS" && (
-          <BlocJalons items={section.items} lang={lang} theme={section.theme} />
-        )}
+        {titre}
+        {chapo}
       </div>
-    </section>
+
+      {avecBouton && (
+        <Link
+          href={section.ctaHref!}
+          className={sombre ? "btn btn--on-dark" : "btn btn--outline"}
+          style={{ whiteSpace: "nowrap" }}
+        >
+          {section.ctaLabel} <span className="arrow">→</span>
+        </Link>
+      )}
+    </Reveal>
   );
+}
+
+/**
+ * Le corps d'une section : le dessin propre à son gabarit.
+ *
+ * Un `switch` sans `default`, volontairement : l'union des gabarits étant close,
+ * le compilateur refuse la fonction dès qu'un cas manque. Ajouter un gabarit
+ * sans l'inscrire ici casse la compilation plutôt que d'afficher une bande vide.
+ */
+function CorpsImpact({ section, lang }: { section: ImpactSectionVue; lang: Lang }) {
+  const t = dict(lang);
+
+  switch (section.layout) {
+    case "STATS":
+      return <BlocStats items={section.items} approx={t.lbl.approx} theme={section.theme} />;
+    case "TEMOIGNAGES":
+      return <BlocTemoignages items={section.items} lang={lang} watchLabel={t.home.watchStory} />;
+    case "CARTES":
+      return <BlocCartes items={section.items} lang={lang} />;
+    case "AVANT_APRES":
+      return (
+        <BlocAvantApres
+          items={section.items}
+          lang={lang}
+          avantLabel={t.words.avant}
+          apresLabel={t.words.apres}
+        />
+      );
+    case "JALONS":
+      return <BlocJalons items={section.items} lang={lang} theme={section.theme} />;
+    case "CITATION":
+      return <BlocCitation citation={section.titre} note={section.note} />;
+    case "ETAPES":
+      return <BlocEtapes items={section.items} theme={section.theme} />;
+    case "PRINCIPES":
+      return <BlocPrincipes items={section.items} />;
+    case "ENGAGEMENTS":
+      return <BlocEngagements items={section.items} />;
+    case "REPERES":
+      return <BlocReperes items={section.items} />;
+    case "POLES":
+      return <BlocPoles items={section.items} lang={lang} />;
+    case "EQUIPE":
+      return (
+        <BlocEquipe kicker={section.kicker} titre={section.titre} lead={section.lead} lang={lang} />
+      );
+    case "FAQ":
+      return <BlocFaq items={section.items} />;
+    case "GLOSSAIRE":
+      return <BlocGlossaire titre={section.titre} lead={section.lead} items={section.items} />;
+    case "CONTEXTE":
+      return (
+        <BlocContexte
+          kicker={section.kicker}
+          titre={section.titre}
+          lead={section.lead}
+          note={section.note}
+          items={section.items}
+        />
+      );
+    case "PERSONAS":
+      return <BlocPersonas items={section.items} />;
+    case "COMPOSANTES":
+      return <BlocComposantes lang={lang} />;
+    case "INDICATEURS":
+      return <BlocIndicateurs lang={lang} />;
+  }
 }

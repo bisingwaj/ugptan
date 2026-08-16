@@ -35,6 +35,7 @@ const traductionsSection = (section: ImpactSeedSection) =>
       titre: entete.titre ?? null,
       lead: entete.lead ?? null,
       ctaLabel: entete.ctaLabel ?? null,
+      note: entete.note ?? null,
     };
   });
 
@@ -49,6 +50,7 @@ const itemsSection = (section: ImpactSeedSection) =>
     lienUrl: item.lienUrl ?? null,
     dateAt: item.dateISO ? new Date(`${item.dateISO}T09:00:00+01:00`) : null,
     coverKey: item.coverKey ?? null,
+    tags: item.tags ?? [],
     translations: {
       create: LOCALES.map((locale: Lang) => {
         const textes = locale === "en" ? item.en : item.fr;
@@ -92,6 +94,7 @@ export async function ensureImpact(): Promise<void> {
           numero: section.numero ?? null,
           compact: section.compact ?? false,
           grandTitre: section.grandTitre ?? false,
+          enchaine: section.enchaine ?? false,
           ctaUrl: section.ctaUrl ?? null,
           limite: section.limite ?? null,
           sourceId: section.sourceKey ? parCle.get(section.sourceKey) ?? null : null,
