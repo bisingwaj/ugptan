@@ -18,6 +18,7 @@ import { ADMIN_IMPACT } from "@/content/admin";
 import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import type { ReferentielsImpact, SectionSaisie } from "@/lib/impact/saisie";
+import type { ImpactEmplacement } from "@/lib/impact/statut";
 import { ImpactEnteteChamps } from "@/components/dashboard/impact/ImpactEnteteChamps";
 import { ImpactReglagesChamps } from "@/components/dashboard/impact/ImpactReglagesChamps";
 
@@ -28,9 +29,12 @@ const LANG_LABEL: Record<Lang, string> = { fr: "Français", en: "English" };
 export function ImpactSectionCreation({
   section,
   referentiels,
+  emplacements,
 }: {
   section: SectionSaisie;
   referentiels: ReferentielsImpact;
+  /** Emplacements du module qui ouvre cet écran. */
+  emplacements: readonly ImpactEmplacement[];
 }) {
   const t = ADMIN_IMPACT;
   const [etat, action, enCours] = useActionState(creerSectionAction, etatInitial);
@@ -66,12 +70,12 @@ export function ImpactSectionCreation({
         <div className="adm-edit__langue">
           {/* `key` : changer de langue de rédaction réinitialise les champs —
               le libellé et le titre déjà saisis appartenaient à l'autre langue. */}
-          <ImpactEnteteChamps key={langue} lang={langue} valeurs={section.traductions[langue]} />
+          <ImpactEnteteChamps key={langue} lang={langue} layout={section.layout} valeurs={section.traductions[langue]} />
         </div>
       </div>
 
       <aside className="adm-edit__aside">
-        <ImpactReglagesChamps section={section} referentiels={referentiels} creation />
+        <ImpactReglagesChamps section={section} referentiels={referentiels} emplacements={emplacements} creation />
 
         <div className="adm-edit__barre">
           <button type="submit" className="btn btn--primary" disabled={enCours}>

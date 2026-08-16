@@ -245,6 +245,21 @@ export function ImpactItemCarte({
               </div>
             )}
 
+            {reglageActif(layout, "tags") && (
+              <div className="adm-form__field">
+                <label className="label-mono" htmlFor={`${idBase}-tags`}>{t.itemTags}</label>
+                <textarea
+                  id={`${idBase}-tags`}
+                  name="tags"
+                  className="field"
+                  rows={4}
+                  defaultValue={item.tags}
+                  placeholder={"Coordonnateur\nCoordonnateur Adjoint\nAuditeur Interne"}
+                />
+                <p className="adm-hint" style={{ marginTop: 6 }}>{t.itemTagsAide}</p>
+              </div>
+            )}
+
             {reglageActif(layout, "videoYt") && (
               <div className="adm-form__field">
                 <label className="label-mono" htmlFor={`${idBase}-videoYt`}>{t.itemVideo}</label>

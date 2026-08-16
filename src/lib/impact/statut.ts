@@ -125,6 +125,33 @@ export const EMPLACEMENT_MODULE: Record<ImpactEmplacement, ImpactModule> = {
 export const emplacementsDuModule = (module: ImpactModule): ImpactEmplacement[] =>
   IMPACT_EMPLACEMENTS.filter((emplacement) => EMPLACEMENT_MODULE[emplacement] === module);
 
+/**
+ * Écran de console d'un module — segment ajouté à `ADMIN_BASE`.
+ *
+ * ⚠️ Ces slugs DOIVENT correspondre aux dossiers de routes sous `(console)/` et
+ * aux entrées de `ADMIN_NAV_SECTIONS` (cf. src/content/admin.ts). Ils sont
+ * écrits ici plutôt qu'importés pour tenir l'invariant du module — aucun import,
+ * cf. l'en-tête.
+ */
+export const MODULE_SLUG: Record<ImpactModule, string> = {
+  histoires: "/stories",
+  ugptn: "/ugptn",
+  projet: "/project",
+};
+
+/**
+ * Nom du module tel que la console l'affiche.
+ *
+ * Les clés valent aussi comme noms de PERMISSION (cf. lib/auth/permissions.ts) :
+ * ce n'est pas une coïncidence, c'est ce qui permet de déduire le droit requis
+ * d'une écriture du seul emplacement de la section touchée.
+ */
+export const MODULE_LABEL_IMPACT: Record<ImpactModule, string> = {
+  histoires: "Histoires & impact",
+  ugptn: "L'UGPTN",
+  projet: "Le projet",
+};
+
 /** Page publique qui accueille l'emplacement — sert à grouper la liste. */
 export const IMPACT_PAGE_LABEL: Record<ImpactEmplacement, string> = {
   ACCUEIL_IMPACT: "Accueil",
@@ -297,6 +324,25 @@ export const LAYOUTS_AUTONOMES: readonly ImpactLayout[] = ["CITATION", "CONTEXTE
 
 export const layoutAutonome = (layout: ImpactLayout): boolean =>
   LAYOUTS_AUTONOMES.includes(layout);
+
+/**
+ * Gabarits qui affichent la `note` de l'en-tête, et sous quel intitulé.
+ *
+ * Le champ est générique, son emploi ne l'est pas : c'est une ligne de
+ * références sous une citation, une légende d'aplat dans une section de
+ * contexte. Ailleurs, la console ne le demande pas — un champ qui ne s'affiche
+ * nulle part est une saisie perdue.
+ */
+export const CHAMP_NOTE: Partial<Record<ImpactLayout, { label: string; aide: string }>> = {
+  CITATION: {
+    label: "Références",
+    aide: "La ligne mono sous la citation. Séparez les mentions par « · » : elles se répartissent alors comme sur le site.",
+  },
+  CONTEXTE: {
+    label: "Légende de l'aplat",
+    aide: "Le texte posé en bas du visuel, à droite du bloc.",
+  },
+};
 
 export const IMPACT_LAYOUT_LABEL: Record<ImpactLayout, string> = {
   STATS: "Chiffres d'impact",

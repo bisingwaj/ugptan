@@ -19,6 +19,7 @@ import {
 } from "@/actions/admin-impact";
 import { ADMIN_IMPACT } from "@/content/admin";
 import type { TraductionSectionSaisie } from "@/lib/impact/saisie";
+import type { ImpactLayout } from "@/lib/impact/statut";
 import type { Lang } from "@/lib/pick";
 import { ImpactEnteteChamps } from "@/components/dashboard/impact/ImpactEnteteChamps";
 
@@ -29,11 +30,14 @@ const LANG_LABEL: Record<Lang, string> = { fr: "Français", en: "English" };
 export function ImpactSectionEntete({
   sectionId,
   lang,
+  layout,
   valeurs,
   visible,
 }: {
   sectionId: string;
   lang: Lang;
+  /** Le gabarit décide des champs demandés (cf. `ImpactEnteteChamps`). */
+  layout: ImpactLayout;
   valeurs: TraductionSectionSaisie;
   visible: boolean;
 }) {
@@ -59,7 +63,7 @@ export function ImpactSectionEntete({
         <input type="hidden" name="sectionId" value={sectionId} />
         <input type="hidden" name="locale" value={lang} />
 
-        <ImpactEnteteChamps lang={lang} valeurs={valeurs} />
+        <ImpactEnteteChamps lang={lang} layout={layout} valeurs={valeurs} />
 
         <div className="adm-edit__actions">
           <button type="submit" className="btn btn--primary" disabled={enCours}>

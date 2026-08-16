@@ -20,7 +20,7 @@
 import { useId, useState } from "react";
 import { ADMIN_IMPACT } from "@/content/admin";
 import {
-  IMPACT_EMPLACEMENTS, IMPACT_EMPLACEMENT_HINT, IMPACT_EMPLACEMENT_LABEL,
+  IMPACT_EMPLACEMENT_HINT, IMPACT_EMPLACEMENT_LABEL,
   IMPACT_LAYOUTS, IMPACT_LAYOUT_HINT, IMPACT_LAYOUT_LABEL,
   IMPACT_PAGE_LABEL, IMPACT_STATUSES, IMPACT_STATUT_HINT, IMPACT_STATUT_LABEL,
   IMPACT_THEMES, IMPACT_THEME_LABEL,
@@ -31,11 +31,19 @@ import type { ReferentielsImpact, SectionSaisie } from "@/lib/impact/saisie";
 type Props = {
   section: SectionSaisie;
   referentiels: ReferentielsImpact;
+  /**
+   * Emplacements que CE module administre.
+   *
+   * La liste n'est pas celle de tous les emplacements du site : proposer à la
+   * rédaction de la page du Projet de déplacer une section vers l'accueil lui
+   * offrirait de la sortir de sa propre portée, et l'action le refuserait.
+   */
+  emplacements: readonly ImpactEmplacement[];
   /** Création : la reprise d'entrées ne s'offre qu'une fois la section créée. */
   creation?: boolean;
 };
 
-export function ImpactReglagesChamps({ section, referentiels, creation = false }: Props) {
+export function ImpactReglagesChamps({ section, referentiels, emplacements, creation = false }: Props) {
   const t = ADMIN_IMPACT;
   const idBase = useId();
 
@@ -92,7 +100,7 @@ export function ImpactReglagesChamps({ section, referentiels, creation = false }
             value={emplacement}
             onChange={(event) => setEmplacement(event.target.value as ImpactEmplacement)}
           >
-            {IMPACT_EMPLACEMENTS.map((valeur) => (
+            {emplacements.map((valeur) => (
               <option key={valeur} value={valeur}>
                 {IMPACT_PAGE_LABEL[valeur]} · {IMPACT_EMPLACEMENT_LABEL[valeur].split(" · ")[1]}
               </option>
@@ -182,6 +190,12 @@ export function ImpactReglagesChamps({ section, referentiels, creation = false }
           <span>{t.champGrandTitre}</span>
         </label>
         <p className="adm-hint">{t.champGrandTitreAide}</p>
+
+        <label className="adm-check">
+          <input type="checkbox" name="enchaine" defaultChecked={section.enchaine} />
+          <span>{t.champEnchaine}</span>
+        </label>
+        <p className="adm-hint">{t.champEnchaineAide}</p>
       </div>
 
       <div className="adm-panel adm-edit__bloc">

@@ -1,12 +1,24 @@
 "use server";
 
 /**
- * Écritures du module « Histoires & impact ».
+ * Écritures des sections administrables — « Histoires & impact », « L'UGPTN »
+ * et « Le projet », qui partagent un moteur et donc ces actions.
  *
- * ⚠️ INVARIANT : chaque action commence par `assertPermission("histoires")`. Le
- * proxy laisse passer les POST (rediriger un POST de server action casserait le
- * protocole Flight), la barrière d'autorisation est donc ici, et nulle part
- * ailleurs.
+ * ⚠️ INVARIANT : chaque action commence par une garde d'autorisation. Le proxy
+ * laisse passer les POST (rediriger un POST de server action casserait le
+ * protocole Flight), la barrière est donc ici, et nulle part ailleurs.
+ *
+ * ─── La permission suit l'emplacement, jamais l'écran ────────────────────────
+ *
+ * Le droit requis se déduit de l'EMPLACEMENT de la section touchée
+ * (cf. `EMPLACEMENT_MODULE`), et non du module depuis lequel la demande est
+ * faite : un formulaire est une donnée d'entrée, pas une preuve. Sans cela, un
+ * compte autorisé sur le seul module « Le projet » réécrirait une section de
+ * l'accueil en forgeant un identifiant.
+ *
+ * Corollaire pour un CHANGEMENT d'emplacement : les deux droits sont exigés,
+ * celui du départ et celui de l'arrivée. Déplacer une section d'un module vers
+ * un autre revient à l'y retirer et à l'y créer.
  *
  * ─── Un formulaire par langue ────────────────────────────────────────────────
  *
@@ -39,14 +51,44 @@ import { safeUrl } from "@/lib/html/sanitize";
 import { slugify } from "@/lib/actus/slug";
 import { revaliderImpact } from "@/lib/impact/cache";
 import {
+  EMPLACEMENT_MODULE, MODULE_SLUG,
   isImpactEmplacement, isImpactLayout, isImpactStatut, isImpactTheme, itemTraduit,
-  sectionTraduite, type ImpactLayout,
+  layoutSansItems, sectionTraduite, type ImpactEmplacement, type ImpactLayout,
 } from "@/lib/impact/statut";
 
 /** État partagé par tous les formulaires du module. */
 export type ImpactFormState = { error: string | null; ok: string | null };
 
-const IMPACT_PATH = adminPath("/stories");
+/** Écran de console qui administre cet emplacement. */
+const cheminModule = (emplacement: ImpactEmplacement): string =>
+  adminPath(MODULE_SLUG[EMPLACEMENT_MODULE[emplacement]]);
+
+/**
+ * Garde d'une écriture : le droit requis est celui du module de l'emplacement.
+ *
+ * `ImpactModule` et `Permission` partagent leurs valeurs — « histoires »,
+ * « ugptn », « projet » sont à la fois des modules et des permissions. C'est ce
+ * qui rend cette déduction possible sans table de correspondance.
+ */
+const assertEmplacement = (emplacement: ImpactEmplacement) =>
+  assertPermission(EMPLACEMENT_MODULE[emplacement]);
+
+/**
+ * Emplacement de la section touchée, lu AVANT la garde — c'est lui qui décide
+ * du droit requis, il faut donc le connaître pour l'exiger.
+ *
+ * La lecture précède l'autorisation mais ne divulgue rien : elle ne rapporte
+ * que l'emplacement, et l'appelant garde immédiatement après. Un compte sans
+ * droit apprend au mieux qu'un identifiant existe, ce que la page de la console
+ * lui dirait déjà.
+ */
+async function emplacementSection(id: string): Promise<ImpactEmplacement | null> {
+  const section = await db().impactSection.findUnique({
+    where: { id },
+    select: { emplacement: true },
+  });
+  return section ? (section.emplacement as ImpactEmplacement) : null;
+}
 
 /**
  * Nom des langues dans les messages rendus à l'utilisateur.
@@ -107,6 +149,20 @@ function lireLocale(formData: FormData): Lang | null {
   return (LOCALES as string[]).includes(brut) ? (brut as Lang) : null;
 }
 
+/**
+ * Pastilles d'une entrée, saisies UNE PAR LIGNE.
+ *
+ * Une zone de texte plutôt qu'un champ à séparateurs : les intitulés en
+ * contiennent (« Responsable Composante 1 (RC1) », « Spécialiste VBG/EAS »), et
+ * n'importe quel séparateur en couperait un tôt ou tard. Le retour à la ligne
+ * est le seul caractère qu'aucun libellé ne porte.
+ */
+const lireTags = (formData: FormData): string[] =>
+  texte(formData, "tags")
+    .split("\n")
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0);
+
 /** Date d'un jalon, saisie en `<input type="date">` à l'heure de Kinshasa. */
 function lireDate(value: string): Date | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
@@ -132,6 +188,7 @@ function lireFicheSection(formData: FormData) {
     numero: optionnel(texte(formData, "numero")),
     compact: coche(formData, "compact"),
     grandTitre: coche(formData, "grandTitre"),
+    enchaine: coche(formData, "enchaine"),
     ctaUrl: lienInterneOuExterne(formData, "ctaUrl"),
     sourceId,
     // Une limite négative n'a pas de sens et `0` vaut « toutes » : les deux se
@@ -150,13 +207,16 @@ export async function creerSectionAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  const acteur = await assertPermission("histoires");
-
   const locale = lireLocale(formData);
   if (!locale) return { error: "Langue de rédaction inconnue.", ok: null };
 
   const emplacement = texte(formData, "emplacement");
   if (!isImpactEmplacement(emplacement)) return { error: "Emplacement inconnu.", ok: null };
+
+  // La garde vient après la lecture de l'emplacement, qui la détermine, et
+  // avant toute écriture. Une valeur d'emplacement invalide est écartée juste
+  // au-dessus : elle ne peut donc pas servir à contourner le droit.
+  const acteur = await assertEmplacement(emplacement);
 
   const layout = texte(formData, "layout");
   if (!isImpactLayout(layout)) return { error: "Gabarit inconnu.", ok: null };
@@ -190,7 +250,7 @@ export async function creerSectionAction(
 
   revaliderImpact();
   // redirect() lève NEXT_REDIRECT : appelé en dernier, hors de tout try/catch.
-  redirect(`${IMPACT_PATH}/${section.id}?cree=1`);
+  redirect(`${cheminModule(emplacement)}/${section.id}?cree=1`);
 }
 
 /** Clé libre, en suffixant tant qu'elle est prise. */
@@ -214,13 +274,19 @@ export async function enregistrerSectionAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const id = texte(formData, "id");
   if (!id) return { error: "Section introuvable.", ok: null };
 
   const emplacement = texte(formData, "emplacement");
   if (!isImpactEmplacement(emplacement)) return { error: "Emplacement inconnu.", ok: null };
+
+  const origine = await emplacementSection(id);
+  if (!origine) return { error: "Section introuvable.", ok: null };
+
+  // Les DEUX droits, celui du départ et celui de l'arrivée : déplacer une
+  // section d'un module vers un autre l'y retire autant qu'il l'y installe.
+  await assertEmplacement(origine);
+  await assertEmplacement(emplacement);
 
   const layout = texte(formData, "layout");
   if (!isImpactLayout(layout)) return { error: "Gabarit inconnu.", ok: null };
@@ -277,7 +343,14 @@ export async function enregistrerSectionAction(
     };
   }
 
-  if (statut === "PUBLISHED" && !fiche.sourceId && section._count.items === 0) {
+  // Les gabarits sans entrées échappent à cette exigence : leur bloc n'en
+  // dessine aucune, et la leur réclamer interdirait purement de les publier.
+  if (
+    statut === "PUBLISHED" &&
+    !fiche.sourceId &&
+    !layoutSansItems(layout) &&
+    section._count.items === 0
+  ) {
     return {
       error: "Cette section n'a aucune entrée : ajoutez-en une, ou reprenez celles d'une autre section.",
       ok: null,
@@ -289,8 +362,12 @@ export async function enregistrerSectionAction(
     data: { ...fiche, emplacement, layout, status: statut },
   });
 
-  revalidatePath(`${IMPACT_PATH}/${id}`);
-  revalidatePath(IMPACT_PATH);
+  /* Les deux écrans sont rafraîchis quand la section change de module : celui
+     qu'elle quitte la listait encore, celui qu'elle rejoint ne la listait pas. */
+  const chemin = cheminModule(emplacement);
+  revalidatePath(`${chemin}/${id}`);
+  revalidatePath(chemin);
+  revalidatePath(cheminModule(origine));
   revaliderImpact();
   return { error: null, ok: "Réglages enregistrés." };
 }
@@ -305,6 +382,7 @@ function lireEnteteSection(formData: FormData) {
     titre: optionnel(texte(formData, "titre")),
     lead: optionnel(texte(formData, "lead")),
     ctaLabel: optionnel(texte(formData, "ctaLabel")),
+    note: optionnel(texte(formData, "note")),
   };
 }
 
@@ -313,15 +391,14 @@ export async function enregistrerSectionLangueAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const sectionId = texte(formData, "sectionId");
   const locale = lireLocale(formData);
   if (!sectionId) return { error: "Section introuvable.", ok: null };
   if (!locale) return { error: "Langue inconnue.", ok: null };
 
-  const section = await db().impactSection.findUnique({ where: { id: sectionId }, select: { id: true } });
-  if (!section) return { error: "Section introuvable.", ok: null };
+  const emplacement = await emplacementSection(sectionId);
+  if (!emplacement) return { error: "Section introuvable.", ok: null };
+  await assertEmplacement(emplacement);
 
   const entete = lireEnteteSection(formData);
   if (!sectionTraduite(entete)) {
@@ -337,7 +414,7 @@ export async function enregistrerSectionLangueAction(
     create: { sectionId, locale, ...entete },
   });
 
-  revalidatePath(`${IMPACT_PATH}/${sectionId}`);
+  revalidatePath(`${cheminModule(emplacement)}/${sectionId}`);
   revaliderImpact();
   return { error: null, ok: `En-tête ${LANGUE_LABEL_M[locale]} enregistré.` };
 }
@@ -353,17 +430,18 @@ export async function supprimerSectionLangueAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const sectionId = texte(formData, "sectionId");
   const locale = lireLocale(formData);
   if (!sectionId || !locale) return { error: "Traduction introuvable.", ok: null };
 
   const section = await db().impactSection.findUnique({
     where: { id: sectionId },
-    select: { status: true, translations: { select: { locale: true } } },
+    select: { status: true, emplacement: true, translations: { select: { locale: true } } },
   });
   if (!section) return { error: "Section introuvable.", ok: null };
+
+  const emplacement = section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
 
   const autres = section.translations.filter((t) => t.locale !== locale);
   if (section.status === "PUBLISHED" && autres.length === 0) {
@@ -375,7 +453,7 @@ export async function supprimerSectionLangueAction(
 
   await db().impactSectionTranslation.deleteMany({ where: { sectionId, locale } });
 
-  revalidatePath(`${IMPACT_PATH}/${sectionId}`);
+  revalidatePath(`${cheminModule(emplacement)}/${sectionId}`);
   revaliderImpact();
   return { error: null, ok: `Version ${LANGUE_LABEL[locale]} supprimée.` };
 }
@@ -388,20 +466,21 @@ export async function basculerSectionAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const id = texte(formData, "id");
   if (!id) return { error: "Section introuvable.", ok: null };
 
   const section = await db().impactSection.findUnique({
     where: { id },
     select: {
-      status: true, sourceId: true,
+      status: true, sourceId: true, emplacement: true, layout: true,
       translations: { select: { kicker: true, titre: true } },
       _count: { select: { items: true } },
     },
   });
   if (!section) return { error: "Section introuvable.", ok: null };
+
+  const emplacement = section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
 
   const enLigne = section.status === "PUBLISHED";
 
@@ -409,7 +488,11 @@ export async function basculerSectionAction(
     if (!section.translations.some(sectionTraduite)) {
       return { error: "Aucune langue renseignée : ajoutez un libellé ou un titre avant de publier.", ok: null };
     }
-    if (!section.sourceId && section._count.items === 0) {
+    if (
+      !section.sourceId &&
+      !layoutSansItems(section.layout as ImpactLayout) &&
+      section._count.items === 0
+    ) {
       return { error: "Cette section n'a aucune entrée à afficher.", ok: null };
     }
   }
@@ -419,8 +502,8 @@ export async function basculerSectionAction(
   // ⚠️ La FICHE de la console est revalidée, pas seulement le site public : le
   // sélecteur « État » des réglages vit sur la même page que ce bouton et se
   // recale sur la prop (même correction que côté événements).
-  revalidatePath(`${IMPACT_PATH}/${id}`);
-  revalidatePath(IMPACT_PATH);
+  revalidatePath(`${cheminModule(emplacement)}/${id}`);
+  revalidatePath(cheminModule(emplacement));
   revaliderImpact();
   return { error: null, ok: enLigne ? "Section retirée du site." : "Section publiée." };
 }
@@ -434,8 +517,6 @@ export async function dupliquerSectionAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  const acteur = await assertPermission("histoires");
-
   const id = texte(formData, "id");
   if (!id) return { error: "Section introuvable.", ok: null };
 
@@ -444,6 +525,9 @@ export async function dupliquerSectionAction(
     include: { translations: true, items: { include: { translations: true }, orderBy: { position: "asc" } } },
   });
   if (!source) return { error: "Section introuvable.", ok: null };
+
+  const emplacement = source.emplacement as ImpactEmplacement;
+  const acteur = await assertEmplacement(emplacement);
 
   const copie = await db().impactSection.create({
     data: {
@@ -503,23 +587,24 @@ export async function dupliquerSectionAction(
   });
 
   revaliderImpact();
-  redirect(`${IMPACT_PATH}/${copie.id}?copie=1`);
+  redirect(`${cheminModule(emplacement)}/${copie.id}?copie=1`);
 }
 
 export async function supprimerSectionAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const id = texte(formData, "id");
   if (!id) return { error: "Section introuvable.", ok: null };
 
   const section = await db().impactSection.findUnique({
     where: { id },
-    select: { id: true, _count: { select: { reprises: true } } },
+    select: { emplacement: true, _count: { select: { reprises: true } } },
   });
   if (!section) return { error: "Section introuvable.", ok: null };
+
+  const emplacement = section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
 
   // Une section reprise ailleurs ne se supprime pas en silence : `SetNull`
   // laisserait la section qui la reprend sans entrées, donc invisible, sans que
@@ -535,7 +620,7 @@ export async function supprimerSectionAction(
   await db().impactSection.delete({ where: { id } });
 
   revaliderImpact();
-  redirect(`${IMPACT_PATH}?supprime=1`);
+  redirect(`${cheminModule(emplacement)}?supprime=1`);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -547,16 +632,27 @@ export async function ajouterItemAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const sectionId = texte(formData, "sectionId");
   if (!sectionId) return { error: "Section introuvable.", ok: null };
 
   const section = await db().impactSection.findUnique({
     where: { id: sectionId },
-    select: { sourceId: true, items: { select: { position: true }, orderBy: { position: "desc" }, take: 1 } },
+    select: {
+      sourceId: true, emplacement: true, layout: true,
+      items: { select: { position: true }, orderBy: { position: "desc" }, take: 1 },
+    },
   });
   if (!section) return { error: "Section introuvable.", ok: null };
+
+  const emplacement = section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
+
+  if (layoutSansItems(section.layout as ImpactLayout)) {
+    return {
+      error: "Ce gabarit ne dessine aucune entrée : tout se saisit dans l'en-tête de la section.",
+      ok: null,
+    };
+  }
   if (section.sourceId) {
     return {
       error: "Cette section reprend les entrées d'une autre : ajoutez l'entrée dans la section source.",
@@ -573,7 +669,7 @@ export async function ajouterItemAction(
     },
   });
 
-  revalidatePath(`${IMPACT_PATH}/${sectionId}`);
+  revalidatePath(`${cheminModule(emplacement)}/${sectionId}`);
   return { error: null, ok: "Entrée ajoutée. Renseignez-la puis affichez-la." };
 }
 
@@ -582,8 +678,6 @@ export async function enregistrerItemAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const id = texte(formData, "id");
   if (!id) return { error: "Entrée introuvable.", ok: null };
 
@@ -594,11 +688,14 @@ export async function enregistrerItemAction(
     where: { id },
     select: {
       sectionId: true,
-      section: { select: { layout: true } },
+      section: { select: { layout: true, emplacement: true } },
       translations: { select: { surtitre: true, titre: true, texte: true, texteSecondaire: true } },
     },
   });
   if (!item) return { error: "Entrée introuvable.", ok: null };
+
+  const emplacement = item.section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
 
   const layout = item.section.layout as ImpactLayout;
 
@@ -625,6 +722,7 @@ export async function enregistrerItemAction(
       videoYt: optionnel(texte(formData, "videoYt")),
       lienUrl: lienInterneOuExterne(formData, "lienUrl"),
       dateAt: lireDate(texte(formData, "dateAt")),
+      tags: lireTags(formData),
       coverMediaId,
       // Un visuel de la bibliothèque prime sur une clé du registre : conserver
       // les deux laisserait deux sources de vérité pour une seule image.
@@ -632,7 +730,7 @@ export async function enregistrerItemAction(
     },
   });
 
-  revalidatePath(`${IMPACT_PATH}/${item.sectionId}`);
+  revalidatePath(`${cheminModule(emplacement)}/${item.sectionId}`);
   revaliderImpact();
   return { error: null, ok: "Entrée enregistrée." };
 }
@@ -642,8 +740,6 @@ export async function enregistrerItemLangueAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const itemId = texte(formData, "itemId");
   const locale = lireLocale(formData);
   if (!itemId) return { error: "Entrée introuvable.", ok: null };
@@ -651,9 +747,12 @@ export async function enregistrerItemLangueAction(
 
   const item = await db().impactItem.findUnique({
     where: { id: itemId },
-    select: { sectionId: true, section: { select: { layout: true } } },
+    select: { sectionId: true, section: { select: { layout: true, emplacement: true } } },
   });
   if (!item) return { error: "Entrée introuvable.", ok: null };
+
+  const emplacement = item.section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
 
   const textes = {
     surtitre: optionnel(texte(formData, "surtitre")),
@@ -682,7 +781,7 @@ export async function enregistrerItemLangueAction(
     create: { itemId, locale, ...textes },
   });
 
-  revalidatePath(`${IMPACT_PATH}/${item.sectionId}`);
+  revalidatePath(`${cheminModule(emplacement)}/${item.sectionId}`);
   revaliderImpact();
 
   const incomplete = complete
@@ -695,21 +794,22 @@ export async function supprimerItemLangueAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const itemId = texte(formData, "itemId");
   const locale = lireLocale(formData);
   if (!itemId || !locale) return { error: "Traduction introuvable.", ok: null };
 
   const item = await db().impactItem.findUnique({
     where: { id: itemId },
-    select: { sectionId: true },
+    select: { sectionId: true, section: { select: { emplacement: true } } },
   });
   if (!item) return { error: "Entrée introuvable.", ok: null };
 
+  const emplacement = item.section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
+
   await db().impactItemTranslation.deleteMany({ where: { itemId, locale } });
 
-  revalidatePath(`${IMPACT_PATH}/${item.sectionId}`);
+  revalidatePath(`${cheminModule(emplacement)}/${item.sectionId}`);
   revaliderImpact();
   return { error: null, ok: `Version ${LANGUE_LABEL[locale]} supprimée.` };
 }
@@ -726,8 +826,6 @@ export async function deplacerItemAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const id = texte(formData, "id");
   const sens = texte(formData, "sens");
   if (!id) return { error: "Entrée introuvable.", ok: null };
@@ -735,9 +833,12 @@ export async function deplacerItemAction(
 
   const item = await db().impactItem.findUnique({
     where: { id },
-    select: { id: true, position: true, sectionId: true },
+    select: { id: true, position: true, sectionId: true, section: { select: { emplacement: true } } },
   });
   if (!item) return { error: "Entrée introuvable.", ok: null };
+
+  const emplacement = item.section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
 
   const freres = await db().impactItem.findMany({
     where: { sectionId: item.sectionId },
@@ -763,7 +864,7 @@ export async function deplacerItemAction(
     ),
   );
 
-  revalidatePath(`${IMPACT_PATH}/${item.sectionId}`);
+  revalidatePath(`${cheminModule(emplacement)}/${item.sectionId}`);
   revaliderImpact();
   return { error: null, ok: null };
 }
@@ -772,13 +873,17 @@ export async function supprimerItemAction(
   _prev: ImpactFormState,
   formData: FormData,
 ): Promise<ImpactFormState> {
-  await assertPermission("histoires");
-
   const id = texte(formData, "id");
   if (!id) return { error: "Entrée introuvable.", ok: null };
 
-  const item = await db().impactItem.findUnique({ where: { id }, select: { sectionId: true } });
+  const item = await db().impactItem.findUnique({
+    where: { id },
+    select: { sectionId: true, section: { select: { emplacement: true } } },
+  });
   if (!item) return { error: "Entrée introuvable.", ok: null };
+
+  const emplacement = item.section.emplacement as ImpactEmplacement;
+  await assertEmplacement(emplacement);
 
   try {
     await db().impactItem.delete({ where: { id } });
@@ -787,7 +892,7 @@ export async function supprimerItemAction(
     throw error;
   }
 
-  revalidatePath(`${IMPACT_PATH}/${item.sectionId}`);
+  revalidatePath(`${cheminModule(emplacement)}/${item.sectionId}`);
   revaliderImpact();
   return { error: null, ok: "Entrée supprimée." };
 }

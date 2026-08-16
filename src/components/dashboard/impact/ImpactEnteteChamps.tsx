@@ -15,17 +15,22 @@
 import { useId } from "react";
 import { ADMIN_IMPACT } from "@/content/admin";
 import type { TraductionSectionSaisie } from "@/lib/impact/saisie";
+import { CHAMP_NOTE, type ImpactLayout } from "@/lib/impact/statut";
 import type { Lang } from "@/lib/pick";
 
 export function ImpactEnteteChamps({
   lang,
+  layout,
   valeurs,
 }: {
   lang: Lang;
+  /** Le gabarit décide si la note est demandée, et sous quel intitulé. */
+  layout: ImpactLayout;
   valeurs: TraductionSectionSaisie;
 }) {
   const t = ADMIN_IMPACT;
   const idBase = useId();
+  const note = CHAMP_NOTE[layout];
 
   return (
     <>
@@ -84,6 +89,24 @@ export function ImpactEnteteChamps({
         />
         <p className="adm-hint" style={{ marginTop: 6 }}>{t.champCtaLabelAide}</p>
       </div>
+
+      {/* La note reste montée en permanence quand le gabarit l'emploie, mais
+          disparaît sinon : le champ n'existe alors pas dans l'envoi, et l'action
+          le lit comme vide — ce qu'il doit être pour ces gabarits. */}
+      {note && (
+        <div className="adm-form__field">
+          <label className="label-mono" htmlFor={`${idBase}-note`}>{note.label}</label>
+          <input
+            id={`${idBase}-note`}
+            name="note"
+            type="text"
+            className="field"
+            key={`${lang}-note`}
+            defaultValue={valeurs.note}
+          />
+          <p className="adm-hint" style={{ marginTop: 6 }}>{note.aide}</p>
+        </div>
+      )}
     </>
   );
 }

@@ -46,6 +46,8 @@ export type ItemSaisie = {
   lienUrl: string;
   /** Format `<input type="date">`, heure de Kinshasa. */
   dateAt: string;
+  /** Pastilles du gabarit POLES, une par ligne. Hors traduction. */
+  tags: string;
   coverMediaId: string;
   coverKey: string;
   /** URL du visuel actuel, pour la vignette d'aperçu. */
@@ -63,6 +65,8 @@ export type TraductionSectionSaisie = {
   titre: string;
   lead: string;
   ctaLabel: string;
+  /** Ligne courte que seuls certains gabarits affichent. */
+  note: string;
   existe: boolean;
   /** Un kicker ou un titre suffit (cf. `sectionTraduite`). */
   complete: boolean;
@@ -82,6 +86,8 @@ export type SectionSaisie = {
   compact: boolean;
   grandTitre: boolean;
   ctaUrl: string;
+  /** La section poursuit la précédente, dans la même bande. */
+  enchaine: boolean;
   /** Section dont celle-ci reprend les entrées. Vide : elle a les siennes. */
   sourceId: string;
   /** Nombre maximal d'entrées affichées. `0` vaut « toutes ». */
