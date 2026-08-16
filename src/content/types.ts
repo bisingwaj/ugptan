@@ -36,6 +36,11 @@ export type Composante = {
   titre: Bilingual; desc: Bilingual; sous: SousComposante[];
 };
 
+/* Les formes du mandat, des principes, de la méthode, des engagements, du
+   glossaire, des questions et des publics visés ont quitté ce fichier avec les
+   données qu'elles décrivaient : ces blocs vivent en base, et leur saisie a
+   ses propres types (cf. src/lib/impact/saisie.ts). */
+
 export type GouvBody = {
   sigle: string; nom: Bilingual; nature: Bilingual;
   /** Bilingue : « 8 membres » restait en français sur la version anglaise. */
@@ -43,8 +48,6 @@ export type GouvBody = {
   presidence: Localizable; decision: Bilingual; frequence: Bilingual;
 };
 
-export type Mandat = { n: string; titre: Bilingual; desc: Bilingual };
-export type Principe = { titre: Bilingual; desc: Bilingual };
 /**
  * Pôle de l'Unité — taxonomie de référence, celle de l'arrêté.
  *
@@ -118,14 +121,9 @@ export type Evenement = {
   statut: EventStatut; img: ImgKey; titre: Bilingual; desc: Bilingual; places: Bilingual;
 };
 export type GouvActivite = { date: Bilingual; org: string; color: string; titre: Bilingual; note: Bilingual };
-export type MethodeEtape = { t: Bilingual; d: Bilingual };
-export type EngagementItem = { t: Bilingual; d: Bilingual; color: string };
-export type GlossaireItem = { s: string; d: Bilingual };
-export type FaqItem = { q: Bilingual; r: Bilingual };
 export type Partner = { name: string; kind: Bilingual; logo?: string };
 export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: string; comp?: string };
 export type GalleryItem = { nom: string; img: ImgKey };
-export type Persona = { k: Bilingual; d: Bilingual };
 
 export type Contact = {
   adresse: string; quartier: string; tel: string; email: string;

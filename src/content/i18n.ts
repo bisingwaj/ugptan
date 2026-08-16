@@ -509,38 +509,15 @@ export function dict(lang: Lang) {
         "Trois chantiers menés ensemble parce qu'aucun ne produit d'effet seul : élargir l'accès au réseau, doter l'État d'un socle numérique commun, et former les compétences qui feront vivre l'un et l'autre. Horizon 2029.",
         "Three efforts pursued together because none works alone: widening access to the network, giving the State a common digital foundation, and building the skills that will keep both running. Horizon 2029.",
       ),
-      ctxLabel: t("Contexte & raison d'être", "Context & rationale"),
-      ctxTitle: t(
-        "Le retard n'est pas technologique. Il est géographique, énergétique et institutionnel.",
-        "The gap is not technological. It is geographic, energy-related and institutional.",
-      ),
-      ctxLead: t(
-        "Les technologies de réseau sont disponibles et éprouvées ; ce qui manque, ce sont les conditions qui les rendent rentables à déployer. Un territoire de 2,3 millions de kilomètres carrés, une population dispersée, une électrification partielle et des systèmes publics conçus séparément les uns des autres : chacun de ces facteurs renchérit l'accès ou empêche l'usage. Le projet s'ancre dans l'approche régionale APM IDEA, qui mutualise l'intégration numérique de l'Afrique orientale et australe — parce que la capacité internationale et les corridors de transit se négocient à l'échelle de la région, pas d'un pays isolé.",
-        "Network technologies are available and proven; what is missing are the conditions that make them viable to deploy. A territory of 2.3 million square kilometres, a dispersed population, partial electrification, and public systems designed independently of one another: each of these factors raises the cost of access or prevents its use. The project is anchored in the regional APM IDEA approach, which pools digital integration across Eastern and Southern Africa — because international capacity and transit corridors are negotiated at regional, not national, scale.",
-      ),
-      ctxStats: [
-        { v: "6,56", u: "kbit/s", t: t("Bande passante intl./hab. au démarrage", "Intl. bandwidth per capita at start") },
-        { v: "26", u: "", t: t("provinces · 2,3 M km²", "provinces · 2.3M km²") },
-        { v: "2029", u: "", t: t("horizon de la transformation", "horizon of the transformation") },
-      ],
-      /* La section « Engagements fondateurs » a été retirée : les deux dates de
-         signature qu'elle affichait en dur figurent déjà dans la frise des
-         jalons, administrée depuis la console, huit cents pixels plus bas sur
-         la même page. Une date publiée à deux endroits finit par diverger. */
-      compLabel: t("Les cinq composantes", "The five components"),
-      compLead: t(
-        "Le projet se découpe en cinq volets, dont chacun a sa page : périmètre, objectifs, projets phares et responsable.",
-        "The project is split into five strands, each with its own page: scope, objectives, flagship projects and lead.",
-      ),
-      mesureLabel: t("Ce que nous nous engageons à mesurer", "What we commit to measuring"),
-      mesureTitle: t(
-        "Des ambitions chiffrées, revues au fil de l'exécution.",
-        "Quantified ambitions, reviewed as implementation proceeds.",
-      ),
-      whoLabel: t("Pour qui ?", "Who benefits"),
-      whoTitle: t("À qui cela profite, et à quelle condition.", "Who benefits, and on what condition."),
-      cfaqLabel: t("Le projet & vous", "The project & you"),
-      cfaqTitle: t("Les questions qu'on nous pose, et nos réponses.", "The questions we are asked, and our answers."),
+      /* ⚠️ Les en-têtes des blocs de la page — contexte, publics visés, aperçus
+         des composantes et des résultats, questions citoyennes — ne sont plus
+         ici : ils sont administrés depuis la console, et leur état initial vit
+         dans `src/content/impact/projet.ts`.
+
+         La section « Engagements fondateurs » avait déjà disparu pour une raison
+         voisine : les deux dates de signature qu'elle affichait en dur figurent
+         dans la frise des jalons, huit cents pixels plus bas sur la même page.
+         Une date publiée à deux endroits finit par diverger. */
       ctaTitle: t("Prenez part à la transformation.", "Take part in the transformation."),
       ctaLead: t(
         "Candidater à un marché, suivre l'avancement province par province, ou signaler une difficulté : chacune de ces portes est ouverte et tracée.",
@@ -651,59 +628,22 @@ export function dict(lang: Lang) {
         "L'unité d'exécution du Projet de Transformation Numérique : son mandat, les règles qui bornent ses décisions, ses cinq pôles et la méthode qu'elle répète marché après marché.",
         "The delivery unit of the Digital Transformation Project: its mandate, the rules that bound its decisions, its five clusters and the method it repeats contract after contract.",
       ),
-      /* Le mandat a absorbé l'ancienne section « Objectif & rôle », qui redisait
-         les mêmes fonctions sous trois verbes, cinq sections plus bas. D'où le
-         titre repris de cette section et le chapeau devenu `mandatLead`. */
-      mandatLabel: t("Mandat", "Mandate"),
-      mandatTitle: t("La capacité d'exécution est un actif. Elle se construit, elle ne se décrète pas.", "Delivery capacity is an asset. It is built, not decreed."),
-      mandatLead: t(
-        "Un financement international n'est utile qu'à proportion de ce qu'une équipe sait en faire : préparer des dossiers qui passent la revue du bailleur, mettre en concurrence sans contentieux, superviser des chantiers dispersés sur un territoire immense, et rendre compte de chaque étape. C'est ce métier-là que l'Unité exerce.",
-        "International financing is only as useful as a team's ability to use it: preparing files that pass donor review, competing contracts without litigation, supervising sites scattered across a vast territory, and accounting for every step. That is the trade the Unit practises.",
-      ),
-      /* Principes et engagements tiennent désormais dans une seule section : les
-         trois règles bornent la décision, les engagements disent ce qui en
-         découle et se vérifie. Deux sections distantes de huit blocs donnaient
-         à lire deux fois la même promesse. */
-      principesLabel: t("Ce qui borne ses décisions", "What bounds its decisions"),
-      principesTitle: t("Trois règles, et ce qu'elles engagent en pratique.", "Three rules, and what they commit to in practice."),
-      arrete: t("Créée par arrêté ministériel", "Created by ministerial order"),
-      /* Une seule section d'organisation, là où la page en portait deux avec des
-         noms de pôles différents. */
-      orgLabel: t("Organisation interne", "Internal organisation"),
-      orgTitle: t("L'organisation, pôle par pôle.", "The organisation, cluster by cluster."),
-      orgLead: t(
-        "Un pôle se juge à ses livrables datés, pas à son organigramme. Chacun porte une responsabilité distincte, et un dossier en cours dont l'avancement est vérifiable.",
-        "A cluster is judged by its dated deliverables, not by its org chart. Each carries a distinct responsibility, and a live file whose progress can be checked.",
-      ),
+      /* ⚠️ Les en-têtes des six blocs de la page — mandat, principes,
+         organisation, méthode, équipe, questions — ne sont plus ici : ils sont
+         administrés depuis la console, et leur état initial vit dans
+         `src/content/impact/ugptn.ts`.
+
+         Ne restent que le héros, le référencement, la sortie, et les deux
+         libellés que le DESSIN pose lui-même : la mention « En cours » de
+         l'organigramme et l'unité du compteur de fiches. Ceux-là ne sont pas du
+         contenu rédigé mais des mots de gabarit, saisis nulle part. */
       orgEnCours: t("En cours", "Under way"),
-      orgPoles: t("pôles", "clusters"),
-      orgNiveaux: t("niveaux de gouvernance", "levels of governance"),
-      equipeLabel: t("L'équipe de l'Unité", "The Unit's team"),
-      equipeTitle: t("Qui fait quoi, à l'Unité.", "Who does what, inside the Unit."),
-      equipeLead: t(
-        "Une équipe d'exécution organisée en cinq pôles, du pilotage national à la liaison avec les provinces. Chaque fiche porte le périmètre de la personne, pas un titre seul.",
-        "A delivery team organised into five clusters, from national steering to liaison with the provinces. Each profile carries the person's remit, not a job title alone.",
-      ),
       membres: t("fiches publiées", "published profiles"),
       ctaTitle: t("Une question sur l'exécution du projet ?", "A question about how the project is delivered?"),
       ctaLead: t(
         "Les décisions relèvent des organes de gouvernance, les marchés d'une procédure écrite, et toute difficulté peut être signalée sans passer par nous.",
         "Decisions rest with the governance bodies, contracts follow a written procedure, and any difficulty can be reported without going through us.",
       ),
-      methodeLabel: t("Notre méthode", "How we work"),
-      methodeTitle: t("Du financement aux résultats : un cycle, répété marché après marché.", "From financing to results: one cycle, repeated contract after contract."),
-      methodeLead: t(
-        "Le même enchaînement s'applique à un chantier de fibre, à une plateforme informatique ou à un programme de formation. C'est sa répétabilité qui permet de conduire des dizaines de marchés en parallèle sans improviser à chaque fois.",
-        "The same sequence applies to a fibre worksite, an IT platform or a training programme. It is its repeatability that makes it possible to run dozens of contracts in parallel without improvising each time.",
-      ),
-      engTitle: t("Des engagements vérifiables, pas des intentions.", "Verifiable commitments, not intentions."),
-      glossaireTitle: t("Les sigles que vous rencontrerez, et ce qu'ils recouvrent.", "The acronyms you will meet, and what they cover."),
-      glossaireLead: t(
-        "Le vocabulaire des projets financés par les bailleurs est technique par nécessité : chaque terme renvoie à une procédure précise. En voici la traduction.",
-        "The vocabulary of donor-financed projects is technical out of necessity: each term refers to a precise procedure. Here is the translation.",
-      ),
-      faqLabel: t("À propos de l'Unité", "About the Unit"),
-      faqTitle: t("Questions fréquentes.", "Frequently asked questions."),
     },
 
     /* --- Gouvernance ------------------------------------------------------ */
