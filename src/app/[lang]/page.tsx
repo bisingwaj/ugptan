@@ -3,11 +3,12 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import {
-  meta, reperes, gouvernance, poles,
+  meta, reperes, poles,
   profils, question,
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
 import { composantesPubliques } from "@/lib/projet/query";
+import { organesPublies } from "@/lib/gouvernance/query";
 import { prochainsEvenements } from "@/lib/events/query";
 import { membresEquipe } from "@/lib/equipe/query";
 import { galleryProvinces, partners } from "@/content/carbon";
@@ -40,11 +41,12 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
   const t = dict(lang);
   // Lectures indépendantes, menées de front : aucune ne conditionne l'autre, et
   // les enchaîner ajouterait autant d'allers-retours à la base pour rien.
-  const [actualites, upcoming, equipe, composantes] = await Promise.all([
+  const [actualites, upcoming, equipe, composantes, organes] = await Promise.all([
     derniersArticles(lang, 4),
     prochainsEvenements(lang, 3),
     membresEquipe(lang),
     composantesPubliques(lang),
+    organesPublies(lang),
   ]);
 
   return (
@@ -193,8 +195,8 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             <p style={{ margin: "18px 0 0", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.gouvLead}</p>
           </Reveal>
           <RevealGroup className="grid-3" gap={0.05}>
-            {gouvernance.map((g) => (
-              <RevealItem key={g.sigle} className="cell" style={{ padding: "30px 28px" }}>
+            {organes.map((g) => (
+              <RevealItem key={g.id} className="cell" style={{ padding: "30px 28px" }}>
                 <CarteOrgane organe={g} lang={lang} champs="court" />
               </RevealItem>
             ))}

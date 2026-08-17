@@ -1,12 +1,13 @@
-import { ProjetSubNav } from "@/components/dashboard/projet/ProjetSubNav";
+import { ADMIN_PROJET, ADMIN_PROJET_ONGLETS } from "@/content/admin";
+import { ModuleSubNav } from "@/components/dashboard/ModuleSubNav";
 
 /**
- * Coquille du module « Le projet » : ses trois écrans en sous-barre, au-dessus
+ * Coquille du module « Le Projet » : ses trois écrans en sous-barre, au-dessus
  * de tout ce que le module affiche.
  *
  * Elle enveloppe aussi les pages de détail — la fiche d'une section, celle
- * d'une composante — et c'est voulu : on doit pouvoir passer des composantes au
- * cadre de résultats sans repasser par la liste.
+ * d'une composante — et c'est voulu : on doit pouvoir passer des composantes
+ * aux résultats sans repasser par la liste.
  *
  * ⚠️ Aucun garde ici. Ce layout ne protège rien : l'App Router rend les pages en
  * parallèle des layouts, et chaque page du module appelle `requirePermission`
@@ -15,7 +16,7 @@ import { ProjetSubNav } from "@/components/dashboard/projet/ProjetSubNav";
 export default function ProjetModuleLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <ProjetSubNav />
+      <ModuleSubNav base="/project" onglets={ADMIN_PROJET_ONGLETS} libelle={ADMIN_PROJET.title} />
       {children}
     </>
   );
