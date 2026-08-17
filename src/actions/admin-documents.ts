@@ -49,7 +49,7 @@ import { cloudinaryActif, deposerFichier, supprimerFichier } from "@/lib/cloudin
 import { fromDateInput } from "@/lib/format";
 import { isEmptyHtml, sanitizeHtml } from "@/lib/html/sanitize";
 import { slugify, uniqueSlug } from "@/lib/actus/slug";
-import { composantes } from "@/content/data";
+import { codesComposantes } from "@/lib/projet/query";
 import { revaliderDocuments } from "@/lib/docs/cache";
 import { estMimeDoc, poidsLisible, tailleMaxPour } from "@/lib/docs/fichier";
 import { isDocLangue, isDocStatut, isDocSupport, isDocType } from "@/lib/docs/statut";
@@ -60,7 +60,6 @@ export type DocFormState = { error: string | null; ok: string | null };
 const DOCS_PATH = adminPath("/documents");
 const CATEGORIES_PATH = adminPath("/documents/categories");
 
-const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 
 /** Code Prisma d'une violation de contrainte d'unicité. */
 const UNIQUE_VIOLATION = "P2002";
@@ -91,8 +90,9 @@ function lireCouleur(value: string): string | null {
 }
 
 /** Codes de composante cochés, réduits à ceux qui existent réellement. */
-function lireComposantes(formData: FormData): string[] {
-  return formData.getAll("comps").map(String).filter((code) => CODES_COMPOSANTE.has(code));
+async function lireComposantes(formData: FormData): Promise<string[]> {
+  const admis = await codesComposantes();
+  return formData.getAll("comps").map(String).filter((code) => admis.has(code));
 }
 
 /**
@@ -119,7 +119,7 @@ const lireCorps = (formData: FormData, champ: string): string => {
  * ici imposerait une traduction avant toute mise en ligne, ce qui retarderait
  * la publication d'une pièce d'intérêt public pour un motif de forme.
  */
-function lireFiche(formData: FormData) {
+async function lireFiche(formData: FormData) {
   const typeBrut = texte(formData, "type");
   const langueBrute = texte(formData, "langue");
 
@@ -145,7 +145,7 @@ function lireFiche(formData: FormData) {
     featured: coche(formData, "featured"),
     position: lireEntier(texte(formData, "position")),
     categoryId: optionnel(texte(formData, "categoryId")),
-    comps: lireComposantes(formData),
+    comps: await lireComposantes(formData),
   };
 }
 
@@ -283,7 +283,7 @@ export async function deposerDocumentAction(
   const supportBrut = texte(formData, "support");
   const support = isDocSupport(supportBrut) ? supportBrut : ("FICHIER" as const);
 
-  const fiche = lireFiche(formData);
+  const fiche = await lireFiche(formData);
   if (!fiche.titreFr) return { error: "Le titre français est obligatoire.", ok: null };
 
   const slug = await resoudreSlug(texte(formData, "slug"), fiche.titreFr, null);
@@ -381,7 +381,7 @@ export async function enregistrerDocumentAction(
   const supportBrut = texte(formData, "support");
   const support = isDocSupport(supportBrut) ? supportBrut : ("FICHIER" as const);
 
-  const fiche = lireFiche(formData);
+  const fiche = await lireFiche(formData);
   if (!fiche.titreFr) return { error: "Le titre français est obligatoire.", ok: null };
 
   const contenuFr = lireCorps(formData, "contenuFr");

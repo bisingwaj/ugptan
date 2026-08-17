@@ -6,6 +6,7 @@ import { urlsArticles } from "@/lib/actus/query";
 import { urlsEvenements } from "@/lib/events/query";
 import { urlsDocuments } from "@/lib/docs/query";
 import { urlsAlbums } from "@/lib/galerie/query";
+import { slugsComposantes } from "@/lib/projet/query";
 
 /**
  * Servi sur /sitemap.xml — toutes les pages localisées (FR + EN), plus une
@@ -36,12 +37,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     };
   });
 
-  const [lignesArticles, lignesEvenements, lignesDocuments, lignesAlbums] = await Promise.all([
+  const [lignesArticles, lignesEvenements, lignesDocuments, lignesAlbums, slugsComp] = await Promise.all([
     urlsArticles(),
     urlsEvenements(),
     urlsDocuments(),
     urlsAlbums(),
+    slugsComposantes(),
   ]);
+
+  /* Une page par composante et par langue. Elles rejoignent le sitemap ici, et
+     non dans `ALL_PATHS`, depuis que leurs adresses vivent en base : une
+     composante publiée en console doit y figurer sans reconstruction. Priorité
+     de page de navigation, pas de feuille — ce sont des pages de section. */
+  const composantes = slugsComp.flatMap((slug) =>
+    LOCALES.map((locale) => ({
+      url: `${SITE_URL}/${locale}${NAV.composantes}/${slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  );
 
   const articles = lignesArticles.map((article) => ({
     url: `${SITE_URL}/${article.locale}${NAV.actualites}/${article.slug}`,
@@ -89,5 +104,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  return [...pages, ...articles, ...evenements, ...documents, ...albums];
+  return [...pages, ...composantes, ...articles, ...evenements, ...documents, ...albums];
 }

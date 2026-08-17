@@ -1,7 +1,19 @@
 /* Helpers de couleur des composantes.
    Chaque page de composante redéfinit localement les variables d'accent à partir
-   de `compColors` : tous les composants existants (Kicker, .btn--primary, .bar,
-   .duo, nappes de survol) prennent alors la couleur de la composante. */
+   de sa couleur : tous les composants existants (Kicker, .btn--primary, .bar,
+   .duo, nappes de survol) prennent alors la couleur de la composante.
+
+   ⚠️ DEUX ENTRÉES, et elles ne servent pas la même chose.
+
+   · `compTint(code)` / `compVar(code)` / `onComp(code)` lisent la table figée
+     `compColors`. Elles ne subsistent que pour les écrans qui ne connaissent
+     qu'un CODE et n'ont pas de composante sous la main — la carte des marchés,
+     qui est un composant client, et le contenu d'origine.
+   · `compTintDe(color)` / `compVarDe(color)` / `onCompDe(color)` prennent la
+     couleur telle que la console la tient. C'est la voie normale depuis que les
+     composantes vivent en base : ce sont elles que les pages du groupe
+     « Le projet » emploient, sans quoi une couleur changée en console
+     n'atteindrait jamais la page. */
 import type { CSSProperties } from "react";
 import { compColors } from "@/content/data";
 
@@ -36,21 +48,39 @@ const luminance = (hex: string): number => {
   return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
 };
 
-/** Couleur de texte lisible sur un aplat de la couleur de composante. */
-export const onComp = (code: string): string => (luminance(compColor(code)) > 0.5 ? "#161616" : "#ffffff");
+/**
+ * Couleur de texte lisible sur un aplat.
+ *
+ * ⚠️ La couleur peut être une VARIABLE CSS (`var(--ac)`) quand aucune n'est
+ * renseignée : sa luminance n'est pas calculable ici. Le blanc l'emporte alors,
+ * comme il le faisait avec l'accent du site, qui est sombre.
+ */
+export const onCompDe = (color: string): string =>
+  color.startsWith("#") && luminance(color) > 0.5 ? "#161616" : "#ffffff";
 
 /** Seule la variable `--comp` (teinte d'une ligne / carte hors page composante). */
-export const compVar = (code: string): CSSProperties => ({ "--comp": compColor(code) } as CSSProperties);
+export const compVarDe = (color: string): CSSProperties => ({ "--comp": color } as CSSProperties);
 
 /** Variables d'accent à poser sur le conteneur racine de la page. */
-export function compTint(code: string): CSSProperties {
-  const c = compColor(code);
+export function compTintDe(color: string): CSSProperties {
+  // Les mélanges n'ont de sens que sur un hexadécimal : sur une variable CSS,
+  // on laisse le site garder son propre jeu d'accents.
+  if (!color.startsWith("#")) return { "--comp": color } as CSSProperties;
   return {
-    "--ac": c,
-    "--acd": mix(c, -0.24),
-    "--ac-light": mix(c, 0.45),
-    "--ac-pale": mix(c, 0.93),
-    "--ac-line": mix(c, 0.76),
-    "--comp": c,
+    "--ac": color,
+    "--acd": mix(color, -0.24),
+    "--ac-light": mix(color, 0.45),
+    "--ac-pale": mix(color, 0.93),
+    "--ac-line": mix(color, 0.76),
+    "--comp": color,
   } as CSSProperties;
 }
+
+/** Couleur de texte lisible sur un aplat de la couleur de composante. */
+export const onComp = (code: string): string => onCompDe(compColor(code));
+
+/** Seule la variable `--comp`, à partir d'un code. */
+export const compVar = (code: string): CSSProperties => compVarDe(compColor(code));
+
+/** Variables d'accent à poser sur le conteneur racine, à partir d'un code. */
+export const compTint = (code: string): CSSProperties => compTintDe(compColor(code));

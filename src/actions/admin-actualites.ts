@@ -46,14 +46,13 @@ import { slugify, uniqueSlug } from "@/lib/actus/slug";
 import { isArticleStatut, type ArticleStatut } from "@/lib/actus/statut";
 import { idYouTube } from "@/lib/actus/video";
 import { revaliderActualites } from "@/lib/actus/cache";
-import { composantes } from "@/content/data";
+import { codesComposantes } from "@/lib/projet/query";
 
 /** État partagé par tous les formulaires du module. */
 export type ActuFormState = { error: string | null; ok: string | null };
 
 const ACTUS_PATH = adminPath("/news");
 
-const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 
 /** Nom des langues dans les messages rendus à l'utilisateur. */
 const LANGUE_LABEL: Record<Lang, string> = { fr: "française", en: "anglaise" };
@@ -121,8 +120,9 @@ async function slugUnique(locale: Lang, base: string, articleId: string | null):
 }
 
 /** Codes de composante cochés, réduits à ceux qui existent réellement. */
-function lireComposantes(formData: FormData): string[] {
-  return formData.getAll("comps").map(String).filter((code) => CODES_COMPOSANTE.has(code));
+async function lireComposantes(formData: FormData): Promise<string[]> {
+  const admis = await codesComposantes();
+  return formData.getAll("comps").map(String).filter((code) => admis.has(code));
 }
 
 /**
@@ -186,7 +186,7 @@ async function lireFiche(formData: FormData) {
     featured: coche(formData, "featured"),
     lieu: optionnel(texte(formData, "lieu")),
     videoYt: idYouTube(texte(formData, "videoYt")),
-    comps: lireComposantes(formData),
+    comps: await lireComposantes(formData),
     categoryId: optionnel(texte(formData, "categoryId")),
     coverMediaId,
     // Une couverture issue de la bibliothèque prime sur une clé du registre :

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { asLang } from "@/lib/params";
 import { dict } from "@/content/i18n";
-import { composantes } from "@/content/data";
-import { composantesDetail } from "@/content/composantes-detail";
 import { NAV, route } from "@/lib/routes";
+import { composantesPubliques } from "@/lib/projet/query";
 import { PageHero } from "@/components/ui/PageHero";
 import { FilAriane } from "@/components/ui/FilAriane";
 import { CtaFin } from "@/components/ui/CtaFin";
@@ -12,6 +11,10 @@ import { CompCard } from "@/components/composantes/CompCard";
 import { CompChaine } from "@/components/composantes/CompChaine";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+
+/** Cache aligné sur les autres pages administrées, invalidé par les écritures
+ *  du module (cf. lib/projet/cache.ts). */
+export const revalidate = 120;
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -34,7 +37,7 @@ export default async function ComposantesPage(props: { params: Promise<{ lang: s
   const lang = asLang(params.lang);
   const t = dict(lang);
   const c = t.comp;
-  const detailOf = (code: string) => composantesDetail.find((d) => d.code === code);
+  const composantes = await composantesPubliques(lang);
 
   return (
     <div>
@@ -54,22 +57,24 @@ export default async function ComposantesPage(props: { params: Promise<{ lang: s
       />
 
       {/* Cartes */}
-      <section className="section">
-        <div className="section__inner">
-          <RevealGroup className="comp-index" gap={0.05}>
-            {composantes.map((comp) => (
-              <RevealItem key={comp.code}>
-                <CompCard comp={comp} detail={detailOf(comp.code)} lang={lang} />
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+      {composantes.length > 0 && (
+        <section className="section">
+          <div className="section__inner">
+            <RevealGroup className="comp-index" gap={0.05}>
+              {composantes.map((comp) => (
+                <RevealItem key={comp.id}>
+                  <CompCard comp={comp} lang={lang} />
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          </div>
+        </section>
+      )}
 
       {/* Lecture transversale — les dépendances entre composantes.
-          Cette section remplace un tableau qui relistait les cinq mêmes
-          composantes juste sous les cartes, avec un titre qui paraphrasait le
-          chapeau du héros. */}
+          Cette section remplace un tableau qui relistait les mêmes composantes
+          juste sous les cartes, avec un titre qui paraphrasait le chapeau du
+          héros. */}
       <section className="section section--grey">
         <div className="section__inner">
           <Reveal>
@@ -77,7 +82,7 @@ export default async function ComposantesPage(props: { params: Promise<{ lang: s
             <h2 className="h2--sm comp-h2">{c.liensTitle}</h2>
             <p className="lead comp-lead">{c.liensLead}</p>
           </Reveal>
-          <CompChaine lang={lang} />
+          <CompChaine composantes={composantes} lang={lang} />
         </div>
       </section>
 

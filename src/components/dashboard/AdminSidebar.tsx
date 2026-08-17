@@ -103,7 +103,7 @@ export function AdminSidebar({
               // doivent garder leur module allumé.
               const active = pathname === href || pathname.startsWith(`${href}/`);
 
-              return (
+              const lien = (
                 <Link
                   key={item.key}
                   href={href}
@@ -114,6 +114,43 @@ export function AdminSidebar({
                 >
                   {content}
                 </Link>
+              );
+
+              if (!item.children || !active) return lien;
+
+              /* Les écrans du module ne se déplient que lorsqu'on y est : les
+                 montrer en permanence allongerait la barre de moitié pour une
+                 information dont on n'a besoin qu'une fois entré. La sous-barre
+                 en tête d'écran les redit de toute façon (cf. ProjetSubNav). */
+              return (
+                <div key={item.key}>
+                  {lien}
+                  <div className="adm__nav-sub" role="group" aria-label={item.label}>
+                    {item.children.map((enfant) => {
+                      const enfantHref = adminPath(enfant.slug);
+                      /* Égalité stricte pour le PREMIER écran, dont le chemin
+                         est celui du module : sans cela « La page du Projet »
+                         resterait allumée depuis les composantes, qui vivent
+                         sous son propre chemin. */
+                      const enfantActif =
+                        enfantHref === href
+                          ? pathname === href
+                          : pathname === enfantHref || pathname.startsWith(`${enfantHref}/`);
+
+                      return (
+                        <Link
+                          key={enfant.slug}
+                          href={enfantHref}
+                          title={enfant.label}
+                          className={`adm__nav-subitem${enfantActif ? " is-active" : ""}`}
+                          aria-current={enfantActif ? "page" : undefined}
+                        >
+                          <span className="adm__nav-text">{enfant.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>

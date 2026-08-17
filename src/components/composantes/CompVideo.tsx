@@ -1,22 +1,21 @@
 /* Emplacement « vidéo de présentation » d'une composante (16:9, pleine largeur).
    Trois états possibles, jamais de zone vide :
-   • vidéo fournie (video.yt ou video.src) → affiche + bouton de lecture (lightbox) ;
+   • vidéo fournie (yt ou src) → affiche + bouton de lecture (lightbox) ;
    • vidéo non fournie → état « à venir » assumé, avec le format attendu ;
    • pas d'emplacement déclaré → le composant ne rend rien. */
 import type { Lang } from "@/lib/pick";
-import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { media } from "@/content/media";
-import type { CompVideoSlot } from "@/content/types";
+import type { ComposanteVue } from "@/lib/projet/query";
 import { Photo } from "@/components/ui/Photo";
 import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
 
-export function CompVideo({ video, code, lang }: { video?: CompVideoSlot; code: string; lang: Lang }) {
-  if (!video) return null;
+export function CompVideo({ comp, lang }: { comp: ComposanteVue; lang: Lang }) {
+  const video = comp.video;
+  if (!video || !video.poster) return null;
+
   const t = dict(lang).comp;
   const src = video.src || video.yt;
-  const titre = pick(video.titre, lang);
 
   return (
     <section className="section section--sm" id="video" data-anchor>
@@ -25,23 +24,24 @@ export function CompVideo({ video, code, lang }: { video?: CompVideoSlot; code: 
           <div className="comp-video" style={{ ["--duo" as string]: "var(--comp)" }}>
             <div className="duo comp-video__stage">
               <Photo
-                src={media.img[video.poster]}
-                alt={titre}
+                src={video.poster.src}
+                alt={video.poster.alt || video.titre}
+                unoptimized={video.poster.unoptimized}
                 sizes="(max-width: 760px) 100vw, 1200px"
               />
               <div className="comp-video__overlay">
                 <div className="mono comp-video__label">
-                  {code} · {t.videoLabel}
+                  {comp.code} · {t.videoLabel}
                   {video.duree ? ` · ${video.duree}` : ""}
                 </div>
-                <div className="comp-video__title">{titre}</div>
+                <div className="comp-video__title">{video.titre}</div>
 
                 {src ? (
                   <VideoButton
                     id={src}
                     className="btn btn--primary comp-video__btn"
-                    meta={{ titre, source: `UGPTN · ${code}` }}
-                    dataSlot={`Vidéo de présentation — ${code}`}
+                    meta={{ titre: video.titre, source: `UGPTN · ${comp.code}` }}
+                    dataSlot={`Vidéo de présentation — ${comp.code}`}
                     dataRatio="16:9"
                   >
                     <span className="comp-video__play" aria-hidden>▶</span>

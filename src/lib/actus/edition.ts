@@ -13,7 +13,7 @@ import { mediaSrc, type MediaRef } from "@/lib/medias";
 import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import { media as registre } from "@/content/media";
-import { composantes } from "@/content/data";
+import { referentielComposantes } from "@/lib/projet/query";
 import type { ImgKey } from "@/content/types";
 import type { ArticleSaisie, ReferentielsSaisie, TraductionSaisie } from "@/lib/actus/saisie";
 import type { ArticleStatut } from "@/lib/actus/statut";
@@ -53,7 +53,7 @@ export async function chargerReferentiels(): Promise<Referentiels> {
       // `name` est requis par Better Auth mais peut valoir l'adresse elle-même :
       // `||` et non `??`, pour qu'une chaîne vide retombe aussi sur l'adresse.
       auteurs: comptes.map((compte) => ({ id: compte.id, nom: compte.name || compte.email })),
-      composantes: composantes.map((composante) => ({ code: composante.code, titre: composante.titre.fr })),
+      composantes: await referentielComposantes(),
     },
     assets,
   };

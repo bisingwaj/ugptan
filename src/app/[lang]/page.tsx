@@ -3,10 +3,11 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import {
-  meta, reperes, composantes, gouvernance, poles,
+  meta, reperes, gouvernance, poles,
   profils, question,
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
+import { composantesPubliques } from "@/lib/projet/query";
 import { prochainsEvenements } from "@/lib/events/query";
 import { membresEquipe } from "@/lib/equipe/query";
 import { galleryProvinces, partners } from "@/content/carbon";
@@ -37,12 +38,13 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
-  // Deux lectures indépendantes, menées de front : aucune ne conditionne
-  // l'autre, et les enchaîner ajouterait un aller-retour à la base pour rien.
-  const [actualites, upcoming, equipe] = await Promise.all([
+  // Lectures indépendantes, menées de front : aucune ne conditionne l'autre, et
+  // les enchaîner ajouterait autant d'allers-retours à la base pour rien.
+  const [actualites, upcoming, equipe, composantes] = await Promise.all([
     derniersArticles(lang, 4),
     prochainsEvenements(lang, 3),
     membresEquipe(lang),
+    composantesPubliques(lang),
   ]);
 
   return (
@@ -124,7 +126,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           </Reveal>
           <RevealGroup style={{ borderTop: "1px solid var(--c-black)" }} gap={0.05}>
             {composantes.map((comp) => (
-              <RevealItem key={comp.code}>
+              <RevealItem key={comp.id}>
                 <CompRow comp={comp} lang={lang} />
               </RevealItem>
             ))}

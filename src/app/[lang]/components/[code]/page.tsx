@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { asLang, LOCALES } from "@/lib/params";
-import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { composantes, odp as odpAll } from "@/content/data";
-import { composantesDetail, composanteDetail } from "@/content/composantes-detail";
 import { NAV, route, compRoute } from "@/lib/routes";
-import { compColor, compTint, onComp } from "@/lib/comp";
+import { compTintDe, onCompDe } from "@/lib/comp";
+import { composantePublique, slugsComposantes } from "@/lib/projet/query";
 import { membreComposante } from "@/lib/equipe/query";
 import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
@@ -24,26 +22,35 @@ import { ProjetsPhares } from "@/components/composantes/ProjetsPhares";
 import { CompResponsable } from "@/components/composantes/CompResponsable";
 import { CompLies } from "@/components/composantes/CompLies";
 
-/** 5 composantes × 2 langues, pré-générées ; tout autre code renvoie 404. */
-export function generateStaticParams() {
-  return LOCALES.flatMap((lang) => composantesDetail.map((d) => ({ lang, code: d.slug })));
+/**
+ * Adresses pré-générées, lues en base.
+ *
+ * ⚠️ `dynamicParams` est passé à `true` en même temps que les composantes ont
+ * quitté le code : une composante créée en console doit répondre sans attendre
+ * une reconstruction. Un slug inconnu tombe sur le `notFound()` ci-dessous,
+ * comme avant — la différence est qu'il est décidé en lisant la base, et non
+ * par la liste figée au build.
+ */
+export async function generateStaticParams() {
+  const slugs = await slugsComposantes();
+  return LOCALES.flatMap((lang) => slugs.map((code) => ({ lang, code })));
 }
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-/** Le bloc « Actualités » de la page lit la base : même politique de cache que
- *  la page « Actualités » elle-même (cf. app/[lang]/actualites/page.tsx). */
+/** La page lit la base : même politique de cache que les autres pages du groupe. */
 export const revalidate = 120;
 
 export async function generateMetadata(props: { params: Promise<{ lang: string; code: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const detail = composanteDetail(params.code);
-  if (!detail) return {};
-  const comp = composantes.find((c) => c.code === detail.code);
+  const trouve = await composantePublique(params.code, lang);
+  if (!trouve) return {};
+
+  const { composante } = trouve;
   const t = dict(lang).comp;
-  const title = `${t.one} ${detail.code.slice(1)} — ${comp ? pick(comp.titre, lang) : pick(detail.titreLong, lang)}`;
-  const description = pick(detail.soustitre, lang);
-  const path = `/${lang}${NAV.composantes}/${detail.slug}`;
+  const title = `${t.one} ${composante.code.slice(1)} — ${composante.titre}`;
+  const description = composante.soustitre;
+  const path = `/${lang}${NAV.composantes}/${composante.slug}`;
   return {
     title,
     description,
@@ -51,8 +58,8 @@ export async function generateMetadata(props: { params: Promise<{ lang: string; 
     alternates: {
       canonical: path,
       languages: {
-        fr: `/fr${NAV.composantes}/${detail.slug}`,
-        en: `/en${NAV.composantes}/${detail.slug}`,
+        fr: `/fr${NAV.composantes}/${composante.slug}`,
+        en: `/en${NAV.composantes}/${composante.slug}`,
       },
     },
   };
@@ -61,50 +68,47 @@ export async function generateMetadata(props: { params: Promise<{ lang: string; 
 export default async function ComposantePage(props: { params: Promise<{ lang: string; code: string }> }) {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const detail = composanteDetail(params.code);
-  if (!detail) notFound();
 
-  const comp = composantes.find((c) => c.code === detail.code);
-  if (!comp) notFound();
+  const trouve = await composantePublique(params.code, lang);
+  if (!trouve) notFound();
+
+  const { composante: comp, toutes } = trouve;
 
   // Responsable administré depuis la console. `null` quand aucune fiche
   // publiée ne se rattache à la composante : la section disparaît alors, comme
   // elle le faisait sans profil renseigné.
-  const responsable = await membreComposante(detail.code, lang);
+  const responsable = await membreComposante(comp.code, lang);
 
   const t = dict(lang);
   const c = t.comp;
-  const num = detail.code.slice(1);
-  const color = compColor(detail.code);
-  const onColor = onComp(detail.code);
-  const odpLies = odpAll.filter((o) => detail.odp?.includes(o.code));
+  const num = comp.code.slice(1);
+  const onColor = onCompDe(comp.color);
 
-  const idx = composantesDetail.findIndex((d) => d.code === detail.code);
-  const prev = idx > 0 ? composantesDetail[idx - 1] : null;
-  const next = idx < composantesDetail.length - 1 ? composantesDetail[idx + 1] : null;
-  const compOf = (code: string) => composantes.find((x) => x.code === code);
+  const idx = toutes.findIndex((item) => item.code === comp.code);
+  const prev = idx > 0 ? toutes[idx - 1] : null;
+  const next = idx >= 0 && idx < toutes.length - 1 ? toutes[idx + 1] : null;
 
-  const tabs = composantesDetail.map((d) => ({
-    code: d.code,
-    label: pick(compOf(d.code)?.titre ?? d.titreLong, lang),
-    href: compRoute(lang, d.slug),
-    color: compColor(d.code),
-    active: d.code === detail.code,
+  const tabs = toutes.map((item) => ({
+    code: item.code,
+    label: item.titre,
+    href: compRoute(lang, item.slug),
+    color: item.color,
+    active: item.code === comp.code,
   }));
 
   const anchors: SubNavAnchor[] = [
-    ...(detail.problematique ? [{ id: "problematique", label: c.aProblematique }] : []),
+    ...(comp.problematique ? [{ id: "problematique", label: c.aProblematique }] : []),
     { id: "contexte", label: c.aContexte },
-    ...(detail.video ? [{ id: "video", label: c.aVideo }] : []),
-    { id: "objectifs", label: c.aObjectifs },
-    ...(detail.projets.length ? [{ id: "projets", label: c.aProjets }] : []),
-    ...(detail.ecosysteme || odpLies.length ? [{ id: "ecosysteme", label: c.aEcosysteme }] : []),
-    ...(detail.finalite ? [{ id: "finalite", label: c.aFinalite }] : []),
+    ...(comp.video ? [{ id: "video", label: c.aVideo }] : []),
+    ...(comp.objectifs.length ? [{ id: "objectifs", label: c.aObjectifs }] : []),
+    ...(comp.projets.length ? [{ id: "projets", label: c.aProjets }] : []),
+    ...(comp.ecosysteme || comp.odpCodes.length ? [{ id: "ecosysteme", label: c.aEcosysteme }] : []),
+    ...(comp.finalite ? [{ id: "finalite", label: c.aFinalite }] : []),
     ...(responsable ? [{ id: "responsable", label: c.aResponsable }] : []),
   ];
 
   return (
-    <div className="comp-page" style={compTint(detail.code)}>
+    <div className="comp-page" style={compTintDe(comp.color)}>
       {/* ===== HÉROS ===== */}
       <section className="comp-hero">
         <div className="section__inner comp-hero__inner">
@@ -127,28 +131,28 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
 
             <Reveal variant="fade" delay={0.05}>
               <div className="comp-hero__badges">
-                <span className="mono comp-hero__code" style={{ background: color, color: onColor }}>
-                  {detail.code}
+                <span className="mono comp-hero__code" style={{ background: comp.color, color: onColor }}>
+                  {comp.code}
                 </span>
-                <span className="mono comp-hero__kind">{pick(comp.titre, lang)}</span>
+                <span className="mono comp-hero__kind">{comp.titre}</span>
               </div>
             </Reveal>
 
             <Reveal variant="mask" delay={0.08}>
-              <h1 className="comp-hero__h1">{pick(detail.titreLong, lang)}</h1>
+              <h1 className="comp-hero__h1">{comp.titreLong}</h1>
             </Reveal>
 
             <Reveal variant="up" delay={0.14}>
-              <p className="comp-hero__lead">{pick(detail.soustitre, lang)}</p>
+              <p className="comp-hero__lead">{comp.soustitre}</p>
             </Reveal>
 
             <Reveal variant="up" delay={0.2} className="comp-hero__cta stack-sm">
-              {detail.projets.length > 0 && (
+              {comp.projets.length > 0 && (
                 <AnchorLink to="projets" className="btn btn--primary">
                   {c.secProjets} <span className="arrow">↓</span>
                 </AnchorLink>
               )}
-              {detail.video && (
+              {comp.video && (
                 <AnchorLink to="video" className="btn btn--on-dark">{c.videoLabel}</AnchorLink>
               )}
               <Link href={route(lang, NAV.composantes)} className="btn btn--on-dark">{c.seeAll}</Link>
@@ -159,14 +163,14 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
           <Reveal variant="fade" delay={0.12} className="comp-hero__figures">
             <div className="mono comp-hero__figures-head">
               <span>{c.perimetre}</span>
-              <span style={{ color: "var(--ac-light)" }}>{detail.code}</span>
+              <span style={{ color: "var(--ac-light)" }}>{comp.code}</span>
             </div>
             <div className="comp-hero__figure comp-hero__figure--big">
               <div className="stat__num">
-                {detail.projets.length > 0 ? <Counter to={detail.projets.length} dur={900} /> : "—"}
+                {comp.projets.length > 0 ? <Counter to={comp.projets.length} dur={900} /> : "—"}
               </div>
               <div className="mono comp-hero__sub">
-                {detail.projets.length > 0 ? c.share : c.noDotation}
+                {comp.projets.length > 0 ? c.share : c.noDotation}
               </div>
             </div>
             <div className="comp-hero__figure comp-hero__split">
@@ -176,7 +180,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
               </div>
               <div>
                 <div className="mono comp-hero__k">{c.objectifsCount}</div>
-                <div className="mono comp-hero__v">{detail.objectifs.length}</div>
+                <div className="mono comp-hero__v">{comp.objectifs.length}</div>
               </div>
             </div>
             <div className="comp-hero__figure comp-hero__split">
@@ -187,7 +191,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
               <div>
                 <div className="mono comp-hero__k">{c.statut}</div>
                 <div className="mono comp-hero__v comp-hero__v--txt">
-                  {detail.projets.length > 0 ? c.statutExec : c.statutReserve}
+                  {comp.projets.length > 0 ? c.statutExec : c.statutReserve}
                 </div>
               </div>
             </div>
@@ -198,7 +202,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
       <CompSubNav tabs={tabs} anchors={anchors} />
 
       {/* ===== PROBLÉMATIQUE ===== */}
-      <CompProblematique pb={detail.problematique} lang={lang} />
+      <CompProblematique comp={comp} voisines={toutes} lang={lang} />
 
       {/* ===== CONTEXTE ===== */}
       <section className="section section--grey" id="contexte" data-anchor>
@@ -208,7 +212,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
               <Kicker>{c.secContexte}</Kicker>
             </Reveal>
             <RevealGroup gap={0.05}>
-              {(lang === "en" ? detail.chapeau.en : detail.chapeau.fr).map((para, i) => (
+              {comp.chapeau.map((para, i) => (
                 <RevealItem key={i}>
                   <p className={i === 0 ? "comp-chapeau comp-chapeau--first" : "comp-chapeau"}>{para}</p>
                 </RevealItem>
@@ -221,9 +225,11 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
             {comp.sous.length > 0 ? (
               <ul className="comp-aside__list">
                 {comp.sous.map((s) => (
-                  <li key={s.ref}>
-                    <div className="mono comp-aside__row"><span>{s.ref}</span></div>
-                    <div className="comp-aside__text">{pick(s.text, lang)}</div>
+                  <li key={s.id}>
+                    {s.reference && (
+                      <div className="mono comp-aside__row"><span>{s.reference}</span></div>
+                    )}
+                    <div className="comp-aside__text">{s.titre}</div>
                   </li>
                 ))}
               </ul>
@@ -238,75 +244,77 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
       </section>
 
       {/* ===== VIDÉO DE PRÉSENTATION ===== */}
-      <CompVideo video={detail.video} code={detail.code} lang={lang} />
+      <CompVideo comp={comp} lang={lang} />
 
       {/* ===== OBJECTIFS ===== */}
-      <section className="section" id="objectifs" data-anchor>
-        <div className="section__inner">
-          <Reveal>
-            <Kicker>{c.secObjectifs}</Kicker>
-            <h2 className="h2--sm comp-h2">
-              {detail.objectifs.length} {c.objectifsCount}
-            </h2>
-          </Reveal>
-          <RevealGroup className="comp-objectifs" gap={0.035}>
-            {detail.objectifs.map((o, i) => (
-              <RevealItem key={i} className="comp-objectif">
-                <span className="mono comp-objectif__n">{String(i + 1).padStart(2, "0")}</span>
-                <span className="comp-objectif__t">{pick(o, lang)}</span>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+      {comp.objectifs.length > 0 && (
+        <section className="section" id="objectifs" data-anchor>
+          <div className="section__inner">
+            <Reveal>
+              <Kicker>{c.secObjectifs}</Kicker>
+              <h2 className="h2--sm comp-h2">
+                {comp.objectifs.length} {c.objectifsCount}
+              </h2>
+            </Reveal>
+            <RevealGroup className="comp-objectifs" gap={0.035}>
+              {comp.objectifs.map((o, i) => (
+                <RevealItem key={o.id} className="comp-objectif">
+                  <span className="mono comp-objectif__n">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="comp-objectif__t">{o.texte}</span>
+                </RevealItem>
+              ))}
+            </RevealGroup>
+          </div>
+        </section>
+      )}
 
       {/* ===== PROJETS PHARES ===== */}
-      {detail.projets.length > 0 && (
+      {comp.projets.length > 0 && (
         <section className="section" id="projets" data-anchor>
           <div className="section__inner">
             <Reveal>
               <Kicker>{c.secProjets}</Kicker>
               <h2 className="h2--sm comp-h2">
-                {detail.projets.length} {c.projets}
+                {comp.projets.length} {c.projets}
               </h2>
               <p className="lead comp-lead">{c.secProjetsLead}</p>
             </Reveal>
-            <ProjetsPhares projets={detail.projets} lang={lang} />
+            <ProjetsPhares projets={comp.projets} label={c.secProjets} />
           </div>
         </section>
       )}
 
       {/* ===== ÉCOSYSTÈME + INDICATEURS ===== */}
-      {(detail.ecosysteme || odpLies.length > 0) && (
+      {(comp.ecosysteme || comp.odpCodes.length > 0) && (
         <section className="section section--dark" id="ecosysteme" data-anchor>
           <div className="section__inner">
-            {detail.ecosysteme && (
+            {comp.ecosysteme && (
               <>
                 <Reveal>
                   <Kicker light>{c.secEcosysteme}</Kicker>
-                  <h2 className="h2--sm comp-h2">{pick(detail.ecosysteme.titre, lang)}</h2>
-                  <p className="comp-eco__lead">{pick(detail.ecosysteme.lead, lang)}</p>
+                  <h2 className="h2--sm comp-h2">{comp.ecosysteme.titre}</h2>
+                  <p className="comp-eco__lead">{comp.ecosysteme.lead}</p>
                 </Reveal>
                 <RevealGroup className="comp-eco" gap={0.045}>
-                  {detail.ecosysteme.couches.map((k, i) => (
-                    <RevealItem key={i} className="comp-eco__row">
+                  {comp.ecosysteme.couches.map((k, i) => (
+                    <RevealItem key={k.id} className="comp-eco__row">
                       <span className="mono comp-eco__n">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="comp-eco__t">{pick(k.t, lang)}</span>
-                      <span className="comp-eco__d">{pick(k.d, lang)}</span>
+                      <span className="comp-eco__t">{k.titre}</span>
+                      <span className="comp-eco__d">{k.texte}</span>
                     </RevealItem>
                   ))}
                 </RevealGroup>
               </>
             )}
 
-            {odpLies.length > 0 && (
-              <div className={detail.ecosysteme ? "comp-odp comp-odp--after" : "comp-odp"}>
+            {comp.odpCodes.length > 0 && (
+              <div className={comp.ecosysteme ? "comp-odp comp-odp--after" : "comp-odp"}>
                 <Reveal>
                   <Kicker light>{c.secIndicateurs}</Kicker>
                 </Reveal>
                 {/* Quatrième copie de la même grille jusqu'ici, avec ses propres
                     tailles : le composant partagé la sert désormais partout. */}
-                <GrilleODP lang={lang} variante="complet" codes={detail.odp} />
+                <GrilleODP lang={lang} variante="complet" codes={comp.odpCodes} />
                 <Link href={route(lang, NAV.resultats)} className="mono comp-aside__link">
                   {t.cta.resultats} →
                 </Link>
@@ -317,19 +325,19 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
       )}
 
       {/* ===== FINALITÉ ===== */}
-      {detail.finalite && (
+      {comp.finalite && (
         <section className="section section--pale" id="finalite" data-anchor>
           <div className="section__inner">
             <Reveal>
               <Kicker>{c.secFinalite}</Kicker>
-              <h2 className="h2--sm comp-h2">{pick(detail.finalite.titre, lang)}</h2>
-              <p className="lead comp-lead">{pick(detail.finalite.lead, lang)}</p>
+              <h2 className="h2--sm comp-h2">{comp.finalite.titre}</h2>
+              <p className="lead comp-lead">{comp.finalite.lead}</p>
             </Reveal>
             <RevealGroup className="comp-finalite" gap={0.04}>
-              {detail.finalite.points.map((p, i) => (
-                <RevealItem key={i} className="comp-finalite__item">
+              {comp.finalite.points.map((p) => (
+                <RevealItem key={p.id} className="comp-finalite__item">
                   <span className="comp-finalite__mark" aria-hidden />
-                  <span>{pick(p, lang)}</span>
+                  <span>{p.texte}</span>
                 </RevealItem>
               ))}
             </RevealGroup>
@@ -341,7 +349,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
       <CompResponsable membre={responsable} comp={comp} lang={lang} />
 
       {/* ===== CONTENUS RATTACHÉS ===== */}
-      <CompLies code={detail.code} lang={lang} />
+      <CompLies code={comp.code} lang={lang} />
 
       {/* ===== PAGER + CTA =====
           Le pager passe en `avant` du bloc partagé : il reste dans la même
@@ -353,8 +361,8 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
               <Link href={compRoute(lang, prev.slug)} className="comp-pager__link">
                 <span className="mono comp-pager__k">← {c.prev}</span>
                 <span className="comp-pager__t">
-                  <span className="mono" style={{ color: compColor(prev.code) }}>{prev.code}</span>{" "}
-                  {pick(compOf(prev.code)?.titre ?? prev.titreLong, lang)}
+                  <span className="mono" style={{ color: prev.color }}>{prev.code}</span>{" "}
+                  {prev.titre}
                 </span>
               </Link>
             ) : null}
@@ -362,8 +370,8 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
               <Link href={compRoute(lang, next.slug)} className="comp-pager__link comp-pager__link--next">
                 <span className="mono comp-pager__k">{c.next} →</span>
                 <span className="comp-pager__t">
-                  <span className="mono" style={{ color: compColor(next.code) }}>{next.code}</span>{" "}
-                  {pick(compOf(next.code)?.titre ?? next.titreLong, lang)}
+                  <span className="mono" style={{ color: next.color }}>{next.code}</span>{" "}
+                  {next.titre}
                 </span>
               </Link>
             ) : null}
