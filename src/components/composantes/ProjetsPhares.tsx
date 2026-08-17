@@ -5,15 +5,13 @@
    complète, impression correcte. En mobile, l'index devient une bande d'ancres
    défilable au-dessus du contenu. */
 import { useCallback, useEffect, useState } from "react";
-import type { Lang } from "@/lib/pick";
-import { pick } from "@/lib/pick";
-import type { CompProjet } from "@/content/types";
+import type { ProjetPhareVue } from "@/lib/projet/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 type LenisLike = { scrollTo: (t: string | HTMLElement, o?: { offset?: number }) => void };
 const OFFSET = 132;
 
-export function ProjetsPhares({ projets, lang }: { projets: CompProjet[]; lang: Lang }) {
+export function ProjetsPhares({ projets, label }: { projets: ProjetPhareVue[]; label: string }) {
   const [active, setActive] = useState<string>(projets[0]?.slug ?? "");
 
   useEffect(() => {
@@ -47,49 +45,51 @@ export function ProjetsPhares({ projets, lang }: { projets: CompProjet[]; lang: 
 
   return (
     <div className="projets-split">
-      <aside className="projets-index" aria-label="Projets phares">
+      {/* Le libellé arrive du serveur : ce composant est client, il n'a pas
+          accès au dictionnaire de la langue de lecture. */}
+      <aside className="projets-index" aria-label={label}>
         {projets.map((p) => (
           <a
-            key={p.slug}
+            key={p.id}
             href={`#projet-${p.slug}`}
             onClick={(e) => goTo(e, p.slug)}
             aria-current={active === p.slug ? "true" : undefined}
             className={active === p.slug ? "projet-link projet-link--on" : "projet-link"}
           >
-            <span className="mono projet-link__n">{p.n}</span>
-            <span className="projet-link__t">{p.sigle ? `${p.sigle} — ${pick(p.titre, lang)}` : pick(p.titre, lang)}</span>
+            <span className="mono projet-link__n">{p.numero}</span>
+            <span className="projet-link__t">{p.sigle ? `${p.sigle} — ${p.titre}` : p.titre}</span>
           </a>
         ))}
       </aside>
 
       <RevealGroup className="projets-body" gap={0.05}>
         {projets.map((p) => (
-          <RevealItem key={p.slug} className="projet-bloc">
+          <RevealItem key={p.id} className="projet-bloc">
             <article id={`projet-${p.slug}`} data-anchor>
               <header className="projet-bloc__head">
-                <span className="mono projet-bloc__n">{p.n}</span>
+                <span className="mono projet-bloc__n">{p.numero}</span>
                 <div>
                   <h3 className="projet-bloc__titre">
                     {p.sigle && <span className="projet-bloc__sigle">{p.sigle}</span>}
-                    {pick(p.titre, lang)}
+                    {p.titre}
                   </h3>
-                  {p.statut && <span className="mono projet-bloc__statut">{pick(p.statut, lang)}</span>}
+                  {p.statut && <span className="mono projet-bloc__statut">{p.statut}</span>}
                 </div>
               </header>
 
-              {(lang === "en" ? p.corps.en : p.corps.fr).map((para, i) => (
+              {p.corps.map((para, i) => (
                 <p key={i} className="projet-bloc__p">{para}</p>
               ))}
 
-              {p.points && p.points.length > 0 && (
+              {p.points.length > 0 && (
                 <ul className="projet-bloc__points">
                   {p.points.map((pt, i) => (
-                    <li key={i}>{pick(pt, lang)}</li>
+                    <li key={i}>{pt}</li>
                   ))}
                 </ul>
               )}
 
-              {p.chute && <p className="projet-bloc__p projet-bloc__chute">{pick(p.chute, lang)}</p>}
+              {p.chute && <p className="projet-bloc__p projet-bloc__chute">{p.chute}</p>}
             </article>
           </RevealItem>
         ))}

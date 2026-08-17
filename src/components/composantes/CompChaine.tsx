@@ -5,64 +5,60 @@
    laquelle l'index ne répondait pas était pourtant celle-ci : pourquoi cinq
    volets plutôt que cinq projets séparés.
 
-   Rien n'est inventé : les renvois sont ceux déjà rédigés dans le champ
-   `problematique.liens` de chaque composante, filtrés sur ceux qui désignent
-   une autre composante. Les renvois hors projet (énergie, cadre juridique)
-   restent sur la page de la composante, où ils ont leur contexte. */
+   Rien n'est inventé : les renvois sont ceux rédigés dans la problématique de
+   chaque composante, filtrés sur ceux qui désignent une AUTRE composante. Les
+   renvois hors projet (énergie, cadre juridique) restent sur la page de la
+   composante, où ils ont leur contexte. */
 import Link from "next/link";
 import type { Lang } from "@/lib/pick";
-import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { composantes } from "@/content/data";
-import { composantesDetail } from "@/content/composantes-detail";
+import type { ComposanteVue } from "@/lib/projet/query";
 import { compRoute } from "@/lib/routes";
-import { compColor, onComp } from "@/lib/comp";
+import { compColor, onCompDe } from "@/lib/comp";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
-export function CompChaine({ lang }: { lang: Lang }) {
-  const compOf = (code: string) => composantes.find((c) => c.code === code);
+export function CompChaine({ composantes, lang }: { composantes: ComposanteVue[]; lang: Lang }) {
   const dependLabel = dict(lang).comp.chaineDepend;
+  const parCode = new Map(composantes.map((comp) => [comp.code.toUpperCase(), comp]));
 
-  const blocs = composantesDetail
-    .map((d) => ({
-      code: d.code,
-      slug: d.slug,
-      titre: pick(compOf(d.code)?.titre ?? d.titreLong, lang),
-      liens: (d.problematique?.liens ?? []).filter((l) => l.code),
+  const blocs = composantes
+    .map((comp) => ({
+      comp,
+      /* Un renvoi ne fait chaîne que s'il vise une composante SERVIE : viser une
+         composante en brouillon, ou non traduite dans cette langue, donnerait un
+         lien vers une page qui répond 404. */
+      liens: (comp.problematique?.liens ?? []).filter(
+        (lien) => lien.cible && parCode.has(lien.cible.toUpperCase()),
+      ),
     }))
-    .filter((b) => b.liens.length > 0);
+    .filter((bloc) => bloc.liens.length > 0);
 
-  /* Aucune composante n'a encore de renvoi rédigé : la section disparaît
-     plutôt que d'afficher une grille vide. */
+  /* Aucune composante n'a de renvoi rédigé : la section disparaît plutôt que
+     d'afficher une grille vide. */
   if (blocs.length === 0) return null;
 
   return (
     <RevealGroup className="celled-flow chaine" gap={0.05}>
-      {blocs.map((b) => (
-        <RevealItem key={b.code} className="chaine__bloc" style={{ borderTop: `3px solid ${compColor(b.code)}` }}>
+      {blocs.map(({ comp, liens }) => (
+        <RevealItem key={comp.id} className="chaine__bloc" style={{ borderTop: `3px solid ${comp.color}` }}>
           <div className="chaine__head">
-            <span className="mono chaine__code" style={{ background: compColor(b.code), color: onComp(b.code) }}>{b.code}</span>
-            <h3 className="chaine__titre">{b.titre}</h3>
+            <span className="mono chaine__code" style={{ background: comp.color, color: onCompDe(comp.color) }}>
+              {comp.code}
+            </span>
+            <h3 className="chaine__titre">{comp.titre}</h3>
           </div>
           <div className="mono chaine__k">{dependLabel}</div>
           <ul className="chaine__liste">
-            {b.liens.map((l, i) => {
-              const code = l.code as string;
-              const detail = composantesDetail.find((d) => d.code === code);
-              const corps = (
-                <>
-                  <span className="mono chaine__vers" style={{ color: compColor(code) }}>{code}</span>
-                  <span className="chaine__quoi">{pick(l.t, lang)}</span>
-                  <span className="chaine__go" aria-hidden>→</span>
-                </>
-              );
+            {liens.map((lien) => {
+              const cible = parCode.get((lien.cible ?? "").toUpperCase());
+              const couleur = cible?.color ?? compColor(lien.cible ?? "");
               return (
-                <li key={i}>
-                  {detail ? (
-                    <Link href={compRoute(lang, detail.slug)} className="chaine__lien">{corps}</Link>
-                  ) : (
-                    <span className="chaine__lien chaine__lien--inerte">{corps}</span>
-                  )}
+                <li key={lien.id}>
+                  <Link href={compRoute(lang, cible!.slug)} className="chaine__lien">
+                    <span className="mono chaine__vers" style={{ color: couleur }}>{cible!.code}</span>
+                    <span className="chaine__quoi">{lien.texte}</span>
+                    <span className="chaine__go" aria-hidden>→</span>
+                  </Link>
                 </li>
               );
             })}

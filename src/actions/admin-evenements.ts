@@ -48,7 +48,7 @@ import { slugify, uniqueSlug } from "@/lib/actus/slug";
 import { isEvenementMode, isEvenementStatut } from "@/lib/events/statut";
 import { INSCRIPTION_LABEL, isInscriptionStatut } from "@/lib/events/inscription";
 import { revaliderEvenements } from "@/lib/events/cache";
-import { composantes } from "@/content/data";
+import { codesComposantes } from "@/lib/projet/query";
 
 /** État partagé par tous les formulaires du module. */
 export type EvtFormState = { error: string | null; ok: string | null };
@@ -66,7 +66,6 @@ const CATEGORIES_PATH = adminPath("/events/categories");
  */
 const INSCRIPTIONS_SEGMENT = "registrations";
 
-const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 
 /** Nom des langues dans les messages rendus à l'utilisateur. */
 const LANGUE_LABEL: Record<Lang, string> = { fr: "française", en: "anglaise" };
@@ -167,8 +166,9 @@ async function slugUnique(locale: Lang, base: string, evenementId: string | null
 }
 
 /** Codes de composante cochés, réduits à ceux qui existent réellement. */
-function lireComposantes(formData: FormData): string[] {
-  return formData.getAll("comps").map(String).filter((code) => CODES_COMPOSANTE.has(code));
+async function lireComposantes(formData: FormData): Promise<string[]> {
+  const admis = await codesComposantes();
+  return formData.getAll("comps").map(String).filter((code) => admis.has(code));
 }
 
 /**
@@ -195,7 +195,7 @@ function lireDates(formData: FormData): { startAt: Date; endAt: Date | null } | 
 }
 
 /** Champs de la fiche, communs à toutes les langues. */
-function lireFiche(formData: FormData) {
+async function lireFiche(formData: FormData) {
   const coverMediaId = optionnel(texte(formData, "coverMediaId"));
   const modeBrut = texte(formData, "mode");
 
@@ -204,7 +204,7 @@ function lireFiche(formData: FormData) {
     featured: coche(formData, "featured"),
     mode: isEvenementMode(modeBrut) ? modeBrut : ("PRESENTIEL" as const),
     color: lireCouleur(texte(formData, "color")),
-    comps: lireComposantes(formData),
+    comps: await lireComposantes(formData),
     categoryId: optionnel(texte(formData, "categoryId")),
     coverMediaId,
     // Une couverture issue de la bibliothèque prime sur une clé du registre :
@@ -268,7 +268,7 @@ export async function creerEvenementAction(
     };
   }
 
-  const fiche = lireFiche(formData);
+  const fiche = await lireFiche(formData);
   traduction.slug = await slugUnique(locale, traduction.slug, null);
 
   const evenement = await db().evenement.create({
@@ -324,7 +324,7 @@ export async function enregistrerFicheEvtAction(
 
   await db().evenement.update({
     where: { id },
-    data: { ...lireFiche(formData), ...dates, status: statut },
+    data: { ...(await lireFiche(formData)), ...dates, status: statut },
   });
 
   revalidatePath(`${EVTS_PATH}/${id}`);

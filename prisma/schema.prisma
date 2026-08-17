@@ -97,6 +97,8 @@ model User {
   galerieSaisie    GalerieItem[]   @relation("GalerieSaisiPar")
   /// Albums de la galerie créés par ce compte — trace interne.
   albumsSaisis     GalerieAlbum[]  @relation("AlbumSaisiPar")
+  /// Composantes du Projet saisies par ce compte — trace interne.
+  composantesSaisies Composante[]  @relation("ComposanteSaisiePar")
 
   @@index([role])
 }
@@ -366,6 +368,10 @@ model MediaAsset {
   portraits   TeamMember[]
   /// Rapports rédigés en ligne dont ce média est l'image de couverture.
   couverturesDoc Document[]
+  /// Visuels de héros des pages de composante.
+  herosComposante Composante[]     @relation("ComposanteCouverture")
+  /// Visuels des projets phares d'une composante.
+  visuelsProjet   ComposanteBloc[] @relation("ComposanteBlocVisuel")
 
   @@index([createdAt])
 }
@@ -1838,4 +1844,300 @@ model GalerieItem {
   @@index([albumId, position])
   @@index([featured])
   @@index([priseAt])
+}
+
+/// ===========================================================================
+/// « Le projet » — les composantes et le cadre de résultats.
+///
+/// Le groupe « Le projet » de la navigation publique tient trois pages : la
+/// page du Projet, l'index des composantes et leurs cinq pages dédiées, et la
+/// page des résultats. Seules les BANDES DE RÉCIT de la première étaient
+/// administrables (cf. `ImpactSection`) ; tout le reste — les cinq composantes,
+/// leurs sous-composantes, leur problématique, leurs projets phares, et les
+/// indicateurs du cadre de résultats — vivait en dur dans `src/content/`.
+///
+/// Deux ensembles, donc, et une même règle que partout ailleurs : ce qui
+/// appartient à la FICHE d'un côté, ce qui appartient à UNE LANGUE de l'autre.
+///
+/// ⚠️ Ces données restent CANONIQUES au sens du Manuel d'Exécution : montants,
+/// clés IDA/AFD, références de sous-composantes et valeurs cibles des
+/// indicateurs ne sont pas de la rédaction. Les rendre administrables ne les
+/// rend pas discutables — cela évite qu'une correction du MEP demande une mise
+/// en production.
+/// ===========================================================================
+
+enum ProjetStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Nature d'un bloc d'une composante.
+///
+/// Une SEULE table porte les huit listes d'une page de composante, distinguées
+/// par ce type. Huit tables spécialisées demanderaient huit formulaires pour un
+/// geste identique — ajouter une ligne, la déplacer, la traduire — alors que
+/// leurs champs se recouvrent presque entièrement (cf. src/lib/projet/statut.ts,
+/// qui tient la table des champs demandés et de leurs intitulés).
+enum ComposanteBlocType {
+  /// Sous-composante du MEP : sa référence (« 1.2 »), son intitulé, sa dotation.
+  SOUS_COMPOSANTE
+  /// Un paragraphe du contexte, dans la colonne de gauche de la page.
+  CHAPEAU
+  /// Un axe de la problématique : constat, mécanisme, coût de l'inaction.
+  PB_AXE
+  /// Un paragraphe de l'appui : ce qui légitime l'intervention publique.
+  PB_APPUI
+  /// Un renvoi de la problématique. `cible` pointe vers une autre composante,
+  /// ou reste vide pour un renvoi hors projet (énergie, cadre juridique).
+  PB_LIEN
+  /// Un objectif de la composante.
+  OBJECTIF
+  /// Un projet phare : corps rédigé, puces, chute.
+  PROJET
+  /// Une brique de l'écosystème (section sombre).
+  ECO_COUCHE
+  /// Un point de la finalité.
+  FIN_POINT
+}
+
+/// Une composante du Projet, telle que le site la publie.
+model Composante {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché. Ancrage de l'amorçage
+  /// (cf. src/lib/projet/bootstrap.ts) : c'est lui qui garantit qu'une reprise
+  /// du contenu d'origine ne crée pas de doublon si elle est rejouée.
+  key String @unique
+
+  /// Code du MEP (« C1 »). Il s'affiche partout et sert de clé de rattachement
+  /// aux fiches de l'équipe, aux marchés et aux renvois entre composantes.
+  code   String @unique
+  /// Segment d'URL de la page dédiée (« c1 »).
+  slug   String @unique
+  /// Accent de la composante, en hexadécimal. Il teinte la page entière
+  /// (cf. `compTint` dans src/lib/comp.ts).
+  color  String
+  status ProjetStatus @default(DRAFT)
+  /// Ordre de lecture, de C1 à C5.
+  position Int @default(0)
+
+  /// --- Données canoniques du MEP ------------------------------------------
+  /// Dotation en millions de dollars. `0` pour une composante non dotée (CERC).
+  montant Float @default(0)
+  ida     Float @default(0)
+  afd     Float @default(0)
+
+  /// Indicateurs d'objectif rattachés, par leur code (« ODP-1 »). La page de la
+  /// composante en tire sa grille ; un code inconnu est simplement ignoré.
+  odpCodes String[] @default([])
+
+  /// --- Visuel du héros -----------------------------------------------------
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation("ComposanteCouverture", fields: [coverMediaId], references: [id], onDelete: SetNull)
+  /// Repli : clé du registre d'images intégré (cf. src/content/media.ts).
+  coverKey     String?
+
+  /// --- Vidéo de présentation ----------------------------------------------
+  /// L'emplacement existe dès qu'un poster est choisi : sans fichier ni
+  /// identifiant, la page affiche l'état « à venir » plutôt qu'une zone vide.
+  videoYt        String?
+  /// Fichier servi directement (« /videos/… »), quand la vidéo n'est pas sur
+  /// YouTube.
+  videoSrc       String?
+  /// Durée affichée sous le libellé, telle qu'elle doit se lire (« 4 min »).
+  videoDuree     String?
+  videoPosterKey String?
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("ComposanteSaisiePar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ComposanteTranslation[]
+  blocs        ComposanteBloc[]
+
+  @@index([status, position])
+}
+
+/// Version d'une composante dans une langue.
+///
+/// Deux registres cohabitent, et c'est voulu : le couple `titre` / `desc` est
+/// la formulation COURTE du MEP, celle des cartes et des lignes d'aperçu ; le
+/// couple `titreLong` / `soustitre` est la formulation ÉDITORIALE, celle du
+/// héros de la page dédiée. Les fondre donnerait un titre de carte long de
+/// deux lignes, ou un H1 qui ne dit rien de plus que l'étiquette.
+model ComposanteTranslation {
+  id           String     @id @default(cuid())
+  composanteId String
+  composante   Composante @relation(fields: [composanteId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale       String
+
+  /// Intitulé court du MEP (« Accès & inclusion numériques »).
+  titre     String?
+  /// Description courte, affichée sur les cartes et les lignes d'aperçu.
+  desc      String?
+  /// H1 éditorial de la page dédiée.
+  titreLong String?
+  /// Chapô du héros de la page dédiée.
+  soustitre String?
+
+  /// En-tête de « La problématique ».
+  pbTitre String?
+  pbLead  String?
+
+  /// En-tête de « L'écosystème » (section sombre).
+  ecoTitre String?
+  ecoLead  String?
+
+  /// En-tête de « La finalité ».
+  finTitre String?
+  finLead  String?
+
+  /// Titre de la vidéo de présentation, qui sert aussi d'alternative au poster.
+  videoTitre String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([composanteId, locale])
+  @@index([locale])
+}
+
+/// Une ligne d'une des huit listes d'une composante (cf. `ComposanteBlocType`).
+model ComposanteBloc {
+  id           String     @id @default(cuid())
+  composanteId String
+  composante   Composante @relation(fields: [composanteId], references: [id], onDelete: Cascade)
+
+  type     ComposanteBlocType
+  position Int                @default(0)
+  status   ProjetStatus       @default(PUBLISHED)
+
+  /// Référence affichée en mono : « 1.2 » pour une sous-composante, « 01 » pour
+  /// un projet phare. Une chaîne, parce qu'elle est rédigée et non calculée.
+  reference String?
+  /// Sigle d'un projet phare (« GOVNET »), affiché devant son titre.
+  sigle     String?
+  /// Ancre d'un projet phare dans la page (« cloud-souverain »).
+  slug      String?
+  /// Dotation d'une sous-composante, en millions de dollars.
+  montant   Float?
+  /// Code de la composante visée par un renvoi (`PB_LIEN`). Vide : renvoi hors
+  /// projet, qui s'affiche alors sans lien.
+  cible     String?
+
+  /// Visuel d'un projet phare.
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation("ComposanteBlocVisuel", fields: [coverMediaId], references: [id], onDelete: SetNull)
+  coverKey     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ComposanteBlocTranslation[]
+
+  @@index([composanteId, type, position])
+}
+
+/// Version d'un bloc dans une langue.
+///
+/// Deux champs de LIGNES s'ajoutent aux trois champs de texte : un projet phare
+/// se compose de plusieurs paragraphes et d'une liste de puces, que rien
+/// n'obligerait à saisir dans un ordre figé. Les stocker en tableau évite un
+/// niveau de table de plus pour une liste qui ne porte ni ordre propre ni
+/// réglage.
+model ComposanteBlocTranslation {
+  id     String         @id @default(cuid())
+  blocId String
+  bloc   ComposanteBloc @relation(fields: [blocId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale String
+
+  /// Intitulé de la ligne : l'axe, l'objectif, le projet, la couche, le point.
+  titre           String?
+  /// Corps principal : la description d'un axe, la chute d'un projet phare, le
+  /// paragraphe d'un contexte ou d'un appui.
+  texte           String?
+  /// Ligne courte propre à un gabarit : le statut affiché d'un projet phare.
+  texteSecondaire String?
+
+  /// Paragraphes du corps d'un projet phare, un par entrée.
+  paragraphes String[] @default([])
+  /// Puces d'un projet phare, une par entrée.
+  puces       String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([blocId, locale])
+  @@index([locale])
+}
+
+/// Famille d'un indicateur du cadre de résultats.
+enum IndicateurFamille {
+  /// Indicateur de l'Objectif de Développement du Projet. Quatre, affichés en
+  /// grille sur l'accueil, « Le projet », « Résultats » et les composantes.
+  ODP
+  /// Indicateur de résultat intermédiaire. Seule la page « Résultats » les
+  /// porte.
+  INTERMEDIAIRE
+}
+
+/// Un indicateur du cadre de résultats.
+model Indicateur {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché — ancrage de l'amorçage.
+  key String @unique
+
+  famille  IndicateurFamille
+  /// Code affiché en mono (« ODP-1 »). Vide pour un indicateur intermédiaire,
+  /// dont le dessin n'en montre pas.
+  code     String?
+  status   ProjetStatus      @default(DRAFT)
+  position Int               @default(0)
+
+  /// Valeur telle qu'elle doit s'afficher, séparateurs compris : « 10 000 ».
+  /// Une chaîne, parce que ce qui se lit n'est pas toujours un nombre.
+  valeur    String
+  /// La même valeur en nombre, quand le dessin l'anime au défilement (les ODP).
+  /// Vide : la valeur s'affiche telle quelle, sans compteur.
+  valeurNum Int?
+  /// Unité affichée en accent, à droite de la valeur (« millions », « kbit/s »).
+  unit      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations IndicateurTranslation[]
+
+  @@index([famille, position])
+  @@index([status])
+}
+
+/// Version d'un indicateur dans une langue.
+model IndicateurTranslation {
+  id           String     @id @default(cuid())
+  indicateurId String
+  indicateur   Indicateur @relation(fields: [indicateurId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale       String
+
+  /// Ce que l'indicateur mesure.
+  label    String?
+  /// Point de départ, tel qu'il doit se lire (« 6,56 kbit/s »). La virgule
+  /// décimale du français devient un point en anglais : le champ se traduit.
+  baseline String?
+  /// Précision affichée en pastille d'accent (« dont environ la moitié de
+  /// femmes »). Vide : aucune pastille.
+  note     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([indicateurId, locale])
+  @@index([locale])
 }

@@ -9,8 +9,8 @@ import Link from "next/link";
 import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { contact } from "@/content/carbon";
-import type { Composante } from "@/content/types";
 import type { MembreEquipe } from "@/lib/equipe/query";
+import type { ComposanteVue } from "@/lib/projet/query";
 import { NAV, route } from "@/lib/routes";
 import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
@@ -22,7 +22,7 @@ export function CompResponsable({
   lang,
 }: {
   membre?: MembreEquipe | null;
-  comp: Composante;
+  comp: ComposanteVue;
   lang: Lang;
 }) {
   if (!membre) return null;
@@ -67,8 +67,8 @@ export function CompResponsable({
                   <div className="mono label-mono" style={{ marginBottom: 10 }}>{t.respPerimetre}</div>
                   <ul>
                     {comp.sous.map((s) => (
-                      <li key={s.ref}>
-                        <span className="mono">{s.ref}</span> {pickSous(s.text, lang)}
+                      <li key={s.id}>
+                        {s.reference && <span className="mono">{s.reference}</span>} {s.titre}
                       </li>
                     ))}
                   </ul>
@@ -87,9 +87,4 @@ export function CompResponsable({
       </div>
     </section>
   );
-}
-
-/** Le périmètre reste écrit dans le code : il décrit la composante, pas la personne. */
-function pickSous(text: { fr: string; en: string }, lang: Lang): string {
-  return lang === "en" ? text.en : text.fr;
 }

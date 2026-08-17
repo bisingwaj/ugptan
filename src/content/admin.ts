@@ -1087,8 +1087,8 @@ export const ADMIN_SECTIONS_MODULE = {
     lead: "La page de l'Unité, bloc par bloc : la citation d'engagement, le mandat, les règles qui bornent ses décisions, l'organigramme des pôles, la méthode, puis les questions et le glossaire. Les fiches de l'équipe se tiennent depuis le module « L'équipe de l'Unité » ; cet écran n'en règle que l'en-tête.",
   },
   projet: {
-    title: "Le projet",
-    lead: "La page du Projet, bloc par bloc : le contexte et ses chiffres, les publics visés, les en-têtes des aperçus et la foire aux questions citoyenne. La frise des jalons et le diptyque « Ce que ça change » relèvent du module « Histoires & impact ». Les cinq composantes et les indicateurs ODP sont des données de structure : ils ne se rédigent pas.",
+    title: "Vue d'ensemble",
+    lead: "La page « Vue d'ensemble » du site, bloc par bloc : le contexte et ses chiffres, les publics visés, les en-têtes des deux aperçus et la foire aux questions citoyenne. La frise des jalons et le diptyque « Ce que ça change » relèvent du module « Histoires & impact ». Le contenu des deux aperçus, lui, se règle sur les écrans « Composantes » et « Résultats ».",
   },
 } as const;
 
@@ -1231,6 +1231,209 @@ export const ADMIN_IMPACT = {
   enregistrement: "Enregistrement…",
   voirSite: "Voir sur le site",
   voirSiteIndisponible: "La page publique s'ouvrira une fois la section publiée et traduite.",
+} as const;
+
+/* ===========================================================================
+   Module « Le projet » — composantes et cadre de résultats
+
+   ⚠️ Ce module a TROIS écrans, qui reprennent un à un les trois entrées du menu
+   « Le projet » du site public. Le vocabulaire ci-dessous est celui des deux
+   écrans propres au module ; le troisième — la page du Projet, bloc par bloc —
+   partage le moteur de sections et donc `ADMIN_IMPACT`.
+   =========================================================================== */
+
+/**
+ * Les trois écrans du module, dans l'ordre du menu public.
+ *
+ * ⚠️ Les LIBELLÉS sont ceux du sous-menu « Le Projet » du site, au mot près :
+ * « Vue d'ensemble », « Composantes », « Résultats » (cf. `navSub` et `nav`
+ * dans src/content/i18n.ts). Ce n'est pas une coquetterie. Un éditeur à qui on
+ * demande de corriger la page des composantes la cherche sous le nom qu'elle
+ * porte sur le site ; l'appeler autrement en console — « Les composantes »,
+ * « Le cadre de résultats » — lui impose de traduire mentalement à chaque fois,
+ * et fait douter qu'il s'agisse bien de la même page.
+ *
+ * Ils sont recopiés plutôt qu'importés : `content/i18n.ts` pèse soixante-dix
+ * kilo-octets et part au navigateur avec la barre latérale, qui est du code
+ * client. Un test tient l'alignement à leur place
+ * (cf. scripts/tests/admin-projet-nav.test.ts) : il échoue dès que l'un des
+ * deux bouge sans l'autre.
+ *
+ * `hint` répond à la question de l'éditeur — ce que je modifie ici, où
+ * est-ce que ça se voit — là où le `navDesc` du site répond à celle du
+ * visiteur : ce que je vais trouver sur cette page.
+ */
+export const ADMIN_PROJET_ONGLETS = [
+  {
+    slug: "",
+    label: "Vue d'ensemble",
+    /** Libellé public correspondant — pinné par le test d'alignement. */
+    public: "/project",
+    hint: "Ce qui s'affiche sur la page « Vue d'ensemble » du site : le contexte et ses chiffres, les publics visés, les en-têtes des deux aperçus et les questions citoyennes.",
+  },
+  {
+    slug: "/components",
+    label: "Composantes",
+    public: "/components",
+    hint: "Ce qui s'affiche sur la page « Composantes » du site et sur les pages dédiées de chaque composante : problématique, contexte, objectifs, projets phares, écosystème, finalité.",
+  },
+  {
+    slug: "/results",
+    label: "Résultats",
+    public: "/results",
+    hint: "Ce qui s'affiche sur la page « Résultats » du site : les indicateurs d'objectif et les indicateurs intermédiaires. Les mêmes indicateurs coiffent l'accueil, la vue d'ensemble et les pages de composante.",
+  },
+] as const;
+
+export const ADMIN_PROJET = {
+  title: "Le Projet",
+  lead: "Les trois pages du menu « Le Projet » du site. Chacune a son écran, sous son nom et dans son ordre : Vue d'ensemble, Composantes, Résultats.",
+
+  /* --- Composantes : liste -------------------------------------------------- */
+  composantesTitle: "Composantes",
+  composantesLead:
+    "Ce qui s'affiche sur la page « Composantes » du site, et sur la page dédiée de chaque composante : sa problématique, son contexte, ses objectifs, ses projets phares, son écosystème et sa finalité. Les montants et les références de sous-composante viennent du Manuel d'Exécution : ils se corrigent, ils ne se rédigent pas.",
+  nouvelle: "Nouvelle composante",
+  listeVide: "Aucune composante pour le moment.",
+  supprimeOk: "Composante supprimée.",
+  creeOk: "Composante créée. Remplissez ses sections puis publiez-la.",
+
+  colComposante: "Composante",
+  colStatut: "État",
+  colCode: "Code",
+  colLangues: "Langues",
+  colSections: "Sections remplies",
+  colOrdre: "Ordre",
+
+  sansTitre: "(sans intitulé)",
+  publier: "Publier",
+  depublier: "Retirer du site",
+  supprimer: "Supprimer",
+  supprimerConfirm:
+    "Supprimer définitivement cette composante, toutes ses entrées et toutes leurs traductions ? Sa page dédiée répondra 404. Cette action est irréversible.",
+  retourListe: "Retour aux composantes",
+
+  /* --- Composantes : création ---------------------------------------------- */
+  creer: "Créer la composante",
+  creation: "Création…",
+  langueRedaction: "Langue de rédaction",
+  langueRedactionAide:
+    "La composante naît dans cette langue. Les autres versions s'ajoutent ensuite depuis la fiche, chacune enregistrée séparément.",
+  creationLead:
+    "Donnez d'abord son code, son accent et son intitulé court. Une fois créée, sa fiche ouvre section par section tout ce que porte sa page dédiée.",
+
+  /* --- Fiche : sommaire ----------------------------------------------------- */
+  sommaire: "Sections de la page",
+  sommaireAide: "Dans l'ordre où elles s'affichent sur le site.",
+
+  /* --- Fiche : identité ----------------------------------------------------- */
+  champCode: "Code",
+  champCodeAide:
+    "Tel qu'il s'affiche : « C1 ». Il sert aussi de clé de rattachement aux actualités, aux publications et aux marchés — le changer déplace ces rattachements.",
+  champSlug: "Adresse de la page",
+  champSlugAide: "Le segment après /components. Vide : dérivé du code.",
+  champCouleur: "Accent de la composante",
+  champCouleurAide: "Il teinte toute la page dédiée : titres, boutons, filets, nappes de survol.",
+  champPosition: "Ordre",
+  champPositionAide: "Le plus petit passe en premier, dans l'index comme dans les aperçus.",
+  champTitre: "Intitulé court",
+  champTitreAide: "Celui du MEP. Il paraît sur les cartes, dans le fil d'Ariane et dans les lignes d'aperçu.",
+  champDesc: "Description courte",
+  champDescAide: "Deux à trois lignes, affichées sous l'intitulé dans les lignes d'aperçu.",
+  champTitreLong: "Titre de la page",
+  champTitreLongAide: "Le grand titre éditorial du héros. Vide : l'intitulé court en tient lieu.",
+  champSoustitre: "Chapô du héros",
+  champSoustitreAide: "Vide : la description courte en tient lieu.",
+  champVisuel: "Visuel du héros",
+
+  /* --- Fiche : MEP ---------------------------------------------------------- */
+  champMontant: "Dotation",
+  champMontantAide: "En millions de dollars. La virgule décimale est admise : « 43,1 ».",
+  champIda: "Part IDA",
+  champAfd: "Part AFD",
+  champOdp: "Indicateurs d'objectif rattachés",
+  champOdpAide:
+    "Ils forment la grille en bas de la page dédiée. Se règlent dans « Le cadre de résultats ».",
+  odpVide: "Aucun indicateur d'objectif n'est encore publié.",
+
+  /* --- Fiche : vidéo -------------------------------------------------------- */
+  champVideoYt: "Identifiant YouTube",
+  champVideoSrc: "Ou fichier servi directement",
+  champVideoSrcAide: "Un chemin du site (« /videos/c1.mp4 »).",
+  champVideoDuree: "Durée affichée",
+  champVideoDureeAide: "Telle qu'elle doit se lire : « 4 min ».",
+  champVideoPoster: "Affiche",
+  champVideoPosterAide:
+    "Sans affiche ni titre, l'emplacement n'existe pas. Avec l'affiche mais sans fichier, la page annonce « à venir ».",
+  champVideoTitre: "Titre de la vidéo",
+
+  /* --- Fiche : blocs -------------------------------------------------------- */
+  blocAjouter: "Ajouter",
+  blocVide: "Aucune entrée pour le moment.",
+  blocSansTitre: "Entrée sans intitulé",
+  blocMonter: "Monter",
+  blocDescendre: "Descendre",
+  blocSupprimer: "Supprimer l'entrée",
+  blocSupprimerConfirm: "Supprimer cette entrée et toutes ses traductions ?",
+  blocReglages: "Réglages de l'entrée",
+  blocStatut: "Affichage",
+  blocPosition: "Rang",
+  champSigle: "Sigle",
+  champSigleAide: "Affiché devant le titre : « GOVNET ». Vide : aucun.",
+  champAncre: "Ancre dans la page",
+  champAncreAide: "Le fragment d'URL du projet. Vide : dérivée du titre.",
+  champCible: "Composante visée",
+  champCibleAide:
+    "Rattaché à une composante, le renvoi devient cliquable et alimente la lecture transversale de l'index. Vide : renvoi hors projet, affiché sans lien.",
+  cibleAucune: "Renvoi hors projet",
+  champMontantBloc: "Dotation",
+
+  /* --- Cadre de résultats --------------------------------------------------- */
+  resultatsTitle: "Résultats",
+  resultatsLead:
+    "Ce qui s'affiche sur la page « Résultats » du site, à son unique endroit de saisie. Les indicateurs d'objectif coiffent aussi l'accueil, la vue d'ensemble et les pages de composante ; les intermédiaires ne paraissent que sur « Résultats ». Ces valeurs viennent du cadre de résultats du Manuel d'Exécution : elles se corrigent, elles ne se rédigent pas.",
+  indicateurAjouter: "Ajouter un indicateur",
+  indicateurVide: "Aucun indicateur dans cette famille.",
+  indicateurSupprimer: "Supprimer l'indicateur",
+  indicateurSupprimerConfirm: "Supprimer cet indicateur et toutes ses traductions ?",
+  champIndCode: "Code",
+  champIndCodeAide: "Affiché en mono au-dessus du chiffre : « ODP-1 ». C'est par lui qu'une composante s'y rattache.",
+  champValeur: "Valeur affichée",
+  champValeurAide: "Telle qu'elle doit se lire, séparateurs compris : « 10 000 », « 30 ».",
+  champValeurNum: "Valeur animée",
+  champValeurNumAide:
+    "Le nombre que le compteur fait défiler à l'apparition. Vide : la valeur s'affiche telle quelle, sans animation.",
+  champUnit: "Unité",
+  champUnitAide: "Affichée en accent, à droite du chiffre : « millions », « kbit/s ».",
+  champLabel: "Ce que l'indicateur mesure",
+  champBaseline: "Point de départ",
+  champBaselineAide:
+    "Tel qu'il doit se lire : « 6,56 kbit/s ». Se traduit : la virgule décimale du français devient un point en anglais.",
+  champNote: "Précision",
+  champNoteAide: "Affichée en pastille d'accent : « dont environ la moitié de femmes ». Vide : aucune pastille.",
+
+  /* --- Langues -------------------------------------------------------------- */
+  tradPresente: "traduit",
+  tradIncomplete: "incomplet",
+  tradManquante: "à traduire",
+  tradNouvelle: (langue: string) =>
+    `Cette version ${langue} n'existe pas encore. Renseignez-la puis enregistrez-la : elle ne touchera à aucune autre langue.`,
+  enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
+  enregistrerFiche: "Enregistrer les réglages",
+  supprimerTraduction: "Supprimer cette traduction",
+  supprimerTraductionConfirm:
+    "Supprimer cette version linguistique ? La composante restera en ligne dans les autres langues.",
+  majLe: "Modifié le",
+
+  aucunVisuel: "Aucun visuel",
+  choisirVisuel: "Choisir un visuel",
+  changerVisuel: "Changer",
+  retirerVisuel: "Retirer",
+  visuelPartage: "Le visuel vaut pour toutes les langues.",
+
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  voirSite: "Voir sur le site",
 } as const;
 
 /* ===========================================================================
@@ -1400,7 +1603,23 @@ export type AdminNavItem = {
   /** Absent tant que le module n'est pas implémenté. */
   slug?: string;
   soon?: boolean;
+  /**
+   * Écrans d'un module qui en compte plusieurs.
+   *
+   * ⚠️ Les enfants NE SONT PAS des modules : ils partagent la permission du
+   * parent et n'apparaissent donc jamais dans `ADMIN_NAV` ni dans les cases à
+   * cocher du module « Utilisateurs ». Ils reproduisent, dans la console, le
+   * sous-menu que le site public offre au visiteur — un éditeur qui cherche où
+   * se modifie la page des composantes la trouve là où il l'attend.
+   *
+   * La barre latérale ne les déplie que sur le module ACTIF : à quatorze
+   * modules, tout déplier rendrait la barre plus longue que l'écran.
+   */
+  children?: AdminNavChild[];
 };
+
+/** Un écran d'un module. Le chemin est complet, comme celui d'un module. */
+export type AdminNavChild = { slug: string; label: string };
 
 export type AdminNavSection = {
   key: string;
@@ -1462,7 +1681,17 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
          reprend ce découpage, sans quoi l'éditeur cherche où se modifie la page
          « L'UGPTN » et ne trouve qu'une entrée nommée autrement. */
       { key: "ugptn", label: "L'UGPTN", slug: "/ugptn" },
-      { key: "projet", label: "Le projet", slug: "/project" },
+      /* Trois écrans sous une seule permission : le module reprend, un à un et
+         sous leur nom, les trois entrées du menu « Le Projet » du site public. */
+      {
+        key: "projet",
+        label: "Le Projet",
+        slug: "/project",
+        children: ADMIN_PROJET_ONGLETS.map((onglet) => ({
+          slug: `/project${onglet.slug}`,
+          label: onglet.label,
+        })),
+      },
     ],
   },
   {

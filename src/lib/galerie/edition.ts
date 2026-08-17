@@ -9,7 +9,7 @@ import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { lectureConsole } from "@/lib/lecture";
 import { formatDateTime, toDateInput } from "@/lib/format";
-import { composantes } from "@/content/data";
+import { referentielComposantes } from "@/lib/projet/query";
 import type { AlbumSaisie, GalerieSaisie, ReferentielsGalerieSaisie } from "@/lib/galerie/saisie";
 import type { GalerieStatut, GalerieTypeMedia } from "@/lib/galerie/statut";
 
@@ -36,7 +36,7 @@ export async function chargerReferentielsGalerie(): Promise<ReferentielsGalerieS
 
   return {
     categories: categories.map((item) => ({ id: item.id, nom: item.nomFr })),
-    composantes: composantes.map((composante) => ({ code: composante.code, titre: composante.titre.fr })),
+    composantes: await referentielComposantes(),
     // L'année accompagne le titre : deux éditions d'un même atelier portent le
     // même nom, et seule la date les distingue dans une liste déroulante.
     albums: albums.map((album) => ({

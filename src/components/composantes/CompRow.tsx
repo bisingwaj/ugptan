@@ -10,18 +10,17 @@
    laissait plus de raison de cliquer. */
 import Link from "next/link";
 import type { Lang } from "@/lib/pick";
-import { pick } from "@/lib/pick";
-import type { Composante } from "@/content/types";
+import type { ComposanteVue } from "@/lib/projet/query";
 import { compRoute } from "@/lib/routes";
-import { compVar } from "@/lib/comp";
+import { compVarDe } from "@/lib/comp";
 
-export function CompRow({ comp, lang }: { comp: Composante; lang: Lang }) {
+export function CompRow({ comp, lang }: { comp: ComposanteVue; lang: Lang }) {
   return (
-    <Link href={compRoute(lang, comp.code)} className="comp-row comp-row--link" style={compVar(comp.code)}>
+    <Link href={compRoute(lang, comp.slug)} className="comp-row comp-row--link" style={compVarDe(comp.color)}>
       <span className="mono comp-row__code">{comp.code}</span>
       <span className="comp-row__corps">
-        <span className="comp-row__titre">{pick(comp.titre, lang)}</span>
-        <span className="comp-row__desc">{pick(comp.desc, lang)}</span>
+        <span className="comp-row__titre">{comp.titre}</span>
+        <span className="comp-row__desc">{comp.desc}</span>
       </span>
       <span className="comp-row__go" aria-hidden>→</span>
     </Link>
