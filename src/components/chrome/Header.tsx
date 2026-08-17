@@ -11,15 +11,10 @@ import { langues } from "@/content/data";
 import { BIDDERS_PORTAL_URL } from "@/lib/external";
 import { NAV, NAV_TREE, NAV_DRAWER, isGroup, route, type NavKey } from "@/lib/routes";
 import { usePrefersReducedMotion } from "@/components/motion/useReducedMotion";
+import { BrandLogo } from "@/components/chrome/BrandLogo";
 
 /** Courbe unique du tiroir : sortie franche, arrivée posée. */
 const EASE = [0.16, 1, 0.3, 1] as const;
-
-const Logo = ({ dark = false }: { dark?: boolean }) => (
-  <span className="relative inline-flex size-[30px] flex-none bg-ac">
-    <span className={cn("absolute right-[5px] bottom-[5px] size-[11px]", dark ? "bg-c-black" : "bg-white")} />
-  </span>
-);
 
 /* Entrées de la barre desktop — liens et boutons de groupe partagent le même
    gabarit pour que le soulignement actif reste aligné d'une entrée à l'autre.
@@ -105,9 +100,12 @@ export function Header({ lang }: { lang: Lang }) {
         {/* Les marges latérales composent le gabarit et la zone sûre : max() garde
             le contenu hors de l'encoche en paysage. */}
         <div className="mx-auto flex h-[calc(64px+var(--sa-t))] max-w-(--maxw) items-center justify-between gap-[18px] pt-(--sa-t) pr-[max(var(--pad-x),var(--sa-r))] pb-0 pl-[max(var(--pad-x),var(--sa-l))]">
-          <Link href={route(lang)} className="flex items-center gap-3">
-            <Logo />
-            <span className="text-[19px] font-bold tracking-[0.02em]">UGPTN</span>
+          {/* Le logo tient le rôle du nom : son mot-symbole est le texte
+              « ugptn ». Son `alt` nomme donc le lien, et reste visible si
+              l'image ne charge pas. `flex-none` le protège du resserrement
+              qu'impose la barre entre 1121 et 1280px. */}
+          <Link href={route(lang)} className="flex flex-none items-center">
+            <BrandLogo priority className="h-10 max-[480px]:h-[34px]" />
           </Link>
 
           <nav ref={navRef} className="nav-desktop flex items-center gap-0.5" aria-label={t.words.navigation}>

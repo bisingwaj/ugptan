@@ -4,6 +4,7 @@ import { dict } from "@/content/i18n";
 import { meta } from "@/content/data";
 import { contact } from "@/content/carbon";
 import { NAV, NAV_FOOTER, NAV_LEGAL, route } from "@/lib/routes";
+import { BrandLogo } from "@/components/chrome/BrandLogo";
 
 /* Classes partagées des colonnes. Volontairement déclinées en variantes
    complètes plutôt que composées par surcharge : deux utilitaires de même
@@ -21,12 +22,10 @@ export function Footer({ lang }: { lang: Lang }) {
     <footer className="bg-c-black text-c-30">
       <div className="footer-grid mx-auto grid max-w-(--maxw) grid-cols-[1.6fr_repeat(4,1fr)] gap-x-[clamp(24px,3vw,48px)] gap-y-[clamp(32px,4vw,44px)] px-(--pad-x) pt-[clamp(54px,7vw,88px)] pb-10">
         <div className="footer-brand">
-          <div className="mb-[18px] flex items-center gap-3">
-            <span className="relative inline-flex size-[30px] bg-ac">
-              <span className="absolute right-[5px] bottom-[5px] size-[11px] bg-c-black" />
-            </span>
-            <span className="text-[19px] font-bold text-white">UGPTN</span>
-          </div>
+          {/* Déclinaison au lettrage blanc : le pied de page est sur #161616.
+              La mention du logotype est absente de ce format, et le paragraphe
+              qui suit énonce déjà le nom complet de l'Unité. */}
+          <BrandLogo sombre className="mb-[18px] h-11" />
           <p className="max-w-[300px] text-[13.5px] leading-[1.6] text-c-50">{meta.uniteLong}</p>
           <p className="mt-4 font-mono text-[11.5px] leading-[1.7] text-c-60">{meta.tutelleLong}<br />{meta.bailleurs}</p>
           <p className="mt-3 max-w-[320px] font-mono text-[11px] leading-[1.6] text-c-50">{t.foot.source}</p>
