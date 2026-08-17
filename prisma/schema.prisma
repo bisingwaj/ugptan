@@ -2141,3 +2141,141 @@ model IndicateurTranslation {
   @@unique([indicateurId, locale])
   @@index([locale])
 }
+
+/// ===========================================================================
+/// « L'UGPTN » — la gouvernance du Projet.
+///
+/// Le menu « L'UGPTN » du site tient deux pages. La première, « L'Unité »,
+/// était déjà administrable bloc par bloc (cf. `ImpactSection`, emplacements
+/// `UGPTN_*`). La seconde, « Gouvernance », ne l'était pas du tout : les trois
+/// organes vivaient dans `src/content/data.ts`, la chronique de leurs décisions
+/// dans `src/content/carbon.ts`, et — plus gênant — la COMPOSITION du comité de
+/// pilotage et du comité technique était écrite dans le DICTIONNAIRE DE
+/// TRADUCTION, à côté des libellés d'interface. Corriger un siège demandait
+/// d'éditer `i18n.ts` ; ajouter un organe demandait de réécrire la page, dont
+/// la section « Composition » nommait COPIL et CTP en toutes lettres.
+///
+/// ⚠️ Ces données sont CANONIQUES au sens de l'arrêté : sigles, présidence,
+/// règles de décision et fréquences ne sont pas de la rédaction. Les rendre
+/// administrables ne les rend pas discutables — cela évite qu'un remaniement
+/// demande une mise en production.
+/// ===========================================================================
+
+enum GouvernanceStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Un organe de gouvernance : comité de pilotage, comité technique, Unité.
+model Organe {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché — ancrage de l'amorçage
+  /// (cf. src/lib/gouvernance/bootstrap.ts).
+  key String @unique
+
+  /// Sigle affiché en grand sur la carte (« COPIL »). Il sert aussi à
+  /// rattacher une décision à l'organe qui l'a prise.
+  sigle    String            @unique
+  status   GouvernanceStatus @default(DRAFT)
+  /// Ordre de lecture : du plus stratégique au plus opérationnel.
+  position Int               @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations OrganeTranslation[]
+
+  @@index([status, position])
+}
+
+/// Version d'un organe dans une langue.
+///
+/// La COMPOSITION vit ici et non dans une table de sièges : un siège est un
+/// intitulé d'institution (« MPTN — Président », « MIS ×2 »), sans attribut ni
+/// ordre propre. Une table de plus demanderait un écran de plus pour saisir ce
+/// qu'une liste de lignes dit déjà — même raisonnement que les puces d'un
+/// projet phare (cf. `ComposanteBlocTranslation`).
+model OrganeTranslation {
+  id       String @id @default(cuid())
+  organeId String
+  organe   Organe @relation(fields: [organeId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale   String
+
+  /// Nom développé (« Comité de Pilotage »).
+  nom       String?
+  /// Ce qu'il est (« Stratégique / décisionnel »).
+  nature    String?
+  /// Effectif tel qu'il doit se lire (« 8 membres »). Bilingue : « 8 membres »
+  /// restait en français sur la version anglaise avant la reprise.
+  effectif  String?
+  presidence String?
+  decision  String?
+  frequence String?
+
+  /// Ce que l'organe fait, en un paragraphe. Sans lui, l'organe ne paraît pas
+  /// dans la section « Composition » — seulement dans la grille des cartes.
+  composition String?
+  /// Un siège par entrée, dans l'ordre où ils s'affichent.
+  membres     String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organeId, locale])
+  @@index([locale])
+}
+
+/// Une décision ou une mission datée, portée à la chronique de la gouvernance.
+model GouvActivite {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché — ancrage de l'amorçage.
+  key String @unique
+
+  status   GouvernanceStatus @default(DRAFT)
+  /// Ordre d'affichage, du plus récent au plus ancien. Saisi et non déduit de
+  /// `dateAt` : la chronique mêle des dates exactes et des mois, et un tri
+  /// automatique ferait remonter « Juin 2026 » au-dessus d'un jour de juin.
+  position Int               @default(0)
+
+  /// Instance à l'origine du fait, telle qu'elle s'affiche en pastille. Une
+  /// chaîne libre et non le sigle d'un `Organe` : la chronique porte aussi des
+  /// faits de « Coordination », qui n'est pas un organe de gouvernance.
+  org   String
+  /// Couleur de la pastille et du filet gauche.
+  color String
+
+  /// Date réelle, quand elle est connue. Elle ne sert qu'à ranger la saisie en
+  /// console ; ce qui s'affiche est le libellé traduit.
+  dateAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations GouvActiviteTranslation[]
+
+  @@index([status, position])
+}
+
+/// Version d'une décision dans une langue.
+model GouvActiviteTranslation {
+  id         String       @id @default(cuid())
+  activiteId String
+  activite   GouvActivite @relation(fields: [activiteId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale     String
+
+  /// Date affichée, rédigée (« Juin 2026 », « Jun 2026 »).
+  dateLabel String?
+  titre     String?
+  /// Ce que la décision emporte, en une phrase.
+  note      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([activiteId, locale])
+  @@index([locale])
+}

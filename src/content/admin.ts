@@ -1083,8 +1083,8 @@ export const ADMIN_SECTIONS_MODULE = {
     lead: "Les blocs qui racontent d'où vient le Projet et ce qu'il change : chiffres d'impact, témoignages, dialogues sectoriels, diptyques avant/après et frise des jalons. Chaque section existe en français et en anglais ; une langue non traduite est signalée et n'est jamais servie au public.",
   },
   ugptn: {
-    title: "L'UGPTN",
-    lead: "La page de l'Unité, bloc par bloc : la citation d'engagement, le mandat, les règles qui bornent ses décisions, l'organigramme des pôles, la méthode, puis les questions et le glossaire. Les fiches de l'équipe se tiennent depuis le module « L'équipe de l'Unité » ; cet écran n'en règle que l'en-tête.",
+    title: "L'Unité",
+    lead: "La page « L'Unité » du site, bloc par bloc : la citation d'engagement, le mandat, les règles qui bornent ses décisions, l'organigramme des pôles, la méthode, puis les questions et le glossaire. Les fiches de l'équipe se tiennent depuis le module « L'équipe de l'Unité » ; cet écran n'en règle que l'en-tête. Les organes de gouvernance se règlent sur l'écran « Gouvernance ».",
   },
   projet: {
     title: "Vue d'ensemble",
@@ -1256,7 +1256,7 @@ export const ADMIN_IMPACT = {
  * Ils sont recopiés plutôt qu'importés : `content/i18n.ts` pèse soixante-dix
  * kilo-octets et part au navigateur avec la barre latérale, qui est du code
  * client. Un test tient l'alignement à leur place
- * (cf. scripts/tests/admin-projet-nav.test.ts) : il échoue dès que l'un des
+ * (cf. scripts/tests/admin-sous-menus.test.ts) : il échoue dès que l'un des
  * deux bouge sans l'autre.
  *
  * `hint` répond à la question de l'éditeur — ce que je modifie ici, où
@@ -1284,6 +1284,94 @@ export const ADMIN_PROJET_ONGLETS = [
     hint: "Ce qui s'affiche sur la page « Résultats » du site : les indicateurs d'objectif et les indicateurs intermédiaires. Les mêmes indicateurs coiffent l'accueil, la vue d'ensemble et les pages de composante.",
   },
 ] as const;
+
+/**
+ * Les deux écrans du module « L'UGPTN », dans l'ordre du menu public.
+ *
+ * ⚠️ Mêmes règles que `ADMIN_PROJET_ONGLETS` : les libellés sont ceux du
+ * sous-menu du site au mot près — « L'Unité », « Gouvernance » (cf. `navSub` et
+ * `nav` dans src/content/i18n.ts) —, recopiés faute de pouvoir importer un
+ * dictionnaire de soixante-dix kilo-octets dans du code client, et tenus par le
+ * test d'alignement (cf. scripts/tests/admin-sous-menus.test.ts).
+ *
+ * L'ÉQUIPE n'y figure pas, et ce n'est pas un oubli : elle a son propre module
+ * dans la barre latérale, elle alimente quatre emplacements du site dont deux
+ * hors de ce menu, et rien ne justifiait de la déplacer.
+ */
+export const ADMIN_UGPTN_ONGLETS = [
+  {
+    slug: "",
+    label: "L'Unité",
+    /** Libellé public correspondant — pinné par le test d'alignement. */
+    public: "/ugptn",
+    hint: "Ce qui s'affiche sur la page « L'Unité » du site : la citation d'engagement, le mandat, les règles qui bornent ses décisions, l'organigramme des pôles, la méthode, les questions et le glossaire.",
+  },
+  {
+    slug: "/governance",
+    label: "Gouvernance",
+    public: "/governance",
+    hint: "Ce qui s'affiche sur la page « Gouvernance » du site : les organes qui décident, leur composition et la chronique datée de leurs décisions. Les cartes de coordination viennent du module « L'équipe de l'Unité ».",
+  },
+] as const;
+
+export const ADMIN_GOUVERNANCE = {
+  title: "Gouvernance",
+  lead: "Ce qui s'affiche sur la page « Gouvernance » du site : les organes qui décident du Projet, qui y siège et ce qu'ils ont effectivement décidé. Sigles, présidence, règles de décision et fréquences viennent de l'arrêté : ils se corrigent, ils ne se rédigent pas.",
+
+  /* --- Organes -------------------------------------------------------------- */
+  organesTitle: "Les organes",
+  organesLead:
+    "Les instances qui orientent, instruisent et exécutent. Chacune paraît en carte sur la page, et sur l'accueil en version courte. Celles dont le rôle est rédigé paraissent en plus dans la section « Composition », avec la liste de leurs sièges.",
+  organeAjouter: "Ajouter un organe",
+  organeVide: "Aucun organe pour le moment.",
+  organeSupprimer: "Supprimer l'organe",
+  organeSupprimerConfirm:
+    "Supprimer cet organe et toutes ses traductions ? Il disparaîtra de la page « Gouvernance » et de l'accueil.",
+  champSigle: "Sigle",
+  champSigleAide: "Affiché en grand sur la carte : « COPIL ». Il identifie l'organe partout.",
+
+  /* --- Chronique ------------------------------------------------------------ */
+  activitesTitle: "La chronique des décisions",
+  activitesLead:
+    "Ce que la gouvernance a effectivement décidé, et quand. Une gouvernance ne se juge pas à sa composition mais à ses décisions et à leur date : c'est la raison d'être de cette section, et elle ne vaut que tenue à jour.",
+  activiteAjouter: "Ajouter une décision",
+  activiteVide: "Aucune décision pour le moment.",
+  activiteSupprimer: "Supprimer la décision",
+  activiteSupprimerConfirm: "Supprimer cette décision et toutes ses traductions ?",
+  champOrg: "Instance",
+  champOrgAide:
+    "La pastille affichée à gauche : « COPIL », « CTP », « Coordination ». Une chaîne libre — la chronique porte aussi des faits qui ne relèvent d'aucun organe.",
+  champCouleur: "Couleur de la pastille",
+  champCouleurAide: "Elle teinte aussi le filet gauche de la ligne.",
+  champDate: "Date réelle",
+  champDateAide: "Sert uniquement à ranger la saisie en console. Ce qui s'affiche est la date rédigée, traduite.",
+
+  /* --- Commun --------------------------------------------------------------- */
+  reglages: "Réglages",
+  statut: "État",
+  position: "Rang",
+  monter: "Monter",
+  descendre: "Descendre",
+  sansTitre: "(sans nom)",
+  publier: "Publier",
+  depublier: "Retirer du site",
+
+  tradPresente: "traduit",
+  tradIncomplete: "incomplet",
+  tradManquante: "à traduire",
+  langueRedaction: "Langue de rédaction",
+  tradNouvelle: (langue: string) =>
+    `Cette version ${langue} n'existe pas encore. Renseignez-la puis enregistrez-la : elle ne touchera à aucune autre langue.`,
+  enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
+  supprimerTraduction: "Supprimer cette traduction",
+  supprimerTraductionConfirm:
+    "Supprimer cette version linguistique ? La fiche restera en ligne dans les autres langues.",
+  majLe: "Modifié le",
+
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+  voirSite: "Voir sur le site",
+} as const;
 
 export const ADMIN_PROJET = {
   title: "Le Projet",
@@ -1680,7 +1768,19 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
          (mandat, principes, pôles, puis les organes de gouvernance) : la console
          reprend ce découpage, sans quoi l'éditeur cherche où se modifie la page
          « L'UGPTN » et ne trouve qu'une entrée nommée autrement. */
-      { key: "ugptn", label: "L'UGPTN", slug: "/ugptn" },
+      /* Deux écrans sous une seule permission, comme « Le Projet » : le module
+         reprend, sous leur nom, les deux entrées du menu « L'UGPTN » du site.
+         L'équipe garde le sien, juste au-dessus : elle alimente quatre
+         emplacements, dont deux hors de ce menu. */
+      {
+        key: "ugptn",
+        label: "L'UGPTN",
+        slug: "/ugptn",
+        children: ADMIN_UGPTN_ONGLETS.map((onglet) => ({
+          slug: `/ugptn${onglet.slug}`,
+          label: onglet.label,
+        })),
+      },
       /* Trois écrans sous une seule permission : le module reprend, un à un et
          sous leur nom, les trois entrées du menu « Le Projet » du site public. */
       {
