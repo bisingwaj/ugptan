@@ -10,9 +10,15 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/fr",
     scope: "/",
     display: "standalone",
-    background_color: "#161616",
+    background_color: "#ffffff",
     theme_color: "#161616",
     lang: "fr",
-    icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }],
+    /* `/icon.png` et `/apple-icon.png` sont servis par Next depuis app/ : les
+       déclarer ici les rend aussi disponibles à l'installation sur l'écran
+       d'accueil, que le <head> seul ne couvre pas. */
+    icons: [
+      { src: "/icon.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/apple-icon.png", sizes: "180x180", type: "image/png", purpose: "any" },
+    ],
   };
 }

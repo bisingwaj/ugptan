@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { loginAction, type LoginState } from "@/actions/admin-auth";
 import { ADMIN } from "@/content/admin";
 import { BIDDERS_PORTAL_URL } from "@/lib/external";
+import { Marque } from "@/components/chrome/Marque";
 
 const initialState: LoginState = { error: null };
 
@@ -30,11 +31,9 @@ export function AdminLoginForm({
   return (
     <section className="auth-split">
       <div className="auth-brand">
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ width: 30, height: 30, background: "var(--ac)", position: "relative", display: "inline-flex", flex: "0 0 auto" }}>
-            <span style={{ position: "absolute", right: 5, bottom: 5, width: 11, height: 11, background: "#fff" }} />
-          </span>
-          <span style={{ fontWeight: 700, fontSize: 19 }}>{ADMIN.brand}</span>
+        {/* Panneau noir : encre blanche. */}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Marque variante="claire" hauteur={36} />
         </div>
 
         <div>
