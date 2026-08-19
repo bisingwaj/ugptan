@@ -149,14 +149,6 @@ export function dict(lang: Lang) {
         "Source of truth: PIM of 23 June 2025. Amounts, dates and indicators per the project's official documents.",
       ),
       legalLabel: t("Informations légales", "Legal information"),
-      /* Surtitre du bandeau de logos, au bas de chaque page. « Financement et
-         tutelle » plutôt que « Nos partenaires » : la Banque mondiale et l'AFD
-         financent, le ministère exerce la tutelle, et les autres institutions
-         mettent en œuvre. Les confondre sous un même mot serait inexact. */
-      partenairesLabel: t(
-        "Financement, tutelle et institutions partenaires",
-        "Funding, supervision and partner institutions",
-      ),
     },
     /* --- Pages légales ----------------------------------------------------- */
     legal: {

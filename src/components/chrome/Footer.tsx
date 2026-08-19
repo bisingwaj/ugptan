@@ -5,8 +5,6 @@ import { meta } from "@/content/data";
 import { contact } from "@/content/carbon";
 import { NAV, NAV_FOOTER, NAV_LEGAL, route } from "@/lib/routes";
 import { Marque } from "@/components/chrome/Marque";
-import Image from "next/image";
-import { partners } from "@/content/carbon";
 
 /* Classes partagées des colonnes. Volontairement déclinées en variantes
    complètes plutôt que composées par surcharge : deux utilitaires de même
@@ -58,39 +56,6 @@ export function Footer({ lang }: { lang: Lang }) {
             )}
           </nav>
         ))}
-      </div>
-
-      {/* --- Bailleurs, tutelle et institutions partenaires ---------------------
-          Sur fond BLANC, et non sur le noir du pied : les logos officiels sont
-          en bleu marine sur fond transparent. Posés sur le noir, ils
-          disparaîtraient — et les retoucher pour les blanchir revient à
-          altérer une identité qui ne nous appartient pas.
-          Le bandeau reste dans le <footer> : c'est bien du pied de page qu'il
-          s'agit, et il s'affiche donc au bas de chaque page. */}
-      <div className="bg-white">
-        <div className="mx-auto max-w-(--maxw) px-(--pad-x) py-[clamp(26px,3vw,38px)]">
-          <div className="mb-[18px] font-mono text-[10.5px] tracking-[0.08em] text-c-50 uppercase">
-            {t.foot.partenairesLabel}
-          </div>
-          <ul className="flex list-none flex-wrap items-center gap-x-[clamp(20px,2.6vw,38px)] gap-y-6 p-0">
-            {partners.map((p) =>
-              p.logo ? (
-                <li key={p.name} className="flex items-center">
-                  {/* Hauteur bornée, largeur libre : les neuf logos n'ont ni le
-                      même rapport ni le même équilibre, et les forcer à une
-                      largeur commune écraserait les plus larges. */}
-                  <Image
-                    src={p.logo}
-                    alt={p.name}
-                    sizes="(max-width: 760px) 40vw, 200px"
-                    loading="lazy"
-                    className="h-[clamp(24px,2.6vw,31px)] w-auto max-w-[148px] object-contain"
-                  />
-                </li>
-              ) : null,
-            )}
-          </ul>
-        </div>
       </div>
 
       <div className="border-t border-c-80">
