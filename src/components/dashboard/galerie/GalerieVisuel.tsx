@@ -16,6 +16,8 @@ import { useActionState, useId, useState } from "react";
 import { remplacerVisuelAction, type GalFormState } from "@/actions/admin-galerie";
 import { ADMIN_GALERIE } from "@/content/admin";
 import type { VisuelSaisie } from "@/lib/galerie/saisie";
+// Aliasée : le composant reçoit déjà une prop booléenne nommée `vignette`.
+import { vignette as bornerLargeur } from "@/lib/images";
 import {
   ACCEPT_GAL_IMAGE, TAILLE_MAX, estMimeImageGalerie, poidsLisible,
 } from "@/lib/galerie/fichier";
@@ -75,7 +77,7 @@ export function GalerieVisuel({
         <div className="adm-gal__apercu">
           {visuel ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={visuel.url} alt={alt} loading="lazy" decoding="async" />
+            <img src={bornerLargeur(visuel.url, 640)} alt={alt} loading="lazy" decoding="async" />
           ) : (
             <span className="adm-gal__apercu-vide mono">{t.visuelAucun}</span>
           )}

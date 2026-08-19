@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { lectureConsole } from "@/lib/lecture";
 import { requirePermission } from "@/lib/auth/guard";
 import { formatDate } from "@/lib/format";
+import { vignette } from "@/lib/images";
 import { ensureRubriquesGalerie } from "@/lib/galerie/bootstrap";
 import {
   GAL_STATUTS, GAL_STATUT_LABEL, GAL_TRIS, GAL_TRI_LABEL, GAL_TYPES, GAL_TYPE_LABEL,
@@ -239,7 +240,7 @@ export default async function GalerieAdminPage(props: { searchParams: Promise<Re
                     // servi à la demande, où l'optimiseur n'ajouterait qu'une
                     // transformation entre la rédaction et ce qu'elle veut voir.
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.imageUrl} alt={item.altFr ?? ""} loading="lazy" decoding="async" />
+                    <img src={vignette(item.imageUrl, 640)} alt={item.altFr ?? ""} loading="lazy" decoding="async" />
                   ) : (
                     <span className="adm-gal__vignette-vide mono">{t.vignetteAbsente}</span>
                   )}

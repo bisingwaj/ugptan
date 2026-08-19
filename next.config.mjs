@@ -58,6 +58,15 @@ const nextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "cdn.ugptn.cd" },
     ],
+    // Les listes par défaut, plus une entrée de 16 px : c'est la largeur des
+    // aperçus flous posés sous les images pendant leur chargement
+    // (cf. `apercuFlou()` dans src/lib/images.ts). Hors liste, l'optimiseur
+    // répond 400 et l'aperçu reste vide.
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Même raison pour la qualité : Next 16 n'autorise plus que les valeurs
+    // déclarées ici, et 75 seule par défaut. 10 ne sert qu'aux aperçus, dont
+    // le flou dissimule de toute façon la compression.
+    qualities: [10, 75],
   },
   async headers() {
     return [

@@ -32,6 +32,7 @@ import {
   reglageBlocActif, type ComposanteBlocType,
 } from "@/lib/projet/statut";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
 import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
 import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
@@ -268,7 +269,7 @@ export function ComposanteBlocCarte({
               <div className="adm-edit__cover" style={{ marginTop: 8, maxWidth: 260 }}>
                 {visuel.src ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={visuel.src} alt="" className="adm-edit__cover-img" />
+                  <img src={vignette(visuel.src, 640)} alt="" loading="lazy" decoding="async" className="adm-edit__cover-img" />
                 ) : (
                   <span className="adm-edit__cover-vide">{t.aucunVisuel}</span>
                 )}

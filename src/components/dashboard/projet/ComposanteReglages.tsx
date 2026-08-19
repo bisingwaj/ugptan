@@ -17,6 +17,7 @@ import { enregistrerComposanteAction, type ProjetFormState } from "@/actions/adm
 import { ADMIN_PROJET } from "@/content/admin";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
 import type { ComposanteSaisie, ReferentielsProjet } from "@/lib/projet/saisie";
+import { vignette } from "@/lib/images";
 import { PROJET_STATUSES, PROJET_STATUT_HINT, PROJET_STATUT_LABEL } from "@/lib/projet/statut";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
 import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
@@ -106,7 +107,7 @@ export function ReglagesIdentite({ composante, assets }: Omit<Props, "referentie
           <div className="adm-edit__cover" style={{ marginTop: 8, maxWidth: 320 }}>
             {visuel.src ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={visuel.src} alt="" className="adm-edit__cover-img" />
+              <img src={vignette(visuel.src, 640)} alt="" loading="lazy" decoding="async" className="adm-edit__cover-img" />
             ) : (
               <span className="adm-edit__cover-vide">{t.aucunVisuel}</span>
             )}
