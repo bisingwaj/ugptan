@@ -1,0 +1,75 @@
+/* ============================================================================
+   Retour d'action — la grammaire visuelle de « c'est parti ».
+   ==========================================================================
+
+   ─── Le principe ────────────────────────────────────────────────────────────
+
+   Entre le clic et la réponse du serveur, il se passe toujours quelque chose :
+   une validation, une écriture en base, un envoi de courriel. Le visiteur, lui,
+   ne voit rien. Un bouton simplement grisé le laisse dans le doute, et le doute
+   produit le second clic.
+
+   La barre ci-dessous répond à cela sans mentir : elle avance FRANCHEMENT
+   jusqu'à 88 %, puis s'arrête. Elle ne prétend pas connaître l'avancement réel
+   du serveur, qui ne le communique pas. Ce qu'elle affirme est exact : la
+   demande est partie, elle est en cours, l'essentiel du chemin est fait. Les
+   12 % restants ne se franchissent qu'à la réponse effective — c'est ce qui
+   distingue ce dessin d'une animation décorative qui tournerait indéfiniment.
+
+   La courbe est celle du site (`cubic-bezier(.16,1,.3,1)`) : départ vif,
+   arrivée posée. Les deux tiers de la barre sont parcourus dans le premier
+   tiers du temps, ce qui rend l'attente plus courte qu'elle n'est.
+   ========================================================================== */
+
+/* Le contenu du bouton passe AU-DESSUS de la barre : sans cette pile, le voile
+   de progression recouvrirait le libellé et la flèche. */
+.btn--action { position: relative; overflow: hidden; }
+.btn--action > * { position: relative; z-index: 1; }
+
+.btn--action::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  /* Un voile clair, et non une couleur pleine : il fonctionne aussi bien sur le
+     bleu du bouton principal que sur le noir du bouton sombre, sans qu'aucune
+     variante ait à déclarer sa propre teinte. */
+  background: rgba(255, 255, 255, 0.24);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Bouton clair (contour, fantôme) : le voile blanc y serait invisible. */
+.btn--action.btn--outline::after,
+.btn--action.btn--ghost::after { background: rgba(15, 98, 254, 0.16); }
+
+.btn--action[data-etat="attente"]::after {
+  animation: btn-progression 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Les 12 % restants, franchis d'un coup à la réponse du serveur. */
+.btn--action[data-etat="fini"]::after {
+  animation: btn-progression-fin 0.26s ease-out forwards;
+}
+
+@keyframes btn-progression {
+  from { width: 0; }
+  to { width: 88%; }
+}
+
+@keyframes btn-progression-fin {
+  from { width: 88%; }
+  to { width: 100%; }
+}
+
+/* Le libellé du bouton change d'état ; la barre, elle, est un ornement utile.
+   Coupée, l'information demeure : le texte dit « Envoi… », puis « Envoyé ». */
+@media (prefers-reduced-motion: reduce) {
+  .btn--action[data-etat="attente"]::after,
+  .btn--action[data-etat="fini"]::after { animation: none; width: 0; }
+}
+
+/* Un bouton en attente reste lisible : il ne s'efface pas à 40 % d'opacité
+   comme le ferait un `:disabled` par défaut. Il n'est plus actionnable, mais il
+   continue d'informer, et c'est sa fonction pendant ces deux secondes. */
+.btn--action:disabled { cursor: progress; opacity: 1; }

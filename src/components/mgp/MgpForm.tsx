@@ -9,6 +9,7 @@ import { mgpCategories } from "@/content/mgp";
 import { NAV, route } from "@/lib/routes";
 import { LIMITS } from "@/lib/mgp/model";
 import { submitGrievance } from "@/actions/mgp";
+import { BoutonAction } from "@/components/ui/BoutonAction";
 
 type Contact = { fullName: string; email: string; tel: string; prov: string };
 
@@ -209,10 +210,16 @@ export function MgpForm({ lang }: { lang: Lang }) {
         {step < 5 ? (
           <button onClick={() => canNext && setStep((s) => s + 1)} className="btn" style={{ flex: 1, justifyContent: "center", background: canNext ? "var(--ac)" : "var(--c-30)", color: "#fff" }}>{t.next} <span className="arrow">→</span></button>
         ) : (
-          <button onClick={submit} disabled={pending} className="btn btn--primary" style={{ flex: 1, justifyContent: "center" }}>
-            {pending ? t.submitting : t.submitGrievance}
-            {!pending && <span className="arrow">→</span>}
-          </button>
+          <BoutonAction
+            onClick={submit}
+            pending={pending}
+            labelPending={t.submitting}
+            className="btn--primary"
+            style={{ flex: 1, justifyContent: "center" }}
+          >
+            {t.submitGrievance}
+            <span className="arrow">→</span>
+          </BoutonAction>
         )}
       </div>
       <p style={{ margin: "14px 0 0", fontSize: 11.5, color: "var(--c-50)", lineHeight: 1.5 }}>{t.formFootnote}</p>

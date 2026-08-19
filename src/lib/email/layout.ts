@@ -22,6 +22,8 @@
  * sans réécrire une ligne de HTML de messagerie.
  */
 
+import { SITE_URL } from "@/lib/site";
+
 /** Recopie des jetons du site (cf. src/styles/tokens.css). */
 const PALETTE = {
   accent: "#0f62fe",
@@ -164,24 +166,63 @@ export const numberedList = (items: string[]): string => `
     .join("")}
 </table>`;
 
+/**
+ * Liste de rubriques : un intitulé, puis ce qu'il recouvre.
+ *
+ * Distincte de `numberedList`, qui énumère des ÉTAPES à suivre dans l'ordre.
+ * Ici l'ordre ne veut rien dire, et chaque entrée porte deux niveaux de lecture :
+ * l'intitulé se parcourt en diagonale, la ligne dessous se lit si le sujet
+ * retient. C'est la forme qui convient à un sommaire de lettre d'information,
+ * qu'on survole avant de décider si on l'ouvrira la prochaine fois.
+ *
+ * Le filet vertical d'accent tient lieu de puce : les puces natives se placent
+ * différemment d'un client à l'autre, et se perdent sous Outlook.
+ */
+export const featureList = (items: { title: string; text: string }[]): string => `
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px;">
+  ${items
+    .map(
+      (item, index) => `
+  <tr>
+    <td style="padding:0 0 ${index === items.length - 1 ? "0" : "18px"};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="3" style="width:3px;background:${PALETTE.accent};font-size:0;line-height:0;">&nbsp;</td>
+          <td style="padding:2px 0 2px 14px;">
+            <div style="font-family:${FONT_SANS};font-size:15px;font-weight:600;line-height:1.35;color:${PALETTE.black};margin:0 0 5px;">${esc(item.title)}</div>
+            <div style="font-family:${FONT_SANS};font-size:13.5px;line-height:1.6;color:${PALETTE.grey70};">${esc(item.text)}</div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>`,
+    )
+    .join("")}
+</table>`;
+
 /* --- Enveloppe ------------------------------------------------------------ */
 
 /**
- * Marque de l'UGPTN : carré d'accent portant un carré blanc en bas à droite.
- * Reproduit `.adm__mark` (styles/dashboard.css) en tableaux plutôt qu'en image
- * — une image distante est bloquée par défaut dans la plupart des clients, et
- * l'en-tête d'un e-mail institutionnel ne peut pas s'afficher vide.
+ * Marque de l'UGPTN, en tête du bandeau noir.
+ *
+ * ─── Pourquoi une image, alors qu'un e-mail ne peut pas compter dessus ──────
+ *
+ * La plupart des clients bloquent les images distantes tant que le
+ * destinataire ne les autorise pas. Le bandeau portait donc jusqu'ici un carré
+ * dessiné en tableaux, qui s'affichait toujours mais ne ressemblait à aucun
+ * logo de la charte.
+ *
+ * Le compromis retenu ne pariait pas sur le déblocage : l'attribut `alt` porte
+ * « UGPTN » en blanc, à la taille et à la graisse du mot-symbole. Images
+ * bloquées, le bandeau affiche donc le sigle en toutes lettres, à sa place et
+ * dans la bonne couleur ; images autorisées, il affiche le logo. Aucun des deux
+ * états n'est un accident.
+ *
+ * L'URL est ABSOLUE et pointe vers le site : un e-mail quitte l'application,
+ * plus aucun chemin relatif n'y a de sens. C'est la version à encre blanche,
+ * le bandeau étant noir.
  */
-const mark = `
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="30" height="30" style="width:30px;height:30px;background:${PALETTE.accent};">
-  <tr>
-    <td align="right" valign="bottom" style="padding:0 4px 4px 0;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="10" height="10" style="width:10px;height:10px;background:${PALETTE.white};">
-        <tr><td style="font-size:0;line-height:0;">&nbsp;</td></tr>
-      </table>
-    </td>
-  </tr>
-</table>`;
+const mark = `<img src="${SITE_URL}/marque/ugptn-blanc.png" width="132" height="78" alt="UGPTN" style="display:block;width:132px;height:auto;border:0;outline:none;text-decoration:none;font-family:${FONT_SANS};font-size:19px;font-weight:700;color:${PALETTE.white};">`;
 
 export type EmailDocument = {
   /** Ligne d'aperçu affichée après l'objet dans la liste des messages. */
@@ -261,15 +302,11 @@ export function renderEmail({
           <!-- En-tête : bandeau noir, marque et intitulé de la console -->
           <tr>
             <td class="pad" bgcolor="${PALETTE.black}" style="background:${PALETTE.black};padding:22px 32px;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td valign="middle" style="padding-right:12px;">${mark}</td>
-                  <td valign="middle">
-                    <div style="font-family:${FONT_SANS};font-size:16px;font-weight:700;color:${PALETTE.white};line-height:1.2;">UGPTN</div>
-                    <div style="font-family:${FONT_MONO};font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${PALETTE.grey50};line-height:1.4;">${esc(subtitle)}</div>
-                  </td>
-                </tr>
-              </table>
+              <!-- Le logo porte déjà le sigle : le répéter en texte à côté le
+                   ferait lire deux fois par un lecteur d'écran. Ne subsiste que
+                   l'intitulé du message, sous la marque. -->
+              ${mark}
+              <div style="font-family:${FONT_MONO};font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:${PALETTE.grey50};line-height:1.4;margin-top:10px;">${esc(subtitle)}</div>
             </td>
           </tr>
 
@@ -286,9 +323,17 @@ export function renderEmail({
           <tr>
             <td class="pad" style="padding:24px 32px 30px;border-top:1px solid ${PALETTE.grey20};">
               ${footnote ? `<p style="margin:0 0 12px;font-family:${FONT_SANS};font-size:12px;line-height:1.6;color:${PALETTE.grey60};">${footnote}</p>` : ""}
-              <p style="margin:0;font-family:${FONT_SANS};font-size:11.5px;line-height:1.6;color:${PALETTE.grey50};">
+              <p style="margin:0 0 10px;font-family:${FONT_SANS};font-size:11.5px;line-height:1.6;color:${PALETTE.grey50};">
                 Unité de Gestion du Projet de Transformation Numérique · République Démocratique du Congo<br>
                 ${esc(signature)}
+              </p>
+              <!-- Bailleurs et tutelle en TEXTE, non en logos : neuf images en
+                   pied de message seraient bloquées par défaut chez la plupart
+                   des destinataires, et laisseraient neuf cadres vides. La
+                   mention, elle, s'affiche toujours. -->
+              <p style="margin:0;font-family:${FONT_MONO};font-size:10.5px;line-height:1.7;letter-spacing:0.04em;color:${PALETTE.grey50};">
+                Financement Banque mondiale (IDA) et Agence Française de Développement<br>
+                Tutelle : Ministère du Numérique · PTN-RDC · P180495
               </p>
             </td>
           </tr>
