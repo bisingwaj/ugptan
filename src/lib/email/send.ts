@@ -81,6 +81,26 @@ export type Mail = {
   html: string;
   /** Version texte. Exigée : un message sans elle est noté comme indésirable. */
   text: string;
+  /**
+   * Adresses de désabonnement, pour les envois GROUPÉS uniquement.
+   *
+   * Renseignées, elles produisent les deux en-têtes que Gmail et Yahoo
+   * réclament depuis février 2024 à tout expéditeur d'envois groupés :
+   * `List-Unsubscribe` et `List-Unsubscribe-Post`. Le client de messagerie
+   * affiche alors son propre bouton « Se désabonner », en tête du message, et
+   * son clic part en POST vers `url` (cf. app/api/newsletter/unsubscribe).
+   *
+   * ⚠️ À NE PAS renseigner sur un message transactionnel — invitation de compte,
+   * accusé de plainte, réinitialisation de mot de passe. Ces messages ne
+   * relèvent d'aucune liste, et offrir de s'en désabonner n'aurait aucun sens :
+   * la personne cesserait de recevoir ce qu'elle a elle-même demandé.
+   */
+  listUnsubscribe?: {
+    /** Adresse HTTPS acceptant le POST du désabonnement en un clic. */
+    url: string;
+    /** Repli pour les clients qui ne savent que composer un courriel. */
+    mailto?: string;
+  };
 };
 
 export async function sendEmail(mail: Mail): Promise<SendResult> {
@@ -105,6 +125,27 @@ export async function sendEmail(mail: Mail): Promise<SendResult> {
       html: mail.html,
       text: mail.text,
       ...(EMAIL_REPLY_TO ? { replyTo: EMAIL_REPLY_TO } : {}),
+      ...(mail.listUnsubscribe
+        ? {
+            headers: {
+              /* Ordre voulu : l'adresse HTTPS d'abord. Les clients qui savent
+                 faire le désabonnement en un clic lisent la première entrée
+                 utilisable ; le `mailto:` ne sert qu'aux plus anciens. */
+              "List-Unsubscribe": [
+                `<${mail.listUnsubscribe.url}>`,
+                ...(mail.listUnsubscribe.mailto ? [`<mailto:${mail.listUnsubscribe.mailto}>`] : []),
+              ].join(", "),
+              /* La valeur est littérale et imposée par la RFC 8058 : c'est elle
+                 qui autorise le client à poster sans confirmation. Sans elle,
+                 l'en-tête précédent ne vaut que comme lien ordinaire. */
+              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+              /* Annonce un envoi automatique de liste : les répondeurs
+                 d'absence n'y répondent pas, ce qui évite des allers-retours
+                 que les filtres comptent contre l'expéditeur. */
+              Precedence: "bulk",
+            },
+          }
+        : {}),
     });
 
     /* `rejected` recense les destinataires que le serveur a refusés alors que

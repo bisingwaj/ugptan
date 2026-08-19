@@ -22,7 +22,11 @@
  * sans réécrire une ligne de HTML de messagerie.
  */
 
+import { contact } from "@/content/carbon";
 import { SITE_URL } from "@/lib/site";
+
+/** Siège de l'Unité, sur une ligne, tel qu'il figure au pied des messages. */
+const ADRESSE_POSTALE = `${contact.adresse}, ${contact.quartier}`;
 
 /** Recopie des jetons du site (cf. src/styles/tokens.css). */
 const PALETTE = {
@@ -331,6 +335,16 @@ export function renderEmail({
                    pied de message seraient bloquées par défaut chez la plupart
                    des destinataires, et laisseraient neuf cadres vides. La
                    mention, elle, s'affiche toujours. -->
+              <!-- Adresse POSTALE de l'expéditeur.
+                   Ce n'est pas une formalité juridique de plus : les filtres
+                   anti-indésirables la cherchent. Un message de liste dépourvu
+                   d'adresse physique identifiable perd des points chez la
+                   plupart d'entre eux, et son absence est l'un des rares
+                   critères qu'un expéditeur légitime peut corriger d'une
+                   ligne. -->
+              <p style="margin:0 0 10px;font-family:${FONT_SANS};font-size:11.5px;line-height:1.6;color:${PALETTE.grey50};">
+                ${esc(ADRESSE_POSTALE)}
+              </p>
               <p style="margin:0;font-family:${FONT_MONO};font-size:10.5px;line-height:1.7;letter-spacing:0.04em;color:${PALETTE.grey50};">
                 Financement Banque mondiale (IDA) et Agence Française de Développement<br>
                 Tutelle : Ministère du Numérique · PTN-RDC · P180495

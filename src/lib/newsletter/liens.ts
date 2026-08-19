@@ -30,6 +30,18 @@ export const lienDesabonnement = (lang: Lang, token: string): string =>
   lien(lang, NEWSLETTER_UNSUBSCRIBE, token);
 
 /**
+ * Adresse du désabonnement en UN CLIC, celle que porte l'en-tête
+ * `List-Unsubscribe` des messages de liste.
+ *
+ * Elle diffère du lien précédent sur deux points, et les deux comptent :
+ *   · elle ne porte pas de langue, n'étant jamais lue par un humain ;
+ *   · elle vise une route d'API qui n'accepte que le POST (cf. RFC 8058),
+ *     là où le lien humain mène à une page qui demande un geste.
+ */
+export const adresseDesabonnementUnClic = (token: string): string =>
+  `${APP_ORIGIN}/api/newsletter/unsubscribe?${TOKEN_PARAM}=${token}`;
+
+/**
  * Lien de confirmation de réinscription. Envoyé quand une adresse DÉSABONNÉE
  * est resoumise : la remettre en liste sans ce clic reviendrait à réabonner
  * quelqu'un parce qu'un tiers a tapé son adresse (cf. actions/newsletter.ts).
