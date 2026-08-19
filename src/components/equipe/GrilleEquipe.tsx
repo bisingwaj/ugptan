@@ -13,6 +13,7 @@
  * le nom — est identique et ne se règle plus qu'à un endroit.
  */
 import type { CSSProperties } from "react";
+import Image from "next/image";
 import { initials } from "@/lib/format";
 import { plafondRole } from "@/lib/equipe/affichage";
 import type { MembreEquipe } from "@/lib/equipe/query";
@@ -77,20 +78,19 @@ export function GrilleEquipe({ membres, variante = "accueil" }: Props) {
               }}
             >
               {photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                  /* `next/image` en mode `fill` : le conteneur porte déjà le
+                     rapport et le recadrage, l'image n'a donc pas de dimensions
+                     propres à déclarer. `unoptimized` suit la source — un
+                     portrait déposé sur un hôte non déclaré dans next.config
+                     doit être servi tel quel plutôt que refusé
+                     (cf. estOptimisable() dans lib/medias.ts). */
+                <Image
                   src={photo}
                   alt={membre.portrait.alt}
-                  loading="lazy"
-                  decoding="async"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center 18%",
-                  }}
+                  fill
+                  unoptimized={membre.portrait.unoptimized}
+                  sizes="(max-width: 760px) 50vw, 260px"
+                  style={{ objectFit: "cover", objectPosition: "center 18%" }}
                 />
               ) : (
                 <span

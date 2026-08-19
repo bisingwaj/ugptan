@@ -1,3 +1,5 @@
+import type { StaticImageData } from "next/image";
+
 import type { Bilingual, Localizable } from "@/lib/pick";
 
 /* ---------------------------------------------------------------------------
@@ -121,7 +123,16 @@ export type Evenement = {
   statut: EventStatut; img: ImgKey; titre: Bilingual; desc: Bilingual; places: Bilingual;
 };
 export type GouvActivite = { date: Bilingual; org: string; color: string; titre: Bilingual; note: Bilingual };
-export type Partner = { name: string; kind: Bilingual; logo?: string };
+/**
+ * Un partenaire de l'accueil.
+ *
+ * `logo` porte une image IMPORTÉE (`import ... from "@/../public/..."`), et non
+ * un chemin écrit à la main : l'import fait connaître à Next les dimensions du
+ * fichier, sans lesquelles `next/image` refuse de le servir — et donc de le
+ * convertir en AVIF. Les neuf logos partaient auparavant en PNG bruts, 988 Ko
+ * sur le premier écran.
+ */
+export type Partner = { name: string; kind: Bilingual; logo?: StaticImageData };
 export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: string; comp?: string };
 export type GalleryItem = { nom: string; img: ImgKey };
 
