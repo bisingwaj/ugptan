@@ -106,8 +106,10 @@ export function newsletterWelcomeEmail(params: {
   email: string;
   lang: Lang;
   unsubscribeUrl: string;
+  /** Adresse POST du désabonnement en un clic (cf. lib/newsletter/liens.ts). */
+  oneClickUrl: string;
 }): Mail {
-  const { email, lang, unsubscribeUrl } = params;
+  const { email, lang, unsubscribeUrl, oneClickUrl } = params;
   const en = lang === "en";
 
   const subject = en
@@ -153,7 +155,14 @@ export function newsletterWelcomeEmail(params: {
   });
 
   const text = [
-    en ? "YOUR SUBSCRIPTION TO THE UGPTN NEWSLETTER" : "VOTRE INSCRIPTION À LA LETTRE D'INFORMATION DE L'UGPTN",
+    /* Titres en casse ordinaire, et non en capitales.
+       Une ligne entièrement capitalisée est un des critères que les filtres
+       anti-indésirables pèsent depuis toujours (SpamAssassin la relève sous
+       « UPPERCASE_25_50 »), et la version texte d'un message est analysée avec
+       autant d'attention que sa version HTML. Le soulignement qui suit donne la
+       hiérarchie que les capitales portaient. */
+    en ? "Your subscription to the UGPTN newsletter" : "Votre inscription à la lettre d'information de l'UGPTN",
+    "=".repeat(52),
     "",
     en
       ? `The address ${email} is now on the mailing list. Each edition reports what changes for the people the project reaches.`
@@ -169,7 +178,10 @@ export function newsletterWelcomeEmail(params: {
     "Unité de Gestion du Projet de Transformation Numérique — RDC",
   ].join("\n");
 
-  return { to: email, subject, html, text };
+  /* Message de LISTE : il porte les en-têtes de désabonnement que réclament
+     Gmail et Yahoo. Le message de confirmation, lui, n'en porte pas — il
+     s'adresse à quelqu'un qui n'est PAS encore sur la liste. */
+  return { to: email, subject, html, text, listUnsubscribe: { url: oneClickUrl } };
 }
 
 /* --- Confirmation de réinscription ---------------------------------------- */
@@ -226,7 +238,8 @@ export function newsletterConfirmEmail(params: {
   });
 
   const text = [
-    en ? "CONFIRM YOUR SUBSCRIPTION" : "CONFIRMEZ VOTRE INSCRIPTION",
+    en ? "Confirm your subscription" : "Confirmez votre inscription",
+    "=".repeat(52),
     "",
     en
       ? `The address ${email} was entered again in the newsletter form, after having been unsubscribed.`
@@ -257,8 +270,9 @@ export function newsletterUnsubscribeLinkEmail(params: {
   email: string;
   lang: Lang;
   unsubscribeUrl: string;
+  oneClickUrl: string;
 }): Mail {
-  const { email, lang, unsubscribeUrl } = params;
+  const { email, lang, unsubscribeUrl, oneClickUrl } = params;
   const en = lang === "en";
 
   const subject = en ? "Unsubscribe from the UGPTN newsletter" : "Désabonnement de la lettre d'information de l'UGPTN";
@@ -295,7 +309,8 @@ export function newsletterUnsubscribeLinkEmail(params: {
   });
 
   const text = [
-    en ? "UNSUBSCRIBE FROM THE UGPTN NEWSLETTER" : "DÉSABONNEMENT DE LA LETTRE D'INFORMATION DE L'UGPTN",
+    en ? "Unsubscribe from the UGPTN newsletter" : "Désabonnement de la lettre d'information de l'UGPTN",
+    "=".repeat(52),
     "",
     en ? `Unsubscribe link for ${email} :` : `Lien de désabonnement pour ${email} :`,
     unsubscribeUrl,
@@ -308,5 +323,5 @@ export function newsletterUnsubscribeLinkEmail(params: {
     "Unité de Gestion du Projet de Transformation Numérique — RDC",
   ].join("\n");
 
-  return { to: email, subject, html, text };
+  return { to: email, subject, html, text, listUnsubscribe: { url: oneClickUrl } };
 }

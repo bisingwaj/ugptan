@@ -32,7 +32,12 @@ import {
   newsletterUnsubscribeLinkEmail,
   newsletterWelcomeEmail,
 } from "@/lib/email/templates/newsletter";
-import { lienConfirmation, lienDesabonnement, nouveauToken } from "@/lib/newsletter/liens";
+import {
+  adresseDesabonnementUnClic,
+  lienConfirmation,
+  lienDesabonnement,
+  nouveauToken,
+} from "@/lib/newsletter/liens";
 import {
   MIN_FILL_MS,
   SUBSCRIBE_LIMIT,
@@ -141,7 +146,12 @@ export async function subscribeNewsletter(draft: SubscribeDraft): Promise<Subscr
        rien : `sendEmail` ne lève jamais (cf. lib/email/send.ts). */
     if (emailConfigured) {
       await sendEmail(
-        newsletterWelcomeEmail({ email, lang, unsubscribeUrl: lienDesabonnement(lang, token) }),
+        newsletterWelcomeEmail({
+          email,
+          lang,
+          unsubscribeUrl: lienDesabonnement(lang, token),
+          oneClickUrl: adresseDesabonnementUnClic(token),
+        }),
       );
     }
 
@@ -268,6 +278,7 @@ export async function requestUnsubscribeLink(
           email,
           lang: langAbonne,
           unsubscribeUrl: lienDesabonnement(langAbonne, abonne.token),
+          oneClickUrl: adresseDesabonnementUnClic(abonne.token),
         }),
       );
     }
