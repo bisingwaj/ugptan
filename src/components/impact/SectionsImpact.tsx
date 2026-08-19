@@ -273,8 +273,7 @@ function EnteteImpact({ section }: { section: ImpactSectionVue }) {
       {avecBouton && (
         <Link
           href={section.ctaHref!}
-          className={sombre ? "btn btn--on-dark" : "btn btn--outline"}
-          style={{ whiteSpace: "nowrap" }}
+          className={`btn btn--cta-section ${sombre ? "btn--on-dark" : "btn--outline"}`}
         >
           {section.ctaLabel} <span className="arrow">→</span>
         </Link>
