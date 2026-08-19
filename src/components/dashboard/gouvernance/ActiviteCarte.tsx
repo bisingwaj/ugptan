@@ -18,6 +18,9 @@ import type { Lang } from "@/lib/pick";
 import type { ActiviteSaisie } from "@/lib/gouvernance/saisie";
 import { CHAMPS_ACTIVITE, GOUV_STATUT_LABEL } from "@/lib/gouvernance/statut";
 import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: GouvFormState = { error: null, ok: null };
 
@@ -27,10 +30,12 @@ export function ActiviteCarte({
   activite,
   rang,
   total,
+  etatsIA,
 }: {
   activite: ActiviteSaisie;
   rang: number;
   total: number;
+  etatsIA: Partial<Record<Lang, EtatVue>>;
 }) {
   const t = ADMIN_GOUVERNANCE;
   const idBase = useId();
@@ -134,6 +139,7 @@ export function ActiviteCarte({
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                   {etat}
                 </span>
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -146,6 +152,8 @@ export function ActiviteCarte({
             lang={lang}
             valeurs={activite.traductions[lang]}
             visible={langue === lang}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => activite.traductions[l].existe)}
           />
         ))}
 
@@ -218,11 +226,15 @@ function ActiviteLangue({
   lang,
   valeurs,
   visible,
+  etatIA,
+  sourceIA,
 }: {
   activiteId: string;
   lang: Lang;
   valeurs: ActiviteSaisie["traductions"][Lang];
   visible: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_GOUVERNANCE;
   const idBase = useId();
@@ -232,6 +244,9 @@ function ActiviteLangue({
     <div className="adm-item__langue" hidden={!visible}>
       {etat.error && <div className="auth-error" role="alert">{etat.error}</div>}
       {etat.ok && <div className="adm-ok" role="status">{etat.ok}</div>}
+
+      {/* Avant les champs : on doit savoir d'où vient le texte avant de le lire. */}
+      <BandeauTraduction entite="gouvActivite" entiteId={activiteId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && <p className="adm-edit__neuve">{t.tradNouvelle(LANG_LABEL[lang])}</p>}
 

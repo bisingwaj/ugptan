@@ -59,7 +59,7 @@ const traductionBlocVide = (): TraductionBlocSaisie => ({
 });
 
 const traductionIndicateurVide = (): TraductionIndicateurSaisie => ({
-  label: "", baseline: "", note: "",
+  label: "", baseline: "", note: "", unit: "",
   existe: false, complete: false, majLe: null,
 });
 
@@ -302,9 +302,9 @@ export async function chargerIndicateurs(famille: IndicateurFamille): Promise<In
       orderBy: [{ position: "asc" }, { code: "asc" }],
       select: {
         id: true, key: true, famille: true, code: true, status: true, position: true,
-        valeur: true, valeurNum: true, unit: true,
+        valeur: true, valeurNum: true,
         translations: {
-          select: { locale: true, label: true, baseline: true, note: true, updatedAt: true },
+          select: { locale: true, label: true, baseline: true, note: true, unit: true, updatedAt: true },
         },
       },
     }),
@@ -319,6 +319,7 @@ export async function chargerIndicateurs(famille: IndicateurFamille): Promise<In
         label: tr.label ?? "",
         baseline: tr.baseline ?? "",
         note: tr.note ?? "",
+        unit: tr.unit ?? "",
         existe: true,
         complete: indicateurTraduit(tr),
         majLe: formatDateTime(tr.updatedAt),
@@ -334,7 +335,6 @@ export async function chargerIndicateurs(famille: IndicateurFamille): Promise<In
       position: ligne.position,
       valeur: ligne.valeur,
       valeurNum: nombre(ligne.valeurNum),
-      unit: ligne.unit ?? "",
       traductions: trads,
     };
   });

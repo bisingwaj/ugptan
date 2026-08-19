@@ -36,6 +36,8 @@ import { ComposanteLangue } from "@/components/dashboard/projet/ComposanteLangue
 import {
   ReglagesIdentite, ReglagesMep, ReglagesVideo,
 } from "@/components/dashboard/projet/ComposanteReglages";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const LANG_LABEL: Record<Lang, string> = { fr: "Français", en: "English" };
 
@@ -43,10 +45,16 @@ export function ComposanteEditeur({
   composante,
   referentiels,
   assets,
+  etatsIA,
+  etatsIABlocs,
 }: {
   composante: ComposanteSaisie & { id: string };
   referentiels: ReferentielsProjet;
   assets: MediaRef[];
+  /** État de l'assistance pour la composante (cf. lib/ia/suivi.ts). */
+  etatsIA: Partial<Record<Lang, EtatVue>>;
+  /** Idem, pour chacun de ses blocs, indexé par identifiant de bloc. */
+  etatsIABlocs: Map<string, Partial<Record<Lang, EtatVue>>>;
 }) {
   const t = ADMIN_PROJET;
   const [section, setSection] = useState<ComposanteSection>("identite");
@@ -118,6 +126,7 @@ export function ComposanteEditeur({
                           <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                             {etat}
                           </span>
+                          <PastilleTraduction etat={etatsIA[lang]} />
                         </button>
                       );
                     })}
@@ -134,6 +143,19 @@ export function ComposanteEditeur({
                       /* Retirer une langue entière n'a de sens qu'ici : c'est la
                          section qui porte l'intitulé dont dépend la publication. */
                       avecSuppression={cle === "identite"}
+                      /* Seule la section AFFICHÉE porte le bandeau d'état.
+                         Une composante s'édite section par section, toutes
+                         rendues et masquées sauf une : le même bandeau
+                         apparaîtrait autant de fois qu'il y a de sections, et
+                         chacun reprendrait de son côté une traduction en
+                         attente — autant d'appels payants pour un seul travail.
+                         Il suit donc la section, au lieu de s'y multiplier. */
+                      etatIA={cle === section ? etatsIA[lang] : undefined}
+                      sourceIA={
+                        cle === section
+                          ? sourcePourTraduire(lang, (l) => composante.traductions[l].existe)
+                          : undefined
+                      }
                     />
                   ))}
                 </>
@@ -153,6 +175,7 @@ export function ComposanteEditeur({
                   blocs={blocsDe(type)}
                   assets={assets}
                   voisines={referentiels.composantes}
+                  etatsIA={etatsIABlocs}
                 />
               ))}
             </section>

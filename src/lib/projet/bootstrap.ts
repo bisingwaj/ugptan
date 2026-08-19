@@ -323,11 +323,11 @@ export async function ensureIndicateurs(): Promise<void> {
         position,
         valeur: String(item.value),
         valeurNum: item.value,
-        unit: item.unit || null,
         traduction: (locale: Lang) => ({
           label: pick(item.label, locale),
           baseline: item.baseline,
           note: item.femmes,
+          unit: pick(item.unit, locale) || null,
         }),
       })),
       ...interSeed.map((item, position) => ({
@@ -337,11 +337,11 @@ export async function ensureIndicateurs(): Promise<void> {
         position,
         valeur: item.value,
         valeurNum: null,
-        unit: item.unit || null,
         traduction: (locale: Lang) => ({
           label: pick(item.text, locale),
           baseline: null,
           note: null,
+          unit: pick(item.unit, locale) || null,
         }),
       })),
     ];
@@ -361,7 +361,6 @@ export async function ensureIndicateurs(): Promise<void> {
           position: ligne.position,
           valeur: ligne.valeur,
           valeurNum: ligne.valeurNum,
-          unit: ligne.unit,
         })),
         select: { id: true },
       });

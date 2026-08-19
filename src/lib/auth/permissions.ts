@@ -37,6 +37,10 @@ export const PERMISSIONS = [
   "equipe",
   "videos",
   "newsletter",
+  /* Écran de suivi de l'assistance à la traduction. Un module à part, et non un
+     onglet d'un autre : il porte des contenus des SIX modules éditoriaux, et le
+     travail de relecture ne se range naturellement dans aucun d'eux. */
+  "traductions",
   /* Renommée depuis « gouvernance » en même temps que l'entrée de la barre
      latérale : le module couvre les deux pages du groupe « L'UGPTN ». Le module
      n'étant pas encore ouvert, aucun droit effectif n'était accordé sous
@@ -77,6 +81,7 @@ const ROLE_BASE: Record<AdminRole, readonly Permission[] | "*"> = {
     "histoires",
     "equipe",
     "videos",
+    "traductions",
     "ugptn",
     "projet",
     "mgp",

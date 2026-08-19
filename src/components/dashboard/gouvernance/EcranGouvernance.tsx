@@ -22,15 +22,22 @@ import { adminPath } from "@/lib/admin";
 import type { ActiviteSaisie, OrganeSaisie } from "@/lib/gouvernance/saisie";
 import { ActiviteCarte } from "@/components/dashboard/gouvernance/ActiviteCarte";
 import { OrganeCarte } from "@/components/dashboard/gouvernance/OrganeCarte";
+import type { Lang } from "@/lib/pick";
+import type { EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: GouvFormState = { error: null, ok: null };
 
 export function EcranGouvernance({
   organes,
   activites,
+  etatsIAOrganes,
+  etatsIAActivites,
 }: {
   organes: OrganeSaisie[];
   activites: ActiviteSaisie[];
+  /** États de l'assistance, indexés par identifiant (cf. lib/ia/suivi.ts). */
+  etatsIAOrganes: Map<string, Partial<Record<Lang, EtatVue>>>;
+  etatsIAActivites: Map<string, Partial<Record<Lang, EtatVue>>>;
 }) {
   const t = ADMIN_GOUVERNANCE;
   const [etatOrgane, ajouterOrgane, organeEnCours] = useActionState(ajouterOrganeAction, etatInitial);
@@ -66,7 +73,13 @@ export function EcranGouvernance({
         ) : (
           <div className="adm-items__liste">
             {organes.map((organe, rang) => (
-              <OrganeCarte key={organe.id} organe={organe} rang={rang} total={organes.length} />
+              <OrganeCarte
+                key={organe.id}
+                organe={organe}
+                rang={rang}
+                total={organes.length}
+                etatsIA={etatsIAOrganes.get(organe.id) ?? {}}
+              />
             ))}
           </div>
         )}
@@ -93,7 +106,13 @@ export function EcranGouvernance({
         ) : (
           <div className="adm-items__liste">
             {activites.map((activite, rang) => (
-              <ActiviteCarte key={activite.id} activite={activite} rang={rang} total={activites.length} />
+              <ActiviteCarte
+                key={activite.id}
+                activite={activite}
+                rang={rang}
+                total={activites.length}
+                etatsIA={etatsIAActivites.get(activite.id) ?? {}}
+              />
             ))}
           </div>
         )}

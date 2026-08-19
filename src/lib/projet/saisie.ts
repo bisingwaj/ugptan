@@ -127,6 +127,8 @@ export type TraductionIndicateurSaisie = {
   label: string;
   baseline: string;
   note: string;
+  /** Unité affichée à droite de la valeur (« millions », « jours », « km »). */
+  unit: string;
   existe: boolean;
   /** Le libellé suffit (cf. `indicateurTraduit`). */
   complete: boolean;
@@ -143,6 +145,5 @@ export type IndicateurSaisie = {
   valeur: string;
   /** Vide : la valeur s'affiche telle quelle, sans compteur animé. */
   valeurNum: string;
-  unit: string;
   traductions: Record<Lang, TraductionIndicateurSaisie>;
 };

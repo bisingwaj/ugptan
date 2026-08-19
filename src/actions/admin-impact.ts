@@ -50,6 +50,8 @@ import type { Lang } from "@/lib/pick";
 import { safeUrl } from "@/lib/html/sanitize";
 import { slugify } from "@/lib/actus/slug";
 import { revaliderImpact } from "@/lib/impact/cache";
+import { apresEnregistrementLangue } from "@/lib/ia/planifier";
+import { oublierTraductions } from "@/lib/ia/suivi";
 import {
   EMPLACEMENT_MODULE, MODULE_SLUG,
   isImpactEmplacement, isImpactLayout, isImpactStatut, isImpactTheme, itemTraduit,
@@ -403,7 +405,7 @@ export async function enregistrerSectionLangueAction(
 
   const emplacement = await emplacementSection(sectionId);
   if (!emplacement) return { error: "Section introuvable.", ok: null };
-  await assertEmplacement(emplacement);
+  const acteur = await assertEmplacement(emplacement);
 
   const entete = lireEnteteSection(formData);
   if (!sectionTraduite(entete)) {
@@ -418,6 +420,8 @@ export async function enregistrerSectionLangueAction(
     update: entete,
     create: { sectionId, locale, ...entete },
   });
+
+  await apresEnregistrementLangue("impactSection", sectionId, locale, acteur.id);
 
   revalidatePath(`${cheminModule(emplacement)}/${sectionId}`);
   revaliderImpact();
@@ -457,6 +461,7 @@ export async function supprimerSectionLangueAction(
   }
 
   await db().impactSectionTranslation.deleteMany({ where: { sectionId, locale } });
+  await oublierTraductions("impactSection", sectionId, locale);
 
   revalidatePath(`${cheminModule(emplacement)}/${sectionId}`);
   revaliderImpact();
@@ -621,8 +626,12 @@ export async function supprimerSectionAction(
     };
   }
 
-  // Entrées et traductions tombent en cascade (cf. schéma).
+  // Entrées et traductions tombent en cascade (cf. schéma) ; le suivi, non — et
+  // il faut d'abord relever les entrées, qui disparaissent avec la section.
+  const entrees = await db().impactItem.findMany({ where: { sectionId: id }, select: { id: true } });
   await db().impactSection.delete({ where: { id } });
+  await oublierTraductions("impactSection", id);
+  for (const entree of entrees) await oublierTraductions("impactItem", entree.id);
 
   revaliderImpact();
   redirect(`${cheminModule(emplacement)}?supprime=1`);
@@ -757,7 +766,7 @@ export async function enregistrerItemLangueAction(
   if (!item) return { error: "Entrée introuvable.", ok: null };
 
   const emplacement = item.section.emplacement as ImpactEmplacement;
-  await assertEmplacement(emplacement);
+  const acteur = await assertEmplacement(emplacement);
 
   const textes = {
     surtitre: optionnel(texte(formData, "surtitre")),
@@ -786,6 +795,8 @@ export async function enregistrerItemLangueAction(
     create: { itemId, locale, ...textes },
   });
 
+  await apresEnregistrementLangue("impactItem", itemId, locale, acteur.id);
+
   revalidatePath(`${cheminModule(emplacement)}/${item.sectionId}`);
   revaliderImpact();
 
@@ -813,6 +824,7 @@ export async function supprimerItemLangueAction(
   await assertEmplacement(emplacement);
 
   await db().impactItemTranslation.deleteMany({ where: { itemId, locale } });
+  await oublierTraductions("impactItem", itemId, locale);
 
   revalidatePath(`${cheminModule(emplacement)}/${item.sectionId}`);
   revaliderImpact();
@@ -896,6 +908,7 @@ export async function supprimerItemAction(
     if (estDoublon(error)) return { error: "Suppression impossible.", ok: null };
     throw error;
   }
+  await oublierTraductions("impactItem", id);
 
   revalidatePath(`${cheminModule(emplacement)}/${item.sectionId}`);
   revaliderImpact();

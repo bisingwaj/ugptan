@@ -61,7 +61,7 @@ export async function chargerReferentiels(): Promise<Referentiels> {
 
 const traductionVide = (): TraductionSaisie => ({
   title: "", slug: "", excerpt: "", content: "",
-  seoTitle: "", seoDescription: "", coverAlt: "",
+  seoTitle: "", seoDescription: "", coverAlt: "", authorRole: "",
   existe: false, complete: false, majLe: null,
 });
 
@@ -83,7 +83,6 @@ export const articleVierge = (): ArticleSaisie => ({
   coverSrc: "",
   authorId: "",
   authorName: "",
-  authorRole: "",
   tagIds: [],
   traductions: traductionsVides(),
 });
@@ -101,12 +100,12 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
     select: {
       id: true, status: true, publishedAt: true, featured: true, lieu: true,
       videoYt: true, comps: true, categoryId: true, coverKey: true, coverMediaId: true,
-      authorId: true, authorName: true, authorRole: true,
+      authorId: true, authorName: true,
       coverMedia: { select: mediaSelect },
       translations: {
         select: {
           locale: true, title: true, slug: true, excerpt: true, contentHtml: true,
-          seoTitle: true, seoDescription: true, coverAlt: true, updatedAt: true,
+          seoTitle: true, seoDescription: true, coverAlt: true, authorRole: true, updatedAt: true,
         },
       },
       tags: { select: { tagId: true } },
@@ -129,6 +128,7 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
       seoTitle: tr.seoTitle ?? "",
       seoDescription: tr.seoDescription ?? "",
       coverAlt: tr.coverAlt ?? "",
+      authorRole: tr.authorRole ?? "",
       existe: true,
       complete: tr.title.trim().length > 0 && !isEmptyHtml(tr.contentHtml),
       majLe: formatDateTime(tr.updatedAt),
@@ -156,7 +156,6 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
     coverSrc,
     authorId: article.authorId ?? "",
     authorName: article.authorName ?? "",
-    authorRole: article.authorRole ?? "",
     tagIds: article.tags.map(({ tagId }) => tagId),
     traductions,
   };

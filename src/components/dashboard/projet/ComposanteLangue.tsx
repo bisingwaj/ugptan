@@ -20,6 +20,8 @@ import { ADMIN_PROJET } from "@/content/admin";
 import type { Lang } from "@/lib/pick";
 import type { TraductionComposanteSaisie } from "@/lib/projet/saisie";
 import { CHAMPS_SECTION, type ComposanteSection } from "@/lib/projet/statut";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import type { EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ProjetFormState = { error: null, ok: null };
 
@@ -33,6 +35,8 @@ export function ComposanteLangue({
   visible,
   /** La suppression de la traduction n'a de sens que sur la section d'identité. */
   avecSuppression = false,
+  etatIA,
+  sourceIA,
 }: {
   composanteId: string;
   section: ComposanteSection;
@@ -40,6 +44,8 @@ export function ComposanteLangue({
   valeurs: TraductionComposanteSaisie;
   visible: boolean;
   avecSuppression?: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_PROJET;
   const idBase = useId();
@@ -61,6 +67,9 @@ export function ComposanteLangue({
     <div className="adm-edit__langue" hidden={!visible}>
       {erreur && <div className="auth-error" role="alert">{erreur}</div>}
       {succes && <div className="adm-ok" role="status">{succes}</div>}
+
+      {/* Avant les champs : on doit savoir d'où vient le texte avant de le lire. */}
+      <BandeauTraduction entite="composante" entiteId={composanteId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && <p className="adm-edit__neuve">{t.tradNouvelle(LANG_LABEL[lang])}</p>}
 

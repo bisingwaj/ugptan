@@ -9,6 +9,7 @@ import { chargerMembre, chargerReferentielsEquipe } from "@/lib/equipe/edition";
 import { TEAM_STATUT_LABEL } from "@/lib/equipe/statut";
 import { MembreActions } from "@/components/dashboard/equipe/MembreActions";
 import { MembreEditeur } from "@/components/dashboard/equipe/MembreEditeur";
+import { vuesDe } from "@/lib/ia/suivi";
 
 export const metadata: Metadata = { title: ADMIN_EQUIPE.title };
 
@@ -25,9 +26,10 @@ export default async function ModifierMembrePage(props: {
   const params = await props.searchParams;
   const t = ADMIN_EQUIPE;
 
-  const [membre, { referentiels, assets }] = await Promise.all([
+  const [membre, { referentiels, assets }, etatsIA] = await Promise.all([
     chargerMembre(id),
     chargerReferentielsEquipe(),
+    vuesDe("teamMember", id),
   ]);
   if (!membre) notFound();
 
@@ -114,6 +116,7 @@ export default async function ModifierMembrePage(props: {
           referentiels={referentiels}
           assets={assets}
           apercuUrl={publicUrl}
+          etatsIA={etatsIA}
         />
       </div>
     </>

@@ -16,6 +16,8 @@ import type { BlocSaisie } from "@/lib/projet/saisie";
 import { BLOC_HINT, BLOC_LABEL, type ComposanteBlocType } from "@/lib/projet/statut";
 import type { MediaRef } from "@/lib/medias";
 import { ComposanteBlocCarte } from "@/components/dashboard/projet/ComposanteBlocCarte";
+import type { Lang } from "@/lib/pick";
+import type { EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ProjetFormState = { error: null, ok: null };
 
@@ -25,6 +27,7 @@ export function ComposanteBlocsListe({
   blocs,
   assets,
   voisines,
+  etatsIA,
 }: {
   composanteId: string;
   type: ComposanteBlocType;
@@ -32,6 +35,8 @@ export function ComposanteBlocsListe({
   blocs: BlocSaisie[];
   assets: MediaRef[];
   voisines: { code: string; nom: string }[];
+  /** États de l'assistance de TOUS les blocs de la composante, indexés par identifiant. */
+  etatsIA: Map<string, Partial<Record<Lang, EtatVue>>>;
 }) {
   const t = ADMIN_PROJET;
   const [etat, ajouter, enCours] = useActionState(ajouterBlocAction, etatInitial);
@@ -70,6 +75,7 @@ export function ComposanteBlocsListe({
               voisines={voisines}
               rang={rang}
               total={blocs.length}
+              etatsIA={etatsIA.get(bloc.id) ?? {}}
             />
           ))}
         </div>

@@ -21,6 +21,8 @@ import { ADMIN_EQUIPE } from "@/content/admin";
 import type { TraductionMembreSaisie } from "@/lib/equipe/saisie";
 import type { Lang } from "@/lib/pick";
 import { MembreProfilChamps } from "@/components/dashboard/equipe/MembreProfilChamps";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import type { EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: EquipeFormState = { error: null, ok: null };
 
@@ -31,11 +33,15 @@ export function MembreProfil({
   lang,
   valeurs,
   visible,
+  etatIA,
+  sourceIA,
 }: {
   membreId: string;
   lang: Lang;
   valeurs: TraductionMembreSaisie;
   visible: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_EQUIPE;
   const [etat, action, enCours] = useActionState(enregistrerMembreLangueAction, etatInitial);
@@ -52,6 +58,9 @@ export function MembreProfil({
     <div className="adm-edit__langue" hidden={!visible}>
       {erreur && <div className="auth-error" role="alert">{erreur}</div>}
       {succes && <div className="adm-ok" role="status">{succes}</div>}
+
+      {/* Avant les champs : on doit savoir d'où vient le texte avant de le lire. */}
+      <BandeauTraduction entite="teamMember" entiteId={membreId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && <p className="adm-edit__neuve">{t.tradNouvelle(LANG_LABEL[lang])}</p>}
 

@@ -22,6 +22,8 @@ import type { TraductionSectionSaisie } from "@/lib/impact/saisie";
 import type { ImpactLayout } from "@/lib/impact/statut";
 import type { Lang } from "@/lib/pick";
 import { ImpactEnteteChamps } from "@/components/dashboard/impact/ImpactEnteteChamps";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import type { EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ImpactFormState = { error: null, ok: null };
 
@@ -33,6 +35,8 @@ export function ImpactSectionEntete({
   layout,
   valeurs,
   visible,
+  etatIA,
+  sourceIA,
 }: {
   sectionId: string;
   lang: Lang;
@@ -40,6 +44,8 @@ export function ImpactSectionEntete({
   layout: ImpactLayout;
   valeurs: TraductionSectionSaisie;
   visible: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_IMPACT;
   const [etat, action, enCours] = useActionState(enregistrerSectionLangueAction, etatInitial);
@@ -56,6 +62,9 @@ export function ImpactSectionEntete({
     <div className="adm-edit__langue" hidden={!visible}>
       {erreur && <div className="auth-error" role="alert">{erreur}</div>}
       {succes && <div className="adm-ok" role="status">{succes}</div>}
+
+      {/* Avant les champs : on doit savoir d'où vient le texte avant de le lire. */}
+      <BandeauTraduction entite="impactSection" entiteId={sectionId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && <p className="adm-edit__neuve">{t.tradNouvelle(LANG_LABEL[lang])}</p>}
 

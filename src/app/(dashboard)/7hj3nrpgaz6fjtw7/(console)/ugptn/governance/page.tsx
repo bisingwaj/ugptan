@@ -4,6 +4,7 @@ import { requirePermission } from "@/lib/auth/guard";
 import { ensureActivites, ensureOrganes } from "@/lib/gouvernance/bootstrap";
 import { chargerActivites, chargerOrganes } from "@/lib/gouvernance/edition";
 import { EcranGouvernance } from "@/components/dashboard/gouvernance/EcranGouvernance";
+import { vuesDePlusieurs } from "@/lib/ia/suivi";
 
 export const metadata: Metadata = { title: ADMIN_GOUVERNANCE.title };
 
@@ -17,5 +18,18 @@ export default async function GouvernanceAdminPage() {
 
   const [organes, activites] = await Promise.all([chargerOrganes(), chargerActivites()]);
 
-  return <EcranGouvernance organes={organes} activites={activites} />;
+  // Une requête par famille pour l'écran entier, plutôt qu'une par carte.
+  const [etatsIAOrganes, etatsIAActivites] = await Promise.all([
+    vuesDePlusieurs("organe", organes.map((organe) => organe.id)),
+    vuesDePlusieurs("gouvActivite", activites.map((activite) => activite.id)),
+  ]);
+
+  return (
+    <EcranGouvernance
+      organes={organes}
+      activites={activites}
+      etatsIAOrganes={etatsIAOrganes}
+      etatsIAActivites={etatsIAActivites}
+    />
+  );
 }

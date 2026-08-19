@@ -23,6 +23,9 @@ import type { IndicateurSaisie } from "@/lib/projet/saisie";
 import {
   familleAnimee, PROJET_STATUT_LABEL, type IndicateurFamille,
 } from "@/lib/projet/statut";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ProjetFormState = { error: null, ok: null };
 
@@ -32,10 +35,12 @@ export function IndicateurCarte({
   indicateur,
   rang,
   total,
+  etatsIA,
 }: {
   indicateur: IndicateurSaisie;
   rang: number;
   total: number;
+  etatsIA: Partial<Record<Lang, EtatVue>>;
 }) {
   const t = ADMIN_PROJET;
   const idBase = useId();
@@ -51,8 +56,10 @@ export function IndicateurCarte({
   const idSuppression = `suppr-ind-${indicateur.id}`;
   const anime = familleAnimee(indicateur.famille);
 
-  // Ce qui identifie l'indicateur replié : ce que le site en montre.
-  const resume = [indicateur.valeur, indicateur.unit].filter(Boolean).join(" ");
+  // Ce qui identifie l'indicateur replié : ce que le site en montre. L'unité est
+  // désormais linguistique — la carte repliée reprend le français, comme le
+  // libellé juste en dessous.
+  const resume = [indicateur.valeur, indicateur.traductions.fr.unit].filter(Boolean).join(" ");
   const libelle = indicateur.traductions.fr.label || indicateur.traductions.en.label;
 
   return (
@@ -137,6 +144,7 @@ export function IndicateurCarte({
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                   {etat}
                 </span>
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -150,6 +158,8 @@ export function IndicateurCarte({
             famille={indicateur.famille}
             valeurs={indicateur.traductions[lang]}
             visible={langue === lang}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => indicateur.traductions[l].existe)}
           />
         ))}
 
@@ -182,12 +192,6 @@ export function IndicateurCarte({
                 <p className="adm-hint" style={{ marginTop: 6 }}>{t.champValeurNumAide}</p>
               </div>
             )}
-
-            <div className="adm-form__field">
-              <label className="label-mono" htmlFor={`${idBase}-unit`}>{t.champUnit}</label>
-              <input id={`${idBase}-unit`} name="unit" type="text" className="field" defaultValue={indicateur.unit} placeholder="millions" />
-              <p className="adm-hint" style={{ marginTop: 6 }}>{t.champUnitAide}</p>
-            </div>
 
             <div className="adm-form__field">
               <label className="label-mono" htmlFor={`${idBase}-position`}>{t.blocPosition}</label>
@@ -238,12 +242,16 @@ function IndicateurLangue({
   famille,
   valeurs,
   visible,
+  etatIA,
+  sourceIA,
 }: {
   indicateurId: string;
   lang: Lang;
   famille: IndicateurFamille;
   valeurs: IndicateurSaisie["traductions"][Lang];
   visible: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_PROJET;
   const idBase = useId();
@@ -259,6 +267,9 @@ function IndicateurLangue({
     <div className="adm-item__langue" hidden={!visible}>
       {etat.error && <div className="auth-error" role="alert">{etat.error}</div>}
       {etat.ok && <div className="adm-ok" role="status">{etat.ok}</div>}
+
+      {/* Avant les champs : on doit savoir d'où vient le texte avant de le lire. */}
+      <BandeauTraduction entite="indicateur" entiteId={indicateurId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && <p className="adm-edit__neuve">{t.tradNouvelle(LANG_LABEL[lang])}</p>}
 
@@ -276,6 +287,21 @@ function IndicateurLangue({
 
         {complet && (
           <>
+            {/* L'unité se lit à droite de la valeur : « millions » et « jours »
+                se traduisent, « km » et « kbit/s » se recopient. */}
+            <div className="adm-form__field">
+              <label className="label-mono" htmlFor={`${idBase}-unit`}>{t.champUnit}</label>
+              <input
+                id={`${idBase}-unit`}
+                name="unit"
+                type="text"
+                className="field"
+                defaultValue={valeurs.unit}
+                placeholder={lang === "en" ? "million" : "millions"}
+              />
+              <p className="adm-hint" style={{ marginTop: 6 }}>{t.champUnitAide}</p>
+            </div>
+
             <div className="adm-form__field">
               <label className="label-mono" htmlFor={`${idBase}-baseline`}>{t.champBaseline}</label>
               <input id={`${idBase}-baseline`} name="baseline" type="text" className="field" defaultValue={valeurs.baseline} placeholder="6,56 kbit/s" />

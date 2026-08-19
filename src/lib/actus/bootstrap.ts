@@ -89,7 +89,6 @@ export async function ensureActualites(): Promise<void> {
           coverKey: item.img,
           categoryId: categories.get(slugify(item.cat.fr)) ?? null,
           authorName: "UGPTN",
-          authorRole: "Cellule communication",
           translations: {
             create: [
               {
@@ -98,6 +97,7 @@ export async function ensureActualites(): Promise<void> {
                 slug: slugFr,
                 excerpt: item.corps.fr[0] ?? null,
                 contentHtml: enHtml(item.corps.fr),
+                authorRole: "Cellule communication",
               },
               {
                 locale: "en",
@@ -105,6 +105,7 @@ export async function ensureActualites(): Promise<void> {
                 slug: slugEn,
                 excerpt: item.corps.en[0] ?? null,
                 contentHtml: enHtml(item.corps.en),
+                authorRole: "Communications Unit",
               },
             ],
           },

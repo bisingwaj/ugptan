@@ -1162,6 +1162,28 @@
   .adm-panneau__hint { max-width: 74ch; margin-top: -10px; font-size: 13px; line-height: 1.55; color: var(--c-60); }
   .adm-panneau__form { border: 1px solid var(--c-20); background: #fff; padding: clamp(18px, 2.4vw, 26px); }
 
+
+  /* --- Assistance à la traduction ------------------------------------------ */
+  /* Un bandeau, pas une carte : il coiffe le formulaire de la langue concernée
+     et doit se lire avant lui, sans détourner l'attention du champ de saisie.
+     Le liseré coloré porte l'état à lui seul, ce qui laisse le fond blanc du
+     formulaire intact. */
+  .adm-ia { border: 1px solid var(--c-20); border-left-width: 3px; background: #fff; padding: 12px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .adm-ia--attente { border-left-color: var(--c-40); }
+  .adm-ia--cours { border-left-color: var(--ac); }
+  .adm-ia--relire { border-left-color: var(--orange); background: #fffaf5; }
+  .adm-ia--echec { border-left-color: var(--red); background: #fff5f5; }
+  .adm-ia__texte { flex: 1 1 22rem; min-width: 0; font-size: 13px; line-height: 1.55; color: var(--c-70); }
+  .adm-ia__titre { display: block; font-weight: 600; color: var(--c-90); }
+  .adm-ia__gestes { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* Pastille d'état d'une langue, posée dans un onglet ou une carte. Reprend la
+     géométrie d'`.adm-badge` pour rester lisible à côté de lui. */
+  .adm-ia-pastille { display: inline-block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--c-30); color: var(--c-60); white-space: nowrap; }
+  .adm-ia-pastille--relire { border-color: var(--orange); background: #fff2e8; color: #8a3800; }
+  .adm-ia-pastille--cours { border-color: var(--ac-line); background: var(--ac-pale); color: var(--ac); }
+  .adm-ia-pastille--echec { border-color: var(--red); background: #fff5f5; color: var(--red); }
+
   @media (max-width: 1100px) {
     /* Le sommaire repasse au-dessus et cesse de coller : sur une colonne, un
        bloc collant mangerait la moitié de la hauteur utile. */

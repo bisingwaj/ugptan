@@ -22,6 +22,9 @@ import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import type { OrganeSaisie } from "@/lib/gouvernance/saisie";
 import { CHAMPS_ORGANE, GOUV_STATUT_LABEL } from "@/lib/gouvernance/statut";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: GouvFormState = { error: null, ok: null };
 
@@ -31,10 +34,12 @@ export function OrganeCarte({
   organe,
   rang,
   total,
+  etatsIA,
 }: {
   organe: OrganeSaisie;
   rang: number;
   total: number;
+  etatsIA: Partial<Record<Lang, EtatVue>>;
 }) {
   const t = ADMIN_GOUVERNANCE;
   const idBase = useId();
@@ -129,6 +134,7 @@ export function OrganeCarte({
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                   {etat}
                 </span>
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -141,6 +147,8 @@ export function OrganeCarte({
             lang={lang}
             valeurs={organe.traductions[lang]}
             visible={langue === lang}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => organe.traductions[l].existe)}
           />
         ))}
 
@@ -208,11 +216,15 @@ function OrganeLangue({
   lang,
   valeurs,
   visible,
+  etatIA,
+  sourceIA,
 }: {
   organeId: string;
   lang: Lang;
   valeurs: OrganeSaisie["traductions"][Lang];
   visible: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_GOUVERNANCE;
   const idBase = useId();
@@ -230,6 +242,9 @@ function OrganeLangue({
     <div className="adm-item__langue" hidden={!visible}>
       {erreur && <div className="auth-error" role="alert">{erreur}</div>}
       {succes && <div className="adm-ok" role="status">{succes}</div>}
+
+      {/* Avant les champs : on doit savoir d'où vient le texte avant de le lire. */}
+      <BandeauTraduction entite="organe" entiteId={organeId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && <p className="adm-edit__neuve">{t.tradNouvelle(LANG_LABEL[lang])}</p>}
 
