@@ -149,6 +149,14 @@ export function dict(lang: Lang) {
         "Source of truth: PIM of 23 June 2025. Amounts, dates and indicators per the project's official documents.",
       ),
       legalLabel: t("Informations légales", "Legal information"),
+      /* Surtitre du bandeau de logos, au bas de chaque page. « Financement et
+         tutelle » plutôt que « Nos partenaires » : la Banque mondiale et l'AFD
+         financent, le ministère exerce la tutelle, et les autres institutions
+         mettent en œuvre. Les confondre sous un même mot serait inexact. */
+      partenairesLabel: t(
+        "Financement, tutelle et institutions partenaires",
+        "Funding, supervision and partner institutions",
+      ),
     },
     /* --- Pages légales ----------------------------------------------------- */
     legal: {
@@ -264,9 +272,14 @@ export function dict(lang: Lang) {
     nl: {
       label: "Newsletter",
       title: t("Suivez la transformation, mois après mois.", "Follow the transformation, month by month."),
+      /* Le sujet de la lettre est ce que le projet DÉPLACE, non ce qu'il fait.
+         Un abonné n'ouvre pas une lettre d'unité de gestion pour l'unité de
+         gestion : il l'ouvre pour savoir si son bureau d'état civil, son centre
+         de santé ou sa démarche du mois prochain vont changer. Le sommaire du
+         message de bienvenue tient le même cap (cf. lib/email/templates/newsletter.ts). */
       lead: t(
-        "L'actualité, les résultats et les histoires du Projet — directement dans votre boîte mail.",
-        "Project news, results and stories — straight to your inbox.",
+        "Ce qui change pour les usagers : institutions raccordées, démarches qui cessent d'exiger un déplacement, compétences formées. Et ce qui bloque, quand ça bloque.",
+        "What changes for users: institutions connected, procedures that no longer require a journey, skills trained. And what is holding, when it is.",
       ),
       placeholder: t("votre@email.cd", "your@email.cd"),
       btn: t("S'inscrire", "Subscribe"),

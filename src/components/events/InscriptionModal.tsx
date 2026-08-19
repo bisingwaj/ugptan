@@ -24,6 +24,7 @@ import { dict } from "@/content/i18n";
 import type { EvtVue } from "@/lib/events/query";
 import { INSCRIPTION_INITIALE, INSCRIPTION_LIMITES } from "@/lib/events/inscription";
 import type { Lang } from "@/lib/pick";
+import { BoutonAction } from "@/components/ui/BoutonAction";
 
 export function InscriptionModal({
   evt,
@@ -151,10 +152,16 @@ export function InscriptionModal({
               style={{ marginBottom: 20, background: "var(--c-10)" }}
             />
 
-            <button type="submit" className="btn btn--primary" disabled={enCours} style={{ width: "100%", justifyContent: "center" }}>
-              {enCours ? t.regSending : t.register}
-              {!enCours && <span className="arrow">→</span>}
-            </button>
+            <BoutonAction
+              type="submit"
+              pending={enCours}
+              labelPending={t.regSending}
+              className="btn--primary"
+              style={{ width: "100%", justifyContent: "center" }}
+            >
+              {t.register}
+              <span className="arrow">→</span>
+            </BoutonAction>
 
             <p className="adm-hint" style={{ marginTop: 14, fontSize: 12, lineHeight: 1.55 }}>{t.regPrivacy}</p>
           </form>

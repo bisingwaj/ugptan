@@ -5,6 +5,7 @@ import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { subscribeNewsletter, type SubscribeError } from "@/actions/newsletter";
 import { HONEYPOT_FIELD } from "@/lib/newsletter/model";
+import { BoutonAction } from "@/components/ui/BoutonAction";
 
 /** Ce que l'écran affiche après l'appel : rien, un succès, ou un refus. */
 type Etat =
@@ -112,10 +113,15 @@ export function Newsletter({ lang }: { lang: Lang }) {
                   />
                 </div>
 
-                <button type="submit" className="btn btn--primary whitespace-nowrap" disabled={pending}>
-                  {pending ? t.submitting : t.btn}
+                <BoutonAction
+                  type="submit"
+                  pending={pending}
+                  labelPending={t.submitting}
+                  className="btn--primary whitespace-nowrap"
+                >
+                  {t.btn}
                   <span className="arrow">→</span>
-                </button>
+                </BoutonAction>
               </form>
 
               {etat.kind === "error" ? (

@@ -17,7 +17,8 @@
  * messageries.
  */
 import type { Lang } from "@/lib/pick";
-import { button, esc, fallbackLink, notice, paragraph, renderEmail } from "../layout";
+import { SITE_URL } from "@/lib/site";
+import { button, esc, fallbackLink, featureList, notice, paragraph, renderEmail } from "../layout";
 import type { Mail } from "../send";
 
 /** Intitulé sous la marque, à la place de « Console d'administration ». */
@@ -33,6 +34,66 @@ const footnote = (lang: Lang, unsubscribeUrl: string) =>
   lang === "en"
     ? `You are receiving this message because this address was entered in the newsletter form on the UGPTN website. <a href="${esc(unsubscribeUrl)}" style="color:#0f62fe;">Unsubscribe in one click</a>.`
     : `Vous recevez ce message parce que cette adresse a été saisie dans le formulaire d'inscription du site de l'UGPTN. <a href="${esc(unsubscribeUrl)}" style="color:#0f62fe;">Se désabonner en un clic</a>.`;
+
+
+/* --- Sommaire de la lettre ------------------------------------------------- */
+
+/**
+ * Ce que l'abonné recevra, annoncé dès l'accusé d'inscription.
+ *
+ * ─── Pourquoi ces quatre rubriques, et pas « l'actualité du projet » ────────
+ *
+ * Une lettre d'information de projet public se lit rarement pour le projet
+ * lui-même. Elle se lit pour ce qu'il déplace chez ceux qui n'y travaillent
+ * pas : un bureau d'état civil territorial, un centre de santé de zone, un
+ * ménage qui renonçait à un déplacement. Les rubriques sont donc écrites du
+ * point de vue de l'usager, et non de celui de l'Unité.
+ *
+ * La quatrième n'est pas une concession de forme. Une lettre qui ne rendrait
+ * compte que des réussites se fait classer en publicité, par ses lecteurs
+ * d'abord, par les filtres ensuite.
+ *
+ * ⚠️ Aucune promesse chiffrée ici : le prospectif s'écrit qualitativement tant
+ * qu'il n'est pas constaté (cf. doctrine de rédaction du projet).
+ */
+const RUBRIQUES = (en: boolean): { title: string; text: string }[] =>
+  en
+    ? [
+        {
+          title: "What changes in a health centre, a school, an administrative office",
+          text: "Which institutions are connected, and what their staff can then do on site: a register consulted without travelling, a file sent to the provincial capital without anyone carrying it there.",
+        },
+        {
+          title: "Services that no longer require a journey",
+          text: "Civil status, identity, enrolment. As registers become interoperable, each of them removes trips and lost days for the people who depend on them.",
+        },
+        {
+          title: "Skills trained, and what becomes of them",
+          text: "The courses opened to young people and to public officials, the occupations they lead to, and what those who completed them are doing now. Training with no demand facing it produces qualified emigration, not employment.",
+        },
+        {
+          title: "What is holding, and why",
+          text: "Delays, trade-offs and the reasons behind them. A newsletter that reported successes alone would soon stop being read.",
+        },
+      ]
+    : [
+        {
+          title: "Ce qui change dans un centre de santé, une école, un bureau administratif",
+          text: "Les institutions raccordées, et ce que leurs agents peuvent faire sur place une fois qu'elles le sont : un registre consulté sans se déplacer, un dossier transmis au chef-lieu sans que personne l'y porte.",
+        },
+        {
+          title: "Les démarches qui cessent d'exiger un déplacement",
+          text: "L'état civil, l'identité, l'inscription. À mesure que les registres deviennent interopérables, chacune d'elles retire des trajets et des journées perdues à ceux qui en dépendent.",
+        },
+        {
+          title: "Les compétences formées, et ce qu'elles deviennent",
+          text: "Les parcours ouverts aux jeunes et aux agents publics, les métiers qu'ils visent, et ce que font aujourd'hui ceux qui les ont terminés. Une formation sans demande en face produit de l'émigration qualifiée, pas de l'emploi.",
+        },
+        {
+          title: "Ce qui bloque, et pourquoi",
+          text: "Les retards, les arbitrages et leurs raisons. Une lettre qui ne rendrait compte que des réussites cesserait vite d'être lue.",
+        },
+      ];
 
 /* --- Bienvenue ------------------------------------------------------------ */
 
@@ -65,19 +126,26 @@ export function newsletterWelcomeEmail(params: {
     blocks: [
       paragraph(
         en
-          ? `The address <strong>${esc(email)}</strong> has been added to the list of the Digital Transformation Project newsletter. You will receive project news, results and stories.`
-          : `L'adresse <strong>${esc(email)}</strong> a été ajoutée à la liste de diffusion de la lettre d'information du Projet de Transformation Numérique. Vous y recevrez l'actualité, les résultats et les histoires du Projet.`,
+          ? `The address <strong>${esc(email)}</strong> is now on the mailing list of the Digital Transformation Project. Each edition reports what changes for the people the project reaches: what a household, a health centre or a territorial registry office can do that it could not do before.`
+          : `L'adresse <strong>${esc(email)}</strong> figure désormais sur la liste de diffusion du Projet de Transformation Numérique. Chaque édition rend compte de ce qui change pour les personnes que le projet atteint : ce qu'un ménage, un centre de santé ou un bureau d'état civil territorial peut faire qu'il ne pouvait pas faire avant.`,
       ),
+      featureList(RUBRIQUES(en)),
+      /* Le bouton mène au site, non au désabonnement.
+         Ce n'est pas un renoncement à la règle qui voulait le lien de sortie
+         entre les mains de l'abonné dès le premier jour : ce lien reste porté
+         par le pied de CE message comme de tous les suivants, et par le
+         paragraphe ci-dessous. Ce qui change, c'est qu'un message de bienvenue
+         cesse de proposer le départ pour seule action. */
+      button(en ? "Read the latest news" : "Lire les dernières actualités", `${SITE_URL}/${lang}/news`),
       notice(
         en
-          ? "You can leave the list at any time: every message we send carries an unsubscribe link, and the button below works from today."
-          : "Vous pouvez quitter la liste à tout moment : chacun de nos messages porte un lien de désabonnement, et le bouton ci-dessous fonctionne dès aujourd'hui.",
+          ? `You can leave the list at any time. Every message carries an unsubscribe link, including this one: <a href="${esc(unsubscribeUrl)}" style="color:#0f62fe;">unsubscribe in one click</a>, with no reason to give and no confirmation to wait for.`
+          : `Vous pouvez quitter la liste à tout moment. Chacun de nos messages porte un lien de désabonnement, celui-ci compris : <a href="${esc(unsubscribeUrl)}" style="color:#0f62fe;">se désabonner en un clic</a>, sans motif à donner ni confirmation à attendre.`,
       ),
-      button(en ? "Unsubscribe" : "Me désabonner", unsubscribeUrl),
       paragraph(
         en
-          ? "If you did not subscribe, this single click removes the address from the list — nothing else was recorded."
-          : "Si vous n'êtes pas à l'origine de cette inscription, ce seul clic retire l'adresse de la liste — rien d'autre n'a été enregistré.",
+          ? "If you did not subscribe, that same link removes the address from the list. Nothing else was recorded: no name, no browsing history."
+          : "Si vous n'êtes pas à l'origine de cette inscription, ce même lien retire l'adresse de la liste. Rien d'autre n'a été enregistré : ni nom, ni historique de navigation.",
         { muted: true },
       ),
     ],
@@ -88,8 +156,11 @@ export function newsletterWelcomeEmail(params: {
     en ? "YOUR SUBSCRIPTION TO THE UGPTN NEWSLETTER" : "VOTRE INSCRIPTION À LA LETTRE D'INFORMATION DE L'UGPTN",
     "",
     en
-      ? `The address ${email} has been added to the newsletter list.`
-      : `L'adresse ${email} a été ajoutée à la liste de diffusion de la lettre d'information.`,
+      ? `The address ${email} is now on the mailing list. Each edition reports what changes for the people the project reaches.`
+      : `L'adresse ${email} figure désormais sur la liste de diffusion. Chaque édition rend compte de ce qui change pour les personnes que le projet atteint.`,
+    "",
+    en ? "What each edition covers:" : "Ce que couvre chaque édition :",
+    ...RUBRIQUES(en).map((r) => `- ${r.title} : ${r.text}`),
     "",
     en ? "Unsubscribe at any time:" : "Vous désabonner à tout moment :",
     unsubscribeUrl,
