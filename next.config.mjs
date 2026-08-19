@@ -74,7 +74,15 @@ const csp = (dev) =>
     "form-action 'self'",
     "object-src 'none'",
     "frame-ancestors 'self'",
-    "upgrade-insecure-requests",
+    /* ⚠️ JAMAIS en développement. Cette directive demande au navigateur de
+       réécrire en `https` toute requête `http` de la page — y compris vers
+       `http://localhost`. Chrome et les navigateurs dérivés exemptent
+       localhost ; Safari, non : il tentait donc de charger les feuilles de
+       style et les scripts sur `https://localhost:3003`, où rien n'écoute, et
+       n'affichait plus qu'un squelette HTML nu. Le symptôme est déroutant parce
+       qu'il ne touche qu'un navigateur, et que le serveur, lui, répond
+       correctement à chaque ressource prise isolément. */
+    ...(dev ? [] : ["upgrade-insecure-requests"]),
   ].join("; ");
 
 // En-têtes de sécurité appliqués à toutes les routes.
