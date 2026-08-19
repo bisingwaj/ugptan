@@ -15,6 +15,7 @@ import { NAV, route } from "@/lib/routes";
 import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
+import Image from "next/image";
 
 export function CompResponsable({
   membre,
@@ -40,8 +41,17 @@ export function CompResponsable({
           <div className="comp-resp">
             <div className="comp-resp__media">
               {photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={photo} alt={membre.portrait.alt} loading="lazy" decoding="async" />
+                /* Mode `fill` : `.comp-resp__media img` pose déjà le cadrage et
+                   le recadrage, l'image n'a pas de dimensions propres à
+                   déclarer. La colonne fait 240 px, d'où le `sizes`. */
+                <Image
+                  src={photo}
+                  alt={membre.portrait.alt}
+                  fill
+                  unoptimized={membre.portrait.unoptimized}
+                  sizes="(max-width: 860px) 100vw, 240px"
+                  style={{ objectFit: "cover", objectPosition: "center 18%" }}
+                />
               ) : (
                 <span className="mono comp-resp__initials">{initials(membre.nom || membre.role)}</span>
               )}

@@ -27,6 +27,7 @@ import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { cheminArticle } from "@/components/actus/ActuCard";
+import Image from "next/image";
 
 /** Cache aligné sur les pages « Actualités » et « Événements » : l'accueil
  *  affiche les derniers communiqués et les prochaines rencontres, invalidés par
@@ -290,8 +291,19 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             {partners.map((p) => (
               <RevealItem key={p.name} className="logo-cell">
                 {p.logo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.logo} alt={p.name} loading="lazy" decoding="async" />
+                  /* `next/image` plutôt qu'une balise brute : les neuf logos
+                     pesaient 988 Ko de PNG servis tels quels sur le premier
+                     écran, pour un affichage de 46 px de haut. L'optimiseur les
+                     redimensionne et les convertit en AVIF.
+                     `sizes` décrit la place RÉELLE prise dans la grille (cf.
+                     `.logo-cell img` dans globals.css), sans quoi Next servirait
+                     la largeur du plus grand écran possible. */
+                  <Image
+                    src={p.logo}
+                    alt={p.name}
+                    sizes="(max-width: 760px) 30vw, 180px"
+                    loading="lazy"
+                  />
                 ) : (
                   <div style={{ fontSize: 13.5, fontWeight: 600, textAlign: "center", lineHeight: 1.25 }}>{p.name}</div>
                 )}

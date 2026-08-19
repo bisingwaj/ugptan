@@ -107,6 +107,10 @@
    génère les utilitaires font-sans / font-mono. `var(--font-sans)` continue
    donc de résoudre pour le CSS existant. */
 @theme {
-  --font-sans: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  /* Les deux variables `--font-plex-*` sont posées sur <html> par next/font
+     (cf. src/lib/fonts.ts), qui sert les fichiers depuis notre domaine. Les
+     replis restent : ils couvrent le temps du téléchargement, et le cas d'une
+     police que le navigateur refuse. */
+  --font-sans: var(--font-plex-sans), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "@/styles/dashboard.css";
 import { NavigationProgress } from "@/components/motion/NavigationProgress";
+import { policesClassName } from "@/lib/fonts";
 
 /**
  * Layout racine de la console d'administration.
@@ -37,14 +38,8 @@ export default function DashboardRootLayout({ children }: { children: React.Reac
     // suppressHydrationWarning : cf. le même garde dans app/[lang]/layout.tsx.
     // Les extensions de navigateur écrivent sur <html> et <body> avant
     // l'hydratation ; l'attribut ne couvre que ces deux éléments, pas la console.
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr" className={policesClassName} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body suppressHydrationWarning>
         <NavigationProgress />

@@ -7,6 +7,16 @@ import type {
   Ressource, GalleryItem, Contact,
 } from "./types";
 
+import logoBanqueMondiale from "@/../public/partenaires/banque-mondiale.png";
+import logoAfd from "@/../public/partenaires/afd.png";
+import logoMptn from "@/../public/partenaires/mptn.png";
+import logoEconomieNumerique from "@/../public/partenaires/economie-numerique.png";
+import logoArptc from "@/../public/partenaires/arptc.png";
+import logoAdn from "@/../public/partenaires/adn.png";
+import logoOnip from "@/../public/partenaires/onip.png";
+import logoMesu from "@/../public/partenaires/mesu.png";
+import logoMepme from "@/../public/partenaires/mepme.png";
+
 /* ⚠️ Quatre jeux de données ont quitté ce fichier : les témoignages de
    bénéficiaires, les chiffres d'impact humain, les diptyques avant/après et les
    dialogues sectoriels. Ils sont désormais administrés depuis la console
@@ -67,17 +77,22 @@ export const gouvActivites: GouvActivite[] = [
    aux questions) et ceux de la page « Le projet » (publics visés, questions
    citoyennes) ne sont plus ici : ils sont administrés depuis la console, et
    leur état initial vit dans `src/content/impact/`. */
-/* --- Accueil : partenaires (logos placeholders) ---------------------------- */
+/* --- Accueil : partenaires -------------------------------------------------
+   Les logos sont IMPORTÉS, non désignés par un chemin : l'import transmet
+   leurs dimensions à `next/image`, qui peut alors les redimensionner et les
+   convertir. Un chemin en chaîne aurait obligé à écrire ces dimensions à la
+   main, et à les corriger au moindre remplacement de fichier. */
+
 export const partners: Partner[] = [
-  { name: "Banque mondiale", kind: { fr: "Bailleur · IDA", en: "Donor · IDA" }, logo: "/partenaires/banque-mondiale.png" },
-  { name: "AFD", kind: { fr: "Bailleur", en: "Donor" }, logo: "/partenaires/afd.png" },
-  { name: "MPTN", kind: { fr: "Tutelle", en: "Supervision" }, logo: "/partenaires/mptn.png" },
-  { name: "Ministère de l'Économie Numérique", kind: { fr: "Ministère", en: "Ministry" }, logo: "/partenaires/economie-numerique.png" },
-  { name: "ARPTC", kind: { fr: "Régulateur", en: "Regulator" }, logo: "/partenaires/arptc.png" },
-  { name: "ADN", kind: { fr: "Agence du Numérique", en: "Digital Agency" }, logo: "/partenaires/adn.png" },
-  { name: "ONIP", kind: { fr: "Identité", en: "Identity" }, logo: "/partenaires/onip.png" },
-  { name: "MESU", kind: { fr: "Enseignement sup.", en: "Higher education" }, logo: "/partenaires/mesu.png" },
-  { name: "MEPME", kind: { fr: "PME", en: "PME" }, logo: "/partenaires/mepme.png" },
+  { name: "Banque mondiale", kind: { fr: "Bailleur · IDA", en: "Donor · IDA" }, logo: logoBanqueMondiale },
+  { name: "AFD", kind: { fr: "Bailleur", en: "Donor" }, logo: logoAfd },
+  { name: "MPTN", kind: { fr: "Tutelle", en: "Supervision" }, logo: logoMptn },
+  { name: "Ministère de l'Économie Numérique", kind: { fr: "Ministère", en: "Ministry" }, logo: logoEconomieNumerique },
+  { name: "ARPTC", kind: { fr: "Régulateur", en: "Regulator" }, logo: logoArptc },
+  { name: "ADN", kind: { fr: "Agence du Numérique", en: "Digital Agency" }, logo: logoAdn },
+  { name: "ONIP", kind: { fr: "Identité", en: "Identity" }, logo: logoOnip },
+  { name: "MESU", kind: { fr: "Enseignement sup.", en: "Higher education" }, logo: logoMesu },
+  { name: "MEPME", kind: { fr: "PME", en: "PME" }, logo: logoMepme },
 ];
 
 /* --- Ressources & publications --------------------------------------------- */
