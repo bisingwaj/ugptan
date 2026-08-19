@@ -1,0 +1,43 @@
+/* ============================================================================
+   Squelettes de chargement.
+   ==========================================================================
+
+   Ce que dessine un squelette : la STRUCTURE de la page attendue, pas un
+   sablier. Une grille de six cartes annonce six cartes ; un titre annonce un
+   titre. C'est ce qui évite le saut de mise en page à l'arrivée du contenu, et
+   ce qui distingue un squelette d'un simple témoin d'attente.
+
+   L'animation est en CSS pur : ces écrans s'affichent AVANT que le JavaScript
+   de la page ne soit exécuté, un composant animé par script ne battrait donc
+   pas. Elle porte sur `opacity` seule — ni `background-position` ni
+   `transform`, qui reflueraient sur la mise en page ou repeindraient la
+   surface à chaque image.
+   ========================================================================== */
+
+@keyframes squelette-battement {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.sq {
+  background: var(--c-10);
+  animation: squelette-battement 1.4s ease-in-out infinite;
+  /* Sans cela, une ligne vide se replierait à zéro dans une grille. */
+  display: block;
+}
+
+/* Décalage des battements : une grille dont toutes les cellules pulsent à
+   l'unisson bat comme un stroboscope. Trois phases suffisent à casser l'effet
+   sans donner l'impression d'un désordre. */
+.sq--b { animation-delay: 0.18s; }
+.sq--c { animation-delay: 0.36s; }
+
+/* Surface pleine (portrait, visuel de couverture) : un ton plus soutenu que le
+   texte, comme sur les cartes réelles où l'image est plus dense que la légende. */
+.sq--surface { background: var(--c-20); }
+
+/* Le battement est une information, pas un ornement : il dit « ça arrive ».
+   Coupé, la structure reste — elle porte déjà l'essentiel du message. */
+@media (prefers-reduced-motion: reduce) {
+  .sq { animation: none; opacity: 0.8; }
+}
