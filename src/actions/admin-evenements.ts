@@ -43,6 +43,8 @@ import { adminPath } from "@/lib/admin";
 import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import { isEmptyHtml, safeUrl, sanitizeHtml } from "@/lib/html/sanitize";
+import { apresEnregistrementLangue } from "@/lib/ia/planifier";
+import { oublierTraductions } from "@/lib/ia/suivi";
 import { fromDateTimeLocal } from "@/lib/format";
 import { slugify, uniqueSlug } from "@/lib/actus/slug";
 import { isEvenementMode, isEvenementStatut } from "@/lib/events/statut";
@@ -342,7 +344,7 @@ export async function enregistrerTraductionEvtAction(
   _prev: EvtFormState,
   formData: FormData,
 ): Promise<EvtFormState> {
-  await assertPermission("evenements");
+  const acteur = await assertPermission("evenements");
 
   const evenementId = texte(formData, "evenementId");
   const locale = lireLocale(formData);
@@ -367,6 +369,8 @@ export async function enregistrerTraductionEvtAction(
     update: traduction,
     create: { evenementId, locale, ...traduction },
   });
+
+  await apresEnregistrementLangue("evenement", evenementId, locale, acteur.id);
 
   revaliderEvenements();
 
@@ -409,6 +413,7 @@ export async function supprimerTraductionEvtAction(
   }
 
   await db().evenementTranslation.deleteMany({ where: { evenementId, locale } });
+  await oublierTraductions("evenement", evenementId, locale);
 
   revaliderEvenements();
   return { error: null, ok: `Version ${LANGUE_LABEL[locale]} supprimée.` };
@@ -539,8 +544,9 @@ export async function supprimerEvenementAction(
   const existe = await db().evenement.findUnique({ where: { id }, select: { id: true } });
   if (!existe) return { error: "Événement introuvable.", ok: null };
 
-  // Les traductions tombent en cascade (cf. schéma).
+  // Les traductions tombent en cascade (cf. schéma) ; le suivi, non.
   await db().evenement.delete({ where: { id } });
+  await oublierTraductions("evenement", id);
 
   revaliderEvenements();
   redirect(`${EVTS_PATH}?supprime=1`);

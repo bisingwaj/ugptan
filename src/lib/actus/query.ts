@@ -50,14 +50,13 @@ const articleSelect = {
   coverKey: true,
   updatedAt: true,
   authorName: true,
-  authorRole: true,
   author: { select: { id: true, name: true, email: true } },
   category: { select: { id: true, slug: true, nomFr: true, nomEn: true, color: true } },
   coverMedia: { select: mediaSelect },
   translations: {
     select: {
       locale: true, title: true, slug: true, excerpt: true, contentHtml: true,
-      seoTitle: true, seoDescription: true, coverAlt: true,
+      seoTitle: true, seoDescription: true, coverAlt: true, authorRole: true,
     },
   },
   tags: { select: { tag: { select: { id: true, slug: true, nomFr: true, nomEn: true } } } },
@@ -128,13 +127,13 @@ type LigneArticle = {
   coverKey: string | null;
   updatedAt: Date;
   authorName: string | null;
-  authorRole: string | null;
   author: { id: string; name: string | null; email: string } | null;
   category: { id: string; slug: string; nomFr: string; nomEn: string; color: string | null } | null;
   coverMedia: MediaRef | null;
   translations: {
     locale: string; title: string; slug: string; excerpt: string | null;
     contentHtml: string; seoTitle: string | null; seoDescription: string | null; coverAlt: string | null;
+    authorRole: string | null;
   }[];
   tags: { tag: { id: string; slug: string; nomFr: string; nomEn: string } }[];
 };
@@ -183,7 +182,9 @@ function toVue(row: LigneArticle, lang: Lang): ActuVue | null {
       ? { slug: row.category.slug, nom: langue === "en" ? row.category.nomEn : row.category.nomFr, color: row.category.color }
       : null,
     tags: row.tags.map(({ tag }) => ({ slug: tag.slug, nom: langue === "en" ? tag.nomEn : tag.nomFr })),
-    auteur: auteurNom ? { nom: auteurNom, role: row.authorRole } : null,
+    /* La fonction vient de la LANGUE affichée, le nom de la fiche : « UGPTN »
+       ne se traduit pas, « Cellule communication » si. */
+    auteur: auteurNom ? { nom: auteurNom, role: tr.authorRole } : null,
     visuel: couverture({ coverMedia: row.coverMedia, coverKey: row.coverKey, coverAlt: tr.coverAlt }, langue, tr.title),
     lecture: readingMinutes(tr.contentHtml),
     langue,

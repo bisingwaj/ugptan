@@ -39,6 +39,8 @@ import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import { slugify } from "@/lib/actus/slug";
 import { revaliderProjet } from "@/lib/projet/cache";
+import { apresEnregistrementLangue } from "@/lib/ia/planifier";
+import { oublierTraductions } from "@/lib/ia/suivi";
 import {
   blocTraduit, composanteTraduite, indicateurTraduit,
   isChampComposante, isComposanteBlocType, isIndicateurFamille, isProjetStatut,
@@ -379,7 +381,14 @@ export async function supprimerComposanteAction(
   const composante = await db().composante.findUnique({ where: { id }, select: { id: true } });
   if (!composante) return { error: "Composante introuvable.", ok: null };
 
+  // Les blocs tombent en cascade avec la composante ; leur suivi de traduction,
+  // non — il faut donc les relever AVANT la suppression. Les indicateurs, eux,
+  // relèvent d'une famille du cadre de résultats et non d'une composante : ils
+  // survivent, et leur suivi avec eux.
+  const blocs = await db().composanteBloc.findMany({ where: { composanteId: id }, select: { id: true } });
   await db().composante.delete({ where: { id } });
+  await oublierTraductions("composante", id);
+  for (const bloc of blocs) await oublierTraductions("composanteBloc", bloc.id);
 
   revaliderProjet();
   redirect(`${COMPOSANTES_PATH}?supprime=1`);
@@ -421,7 +430,7 @@ export async function enregistrerComposanteLangueAction(
   _prev: ProjetFormState,
   formData: FormData,
 ): Promise<ProjetFormState> {
-  await assertPermission("projet");
+  const acteur = await assertPermission("projet");
 
   const composanteId = texte(formData, "composanteId");
   const locale = lireLocale(formData);
@@ -451,6 +460,12 @@ export async function enregistrerComposanteLangueAction(
     update: valeurs,
     create: { composanteId, locale, ...valeurs },
   });
+
+  /* Une composante s'enregistre SECTION PAR SECTION : chaque envoi relance donc
+     la composition de l'autre langue, qui repart de la ligne fusionnée. C'est
+     redondant tant que la fiche se remplit, et voulu — la dernière génération
+     est la seule qui compte, et elle porte l'état complet. */
+  await apresEnregistrementLangue("composante", composanteId, locale, acteur.id);
 
   revalidatePath(`${COMPOSANTES_PATH}/${composanteId}`);
   revaliderProjet();
@@ -487,6 +502,7 @@ export async function supprimerComposanteLangueAction(
   }
 
   await db().composanteTranslation.deleteMany({ where: { composanteId, locale } });
+  await oublierTraductions("composante", composanteId, locale);
 
   revalidatePath(`${COMPOSANTES_PATH}/${composanteId}`);
   revaliderProjet();
@@ -643,6 +659,7 @@ export async function supprimerBlocAction(
   if (!composanteId) return { error: "Entrée introuvable.", ok: null };
 
   await db().composanteBloc.delete({ where: { id } });
+  await oublierTraductions("composanteBloc", id);
 
   revalidatePath(`${COMPOSANTES_PATH}/${composanteId}`);
   revaliderProjet();
@@ -664,7 +681,7 @@ export async function enregistrerBlocLangueAction(
   _prev: ProjetFormState,
   formData: FormData,
 ): Promise<ProjetFormState> {
-  await assertPermission("projet");
+  const acteur = await assertPermission("projet");
 
   const blocId = texte(formData, "blocId");
   const locale = lireLocale(formData);
@@ -691,6 +708,8 @@ export async function enregistrerBlocLangueAction(
     create: { blocId, locale, ...valeurs },
   });
 
+  await apresEnregistrementLangue("composanteBloc", blocId, locale, acteur.id);
+
   revalidatePath(`${COMPOSANTES_PATH}/${bloc.composanteId}`);
   revaliderProjet();
   return { error: null, ok: `Version ${LANGUE_LABEL[locale]} enregistrée.` };
@@ -710,6 +729,7 @@ export async function supprimerBlocLangueAction(
   if (!composanteId) return { error: "Entrée introuvable.", ok: null };
 
   await db().composanteBlocTranslation.deleteMany({ where: { blocId, locale } });
+  await oublierTraductions("composanteBloc", blocId, locale);
 
   revalidatePath(`${COMPOSANTES_PATH}/${composanteId}`);
   revaliderProjet();
@@ -809,7 +829,6 @@ export async function enregistrerIndicateurAction(
         code: optionnel(texte(formData, "code").toUpperCase()),
         valeur,
         valeurNum: entierOptionnel(formData, "valeurNum"),
-        unit: optionnel(texte(formData, "unit")),
       },
     });
   } catch (error) {
@@ -851,6 +870,7 @@ export async function supprimerIndicateurAction(
   }
 
   await db().indicateur.delete({ where: { id } });
+  await oublierTraductions("indicateur", id);
 
   revalidatePath(RESULTATS_PATH);
   revaliderProjet();
@@ -862,6 +882,9 @@ function lireTraductionIndicateur(formData: FormData) {
     label: optionnel(texte(formData, "label")),
     baseline: optionnel(texte(formData, "baseline")),
     note: optionnel(texte(formData, "note")),
+    /* « millions » et « jours » se traduisent, « km » et « kbit/s » se
+       recopient : dans les deux cas, c'est un libellé de langue. */
+    unit: optionnel(texte(formData, "unit")),
   };
 }
 
@@ -870,7 +893,7 @@ export async function enregistrerIndicateurLangueAction(
   _prev: ProjetFormState,
   formData: FormData,
 ): Promise<ProjetFormState> {
-  await assertPermission("projet");
+  const acteur = await assertPermission("projet");
 
   const indicateurId = texte(formData, "indicateurId");
   const locale = lireLocale(formData);
@@ -887,6 +910,8 @@ export async function enregistrerIndicateurLangueAction(
     update: valeurs,
     create: { indicateurId, locale, ...valeurs },
   });
+
+  await apresEnregistrementLangue("indicateur", indicateurId, locale, acteur.id);
 
   revalidatePath(RESULTATS_PATH);
   revaliderProjet();

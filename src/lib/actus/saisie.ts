@@ -23,6 +23,8 @@ export type TraductionSaisie = {
   seoTitle: string;
   seoDescription: string;
   coverAlt: string;
+  /** Fonction affichée sous la signature (« Cellule communication »). */
+  authorRole: string;
   /** `false` tant qu'aucune ligne n'existe en base pour cette langue. */
   existe: boolean;
   /** Titre ET corps renseignés : la langue est servie au public. */
@@ -48,7 +50,6 @@ export type ArticleSaisie = {
   coverSrc: string;
   authorId: string;
   authorName: string;
-  authorRole: string;
   tagIds: string[];
   traductions: Record<Lang, TraductionSaisie>;
 };

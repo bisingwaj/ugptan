@@ -22,6 +22,8 @@ import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import { revaliderGouvernance } from "@/lib/gouvernance/cache";
 import { activiteTraduite, isGouvStatut, organeTraduit } from "@/lib/gouvernance/statut";
+import { apresEnregistrementLangue } from "@/lib/ia/planifier";
+import { oublierTraductions } from "@/lib/ia/suivi";
 
 /** État partagé par tous les formulaires du module. */
 export type GouvFormState = { error: string | null; ok: string | null };
@@ -200,6 +202,7 @@ export async function supprimerOrganeAction(
   if (!organe) return { error: "Organe introuvable.", ok: null };
 
   await db().organe.delete({ where: { id } });
+  await oublierTraductions("organe", id);
 
   revalidatePath(ECRAN);
   revaliderGouvernance();
@@ -258,7 +261,7 @@ export async function enregistrerOrganeLangueAction(
   _prev: GouvFormState,
   formData: FormData,
 ): Promise<GouvFormState> {
-  await assertPermission("ugptn");
+  const acteur = await assertPermission("ugptn");
 
   const organeId = texte(formData, "organeId");
   const locale = lireLocale(formData);
@@ -278,6 +281,8 @@ export async function enregistrerOrganeLangueAction(
     update: valeurs,
     create: { organeId, locale, ...valeurs },
   });
+
+  await apresEnregistrementLangue("organe", organeId, locale, acteur.id);
 
   revalidatePath(ECRAN);
   revaliderGouvernance();
@@ -313,6 +318,7 @@ export async function supprimerOrganeLangueAction(
   }
 
   await db().organeTranslation.deleteMany({ where: { organeId, locale } });
+  await oublierTraductions("organe", organeId, locale);
 
   revalidatePath(ECRAN);
   revaliderGouvernance();
@@ -437,6 +443,7 @@ export async function supprimerActiviteAction(
   if (!activite) return { error: "Décision introuvable.", ok: null };
 
   await db().gouvActivite.delete({ where: { id } });
+  await oublierTraductions("gouvActivite", id);
 
   revalidatePath(ECRAN);
   revaliderGouvernance();
@@ -487,7 +494,7 @@ export async function enregistrerActiviteLangueAction(
   _prev: GouvFormState,
   formData: FormData,
 ): Promise<GouvFormState> {
-  await assertPermission("ugptn");
+  const acteur = await assertPermission("ugptn");
 
   const activiteId = texte(formData, "activiteId");
   const locale = lireLocale(formData);
@@ -507,6 +514,8 @@ export async function enregistrerActiviteLangueAction(
     update: valeurs,
     create: { activiteId, locale, ...valeurs },
   });
+
+  await apresEnregistrementLangue("gouvActivite", activiteId, locale, acteur.id);
 
   revalidatePath(ECRAN);
   revaliderGouvernance();

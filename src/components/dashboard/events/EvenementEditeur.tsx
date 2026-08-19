@@ -26,6 +26,8 @@ import type { EvenementSaisie, ReferentielsEvtSaisie } from "@/lib/events/saisie
 import type { MediaRef } from "@/lib/medias";
 import { EvenementReglages } from "@/components/dashboard/events/EvenementReglages";
 import { EvenementTraduction } from "@/components/dashboard/events/EvenementTraduction";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const LANG_LABEL: Record<Lang, string> = { fr: "Français", en: "English" };
 
@@ -35,9 +37,11 @@ type Props = {
   assets: MediaRef[];
   /** Lien vers la fiche publique, quand elle existe. */
   apercuUrl: string | null;
+  /** État de l'assistance à la traduction, par langue (cf. lib/ia/suivi.ts). */
+  etatsIA: Partial<Record<Lang, EtatVue>>;
 };
 
-export function EvenementEditeur({ evenement, referentiels, assets, apercuUrl }: Props) {
+export function EvenementEditeur({ evenement, referentiels, assets, apercuUrl, etatsIA }: Props) {
   const t = ADMIN_EVTS;
   const [langue, setLangue] = useState<Lang>("fr");
 
@@ -62,6 +66,7 @@ export function EvenementEditeur({ evenement, referentiels, assets, apercuUrl }:
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                   {etat}
                 </span>
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -75,6 +80,8 @@ export function EvenementEditeur({ evenement, referentiels, assets, apercuUrl }:
             valeurs={evenement.traductions[lang]}
             assets={assets}
             visible={langue === lang}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => evenement.traductions[l].existe)}
           />
         ))}
       </div>

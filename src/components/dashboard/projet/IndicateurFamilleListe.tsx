@@ -14,15 +14,20 @@ import { ADMIN_PROJET } from "@/content/admin";
 import type { IndicateurSaisie } from "@/lib/projet/saisie";
 import { FAMILLE_HINT, FAMILLE_LABEL, type IndicateurFamille } from "@/lib/projet/statut";
 import { IndicateurCarte } from "@/components/dashboard/projet/IndicateurCarte";
+import type { Lang } from "@/lib/pick";
+import type { EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ProjetFormState = { error: null, ok: null };
 
 export function IndicateurFamilleListe({
   famille,
   indicateurs,
+  etatsIA,
 }: {
   famille: IndicateurFamille;
   indicateurs: IndicateurSaisie[];
+  /** États de l'assistance, indexés par identifiant d'indicateur. */
+  etatsIA: Map<string, Partial<Record<Lang, EtatVue>>>;
 }) {
   const t = ADMIN_PROJET;
   const [etat, ajouter, enCours] = useActionState(ajouterIndicateurAction, etatInitial);
@@ -58,6 +63,7 @@ export function IndicateurFamilleListe({
               indicateur={indicateur}
               rang={rang}
               total={indicateurs.length}
+              etatsIA={etatsIA.get(indicateur.id) ?? {}}
             />
           ))}
         </div>

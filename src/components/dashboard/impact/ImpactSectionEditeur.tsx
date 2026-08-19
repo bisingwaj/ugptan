@@ -28,6 +28,8 @@ import type { MediaRef } from "@/lib/medias";
 import { ImpactItemCarte } from "@/components/dashboard/impact/ImpactItemCarte";
 import { ImpactSectionEntete } from "@/components/dashboard/impact/ImpactSectionEntete";
 import { ImpactSectionReglages } from "@/components/dashboard/impact/ImpactSectionReglages";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ImpactFormState = { error: null, ok: null };
 
@@ -50,6 +52,10 @@ type Props = {
    */
   sourceHref: string | null;
   apercuUrl: string | null;
+  /** État de l'assistance pour la section (cf. lib/ia/suivi.ts). */
+  etatsIA: Partial<Record<Lang, EtatVue>>;
+  /** Idem, pour chacune des entrées, indexé par identifiant d'entrée. */
+  etatsIAItems: Map<string, Partial<Record<Lang, EtatVue>>>;
 };
 
 export function ImpactSectionEditeur({
@@ -60,6 +66,8 @@ export function ImpactSectionEditeur({
   sourceNom,
   sourceHref,
   apercuUrl,
+  etatsIA,
+  etatsIAItems,
 }: Props) {
   const t = ADMIN_IMPACT;
   const [langue, setLangue] = useState<Lang>("fr");
@@ -92,6 +100,7 @@ export function ImpactSectionEditeur({
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                   {etat}
                 </span>
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -107,6 +116,8 @@ export function ImpactSectionEditeur({
             layout={section.layout}
             valeurs={section.traductions[lang]}
             visible={langue === lang}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => section.traductions[l].existe)}
           />
         ))}
 
@@ -154,6 +165,7 @@ export function ImpactSectionEditeur({
                   assets={assets}
                   rang={rang}
                   total={section.items.length}
+                  etatsIA={etatsIAItems.get(item.id) ?? {}}
                 />
               ))}
             </div>

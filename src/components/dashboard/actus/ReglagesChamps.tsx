@@ -226,18 +226,6 @@ export function ReglagesChamps({ article, referentiels, assets }: Props) {
         </div>
 
         <div className="adm-form__field">
-          <label className="label-mono" htmlFor={`${idBase}-authorRole`}>{t.champFonction}</label>
-          <input
-            id={`${idBase}-authorRole`}
-            name="authorRole"
-            type="text"
-            className="field"
-            defaultValue={article.authorRole}
-            placeholder="Cellule communication"
-          />
-        </div>
-
-        <div className="adm-form__field">
           <label className="label-mono" htmlFor={`${idBase}-lieu`}>{t.champLieu}</label>
           <input
             id={`${idBase}-lieu`}

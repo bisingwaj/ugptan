@@ -33,6 +33,9 @@ import {
 } from "@/lib/projet/statut";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ProjetFormState = { error: null, ok: null };
 
@@ -44,6 +47,7 @@ export function ComposanteBlocCarte({
   voisines,
   rang,
   total,
+  etatsIA,
 }: {
   bloc: BlocSaisie;
   assets: MediaRef[];
@@ -51,6 +55,7 @@ export function ComposanteBlocCarte({
   voisines: { code: string; nom: string }[];
   rang: number;
   total: number;
+  etatsIA: Partial<Record<Lang, EtatVue>>;
 }) {
   const t = ADMIN_PROJET;
   const idBase = useId();
@@ -167,6 +172,7 @@ export function ComposanteBlocCarte({
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                   {etat}
                 </span>
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -180,6 +186,8 @@ export function ComposanteBlocCarte({
             type={bloc.type}
             valeurs={bloc.traductions[lang]}
             visible={langue === lang}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => bloc.traductions[l].existe)}
           />
         ))}
 
@@ -338,12 +346,16 @@ function BlocLangue({
   type,
   valeurs,
   visible,
+  etatIA,
+  sourceIA,
 }: {
   blocId: string;
   lang: Lang;
   type: ComposanteBlocType;
   valeurs: BlocSaisie["traductions"][Lang];
   visible: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_PROJET;
   const idBase = useId();
@@ -361,6 +373,9 @@ function BlocLangue({
     <div className="adm-item__langue" hidden={!visible}>
       {erreur && <div className="auth-error" role="alert">{erreur}</div>}
       {succes && <div className="adm-ok" role="status">{succes}</div>}
+
+      {/* Avant les champs : on doit savoir d'où vient le texte avant de le lire. */}
+      <BandeauTraduction entite="composanteBloc" entiteId={blocId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && <p className="adm-edit__neuve">{t.tradNouvelle(LANG_LABEL[lang])}</p>}
 

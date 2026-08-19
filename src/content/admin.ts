@@ -1727,7 +1727,12 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
   {
     key: "pilotage",
     label: "Pilotage",
-    items: [{ key: "tableau-de-bord", label: "Tableau de bord", slug: "/dashboard" }],
+    items: [
+      { key: "tableau-de-bord", label: "Tableau de bord", slug: "/dashboard" },
+      /* Rangé au pilotage, et non dans « Contenus » : la file de relecture
+         traverse les six modules éditoriaux, elle n'appartient à aucun. */
+      { key: "traductions", label: "Traductions", slug: "/translations" },
+    ],
   },
   {
     /* Les entrées « Appels d'offres » et « Soumissionnaires » ont été retirées :

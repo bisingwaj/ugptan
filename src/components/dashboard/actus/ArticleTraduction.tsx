@@ -22,6 +22,8 @@ import type { TraductionSaisie } from "@/lib/actus/saisie";
 import type { MediaRef } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
 import { TraductionChamps } from "@/components/dashboard/actus/TraductionChamps";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import type { EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ActuFormState = { error: null, ok: null };
 
@@ -33,12 +35,16 @@ export function ArticleTraduction({
   valeurs,
   assets,
   visible,
+  etatIA,
+  sourceIA,
 }: {
   articleId: string;
   lang: Lang;
   valeurs: TraductionSaisie;
   assets: MediaRef[];
   visible: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_ACTUS;
   const [etat, action, enCours] = useActionState(enregistrerTraductionAction, etatInitial);
@@ -57,6 +63,10 @@ export function ArticleTraduction({
     <div className="adm-edit__langue" hidden={!visible}>
       {erreur && <div className="auth-error" role="alert">{erreur}</div>}
       {succes && <div className="adm-ok" role="status">{succes}</div>}
+
+      {/* Avant les champs, et non après : une personne qui ouvre cet onglet doit
+          savoir d'où vient le texte avant d'en lire la première ligne. */}
+      <BandeauTraduction entite="article" entiteId={articleId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && (
         <p className="adm-edit__neuve">

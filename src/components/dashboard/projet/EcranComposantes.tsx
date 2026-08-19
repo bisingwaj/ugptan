@@ -14,6 +14,7 @@ import { LOCALES } from "@/lib/params";
 import {
   chargerComposante, chargerReferentielsProjet, composanteVierge,
 } from "@/lib/projet/edition";
+import { vuesDe, vuesDePlusieurs } from "@/lib/ia/suivi";
 import {
   COMPOSANTE_SECTIONS, COMPOSANTE_SECTION_LABEL, PROJET_STATUT_LABEL,
   SECTION_BLOCS, composanteTraduite, type ProjetStatut,
@@ -203,6 +204,13 @@ export async function EcranFicheComposante({
   ]);
   if (!composante) notFound();
 
+  /* États de l'assistance : ceux de la composante, et ceux de tous ses blocs
+     d'un coup — une requête pour la fiche entière plutôt qu'une par carte. */
+  const [etatsIA, etatsIABlocs] = await Promise.all([
+    vuesDe("composante", composante.id),
+    vuesDePlusieurs("composanteBloc", composante.blocs.map((bloc) => bloc.id)),
+  ]);
+
   const enLigne = composante.status === "PUBLISHED";
   const titre = composante.traductions.fr.titre || composante.traductions.en.titre || t.sansTitre;
 
@@ -271,7 +279,13 @@ export async function EcranFicheComposante({
       {params.cree && <div className="adm-ok" role="status" style={{ marginTop: 16 }}>{t.creeOk}</div>}
 
       <div style={{ marginTop: 26 }}>
-        <ComposanteEditeur composante={composante} referentiels={referentiels} assets={assets} />
+        <ComposanteEditeur
+          composante={composante}
+          referentiels={referentiels}
+          assets={assets}
+          etatsIA={etatsIA}
+          etatsIABlocs={etatsIABlocs}
+        />
       </div>
     </>
   );
