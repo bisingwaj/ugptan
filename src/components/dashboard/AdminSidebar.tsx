@@ -7,6 +7,7 @@ import { ADMIN, ADMIN_NAV_SECTIONS } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import type { Permission } from "@/lib/auth/permissions";
 import { AdminIcon } from "@/components/dashboard/AdminIcon";
+import { Marque } from "@/components/chrome/Marque";
 
 /** Chevron de la bascule. Dessiné ici : c'est de la chrome, pas un module. */
 const Chevron = ({ pointsRight }: { pointsRight: boolean }) => (
@@ -64,7 +65,9 @@ export function AdminSidebar({
   return (
     <aside className="adm__side">
       <div className="adm__brand">
-        <span className="adm__mark" />
+        {/* Le rail replié ne laisse que 62 px : seul le signe y tient, et le
+           « UGPTN » voisin nomme déjà la marque. */}
+        <Marque variante="signe" hauteur={26} alt="" className="adm__mark" />
         <span className="adm__nav-text">
           <span style={{ display: "block", fontWeight: 700, fontSize: 16 }}>{ADMIN.brand}</span>
           <span className="mono" style={{ display: "block", fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--c-60)" }}>

@@ -142,8 +142,10 @@
   .adm__brand {
     @apply flex items-center gap-[11px] px-5 py-[22px] border-b border-c-90;
   }
-  .adm__mark { @apply w-[26px] h-[26px] flex-none bg-ac relative; }
-  .adm__mark::after { content: ""; position: absolute; right: 4px; bottom: 4px; width: 9px; height: 9px; background: #fff; }
+  /* Le carré bleu dessiné en CSS a cédé la place au signe de la charte
+     (cf. components/chrome/Marque.tsx). La règle ne fait plus que réserver sa
+     place dans la barre : ni fond ni pastille, l'image porte le dessin. */
+  .adm__mark { @apply flex-none; }
   /* Seul le bloc des modules défile : la marque et le pied restent visibles. */
   .adm__nav { @apply flex-1 overflow-y-auto overflow-x-hidden py-2.5; }
   /* Sections : à quatorze modules, une liste plate se relit intégralement à
