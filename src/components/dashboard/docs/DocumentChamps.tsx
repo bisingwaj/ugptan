@@ -24,6 +24,7 @@ import { ADMIN_DOCS } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import { slugify } from "@/lib/actus/slug";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 import type { DocumentSaisie, ReferentielsDocSaisie } from "@/lib/docs/saisie";
 import {
   DOC_LANGUES, DOC_LANGUE_LABEL, DOC_STATUTS, DOC_STATUT_HINT, DOC_STATUT_LABEL,
@@ -464,7 +465,7 @@ export function DocumentReglages({
                   bibliothèque, l'hôte n'est pas garanti déclaré, et l'aperçu
                   de la console n'a aucun besoin d'optimisation. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={mediaSrc(visuel)} alt="" className="adm-cover__img" />
+              <img src={vignette(mediaSrc(visuel), 640)} alt="" loading="lazy" decoding="async" className="adm-cover__img" />
               <div className="adm-cover__meta">
                 <span className="adm-hint">{visuel.altFr || visuel.filename}</span>
               </div>

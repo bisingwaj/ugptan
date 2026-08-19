@@ -13,6 +13,7 @@
 import { initials } from "@/lib/format";
 import type { MembreEquipe } from "@/lib/equipe/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { Photo } from "@/components/ui/Photo";
 
 export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
   if (membres.length === 0) return null;
@@ -50,20 +51,12 @@ export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
               }}
             >
               {photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Photo
                   src={photo}
                   alt={membre.portrait.alt}
-                  loading="lazy"
-                  decoding="async"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center 22%",
-                  }}
+                  unoptimized={membre.portrait.unoptimized}
+                  sizes="(max-width: 560px) 92vw, 340px"
+                  style={{ objectPosition: "center 22%" }}
                 />
               ) : (
                 <span

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
@@ -294,8 +295,14 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             {partners.map((p) => (
               <RevealItem key={p.name} className="logo-cell">
                 {p.logo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.logo} alt={p.name} loading="lazy" decoding="async" />
+                  /* Les fichiers déposés font jusqu'à 2900 px de large pour un
+                     affichage en 46 px de haut : l'optimiseur les ramène au
+                     format servi, ce qui retire près d'un mégaoctet à la page
+                     d'accueil. Le cadre porte les dimensions, le logotype s'y
+                     inscrit sans déformation (`contain`). */
+                  <span className="logo-cell__mark">
+                    <Image src={p.logo} alt={p.name} fill sizes="220px" style={{ objectFit: "contain" }} />
+                  </span>
                 ) : (
                   <div style={{ fontSize: 13.5, fontWeight: 600, textAlign: "center", lineHeight: 1.25 }}>{p.name}</div>
                 )}

@@ -88,9 +88,15 @@ export default async function LangLayout(props: { children: React.ReactNode; par
           href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        {/* Secours sans JS : force la visibilité des éléments animés (data-mo). */}
+        {/* Presque tous les visuels gérés depuis la console sont servis par le
+            CDN de Cloudinary : ouvrir la connexion pendant la lecture du HTML
+            épargne à la première image la négociation DNS + TLS. */}
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="" />
+        {/* Secours sans JS : force la visibilité des éléments animés (data-mo)
+            et des images, dont le fondu d'apparition dépend de `onLoad`
+            (cf. components/ui/Photo.tsx). */}
         <noscript>
-          <style dangerouslySetInnerHTML={{ __html: "[data-mo]{opacity:1!important;transform:none!important;clip-path:none!important}" }} />
+          <style dangerouslySetInnerHTML={{ __html: "[data-mo]{opacity:1!important;transform:none!important;clip-path:none!important}[data-photo=image]{opacity:1!important}[data-photo=apercu]{display:none!important}" }} />
         </noscript>
       </head>
       <body suppressHydrationWarning>

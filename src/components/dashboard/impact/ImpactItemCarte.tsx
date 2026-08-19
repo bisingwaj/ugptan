@@ -33,6 +33,7 @@ import {
   reglageActif, type ImpactLayout, type ImpactStatut,
 } from "@/lib/impact/statut";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
 import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
 import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
@@ -307,7 +308,7 @@ export function ImpactItemCarte({
               <div className="adm-edit__cover" style={{ marginTop: 8, maxWidth: 260 }}>
                 {couverture.src ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={couverture.src} alt="" className="adm-edit__cover-img" />
+                  <img src={vignette(couverture.src, 640)} alt="" loading="lazy" decoding="async" className="adm-edit__cover-img" />
                 ) : (
                   <span className="adm-edit__cover-vide">{t.aucunVisuel}</span>
                 )}

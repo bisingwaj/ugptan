@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { lectureConsole } from "@/lib/lecture";
 import { requirePermission } from "@/lib/auth/guard";
 import { formatDate } from "@/lib/format";
+import { vignette } from "@/lib/images";
 import { ensureRubriquesGalerie } from "@/lib/galerie/bootstrap";
 import { GAL_STATUT_LABEL, type GalerieStatut } from "@/lib/galerie/statut";
 import { AlbumActions } from "@/components/dashboard/galerie/AlbumActions";
@@ -107,7 +108,7 @@ export default async function AlbumsPage(props: { searchParams: Promise<Recherch
                 >
                   {couverture?.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={couverture.imageUrl} alt={couverture.altFr ?? ""} loading="lazy" decoding="async" />
+                    <img src={vignette(couverture.imageUrl, 640)} alt={couverture.altFr ?? ""} loading="lazy" decoding="async" />
                   ) : (
                     <span className="adm-gal__vignette-vide mono">{t.albumSansContenu}</span>
                   )}

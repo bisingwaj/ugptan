@@ -14,6 +14,7 @@ import type { ComposanteVue } from "@/lib/projet/query";
 import { NAV, route } from "@/lib/routes";
 import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
+import { Photo } from "@/components/ui/Photo";
 import { Reveal } from "@/components/motion/Reveal";
 
 export function CompResponsable({
@@ -40,8 +41,13 @@ export function CompResponsable({
           <div className="comp-resp">
             <div className="comp-resp__media">
               {photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={photo} alt={membre.portrait.alt} loading="lazy" decoding="async" />
+                <Photo
+                  src={photo}
+                  alt={membre.portrait.alt}
+                  unoptimized={membre.portrait.unoptimized}
+                  sizes="(max-width: 760px) 120px, 240px"
+                  style={{ objectPosition: "center 18%" }}
+                />
               ) : (
                 <span className="mono comp-resp__initials">{initials(membre.nom || membre.role)}</span>
               )}
