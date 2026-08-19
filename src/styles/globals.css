@@ -21,6 +21,8 @@
 /* Graphiques du corps rédigé — feuille partagée par le site et la console.
    Elle porte sa propre couche `components` (cf. son en-tête). */
 @import "./prose-graphique.css";
+@import "./squelette.css";
+@import "./interactions.css";
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 
 /* Détection de sources cadrée sur le code applicatif. Laissée automatique,
@@ -143,6 +145,13 @@ html.scroll-locked body {
   border: 1px solid transparent;
 }
 .btn .arrow { font-family: var(--font-mono); }
+/* Bouton de fin de section : son libellé tient sur une ligne tant qu'il y a la
+   place, et se replie quand il n'y en a plus. Un `white-space: nowrap` posé sans
+   condition faisait déborder « Voir toutes les histoires & vidéos » de 14 px sur
+   un écran de 320 px, ce qui met TOUTE la page en défilement horizontal — un
+   seul mot insécable suffit à décaler l'ensemble. */
+.btn--cta-section { white-space: nowrap; }
+@media (max-width: 480px) { .btn--cta-section { white-space: normal; text-align: center; } }
 .btn--primary { background: var(--ac); color: #fff; }
 .btn--primary:hover { background: var(--acd); }
 .btn--dark { background: var(--c-black); color: #fff; }
@@ -271,7 +280,12 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 =========================================================================== */
 .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 72px); align-items: start; }
 .cols2--center { align-items: center; }
-.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(296px, 1fr)); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
+/* `min(296px, 100%)` et non `296px` : sur un écran de 320 px, la marge du
+   gabarit ne laisse que 288 px, et une piste de 296 px débordait de huit
+   pixels — assez pour déclencher un défilement horizontal sur toute la page.
+   L'idiome borne la piste à la largeur disponible, sans requête média : la
+   grille se réduit d'elle-même à une colonne quand la place manque. */
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(296px, 100%), 1fr)); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
 .grid-auto--dark { background: var(--c-80); border-color: var(--c-80); }
 
 /* Mur de logos partenaires — grille compacte, logos harmonisés (jamais 1 seul par ligne). */
@@ -1340,6 +1354,14 @@ a.actu-nav__lien:hover { background: var(--c-10); }
 @media (max-width: 900px) {
   .actu-barre { flex-direction: column; align-items: stretch; }
   .actu-recherche__champ { flex: 1; min-width: 0; }
+  /* Un élément de flexbox refuse par défaut de descendre sous sa largeur de
+     contenu minimale : la barre de filtres et le formulaire de recherche
+     débordaient donc de leur colonne sur un écran de 320 px, et mettaient toute
+     la page en défilement horizontal. `min-width: 0` lève ce plancher, et le
+     `max-width` ferme le cas où un libellé insécable reste plus large que la
+     place disponible. */
+  .actu-barre > * { min-width: 0; max-width: 100%; }
+  .actu-recherche { flex-wrap: wrap; }
 }
 
 @media (max-width: 760px) {
