@@ -17,6 +17,7 @@ import { televerserMediaAction } from "@/actions/admin-medias";
 import { media as registre } from "@/content/media";
 import type { ImgKey } from "@/content/types";
 import { estImage, MIMES_IMAGE, mediaSrc, poidsLisible, TAILLE_MAX, type MediaRef } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 
 /** Ce que le sélecteur renvoie à son appelant. */
 export type ChoixMedia =
@@ -159,8 +160,12 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
                       className="adm-media"
                       onClick={() => onSelect({ kind: "asset", asset, src, alt: asset.altFr ?? "" })}
                     >
+                      {/* Le sélecteur affiche des dizaines de fichiers à la fois,
+                          dans des cases de 152 px : servis en pleine définition,
+                          ils feraient plusieurs dizaines de mégaoctets à chaque
+                          ouverture (cf. `vignette()` dans lib/images.ts). */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={src} alt="" loading="lazy" decoding="async" className="adm-media__img" />
+                      <img src={vignette(src, 320)} alt="" loading="lazy" decoding="async" className="adm-media__img" />
                       <span className="adm-media__nom">{asset.altFr || asset.filename}</span>
                       <span className="adm-media__meta mono">
                         {asset.width && asset.height ? `${asset.width}×${asset.height}` : "—"}

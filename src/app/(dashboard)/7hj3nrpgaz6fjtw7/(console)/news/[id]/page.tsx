@@ -12,6 +12,7 @@ import { chargerArticle, chargerReferentiels } from "@/lib/actus/edition";
 import { STATUT_LABEL, statutEffectif } from "@/lib/actus/statut";
 import { ArticleActions } from "@/components/dashboard/actus/ArticleActions";
 import { ArticleEditeur } from "@/components/dashboard/actus/ArticleEditeur";
+import { vuesDe } from "@/lib/ia/suivi";
 
 export const metadata: Metadata = { title: ADMIN_ACTUS.modifier };
 
@@ -28,7 +29,12 @@ export default async function ModifierArticlePage(props: {
   const params = await props.searchParams;
   const t = ADMIN_ACTUS;
 
-  const [article, referentiels] = await Promise.all([chargerArticle(id), chargerReferentiels()]);
+  const [article, referentiels, etatsIA] = await Promise.all([
+    chargerArticle(id),
+    chargerReferentiels(),
+    // Où en est chaque langue vis-à-vis de l'assistance (cf. lib/ia/suivi.ts).
+    vuesDe("article", id),
+  ]);
   if (!article) notFound();
 
   const publieLe = fromDateTimeLocal(article.publishedAt);
@@ -101,6 +107,7 @@ export default async function ModifierArticlePage(props: {
           referentiels={referentiels.referentiels}
           assets={referentiels.assets}
           apercuUrl={apercuUrl}
+          etatsIA={etatsIA}
         />
       </div>
     </>

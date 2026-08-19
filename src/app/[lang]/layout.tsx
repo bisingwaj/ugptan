@@ -83,9 +83,17 @@ export default async function LangLayout(props: { children: React.ReactNode; par
     // descendants : un vrai écart dans l'application resterait signalé.
     <html lang={lang} className={policesClassName} suppressHydrationWarning>
       <head>
-        {/* Secours sans JS : force la visibilité des éléments animés (data-mo). */}
+        {/* Presque tous les visuels gérés depuis la console sont servis par le
+            CDN de Cloudinary : ouvrir la connexion pendant la lecture du HTML
+            épargne à la première image la négociation DNS + TLS. Les polices,
+            elles, sont auto-hébergées (cf. src/lib/fonts.ts) et n'ont plus
+            d'hôte tiers à joindre. */}
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="" />
+        {/* Secours sans JS : force la visibilité des éléments animés (data-mo)
+            et des images, dont le fondu d'apparition dépend de `onLoad`
+            (cf. components/ui/Photo.tsx). */}
         <noscript>
-          <style dangerouslySetInnerHTML={{ __html: "[data-mo]{opacity:1!important;transform:none!important;clip-path:none!important}" }} />
+          <style dangerouslySetInnerHTML={{ __html: "[data-mo]{opacity:1!important;transform:none!important;clip-path:none!important}[data-photo=image]{opacity:1!important}[data-photo=apercu]{display:none!important}" }} />
         </noscript>
       </head>
       <body suppressHydrationWarning>

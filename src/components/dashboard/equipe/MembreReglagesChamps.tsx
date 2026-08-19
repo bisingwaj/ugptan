@@ -22,6 +22,7 @@ import {
 } from "@/lib/equipe/statut";
 import type { MembreSaisie, ReferentielsEquipe } from "@/lib/equipe/saisie";
 import type { MediaRef } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
 
@@ -178,7 +179,7 @@ export function MembreReglagesChamps({ membre, referentiels, assets }: Props) {
           <div className="adm-edit__cover" style={{ marginTop: 8, maxWidth: 220 }}>
             {portrait.src ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={portrait.src} alt="" className="adm-edit__cover-img" />
+              <img src={vignette(portrait.src, 640)} alt="" loading="lazy" decoding="async" className="adm-edit__cover-img" />
             ) : (
               <span className="adm-edit__cover-vide">{t.aucunPortrait}</span>
             )}

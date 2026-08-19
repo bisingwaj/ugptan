@@ -1,12 +1,15 @@
 import Link from "next/link";
+import Image from "next/image";
 import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import {
-  meta, reperes, composantes, gouvernance, poles,
+  meta, reperes, poles,
   profils, question,
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
+import { composantesPubliques } from "@/lib/projet/query";
+import { organesPublies } from "@/lib/gouvernance/query";
 import { prochainsEvenements } from "@/lib/events/query";
 import { membresEquipe } from "@/lib/equipe/query";
 import { galleryProvinces, partners } from "@/content/carbon";
@@ -27,7 +30,6 @@ import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { cheminArticle } from "@/components/actus/ActuCard";
-import Image from "next/image";
 
 /** Cache aligné sur les pages « Actualités » et « Événements » : l'accueil
  *  affiche les derniers communiqués et les prochaines rencontres, invalidés par
@@ -38,12 +40,14 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
-  // Deux lectures indépendantes, menées de front : aucune ne conditionne
-  // l'autre, et les enchaîner ajouterait un aller-retour à la base pour rien.
-  const [actualites, upcoming, equipe] = await Promise.all([
+  // Lectures indépendantes, menées de front : aucune ne conditionne l'autre, et
+  // les enchaîner ajouterait autant d'allers-retours à la base pour rien.
+  const [actualites, upcoming, equipe, composantes, organes] = await Promise.all([
     derniersArticles(lang, 4),
     prochainsEvenements(lang, 3),
     membresEquipe(lang),
+    composantesPubliques(lang),
+    organesPublies(lang),
   ]);
 
   return (
@@ -125,7 +129,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           </Reveal>
           <RevealGroup style={{ borderTop: "1px solid var(--c-black)" }} gap={0.05}>
             {composantes.map((comp) => (
-              <RevealItem key={comp.code}>
+              <RevealItem key={comp.id}>
                 <CompRow comp={comp} lang={lang} />
               </RevealItem>
             ))}
@@ -192,8 +196,8 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             <p style={{ margin: "18px 0 0", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.gouvLead}</p>
           </Reveal>
           <RevealGroup className="grid-3" gap={0.05}>
-            {gouvernance.map((g) => (
-              <RevealItem key={g.sigle} className="cell" style={{ padding: "30px 28px" }}>
+            {organes.map((g) => (
+              <RevealItem key={g.id} className="cell" style={{ padding: "30px 28px" }}>
                 <CarteOrgane organe={g} lang={lang} champs="court" />
               </RevealItem>
             ))}
@@ -291,19 +295,22 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             {partners.map((p) => (
               <RevealItem key={p.name} className="logo-cell">
                 {p.logo ? (
-                  /* `next/image` plutôt qu'une balise brute : les neuf logos
-                     pesaient 988 Ko de PNG servis tels quels sur le premier
-                     écran, pour un affichage de 46 px de haut. L'optimiseur les
-                     redimensionne et les convertit en AVIF.
-                     `sizes` décrit la place RÉELLE prise dans la grille (cf.
-                     `.logo-cell img` dans globals.css), sans quoi Next servirait
-                     la largeur du plus grand écran possible. */
-                  <Image
-                    src={p.logo}
-                    alt={p.name}
-                    sizes="(max-width: 760px) 30vw, 180px"
-                    loading="lazy"
-                  />
+                  /* Les neuf logos pesaient 988 Ko de PNG servis tels quels sur
+                     le premier écran, pour un affichage de 46 px de haut :
+                     l'optimiseur les ramène au format rendu et les convertit en
+                     AVIF. Le cadre porte les dimensions (cf. `.logo-cell__mark`
+                     dans globals.css), le logotype s'y inscrit sans déformation.
+                     `sizes` décrit la place RÉELLE : trois colonnes sous 760 px,
+                     un cadre d'environ 180 px au-delà. */
+                  <span className="logo-cell__mark">
+                    <Image
+                      src={p.logo}
+                      alt={p.name}
+                      fill
+                      sizes="(max-width: 760px) 26vw, 200px"
+                      style={{ objectFit: "contain" }}
+                    />
+                  </span>
                 ) : (
                   <div style={{ fontSize: 13.5, fontWeight: 600, textAlign: "center", lineHeight: 1.25 }}>{p.name}</div>
                 )}

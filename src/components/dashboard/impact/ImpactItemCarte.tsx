@@ -33,8 +33,12 @@ import {
   reglageActif, type ImpactLayout, type ImpactStatut,
 } from "@/lib/impact/statut";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
 import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: ImpactFormState = { error: null, ok: null };
 
@@ -46,12 +50,14 @@ export function ImpactItemCarte({
   assets,
   rang,
   total,
+  etatsIA,
 }: {
   item: ItemSaisie;
   layout: ImpactLayout;
   assets: MediaRef[];
   rang: number;
   total: number;
+  etatsIA: Partial<Record<Lang, EtatVue>>;
 }) {
   const t = ADMIN_IMPACT;
   const idBase = useId();
@@ -163,6 +169,7 @@ export function ImpactItemCarte({
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                   {etat}
                 </span>
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -177,6 +184,8 @@ export function ImpactItemCarte({
             champs={champs}
             avecVisuel={avecVisuel}
             visible={langue === lang}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => item.traductions[l].existe)}
           />
         ))}
 
@@ -299,7 +308,7 @@ export function ImpactItemCarte({
               <div className="adm-edit__cover" style={{ marginTop: 8, maxWidth: 260 }}>
                 {couverture.src ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={couverture.src} alt="" className="adm-edit__cover-img" />
+                  <img src={vignette(couverture.src, 640)} alt="" loading="lazy" decoding="async" className="adm-edit__cover-img" />
                 ) : (
                   <span className="adm-edit__cover-vide">{t.aucunVisuel}</span>
                 )}
@@ -384,6 +393,8 @@ function ImpactItemLangue({
   champs,
   avecVisuel,
   visible,
+  etatIA,
+  sourceIA,
 }: {
   itemId: string;
   lang: Lang;
@@ -391,6 +402,8 @@ function ImpactItemLangue({
   champs: (typeof CHAMPS_ITEM)[ImpactLayout];
   avecVisuel: boolean;
   visible: boolean;
+  etatIA: EtatVue | undefined;
+  sourceIA: Lang | undefined;
 }) {
   const t = ADMIN_IMPACT;
   const idBase = useId();
@@ -408,6 +421,9 @@ function ImpactItemLangue({
     <div className="adm-item__langue" hidden={!visible}>
       {erreur && <div className="auth-error" role="alert">{erreur}</div>}
       {succes && <div className="adm-ok" role="status">{succes}</div>}
+
+      {/* Avant les champs : on doit savoir d'où vient le texte avant de le lire. */}
+      <BandeauTraduction entite="impactItem" entiteId={itemId} locale={lang} etat={etatIA} sourcePossible={sourceIA} actif={visible} />
 
       {!valeurs.existe && <p className="adm-edit__neuve">{t.tradNouvelle(LANG_LABEL[lang])}</p>}
 

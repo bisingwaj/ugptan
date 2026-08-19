@@ -15,6 +15,7 @@ import { adminPath } from "@/lib/admin";
 import { ARTICLE_STATUSES, STATUT_HINT, STATUT_LABEL, type ArticleStatut } from "@/lib/actus/statut";
 import type { ArticleSaisie, ReferentielsSaisie } from "@/lib/actus/saisie";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
 
 type Props = {
@@ -96,7 +97,7 @@ export function ReglagesChamps({ article, referentiels, assets }: Props) {
         <div className="adm-edit__cover">
           {couverture.src ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={couverture.src} alt="" className="adm-edit__cover-img" />
+            <img src={vignette(couverture.src, 640)} alt="" loading="lazy" decoding="async" className="adm-edit__cover-img" />
           ) : (
             <span className="adm-edit__cover-vide">{t.aucunVisuel}</span>
           )}
@@ -223,18 +224,6 @@ export function ReglagesChamps({ article, referentiels, assets }: Props) {
             placeholder="UGPTN"
           />
           <p className="adm-hint" style={{ marginTop: 6 }}>{t.champSignatureAide}</p>
-        </div>
-
-        <div className="adm-form__field">
-          <label className="label-mono" htmlFor={`${idBase}-authorRole`}>{t.champFonction}</label>
-          <input
-            id={`${idBase}-authorRole`}
-            name="authorRole"
-            type="text"
-            className="field"
-            defaultValue={article.authorRole}
-            placeholder="Cellule communication"
-          />
         </div>
 
         <div className="adm-form__field">
