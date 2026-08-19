@@ -107,6 +107,11 @@ const SAFE_SCHEMES = new Set(["http", "https", "mailto", "tel"]);
 /**
  * Hôtes admis dans un `<iframe>`. Une intégration vidéo est une exécution de
  * code tiers dans la page : la liste reste courte et explicite.
+ *
+ * ⚠️ DOIT rester alignée sur `HOTES_VIDEO` de next.config.mjs, qui porte la même
+ * liste dans la directive `frame-src` de la CSP. Ici on empêche d'ÉCRIRE une
+ * intégration vers un autre hôte ; là-bas on empêche le navigateur de la
+ * CHARGER si une s'y glisse malgré tout.
  */
 const ALLOWED_FRAME_HOSTS = [
   "www.youtube-nocookie.com", "youtube-nocookie.com",

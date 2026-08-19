@@ -52,6 +52,7 @@ import { slugify, uniqueSlug } from "@/lib/actus/slug";
 import { composantes } from "@/content/data";
 import { revaliderDocuments } from "@/lib/docs/cache";
 import { estMimeDoc, poidsLisible, tailleMaxPour } from "@/lib/docs/fichier";
+import { contenuCorrespond } from "@/lib/medias";
 import { isDocLangue, isDocStatut, isDocSupport, isDocType } from "@/lib/docs/statut";
 
 /** État partagé par tous les formulaires du module. */
@@ -226,6 +227,12 @@ async function deposer(formData: FormData): Promise<{ fichier: Fichier } | { err
 
   const nom = fichier.name.slice(0, 180) || "document";
   const octets = new Uint8Array(await fichier.arrayBuffer());
+  /* Même contrôle que la bibliothèque de médias : le type annoncé par le client
+     ne prouve rien, les premiers octets si (cf. contenuCorrespond). */
+  if (!contenuCorrespond(octets, fichier.type)) {
+    return { error: "Le contenu du fichier ne correspond pas à son format annoncé. Dépôt refusé." };
+  }
+
 
   try {
     const depot = await deposerFichier(octets, {

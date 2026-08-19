@@ -27,7 +27,7 @@ import { getCurrentUser, type AdminUser } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/permissions";
 import { cloudinaryActif, deposerFichier, supprimerFichier } from "@/lib/cloudinary";
 import { dimensionsImage } from "@/lib/image-size";
-import { MIMES_ACCEPTES, estImage, poidsLisible, tailleMaxPour } from "@/lib/medias";
+import { MIMES_ACCEPTES, contenuCorrespond, estImage, poidsLisible, tailleMaxPour } from "@/lib/medias";
 import { safeUrl } from "@/lib/html/sanitize";
 import { revaliderActualites } from "@/lib/actus/cache";
 import type { ActuFormState } from "@/actions/admin-actualites";
@@ -106,6 +106,18 @@ export async function televerserMediaAction(formData: FormData): Promise<Telever
   }
 
   const octets = new Uint8Array(await fichier.arrayBuffer());
+
+  /* Le type contrôlé plus haut est celui que le CLIENT annonce : une requête
+     forgée présente ce qu'elle veut sous l'étiquette « image/png ». On relit
+     donc les premiers octets, qui eux ne mentent pas. Sans ce contrôle, la
+     liste blanche des types ne vérifiait que la politesse du navigateur. */
+  if (!contenuCorrespond(octets, fichier.type)) {
+    return {
+      ok: false,
+      error: "Le contenu du fichier ne correspond pas à son format annoncé. Envoi refusé.",
+    };
+  }
+
   const nom = fichier.name.slice(0, 180) || (estImage(fichier.type) ? "image" : "document");
 
   // Dimensions lues localement : Cloudinary les renvoie aussi, mais seulement

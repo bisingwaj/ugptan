@@ -1,9 +1,85 @@
 /** @type {import('next').NextConfig} */
 
-// En-têtes de sécurité appliqués à toutes les routes. Volontairement SANS
-// Content-Security-Policy stricte : le site intègre des iframes YouTube, des
-// images Unsplash et Google Fonts — une CSP mal calibrée les casserait.
+/**
+ * Hôtes d'intégration vidéo autorisés.
+ *
+ * ⚠️ DOIT rester aligné sur `ALLOWED_FRAME_HOSTS` de src/lib/html/sanitize.ts,
+ * qui décide quels `<iframe>` survivent à l'assainissement du corps des
+ * articles. Les deux listes se répondent : l'assainisseur empêche d'ÉCRIRE une
+ * intégration vers un autre hôte, la CSP empêche le navigateur de la CHARGER si
+ * une s'y glisse malgré tout. Le même contrôle, à deux étages.
+ */
+const HOTES_VIDEO = [
+  "https://www.youtube-nocookie.com",
+  "https://www.youtube.com",
+  "https://player.vimeo.com",
+  "https://www.dailymotion.com",
+  "https://geo.dailymotion.com",
+];
+
+/** Hôtes d'images distantes — miroir de `images.remotePatterns` ci-dessous. */
+const HOTES_IMAGES = [
+  "https://res.cloudinary.com",
+  "https://images.unsplash.com",
+  "https://cdn.ugptn.cd",
+  // Vignettes des vidéos YouTube (cf. src/lib/actus/video.ts).
+  "https://i.ytimg.com",
+];
+
+/**
+ * Politique de sécurité du contenu.
+ *
+ * ─── Ce qu'elle protège réellement, et ce qu'elle ne protège pas ────────────
+ *
+ * `script-src` porte `'unsafe-inline'`, et il faut le dire franchement : cette
+ * CSP n'arrête donc PAS un script injecté en ligne. Next place son amorce
+ * d'hydratation et ses charges utiles RSC dans des balises en ligne ; les en
+ * retirer imposerait un nonce par requête, donc un rendu dynamique de CHAQUE
+ * page, ce qui supprimerait la génération statique dont vit ce site.
+ *
+ * Ce qu'elle arrête malgré cela, et qui compte :
+ *
+ *   · `default-src`/`connect-src 'self'` — un script injecté ne peut plus
+ *     EXFILTRER : ni requête, ni image, ni balise vers un domaine tiers. C'est
+ *     la moitié utile d'une attaque par injection qui tombe ;
+ *   · `script-src 'self'` — aucun script EXTERNE ne se charge, quand bien même
+ *     une balise `<script src>` serait injectée ;
+ *   · `base-uri 'self'` — bloque l'injection d'une balise `<base>`, qui
+ *     détourne d'un coup toutes les URL relatives de la page ;
+ *   · `form-action 'self'` — un formulaire injecté ne peut pas poster les
+ *     identifiants de la console vers un serveur tiers ;
+ *   · `object-src 'none'` — plus de `<object>`/`<embed>`, vecteurs hérités ;
+ *   · `frame-ancestors 'self'` — anti-détournement de clic, et la version
+ *     moderne de `X-Frame-Options`, qui reste pour les vieux navigateurs.
+ *
+ * `'unsafe-eval'` n'est admis QU'EN DÉVELOPPEMENT : le rechargement à chaud de
+ * Next en dépend, la production non.
+ */
+const csp = (dev) =>
+  [
+    "default-src 'self'",
+    `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}`,
+    // Le site compose une large part de sa mise en page en styles en ligne.
+    "style-src 'self' 'unsafe-inline'",
+    `img-src 'self' data: blob: ${HOTES_IMAGES.join(" ")}`,
+    // Polices auto-hébergées depuis la bascule vers next/font : plus aucun
+    // hôte tiers n'a à figurer ici (cf. src/lib/fonts.ts).
+    "font-src 'self'",
+    // `blob:` : les extraits vidéo de la galerie sont lus depuis un objet local.
+    "media-src 'self' blob: https://res.cloudinary.com",
+    `frame-src 'self' ${HOTES_VIDEO.join(" ")}`,
+    // `ws:` en développement seulement : c'est le canal du rechargement à chaud.
+    `connect-src 'self'${dev ? " ws: wss:" : ""}`,
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'self'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+
+// En-têtes de sécurité appliqués à toutes les routes.
 const securityHeaders = [
+  { key: "Content-Security-Policy", value: csp(process.env.NODE_ENV !== "production") },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

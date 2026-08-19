@@ -46,7 +46,7 @@ import { assertPermission, type AdminUser } from "@/lib/auth/guard";
 import { cloudinaryActif, deposerFichier, supprimerFichier } from "@/lib/cloudinary";
 import { fromDateInput } from "@/lib/format";
 import { dimensionsImage } from "@/lib/image-size";
-import { poidsLisible } from "@/lib/medias";
+import { contenuCorrespond, poidsLisible } from "@/lib/medias";
 import { slugify } from "@/lib/actus/slug";
 import { composantes } from "@/content/data";
 import { revaliderGalerie } from "@/lib/galerie/cache";
@@ -189,6 +189,12 @@ async function deposerVisuel(
   const nom = fichier.name.slice(0, 180) || "visuel";
   const octets = new Uint8Array(await fichier.arrayBuffer());
 
+  /* Le type annoncé par le client ne prouve rien ; les premiers octets, si.
+     Cf. `contenuCorrespond` — même contrôle que la bibliothèque de médias. */
+  if (!contenuCorrespond(octets, fichier.type)) {
+    return { error: "Le contenu du fichier ne correspond pas à son format annoncé. Dépôt refusé." };
+  }
+
   // Dimensions lues localement : Cloudinary les renvoie aussi, mais la lecture
   // d'en-tête couvre les cas où le service les omet, et ne coûte que quelques
   // octets. Elles donnent son ratio à la cellule de la grille publique.
@@ -264,6 +270,12 @@ async function deposerVideo(
 
   const nom = fichier.name.slice(0, 180) || "video";
   const octets = new Uint8Array(await fichier.arrayBuffer());
+
+  /* Le type annoncé par le client ne prouve rien ; les premiers octets, si.
+     Cf. `contenuCorrespond` — même contrôle que la bibliothèque de médias. */
+  if (!contenuCorrespond(octets, fichier.type)) {
+    return { error: "Le contenu du fichier ne correspond pas à son format annoncé. Dépôt refusé." };
+  }
 
   try {
     const depot = await deposerFichier(octets, {
@@ -705,6 +717,13 @@ export async function verserDansAlbumAction(formData: FormData): Promise<Verseme
   }
 
   const octets = new Uint8Array(await fichier.arrayBuffer());
+
+  /* Le type annoncé par le client ne prouve rien ; les premiers octets, si.
+     Cf. `contenuCorrespond` — même contrôle que la bibliothèque de médias. */
+  if (!contenuCorrespond(octets, fichier.type)) {
+    return { ok: false, nom, error: "contenu du fichier non conforme au format annoncé" };
+  }
+
   // Dimensions lues localement pour une image : elles donnent son ratio à la
   // cellule de la mosaïque publique, ce qui évite que la page se réorganise
   // sous les yeux du visiteur au fil des chargements.

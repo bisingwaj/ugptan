@@ -135,6 +135,73 @@ export const MIMES_DOCUMENT = [
 /** Tout ce que la bibliothèque accepte, images et documents confondus. */
 export const MIMES_ACCEPTES = [...MIMES_IMAGE, ...MIMES_DOCUMENT] as const;
 
+/* -------------------------------------------------------------------------- */
+/* Contrôle du contenu réel d'un fichier                                       */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Signatures de début de fichier, par famille.
+ *
+ * ─── Pourquoi ce contrôle existe ────────────────────────────────────────────
+ *
+ * Le type d'un fichier téléversé est ANNONCÉ par le navigateur, dans un champ
+ * que l'auteur de la requête contrôle entièrement. Une requête forgée peut donc
+ * présenter n'importe quel contenu sous l'étiquette `image/png`, et la seule
+ * comparaison de cette étiquette à la liste des types acceptés ne vérifie rien
+ * d'autre que la politesse du client.
+ *
+ * On lit donc les premiers octets, qui ne mentent pas. Ce contrôle ne remplace
+ * pas la liste blanche des types : il la rend effective.
+ *
+ * Le CSV est absent, et il n'y a pas d'oubli : un fichier texte n'a pas de
+ * signature. Un CSV reste donc admis sur son seul type déclaré — sans danger,
+ * puisqu'il ressort tel quel et n'est jamais interprété.
+ */
+const SIGNATURES: { mimes: readonly string[]; octets: readonly (number | null)[] }[] = [
+  { mimes: ["image/jpeg"], octets: [0xff, 0xd8, 0xff] },
+  { mimes: ["image/png"], octets: [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a] },
+  { mimes: ["image/gif"], octets: [0x47, 0x49, 0x46, 0x38] },
+  // RIFF….WEBP : les quatre octets de longueur, au milieu, sont quelconques.
+  { mimes: ["image/webp"], octets: [0x52, 0x49, 0x46, 0x46, null, null, null, null, 0x57, 0x45, 0x42, 0x50] },
+  // AVIF : boîte `ftyp` en tête, la marque suit. Les quatre premiers octets
+  // portent la taille de la boîte, variable.
+  { mimes: ["image/avif"], octets: [null, null, null, null, 0x66, 0x74, 0x79, 0x70] },
+  { mimes: ["application/pdf"], octets: [0x25, 0x50, 0x44, 0x46, 0x2d] },
+  // MP4 : boîte `ftyp`, comme l'AVIF — les deux descendent du même conteneur
+  // ISO. La signature ne distingue donc pas l'un de l'autre, et n'a pas à le
+  // faire : elle écarte ce qui n'est ni l'un ni l'autre.
+  { mimes: ["video/mp4"], octets: [null, null, null, null, 0x66, 0x74, 0x79, 0x70] },
+  // WebM : conteneur Matroska.
+  { mimes: ["video/webm"], octets: [0x1a, 0x45, 0xdf, 0xa3] },
+  // Les formats Office modernes (.docx, .xlsx, .pptx) sont des archives ZIP.
+  {
+    mimes: [
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    ],
+    octets: [0x50, 0x4b, 0x03, 0x04],
+  },
+  // Les formats Office hérités (.doc, .xls, .ppt) partagent un conteneur OLE2.
+  {
+    mimes: ["application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint"],
+    octets: [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1],
+  },
+];
+
+/**
+ * Le contenu du fichier correspond-il au type annoncé ?
+ *
+ * Renvoie `true` quand aucune signature n'est connue pour ce type : le contrôle
+ * dit ce qu'il sait, il ne bloque pas ce qu'il ignore.
+ */
+export function contenuCorrespond(octets: Uint8Array, mimeType: string): boolean {
+  const attendue = SIGNATURES.find((s) => s.mimes.includes(mimeType));
+  if (!attendue) return true;
+  if (octets.length < attendue.octets.length) return false;
+  return attendue.octets.every((o, i) => o === null || octets[i] === o);
+}
+
 /**
  * Vidéos acceptées au téléversement — module « Vidéos & galeries » uniquement.
  *
