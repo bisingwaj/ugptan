@@ -29,6 +29,7 @@ import {
 import { ImpactSectionActions } from "@/components/dashboard/impact/ImpactSectionActions";
 import { ImpactSectionCreation } from "@/components/dashboard/impact/ImpactSectionCreation";
 import { ImpactSectionEditeur } from "@/components/dashboard/impact/ImpactSectionEditeur";
+import { vuesDe, vuesDePlusieurs } from "@/lib/ia/suivi";
 
 export type RechercheListe = {
   statut?: string;
@@ -294,6 +295,13 @@ export async function EcranFicheSection({
      de l'accueil, ni à en afficher le titre dans un message d'erreur. */
   if (!emplacements.includes(section.emplacement)) notFound();
 
+  /* États de l'assistance : ceux de la section, et ceux de toutes ses entrées
+     d'un coup — une requête pour la liste entière plutôt qu'une par carte. */
+  const [etatsIA, etatsIAItems] = await Promise.all([
+    vuesDe("impactSection", section.id),
+    vuesDePlusieurs("impactItem", section.items.map((item) => item.id)),
+  ]);
+
   /* Nom et fiche de la section source, pour renvoyer là où les entrées se
      modifient réellement — y compris quand la source relève d'un autre module,
      d'où la lecture de son emplacement. */
@@ -388,6 +396,8 @@ export async function EcranFicheSection({
           sourceNom={source?.translations[0]?.titre || source?.translations[0]?.kicker || null}
           sourceHref={sourceHref}
           apercuUrl={publicUrl}
+          etatsIA={etatsIA}
+          etatsIAItems={etatsIAItems}
         />
       </div>
     </>

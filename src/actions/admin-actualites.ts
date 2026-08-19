@@ -46,14 +46,15 @@ import { slugify, uniqueSlug } from "@/lib/actus/slug";
 import { isArticleStatut, type ArticleStatut } from "@/lib/actus/statut";
 import { idYouTube } from "@/lib/actus/video";
 import { revaliderActualites } from "@/lib/actus/cache";
-import { composantes } from "@/content/data";
+import { codesComposantes } from "@/lib/projet/query";
+import { apresEnregistrementLangue } from "@/lib/ia/planifier";
+import { oublierTraductions } from "@/lib/ia/suivi";
 
 /** État partagé par tous les formulaires du module. */
 export type ActuFormState = { error: string | null; ok: string | null };
 
 const ACTUS_PATH = adminPath("/news");
 
-const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 
 /** Nom des langues dans les messages rendus à l'utilisateur. */
 const LANGUE_LABEL: Record<Lang, string> = { fr: "française", en: "anglaise" };
@@ -82,6 +83,9 @@ type Traduction = {
   seoTitle: string | null;
   seoDescription: string | null;
   coverAlt: string | null;
+  /* La FONCTION de l'auteur, pas son nom : « Cellule communication » se traduit,
+     « UGPTN » non. Le nom reste donc sur la fiche. */
+  authorRole: string | null;
 };
 
 function lireTraduction(formData: FormData): Traduction {
@@ -98,6 +102,7 @@ function lireTraduction(formData: FormData): Traduction {
     seoTitle: optionnel(texte(formData, "seoTitle")),
     seoDescription: optionnel(texte(formData, "seoDescription")),
     coverAlt: optionnel(texte(formData, "coverAlt")),
+    authorRole: optionnel(texte(formData, "authorRole")),
   };
 }
 
@@ -121,8 +126,9 @@ async function slugUnique(locale: Lang, base: string, articleId: string | null):
 }
 
 /** Codes de composante cochés, réduits à ceux qui existent réellement. */
-function lireComposantes(formData: FormData): string[] {
-  return formData.getAll("comps").map(String).filter((code) => CODES_COMPOSANTE.has(code));
+async function lireComposantes(formData: FormData): Promise<string[]> {
+  const admis = await codesComposantes();
+  return formData.getAll("comps").map(String).filter((code) => admis.has(code));
 }
 
 /**
@@ -186,7 +192,7 @@ async function lireFiche(formData: FormData) {
     featured: coche(formData, "featured"),
     lieu: optionnel(texte(formData, "lieu")),
     videoYt: idYouTube(texte(formData, "videoYt")),
-    comps: lireComposantes(formData),
+    comps: await lireComposantes(formData),
     categoryId: optionnel(texte(formData, "categoryId")),
     coverMediaId,
     // Une couverture issue de la bibliothèque prime sur une clé du registre :
@@ -194,7 +200,6 @@ async function lireFiche(formData: FormData) {
     coverKey: coverMediaId ? null : optionnel(texte(formData, "coverKey")),
     authorId: optionnel(texte(formData, "authorId")),
     authorName: optionnel(texte(formData, "authorName")),
-    authorRole: optionnel(texte(formData, "authorRole")),
     tagIds: await resoudreTags(formData),
   };
 }
@@ -322,7 +327,7 @@ export async function enregistrerTraductionAction(
   _prev: ActuFormState,
   formData: FormData,
 ): Promise<ActuFormState> {
-  await assertPermission("actualites");
+  const acteur = await assertPermission("actualites");
 
   const articleId = texte(formData, "articleId");
   const locale = lireLocale(formData);
@@ -347,6 +352,10 @@ export async function enregistrerTraductionAction(
     update: traduction,
     create: { articleId, locale, ...traduction },
   });
+
+  // Cette langue appartient désormais à son auteur ; les autres, si elles sont
+  // encore libres, partent en traduction (cf. lib/ia/planifier.ts).
+  await apresEnregistrementLangue("article", articleId, locale, acteur.id);
 
   revaliderActualites();
 
@@ -390,6 +399,9 @@ export async function supprimerTraductionAction(
   }
 
   await db().articleTranslation.deleteMany({ where: { articleId, locale } });
+  // Le journal ne porte pas de clé étrangère : sans cet oubli, l'écran de suivi
+  // continuerait d'annoncer une traduction pour une langue qui n'existe plus.
+  await oublierTraductions("article", articleId, locale);
 
   revaliderActualites();
   return { error: null, ok: `Version ${LANGUE_LABEL[locale]} supprimée.` };
@@ -461,7 +473,8 @@ export async function dupliquerArticleAction(
   if (!source) return { error: "Article introuvable.", ok: null };
 
   const copies: { locale: string; slug: string; title: string; excerpt: string | null;
-    contentHtml: string; seoTitle: string | null; seoDescription: string | null; coverAlt: string | null }[] = [];
+    contentHtml: string; seoTitle: string | null; seoDescription: string | null;
+    coverAlt: string | null; authorRole: string | null }[] = [];
 
   for (const tr of source.translations) {
     if (!(LOCALES as string[]).includes(tr.locale)) continue;
@@ -474,6 +487,7 @@ export async function dupliquerArticleAction(
       seoTitle: tr.seoTitle,
       seoDescription: tr.seoDescription,
       coverAlt: tr.coverAlt,
+      authorRole: tr.authorRole,
     });
   }
 
@@ -490,7 +504,6 @@ export async function dupliquerArticleAction(
       coverKey: source.coverKey,
       authorId: source.authorId,
       authorName: source.authorName,
-      authorRole: source.authorRole,
       createdById: acteur.id,
       translations: { create: copies },
       tags: { create: source.tags.map(({ tagId }) => ({ tagId })) },
@@ -516,6 +529,8 @@ export async function supprimerArticleAction(
 
   // Traductions et rattachements d'étiquettes tombent en cascade (cf. schéma).
   await db().article.delete({ where: { id } });
+  // Le suivi des traductions, lui, n'est rattaché par aucune clé étrangère.
+  await oublierTraductions("article", id);
 
   revaliderActualites();
   redirect(`${ACTUS_PATH}?supprime=1`);

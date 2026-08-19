@@ -29,6 +29,7 @@ import {
 } from "@/lib/events/statut";
 import type { EvenementSaisie, ReferentielsEvtSaisie } from "@/lib/events/saisie";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
 import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
 
@@ -198,7 +199,7 @@ export function EvtReglagesChamps({ evenement, referentiels, assets }: Props) {
         <div className="adm-edit__cover">
           {couverture.src ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={couverture.src} alt="" className="adm-edit__cover-img" />
+            <img src={vignette(couverture.src, 640)} alt="" loading="lazy" decoding="async" className="adm-edit__cover-img" />
           ) : (
             <span className="adm-edit__cover-vide">{t.aucunVisuel}</span>
           )}

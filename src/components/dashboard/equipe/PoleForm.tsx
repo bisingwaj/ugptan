@@ -20,6 +20,8 @@ import {
 import { ADMIN_EQUIPE } from "@/content/admin";
 import type { PoleSaisie } from "@/lib/equipe/saisie";
 import { ChampCouleur } from "@/components/dashboard/ChampCouleur";
+import { BandeauTraduction } from "@/components/dashboard/ia/BandeauTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const etatInitial: EquipeFormState = { error: null, ok: null };
 
@@ -78,10 +80,17 @@ export function PoleCarte({
   pole,
   premier,
   dernier,
+  etatIA,
 }: {
   pole: PoleSaisie;
   premier: boolean;
   dernier: boolean;
+  /**
+   * État de la version ANGLAISE, seule que l'assistance compose ici : le
+   * formulaire d'un pôle porte ses deux langues côte à côte, le français est
+   * donc toujours saisi à la main.
+   */
+  etatIA: EtatVue | undefined;
 }) {
   const t = ADMIN_EQUIPE;
   const [etat, action, enCours] = useActionState(enregistrerPoleAction, etatInitial);
@@ -125,6 +134,14 @@ export function PoleCarte({
 
       {erreur && <div className="auth-error" role="alert">{erreur}</div>}
       {etat.ok && <div className="adm-ok" role="status">{etat.ok}</div>}
+
+      <BandeauTraduction
+        entite="teamPole"
+        entiteId={pole.id}
+        locale="en"
+        etat={etatIA}
+        sourcePossible={sourcePourTraduire("en", (l) => pole.traductions[l].existe)}
+      />
 
       <form action={action}>
         <input type="hidden" name="id" value={pole.id} />

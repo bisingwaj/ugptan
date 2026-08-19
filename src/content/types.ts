@@ -28,9 +28,9 @@ export type Chiffre = { value: number; unit: string; pct?: string; label: Biling
  *  mis en avant à la place des montants sur les pages publiques. */
 export type Repere = { v: string; label: Bilingual; sub: Bilingual };
 
-export type Odp = { code: string; value: number; unit: string; baseline: string; femmes: string | null; label: Bilingual };
+export type Odp = { code: string; value: number; unit: Bilingual; baseline: string; femmes: string | null; label: Bilingual };
 
-export type Intermediaire = { value: string; unit: string; text: Bilingual };
+export type Intermediaire = { value: string; unit: Bilingual; text: Bilingual };
 
 export type SousComposante = { ref: string; montant: number; text: Bilingual };
 export type Composante = {

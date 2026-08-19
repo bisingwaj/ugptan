@@ -36,6 +36,8 @@ import type { Lang } from "@/lib/pick";
 import { slugify } from "@/lib/actus/slug";
 import { revaliderEquipe } from "@/lib/equipe/cache";
 import { isTeamComposante, isTeamStatut } from "@/lib/equipe/statut";
+import { apresEnregistrementLangue } from "@/lib/ia/planifier";
+import { marquerRelue, oublierTraductions } from "@/lib/ia/suivi";
 
 /** État partagé par tous les formulaires du module. */
 export type EquipeFormState = { error: string | null; ok: string | null };
@@ -250,7 +252,7 @@ export async function enregistrerMembreLangueAction(
   _prev: EquipeFormState,
   formData: FormData,
 ): Promise<EquipeFormState> {
-  await assertPermission("equipe");
+  const acteur = await assertPermission("equipe");
 
   const id = texte(formData, "id");
   if (!id) return { error: "Fiche introuvable.", ok: null };
@@ -274,6 +276,8 @@ export async function enregistrerMembreLangueAction(
     create: { memberId: id, locale, ...profil },
     update: profil,
   });
+
+  await apresEnregistrementLangue("teamMember", id, locale, acteur.id);
 
   revalidatePath(`${EQUIPE_PATH}/${id}`);
   revaliderEquipe();
@@ -308,6 +312,7 @@ export async function supprimerMembreLangueAction(
   }
 
   await db().teamMemberTranslation.deleteMany({ where: { memberId: id, locale } });
+  await oublierTraductions("teamMember", id, locale);
 
   revalidatePath(`${EQUIPE_PATH}/${id}`);
   revaliderEquipe();
@@ -458,6 +463,7 @@ export async function supprimerMembreAction(
   // lui, reste dans la bibliothèque : il peut servir ailleurs, et une
   // suppression en cascade d'un média partagé serait irréversible.
   await db().teamMember.delete({ where: { id } });
+  await oublierTraductions("teamMember", id);
 
   revaliderEquipe();
   redirect(`${EQUIPE_PATH}?supprime=1`);
@@ -478,7 +484,7 @@ export async function creerPoleAction(
   _prev: EquipeFormState,
   formData: FormData,
 ): Promise<EquipeFormState> {
-  await assertPermission("equipe");
+  const acteur = await assertPermission("equipe");
 
   const nomFr = texte(formData, "nomFr");
   if (!nomFr) return { error: "Renseignez au moins le nom français du pôle.", ok: null };
@@ -497,8 +503,9 @@ export async function creerPoleAction(
   ];
   if (nomEn) traductions.push({ locale: "en", nom: nomEn, mission: missionEn });
 
+  let cree: { id: string };
   try {
-    await db().teamPole.create({
+    cree = await db().teamPole.create({
       data: {
         key: await clePoleUnique(slugify(nomFr) || "pole"),
         position: dernier ? dernier.position + 1 : 0,
@@ -511,6 +518,10 @@ export async function creerPoleAction(
     if (estDoublon(error)) return { error: "Un pôle porte déjà ce nom.", ok: null };
     throw error;
   }
+
+  // Un pôle créé en français seul part en traduction ; créé dans les deux
+  // langues, il n'y a rien à composer.
+  if (!nomEn) await apresEnregistrementLangue("teamPole", cree.id, "fr", acteur.id);
 
   revalidatePath(POLES_PATH);
   revaliderEquipe();
@@ -537,7 +548,7 @@ export async function enregistrerPoleAction(
   _prev: EquipeFormState,
   formData: FormData,
 ): Promise<EquipeFormState> {
-  await assertPermission("equipe");
+  const acteur = await assertPermission("equipe");
 
   const id = texte(formData, "id");
   if (!id) return { error: "Pôle introuvable.", ok: null };
@@ -551,6 +562,18 @@ export async function enregistrerPoleAction(
 
   const pole = await db().teamPole.findUnique({ where: { id }, select: { id: true } });
   if (!pole) return { error: "Pôle introuvable.", ok: null };
+
+  /* Relevé AVANT l'écriture, et il décide de tout ce qui suit : un formulaire
+     rendu sans nom anglais veut dire « efface l'anglais » quand il en existait
+     un, et « je n'ai pas encore d'anglais » quand il n'y en a jamais eu. Le
+     premier cas est une volonté, le second une lacune — seul le second se
+     compose. */
+  const avaitAnglais = Boolean(
+    await db().teamPoleTranslation.findUnique({
+      where: { poleId_locale: { poleId: id, locale: "en" } },
+      select: { id: true },
+    }),
+  );
 
   await db().teamPole.update({
     where: { id },
@@ -574,6 +597,18 @@ export async function enregistrerPoleAction(
     });
   } else {
     await db().teamPoleTranslation.deleteMany({ where: { poleId: id, locale: "en" } });
+  }
+
+  if (nomEn) {
+    // Les deux langues sont saisies à la main : rien à composer, et les deux
+    // appartiennent à la personne qui vient d'enregistrer.
+    await marquerRelue("teamPole", id, "fr", acteur.id);
+    await marquerRelue("teamPole", id, "en", acteur.id);
+  } else if (avaitAnglais) {
+    // Effacement délibéré : on n'a pas à recomposer ce qui vient d'être retiré.
+    await oublierTraductions("teamPole", id);
+  } else {
+    await apresEnregistrementLangue("teamPole", id, "fr", acteur.id);
   }
 
   revalidatePath(POLES_PATH);
@@ -650,6 +685,7 @@ export async function supprimerPoleAction(
   }
 
   await db().teamPole.delete({ where: { id } });
+  await oublierTraductions("teamPole", id);
 
   revalidatePath(POLES_PATH);
   revaliderEquipe();

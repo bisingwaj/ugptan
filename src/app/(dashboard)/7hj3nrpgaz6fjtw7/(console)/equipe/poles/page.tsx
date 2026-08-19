@@ -6,6 +6,7 @@ import { requirePermission } from "@/lib/auth/guard";
 import { ensureEquipe } from "@/lib/equipe/bootstrap";
 import { chargerPoles } from "@/lib/equipe/edition";
 import { PoleCarte, PoleCreation } from "@/components/dashboard/equipe/PoleForm";
+import { vuesDePlusieurs } from "@/lib/ia/suivi";
 
 export const metadata: Metadata = { title: ADMIN_EQUIPE.polesTitle };
 
@@ -16,6 +17,8 @@ export default async function PolesEquipePage() {
 
   const t = ADMIN_EQUIPE;
   const poles = await chargerPoles();
+  // Une requête pour toute la liste, plutôt qu'une par carte.
+  const etatsIA = await vuesDePlusieurs("teamPole", poles.map((pole) => pole.id));
 
   return (
     <>
@@ -41,6 +44,7 @@ export default async function PolesEquipePage() {
             pole={pole}
             premier={rang === 0}
             dernier={rang === poles.length - 1}
+            etatIA={etatsIA.get(pole.id)?.en}
           />
         ))
       )}

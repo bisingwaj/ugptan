@@ -48,7 +48,7 @@ import { fromDateInput } from "@/lib/format";
 import { dimensionsImage } from "@/lib/image-size";
 import { contenuCorrespond, poidsLisible } from "@/lib/medias";
 import { slugify } from "@/lib/actus/slug";
-import { composantes } from "@/content/data";
+import { codesComposantes } from "@/lib/projet/query";
 import { revaliderGalerie } from "@/lib/galerie/cache";
 import {
   estMimeImageGalerie, estMimeVideoGalerie, tailleMaxPour, typeMediaDuFichier,
@@ -72,7 +72,6 @@ const ALBUMS_PATH = adminPath("/gallery/albums");
 const DOSSIER_VISUEL = "galerie/visuels";
 const DOSSIER_VIDEO = "galerie/videos";
 
-const CODES_COMPOSANTE = new Set(composantes.map((c) => c.code));
 
 /** Code Prisma d'une violation de contrainte d'unicité. */
 const UNIQUE_VIOLATION = "P2002";
@@ -103,8 +102,9 @@ function lireCouleur(value: string): string | null {
 }
 
 /** Codes de composante cochés, réduits à ceux qui existent réellement. */
-function lireComposantes(formData: FormData): string[] {
-  return formData.getAll("comps").map(String).filter((code) => CODES_COMPOSANTE.has(code));
+async function lireComposantes(formData: FormData): Promise<string[]> {
+  const admis = await codesComposantes();
+  return formData.getAll("comps").map(String).filter((code) => admis.has(code));
 }
 
 /**
@@ -115,7 +115,7 @@ function lireComposantes(formData: FormData): string[] {
  * ici imposerait une traduction avant toute mise en ligne, ce qui retarderait la
  * parution d'une photographie pour un motif de forme.
  */
-function lireFiche(formData: FormData) {
+async function lireFiche(formData: FormData) {
   return {
     titreFr: texte(formData, "titreFr"),
     titreEn: optionnel(texte(formData, "titreEn")),
@@ -129,7 +129,7 @@ function lireFiche(formData: FormData) {
     position: lireEntier(texte(formData, "position")),
     categoryId: optionnel(texte(formData, "categoryId")),
     albumId: optionnel(texte(formData, "albumId")),
-    comps: lireComposantes(formData),
+    comps: await lireComposantes(formData),
   };
 }
 
@@ -314,7 +314,7 @@ export async function ajouterGalerieAction(
   const typeBrut = texte(formData, "type");
   const type = isGalType(typeBrut) ? typeBrut : ("PHOTO" as const);
 
-  const fiche = lireFiche(formData);
+  const fiche = await lireFiche(formData);
   if (!fiche.titreFr) return { error: "Le titre français est obligatoire.", ok: null };
 
   // Une vidéo peut n'avoir pas de vignette ; une photographie sans image n'est
@@ -389,7 +389,7 @@ export async function enregistrerGalerieAction(
   if (!isGalStatut(statutBrut)) return { error: "Statut inconnu.", ok: null };
   const statut = statutBrut;
 
-  const fiche = lireFiche(formData);
+  const fiche = await lireFiche(formData);
   if (!fiche.titreFr) return { error: "Le titre français est obligatoire.", ok: null };
 
   const existant = await db().galerieItem.findUnique({
@@ -832,7 +832,7 @@ export async function basculerMediaAlbumAction(
 /* -------------------------------------------------------------------------- */
 
 /** Champs de la fiche d'un album, hors statut et hors couverture. */
-function lireAlbum(formData: FormData) {
+async function lireAlbum(formData: FormData) {
   return {
     titreFr: texte(formData, "titreFr"),
     titreEn: optionnel(texte(formData, "titreEn")),
@@ -844,7 +844,7 @@ function lireAlbum(formData: FormData) {
     featured: coche(formData, "featured"),
     position: lireEntier(texte(formData, "position")),
     categoryId: optionnel(texte(formData, "categoryId")),
-    comps: lireComposantes(formData),
+    comps: await lireComposantes(formData),
   };
 }
 
@@ -866,7 +866,7 @@ export async function creerAlbumAction(
 ): Promise<GalFormState> {
   const acteur: AdminUser = await assertPermission("videos");
 
-  const fiche = lireAlbum(formData);
+  const fiche = await lireAlbum(formData);
   if (!fiche.titreFr) return { error: "Le titre français est obligatoire.", ok: null };
 
   const slug = slugify(texte(formData, "slug") || fiche.titreFr);
@@ -904,7 +904,7 @@ export async function enregistrerAlbumAction(
   if (!isGalStatut(statutBrut)) return { error: "Statut inconnu.", ok: null };
   const statut = statutBrut;
 
-  const fiche = lireAlbum(formData);
+  const fiche = await lireAlbum(formData);
   if (!fiche.titreFr) return { error: "Le titre français est obligatoire.", ok: null };
 
   const slug = slugify(texte(formData, "slug") || fiche.titreFr);

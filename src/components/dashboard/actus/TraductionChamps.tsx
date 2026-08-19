@@ -90,6 +90,20 @@ export function TraductionChamps({
           />
           <p className="adm-hint" style={{ marginTop: 6 }}>{t.champAltAide}</p>
         </div>
+
+        {/* La FONCTION de l'auteur, pas son nom : « Cellule communication » se
+            traduit, la signature « UGPTN » reste sur la fiche. */}
+        <div className="adm-form__field">
+          <label className="label-mono" htmlFor={`${idBase}-authorRole`}>{t.champFonction}</label>
+          <input
+            id={`${idBase}-authorRole`}
+            name="authorRole"
+            type="text"
+            className="field"
+            defaultValue={valeurs.authorRole}
+            placeholder={lang === "en" ? "Communications Unit" : "Cellule communication"}
+          />
+        </div>
       </div>
 
       <div className="adm-form__field">

@@ -211,8 +211,8 @@ export const IMPACT_EMPLACEMENT_HINT: Record<ImpactEmplacement, string> = {
   UGPTN_QUESTIONS: "Dernier bloc de la page, avant la sortie.",
   PROJET_CONTEXTE: "Premier bloc après le titre de la page, avant la frise des jalons.",
   PROJET_POUR_QUI: "Entre le diptyque « Ce que ça change » et l'aperçu des composantes.",
-  PROJET_COMPOSANTES: "L'en-tête de l'aperçu. Les cinq composantes viennent du Projet.",
-  PROJET_RESULTATS: "L'en-tête de l'aperçu. Les indicateurs viennent du cadre de résultats.",
+  PROJET_COMPOSANTES: "L'en-tête de l'aperçu. Les composantes elles-mêmes se règlent sur l'écran « Les composantes ».",
+  PROJET_RESULTATS: "L'en-tête de l'aperçu. Les indicateurs eux-mêmes se règlent sur l'écran « Le cadre de résultats ».",
   PROJET_QUESTIONS: "Dernier bloc de la page, avant la sortie.",
 };
 
@@ -382,8 +382,8 @@ export const IMPACT_LAYOUT_HINT: Record<ImpactLayout, string> = {
   GLOSSAIRE: "Bloc replié : un sigle, ce qu'il recouvre. S'installe sous une foire aux questions.",
   CONTEXTE: "Texte et chiffres à gauche, aplat légendé à droite.",
   PERSONAS: "Cartes à trait d'accent : le public visé, puis ce que le Projet lui apporte.",
-  COMPOSANTES: "Titre et bouton, puis les cinq composantes du Projet. Sans entrées.",
-  INDICATEURS: "Titre et bouton sur fond sombre, puis les indicateurs ODP. Sans entrées.",
+  COMPOSANTES: "Titre et bouton, puis les composantes publiées du Projet. Sans entrées : elles se règlent sur l'écran « Les composantes ».",
+  INDICATEURS: "Titre et bouton sur fond sombre, puis les indicateurs d'objectif. Sans entrées : ils se règlent sur l'écran « Le cadre de résultats ».",
 };
 
 /* -------------------------------------------------------------------------- */

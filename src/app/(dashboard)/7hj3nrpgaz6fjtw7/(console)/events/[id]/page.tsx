@@ -11,6 +11,7 @@ import { chargerEvenement, chargerReferentielsEvt } from "@/lib/events/edition";
 import { EVT_PHASE_LABEL, EVT_STATUT_LABEL, phaseEvenement } from "@/lib/events/statut";
 import { EvenementActions } from "@/components/dashboard/events/EvenementActions";
 import { EvenementEditeur } from "@/components/dashboard/events/EvenementEditeur";
+import { vuesDe } from "@/lib/ia/suivi";
 
 export const metadata: Metadata = { title: ADMIN_EVTS.modifier };
 
@@ -27,9 +28,10 @@ export default async function ModifierEvenementPage(props: {
   const params = await props.searchParams;
   const t = ADMIN_EVTS;
 
-  const [evenement, referentiels] = await Promise.all([
+  const [evenement, referentiels, etatsIA] = await Promise.all([
     chargerEvenement(id),
     chargerReferentielsEvt(),
+    vuesDe("evenement", id),
   ]);
   if (!evenement) notFound();
 
@@ -126,6 +128,7 @@ export default async function ModifierEvenementPage(props: {
           referentiels={referentiels.referentiels}
           assets={referentiels.assets}
           apercuUrl={publicUrl}
+          etatsIA={etatsIA}
         />
       </div>
     </>

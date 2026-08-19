@@ -13,11 +13,11 @@
  * le nom — est identique et ne se règle plus qu'à un endroit.
  */
 import type { CSSProperties } from "react";
-import Image from "next/image";
 import { initials } from "@/lib/format";
 import { plafondRole } from "@/lib/equipe/affichage";
 import type { MembreEquipe } from "@/lib/equipe/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { Photo } from "@/components/ui/Photo";
 
 /** Numéro d'ordre affiché en incrustation : « 01 », « 02 »… */
 const n2 = (i: number) => String(i + 1).padStart(2, "0");
@@ -78,19 +78,22 @@ export function GrilleEquipe({ membres, variante = "accueil" }: Props) {
               }}
             >
               {photo ? (
-                  /* `next/image` en mode `fill` : le conteneur porte déjà le
-                     rapport et le recadrage, l'image n'a donc pas de dimensions
-                     propres à déclarer. `unoptimized` suit la source — un
-                     portrait déposé sur un hôte non déclaré dans next.config
-                     doit être servi tel quel plutôt que refusé
-                     (cf. estOptimisable() dans lib/medias.ts). */
-                <Image
+                  /* `Photo` plutôt que `next/image` nu : le portrait vient de la
+                     base et pèse souvent plusieurs mégaoctets, il s'affiche donc
+                     derrière un aperçu flou le temps de son chargement
+                     (cf. components/ui/Photo.tsx). Le conteneur porte le rapport
+                     et le recadrage, l'image n'a pas de dimensions propres à
+                     déclarer ; `unoptimized` suit la source — un portrait déposé
+                     sur un hôte non déclaré dans next.config doit être servi tel
+                     quel plutôt que refusé (cf. estOptimisable() dans medias.ts).
+                     `sizes` décrit la grille : une colonne sur téléphone, deux
+                     jusqu'à 700 px, puis des cellules d'environ 270 px. */
+                <Photo
                   src={photo}
                   alt={membre.portrait.alt}
-                  fill
                   unoptimized={membre.portrait.unoptimized}
-                  sizes="(max-width: 760px) 50vw, 260px"
-                  style={{ objectFit: "cover", objectPosition: "center 18%" }}
+                  sizes="(max-width: 520px) 92vw, (max-width: 700px) 46vw, 280px"
+                  style={{ objectPosition: "center 18%" }}
                 />
               ) : (
                 <span
