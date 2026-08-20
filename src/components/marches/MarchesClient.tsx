@@ -16,7 +16,10 @@ import { Photo } from "@/components/ui/Photo";
 import { useVideo } from "@/components/video/VideoProvider";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
-const FILTERS = ["tous", "ouvert", "AOI", "AON", "AMI", "SFQC", "DC"] as const;
+/* Types d'AVIS, et non méthodes de passation : l'avis à manifestation d'intérêt
+   ouvre une sélection de consultants, il se filtre donc comme les autres même
+   s'il ne figure pas au bandeau des méthodes (cf. content/marches.ts). */
+const FILTERS = ["tous", "ouvert", "AOI", "AON", "AMI", "SFQC", "SBQ", "DC"] as const;
 
 export function MarchesClient({ lang }: { lang: Lang }) {
   const t = dict(lang).marches;
@@ -58,6 +61,29 @@ export function MarchesClient({ lang }: { lang: Lang }) {
 
   const filterLabel = (k: string) =>
     k === "tous" ? t.filtersAll : k === "ouvert" ? t.filterOpen : k;
+
+  /* Aucun avis publié : ce n'est pas une recherche infructueuse, et le montrer
+     comme telle serait trompeur. Ni compteur à zéro, ni champ de recherche, ni
+     filtres — il n'y a rien à chercher ni à réinitialiser. Le visiteur a besoin
+     d'une phrase et d'une porte, pas d'une grille vide. */
+  if (marches.length === 0) {
+    return (
+      <div style={{ border: "1px solid var(--c-20)", background: "var(--c-10)", padding: "clamp(40px,6vw,72px) clamp(20px,4vw,40px)", textAlign: "center" }}>
+        <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--c-50)" }}>
+          {dict(lang).nav.marches}
+        </div>
+        <p style={{ margin: "14px auto 0", fontSize: "clamp(17px,2.2vw,22px)", fontWeight: 600, letterSpacing: "-0.01em", maxWidth: "26ch" }}>
+          {t.aucunAvis}
+        </p>
+        <p style={{ margin: "12px auto 0", fontSize: 14.5, lineHeight: 1.65, color: "var(--c-70)", maxWidth: "62ch" }}>
+          {t.aucunAvisLead}
+        </p>
+        <Link href={route(lang, NAV.contact)} className="btn" style={{ marginTop: 26, background: "var(--c-black)", color: "#fff" }}>
+          {dict(lang).words.askQuestion} <span className="arrow">→</span>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div>

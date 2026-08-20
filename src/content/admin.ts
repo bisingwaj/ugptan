@@ -1738,9 +1738,15 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     ],
   },
   {
-    /* Les entrées « Appels d'offres » et « Soumissionnaires » ont été retirées :
-       la passation se tient sur la plateforme nationale, la console n'a pas
-       vocation à la doubler. Il ne reste donc ici que le traitement des
+    /* Les entrées « Appels d'offres » et « Soumissionnaires » avaient été
+       retirées au motif que la passation se tenait sur une plateforme
+       nationale. Cette plateforme n'existe pas, et le motif tombe.
+
+       Elles ne reviennent pas ici pour autant : la passation se tiendra sur
+       DigiProcure, application distincte avec sa propre base, ses comptes
+       d'entreprises et ses plis scellés. Cette console administre le CONTENU du
+       site ; y loger des marchés mêlerait deux métiers dont les exigences de
+       sécurité n'ont rien de commun. Il ne reste donc ici que le traitement des
        plaintes, d'où le nom de la section. */
     key: "recours",
     label: "Recours",

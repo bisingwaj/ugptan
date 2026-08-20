@@ -779,6 +779,14 @@ export function dict(lang: Lang) {
       viewDetail: t("Voir le détail", "View details"),
       noResult: t("Aucun avis ne correspond à votre recherche.", "No notice matches your search."),
       reset: t("Réinitialiser", "Reset"),
+      /* Liste vide pour de bon, à distinguer d'une recherche infructueuse : il
+         n'y a rien à réinitialiser, et le visiteur doit savoir où s'adresser
+         plutôt que de conclure que la page est en panne. */
+      aucunAvis: t("Aucun avis n'est ouvert en ce moment.", "No notice is open at this time."),
+      aucunAvisLead: t(
+        "Les prochains appels d'offres et avis à manifestation d'intérêt paraîtront sur cette page dès leur publication. D'ici là, la cellule passation de l'UGPTN répond aux questions des entreprises intéressées.",
+        "Upcoming invitations to bid and requests for expressions of interest will appear on this page as soon as they are published. Until then, the UGPTN procurement unit answers questions from interested companies.",
+      ),
       published: t("Publié le", "Published"),
       budget: t("Budget estimé", "Estimated budget"),
       place: t("Lieu d'exécution", "Place of performance"),
