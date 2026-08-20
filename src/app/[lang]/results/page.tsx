@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { asLang } from "@/lib/params";
-import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { intermediaires } from "@/content/data";
+import { indicateurs } from "@/lib/projet/query";
 import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
 import { FlowLines, FlowLinesDefs } from "@/components/ui/FlowLines";
@@ -14,9 +13,10 @@ import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
 import { GrilleODP } from "@/components/resultats/GrilleODP";
 
-/** Cache aligné sur l'accueil : la page sert deux blocs administrés depuis la
- *  console (dialogues sectoriels, témoignages), invalidés par les écritures du
- *  module (cf. lib/impact/cache.ts). */
+/** Cache aligné sur l'accueil : la page est entièrement administrée — la grille
+ *  ODP et les indicateurs intermédiaires depuis « Le projet », les dialogues
+ *  sectoriels et les témoignages depuis « Histoires & impact ». Les écritures
+ *  des deux modules l'invalident (cf. lib/projet/cache.ts, lib/impact/cache.ts). */
 export const revalidate = 120;
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
@@ -42,6 +42,7 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
   const lang = asLang(params.lang);
   const t = dict(lang);
   const r = t.resultats;
+  const intermediaires = await indicateurs("INTERMEDIAIRE", lang);
 
   return (
     <div>
@@ -74,16 +75,18 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
 
       {/* Intermédiaires — seule occurrence du site, après allègement de
           l'accueil et de « Le Projet ». */}
-      <section className="section">
-        <div className="section__inner">
-          <Reveal><Kicker>{r.interLabel}</Kicker></Reveal>
-          <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", marginTop: 16 }}>
-            {intermediaires.map((x, i) => (
-              <RevealItem fade key={i} className="cell cell--fx cell--light" style={{ padding: "22px" }}><FlowLines variant={i} /><div className="mono" style={{ fontWeight: 600, fontSize: 24, color: "var(--cell-fg)" }}><span className="stat__approx">{t.lbl.approx}</span>{x.value}<span style={{ fontSize: 13, color: "var(--cell-acc)", marginLeft: 4 }}>{x.unit}</span></div><div style={{ fontSize: 12.5, color: "var(--cell-mut)", marginTop: 8, lineHeight: 1.45 }}>{pick(x.text, lang)}</div></RevealItem>
-            ))}
-          </RevealGroup>
-        </div>
-      </section>
+      {intermediaires.length > 0 && (
+        <section className="section">
+          <div className="section__inner">
+            <Reveal><Kicker>{r.interLabel}</Kicker></Reveal>
+            <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", marginTop: 16 }}>
+              {intermediaires.map((x, i) => (
+                <RevealItem fade key={x.id} className="cell cell--fx cell--light" style={{ padding: "22px" }}><FlowLines variant={i} /><div className="mono" style={{ fontWeight: 600, fontSize: 24, color: "var(--cell-fg)" }}><span className="stat__approx">{t.lbl.approx}</span>{x.valeur}<span style={{ fontSize: 13, color: "var(--cell-acc)", marginLeft: 4 }}>{x.unit}</span></div><div style={{ fontSize: 12.5, color: "var(--cell-mut)", marginTop: 8, lineHeight: 1.45 }}>{x.label}</div></RevealItem>
+              ))}
+            </RevealGroup>
+          </div>
+        </section>
+      )}
 
       {/* La section « Le projet en vidéos » a été retirée : cinq cartes portant
           un bouton de lecture et une durée devant des films qui ne sont pas

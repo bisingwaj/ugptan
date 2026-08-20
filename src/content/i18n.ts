@@ -684,8 +684,15 @@ export function dict(lang: Lang) {
         "Les comptes rendus, les rapports d'avancement et les avis de marché sont publiés à mesure. Ce qui ne l'est pas est signalé, avec son motif.",
         "Minutes, progress reports and tender notices are published as they come. What is not published is flagged, with the reason why.",
       ),
-      copilComp: t("Composition — 8 membres", "Composition — 8 members"),
-      ctpComp: t("Composition — 12 représentants", "Composition — 12 representatives"),
+      /* `copilComp` et `ctpComp` ont disparu : ils redisaient l'effectif déjà
+         porté par l'organe (« 8 membres »), préfixé de `compLabel`. La page
+         compose désormais les deux, ce qui évite qu'un effectif corrigé en
+         console laisse ici l'ancien chiffre.
+
+         `copilDesc`, `ctpDesc`, `copilMembers` et `ctpMembers` restent, mais
+         comme CONTENU D'ORIGINE et non comme libellés : ils n'alimentent plus
+         la page, seulement la reprise en base et le repli tant qu'elle n'a pas
+         eu lieu (cf. src/lib/gouvernance/origine.ts). */
       copilDesc: t(
         "Comité de Pilotage — il fixe le cap, valide la programmation annuelle et tranche les arbitrages qui dépassent le mandat technique : priorités entre composantes, réallocations, conflits entre institutions bénéficiaires.",
         "Steering Committee — it sets the course, approves annual programming and settles the arbitrations that exceed the technical mandate: priorities between components, reallocations, disputes between beneficiary institutions.",

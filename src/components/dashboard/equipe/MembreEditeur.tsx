@@ -18,6 +18,8 @@ import type { MembreSaisie, ReferentielsEquipe } from "@/lib/equipe/saisie";
 import type { MediaRef } from "@/lib/medias";
 import { MembreProfil } from "@/components/dashboard/equipe/MembreProfil";
 import { MembreReglages } from "@/components/dashboard/equipe/MembreReglages";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const LANG_LABEL: Record<Lang, string> = { fr: "Français", en: "English" };
 
@@ -26,9 +28,11 @@ type Props = {
   referentiels: ReferentielsEquipe;
   assets: MediaRef[];
   apercuUrl: string | null;
+  /** État de l'assistance à la traduction, par langue (cf. lib/ia/suivi.ts). */
+  etatsIA: Partial<Record<Lang, EtatVue>>;
 };
 
-export function MembreEditeur({ membre, referentiels, assets, apercuUrl }: Props) {
+export function MembreEditeur({ membre, referentiels, assets, apercuUrl, etatsIA }: Props) {
   const t = ADMIN_EQUIPE;
   const [langue, setLangue] = useState<Lang>("fr");
 
@@ -51,6 +55,7 @@ export function MembreEditeur({ membre, referentiels, assets, apercuUrl }: Props
                 <span className="mono adm-tab__code">{lang.toUpperCase()}</span>
                 <span>{LANG_LABEL[lang]}</span>
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : ""}`}>{etat}</span>
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -64,6 +69,8 @@ export function MembreEditeur({ membre, referentiels, assets, apercuUrl }: Props
             membreId={membre.id}
             lang={lang}
             valeurs={membre.traductions[lang]}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => membre.traductions[l].existe)}
             visible={langue === lang}
           />
         ))}

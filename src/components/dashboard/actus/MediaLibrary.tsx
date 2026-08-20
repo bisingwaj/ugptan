@@ -31,6 +31,7 @@ import {
   TAILLE_MAX_DOCUMENT,
   type MediaRef,
 } from "@/lib/medias";
+import { vignette } from "@/lib/images";
 
 const etatInitial: ActuFormState = { error: null, ok: null };
 
@@ -142,8 +143,11 @@ function MediaCard({ media }: { media: MediaAvecUsage }) {
     <div className="adm-media-card">
       <div className="adm-media-card__visuel">
         {image ? (
+          // Vignette de 220 px : inutile de rapatrier l'original pour la
+          // remplir (cf. `vignette()` dans lib/images.ts). Le fichier reste
+          // accessible en pleine définition par son adresse, juste au-dessous.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={media.altFr ?? ""} loading="lazy" decoding="async" />
+          <img src={vignette(src, 480)} alt={media.altFr ?? ""} loading="lazy" decoding="async" />
         ) : (
           <a
             href={src}

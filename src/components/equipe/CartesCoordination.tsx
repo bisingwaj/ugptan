@@ -10,11 +10,11 @@
  * Elles proviennent désormais des fiches marquées « mise en avant ». Le dessin
  * est repris à l'identique ; seule la source change.
  */
-import Image from "next/image";
 import { initials } from "@/lib/format";
 import { plafondRole } from "@/lib/equipe/affichage";
 import type { MembreEquipe } from "@/lib/equipe/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { Photo } from "@/components/ui/Photo";
 
 export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
   if (membres.length === 0) return null;
@@ -52,19 +52,19 @@ export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
               }}
             >
               {photo ? (
-                  /* `next/image` en mode `fill` : le conteneur porte déjà le
-                     rapport et le recadrage, l'image n'a donc pas de dimensions
-                     propres à déclarer. `unoptimized` suit la source — un
-                     portrait déposé sur un hôte non déclaré dans next.config
-                     doit être servi tel quel plutôt que refusé
+                  /* `Photo` plutôt que `next/image` nu : le portrait vient de la
+                     base, il s'affiche donc derrière un aperçu flou le temps de
+                     son chargement (cf. components/ui/Photo.tsx). Le conteneur
+                     porte le rapport et le recadrage ; `unoptimized` suit la
+                     source — un portrait déposé sur un hôte non déclaré dans
+                     next.config doit être servi tel quel plutôt que refusé
                      (cf. estOptimisable() dans lib/medias.ts). */
-                <Image
+                <Photo
                   src={photo}
                   alt={membre.portrait.alt}
-                  fill
                   unoptimized={membre.portrait.unoptimized}
-                  sizes="(max-width: 760px) 100vw, 320px"
-                  style={{ objectFit: "cover", objectPosition: "center 22%" }}
+                  sizes="(max-width: 560px) 92vw, (max-width: 860px) 46vw, 340px"
+                  style={{ objectPosition: "center 22%" }}
                 />
               ) : (
                 <span

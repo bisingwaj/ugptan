@@ -43,20 +43,20 @@ export const reperes: Repere[] = [
 ];
 
 export const odp: Odp[] = [
-  { code: "ODP-1", value: 30, unit: "millions", baseline: "0", femmes: "dont 15 millions de femmes", label: { fr: "Personnes utilisant l'internet haut débit", en: "People using broadband internet" } },
-  { code: "ODP-2", value: 20, unit: "kbit/s", baseline: "6,65 kbit/s", femmes: null, label: { fr: "Bande passante internationale par habitant", en: "International bandwidth per capita" } },
-  { code: "ODP-3", value: 1, unit: "million", baseline: "0", femmes: "dont environ la moitié de femmes", label: { fr: "Personnes utilisant des services numériques", en: "People using digital services" } },
-  { code: "ODP-4", value: 3000, unit: "", baseline: "0", femmes: "dont environ un tiers de femmes", label: { fr: "Diplômés de formations numériques avancées", en: "Graduates of advanced digital training" } },
+  { code: "ODP-1", value: 30, unit: { fr: "millions", en: "million" }, baseline: "0", femmes: "dont 15 millions de femmes", label: { fr: "Personnes utilisant l'internet haut débit", en: "People using broadband internet" } },
+  { code: "ODP-2", value: 20, unit: { fr: "kbit/s", en: "kbit/s" }, baseline: "6,65 kbit/s", femmes: null, label: { fr: "Bande passante internationale par habitant", en: "International bandwidth per capita" } },
+  { code: "ODP-3", value: 1, unit: { fr: "million", en: "million" }, baseline: "0", femmes: "dont environ la moitié de femmes", label: { fr: "Personnes utilisant des services numériques", en: "People using digital services" } },
+  { code: "ODP-4", value: 3000, unit: { fr: "", en: "" }, baseline: "0", femmes: "dont environ un tiers de femmes", label: { fr: "Diplômés de formations numériques avancées", en: "Graduates of advanced digital training" } },
 ];
 
 export const intermediaires: Intermediaire[] = [
-  { value: "10 000", unit: "km", text: { fr: "de fibre optique additionnelle visés à l'horizon du projet", en: "of additional fibre optic targeted over the project horizon" } },
-  { value: "650", unit: "", text: { fr: "nouvelles communautés à couvrir en mobile haut débit", en: "new communities to be covered by mobile broadband" } },
-  { value: "1 000", unit: "", text: { fr: "institutions publiques à raccorder", en: "public institutions to be connected" } },
-  { value: "100", unit: "", text: { fr: "startups à soutenir, dont environ un tiers dirigées par des femmes", en: "startups to support, around a third of them women-led" } },
-  { value: "10", unit: "", text: { fr: "centres d'innovation à établir", en: "innovation centres to be established" } },
-  { value: "6 000", unit: "", text: { fr: "personnes à inscrire en formation", en: "people to be enrolled in training" } },
-  { value: "30", unit: "jours", text: { fr: "délai visé pour le traitement d'un grief MGP", en: "target time frame for handling a grievance" } },
+  { value: "10 000", unit: { fr: "km", en: "km" }, text: { fr: "de fibre optique additionnelle visés à l'horizon du projet", en: "of additional fibre optic targeted over the project horizon" } },
+  { value: "650", unit: { fr: "", en: "" }, text: { fr: "nouvelles communautés à couvrir en mobile haut débit", en: "new communities to be covered by mobile broadband" } },
+  { value: "1 000", unit: { fr: "", en: "" }, text: { fr: "institutions publiques à raccorder", en: "public institutions to be connected" } },
+  { value: "100", unit: { fr: "", en: "" }, text: { fr: "startups à soutenir, dont environ un tiers dirigées par des femmes", en: "startups to support, around a third of them women-led" } },
+  { value: "10", unit: { fr: "", en: "" }, text: { fr: "centres d'innovation à établir", en: "innovation centres to be established" } },
+  { value: "6 000", unit: { fr: "", en: "" }, text: { fr: "personnes à inscrire en formation", en: "people to be enrolled in training" } },
+  { value: "30", unit: { fr: "jours", en: "days" }, text: { fr: "délai visé pour le traitement d'un grief MGP", en: "target time frame for handling a grievance" } },
 ];
 
 export const composantes: Composante[] = [

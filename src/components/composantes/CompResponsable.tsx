@@ -9,13 +9,13 @@ import Link from "next/link";
 import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { contact } from "@/content/carbon";
-import type { Composante } from "@/content/types";
 import type { MembreEquipe } from "@/lib/equipe/query";
+import type { ComposanteVue } from "@/lib/projet/query";
 import { NAV, route } from "@/lib/routes";
 import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
+import { Photo } from "@/components/ui/Photo";
 import { Reveal } from "@/components/motion/Reveal";
-import Image from "next/image";
 
 export function CompResponsable({
   membre,
@@ -23,7 +23,7 @@ export function CompResponsable({
   lang,
 }: {
   membre?: MembreEquipe | null;
-  comp: Composante;
+  comp: ComposanteVue;
   lang: Lang;
 }) {
   if (!membre) return null;
@@ -41,16 +41,18 @@ export function CompResponsable({
           <div className="comp-resp">
             <div className="comp-resp__media">
               {photo ? (
-                /* Mode `fill` : `.comp-resp__media img` pose déjà le cadrage et
-                   le recadrage, l'image n'a pas de dimensions propres à
-                   déclarer. La colonne fait 240 px, d'où le `sizes`. */
-                <Image
+                /* `Photo` plutôt que `next/image` nu : le portrait vient de la
+                   base, il s'affiche donc derrière un aperçu flou le temps de
+                   son chargement (cf. components/ui/Photo.tsx). `.comp-resp__media`
+                   pose le cadrage, l'image n'a pas de dimensions propres à
+                   déclarer. Le `sizes` suit les trois paliers de la colonne :
+                   116 px sous 760, 180 px jusqu'à 1000, 240 px au-delà. */
+                <Photo
                   src={photo}
                   alt={membre.portrait.alt}
-                  fill
                   unoptimized={membre.portrait.unoptimized}
-                  sizes="(max-width: 860px) 100vw, 240px"
-                  style={{ objectFit: "cover", objectPosition: "center 18%" }}
+                  sizes="(max-width: 760px) 120px, (max-width: 1000px) 180px, 240px"
+                  style={{ objectPosition: "center 18%" }}
                 />
               ) : (
                 <span className="mono comp-resp__initials">{initials(membre.nom || membre.role)}</span>
@@ -86,8 +88,8 @@ export function CompResponsable({
                   <div className="mono label-mono" style={{ marginBottom: 10 }}>{t.respPerimetre}</div>
                   <ul>
                     {comp.sous.map((s) => (
-                      <li key={s.ref}>
-                        <span className="mono">{s.ref}</span> {pickSous(s.text, lang)}
+                      <li key={s.id}>
+                        {s.reference && <span className="mono">{s.reference}</span>} {s.titre}
                       </li>
                     ))}
                   </ul>
@@ -106,9 +108,4 @@ export function CompResponsable({
       </div>
     </section>
   );
-}
-
-/** Le périmètre reste écrit dans le code : il décrit la composante, pas la personne. */
-function pickSous(text: { fr: string; en: string }, lang: Lang): string {
-  return lang === "en" ? text.en : text.fr;
 }

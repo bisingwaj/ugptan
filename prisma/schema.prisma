@@ -97,6 +97,11 @@ model User {
   galerieSaisie    GalerieItem[]   @relation("GalerieSaisiPar")
   /// Albums de la galerie créés par ce compte — trace interne.
   albumsSaisis     GalerieAlbum[]  @relation("AlbumSaisiPar")
+  /// Composantes du Projet saisies par ce compte — trace interne.
+  composantesSaisies Composante[]  @relation("ComposanteSaisiePar")
+
+  /// Traductions assistées relues par ce compte — trace interne.
+  traductionsRelues TraductionAssistee[] @relation("TraductionReluePar")
 
   @@index([role])
 }
@@ -366,6 +371,10 @@ model MediaAsset {
   portraits   TeamMember[]
   /// Rapports rédigés en ligne dont ce média est l'image de couverture.
   couverturesDoc Document[]
+  /// Visuels de héros des pages de composante.
+  herosComposante Composante[]     @relation("ComposanteCouverture")
+  /// Visuels des projets phares d'une composante.
+  visuelsProjet   ComposanteBloc[] @relation("ComposanteBlocVisuel")
 
   @@index([createdAt])
 }
@@ -442,9 +451,12 @@ model Article {
   /// Auteur affiché, quand c'est un compte de la console.
   authorId   String?
   author     User?   @relation("ArticleAuteur", fields: [authorId], references: [id], onDelete: SetNull)
-  /// Signature libre, quand l'auteur n'a pas de compte (« Cellule communication »).
+  /// Signature libre, quand l'auteur n'a pas de compte (« UGPTN »).
+  ///
+  /// Le NOM seulement : c'est un nom propre, il ne se traduit pas. La FONCTION
+  /// qui l'accompagne a rejoint `ArticleTranslation.authorRole`, où elle peut
+  /// différer d'une langue à l'autre.
   authorName String?
-  authorRole String?
 
   /// Trace de saisie, interne à la console.
   createdById String?
@@ -482,6 +494,14 @@ model ArticleTranslation {
   seoDescription String?
   /// Texte alternatif de l'image de couverture, propre à la langue.
   coverAlt       String?
+
+  /// Fonction affichée sous la signature (« Cellule communication »).
+  ///
+  /// Elle a d'abord vécu sur la fiche, en un seul exemplaire : « Cellule
+  /// communication » paraissait donc tel quel sous un article anglais. C'est un
+  /// LIBELLÉ, pas un nom propre — sa place est ici, avec le reste de ce qui se
+  /// lit. Le nom, lui, reste sur la fiche : « UGPTN » ne se traduit pas.
+  authorRole     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1838,4 +1858,542 @@ model GalerieItem {
   @@index([albumId, position])
   @@index([featured])
   @@index([priseAt])
+}
+
+/// ===========================================================================
+/// « Le projet » — les composantes et le cadre de résultats.
+///
+/// Le groupe « Le projet » de la navigation publique tient trois pages : la
+/// page du Projet, l'index des composantes et leurs cinq pages dédiées, et la
+/// page des résultats. Seules les BANDES DE RÉCIT de la première étaient
+/// administrables (cf. `ImpactSection`) ; tout le reste — les cinq composantes,
+/// leurs sous-composantes, leur problématique, leurs projets phares, et les
+/// indicateurs du cadre de résultats — vivait en dur dans `src/content/`.
+///
+/// Deux ensembles, donc, et une même règle que partout ailleurs : ce qui
+/// appartient à la FICHE d'un côté, ce qui appartient à UNE LANGUE de l'autre.
+///
+/// ⚠️ Ces données restent CANONIQUES au sens du Manuel d'Exécution : montants,
+/// clés IDA/AFD, références de sous-composantes et valeurs cibles des
+/// indicateurs ne sont pas de la rédaction. Les rendre administrables ne les
+/// rend pas discutables — cela évite qu'une correction du MEP demande une mise
+/// en production.
+/// ===========================================================================
+
+enum ProjetStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Nature d'un bloc d'une composante.
+///
+/// Une SEULE table porte les huit listes d'une page de composante, distinguées
+/// par ce type. Huit tables spécialisées demanderaient huit formulaires pour un
+/// geste identique — ajouter une ligne, la déplacer, la traduire — alors que
+/// leurs champs se recouvrent presque entièrement (cf. src/lib/projet/statut.ts,
+/// qui tient la table des champs demandés et de leurs intitulés).
+enum ComposanteBlocType {
+  /// Sous-composante du MEP : sa référence (« 1.2 »), son intitulé, sa dotation.
+  SOUS_COMPOSANTE
+  /// Un paragraphe du contexte, dans la colonne de gauche de la page.
+  CHAPEAU
+  /// Un axe de la problématique : constat, mécanisme, coût de l'inaction.
+  PB_AXE
+  /// Un paragraphe de l'appui : ce qui légitime l'intervention publique.
+  PB_APPUI
+  /// Un renvoi de la problématique. `cible` pointe vers une autre composante,
+  /// ou reste vide pour un renvoi hors projet (énergie, cadre juridique).
+  PB_LIEN
+  /// Un objectif de la composante.
+  OBJECTIF
+  /// Un projet phare : corps rédigé, puces, chute.
+  PROJET
+  /// Une brique de l'écosystème (section sombre).
+  ECO_COUCHE
+  /// Un point de la finalité.
+  FIN_POINT
+}
+
+/// Une composante du Projet, telle que le site la publie.
+model Composante {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché. Ancrage de l'amorçage
+  /// (cf. src/lib/projet/bootstrap.ts) : c'est lui qui garantit qu'une reprise
+  /// du contenu d'origine ne crée pas de doublon si elle est rejouée.
+  key String @unique
+
+  /// Code du MEP (« C1 »). Il s'affiche partout et sert de clé de rattachement
+  /// aux fiches de l'équipe, aux marchés et aux renvois entre composantes.
+  code   String @unique
+  /// Segment d'URL de la page dédiée (« c1 »).
+  slug   String @unique
+  /// Accent de la composante, en hexadécimal. Il teinte la page entière
+  /// (cf. `compTint` dans src/lib/comp.ts).
+  color  String
+  status ProjetStatus @default(DRAFT)
+  /// Ordre de lecture, de C1 à C5.
+  position Int @default(0)
+
+  /// --- Données canoniques du MEP ------------------------------------------
+  /// Dotation en millions de dollars. `0` pour une composante non dotée (CERC).
+  montant Float @default(0)
+  ida     Float @default(0)
+  afd     Float @default(0)
+
+  /// Indicateurs d'objectif rattachés, par leur code (« ODP-1 »). La page de la
+  /// composante en tire sa grille ; un code inconnu est simplement ignoré.
+  odpCodes String[] @default([])
+
+  /// --- Visuel du héros -----------------------------------------------------
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation("ComposanteCouverture", fields: [coverMediaId], references: [id], onDelete: SetNull)
+  /// Repli : clé du registre d'images intégré (cf. src/content/media.ts).
+  coverKey     String?
+
+  /// --- Vidéo de présentation ----------------------------------------------
+  /// L'emplacement existe dès qu'un poster est choisi : sans fichier ni
+  /// identifiant, la page affiche l'état « à venir » plutôt qu'une zone vide.
+  videoYt        String?
+  /// Fichier servi directement (« /videos/… »), quand la vidéo n'est pas sur
+  /// YouTube.
+  videoSrc       String?
+  /// Durée affichée sous le libellé, telle qu'elle doit se lire (« 4 min »).
+  videoDuree     String?
+  videoPosterKey String?
+
+  /// Trace de saisie, interne à la console.
+  createdById String?
+  createdBy   User?   @relation("ComposanteSaisiePar", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ComposanteTranslation[]
+  blocs        ComposanteBloc[]
+
+  @@index([status, position])
+}
+
+/// Version d'une composante dans une langue.
+///
+/// Deux registres cohabitent, et c'est voulu : le couple `titre` / `desc` est
+/// la formulation COURTE du MEP, celle des cartes et des lignes d'aperçu ; le
+/// couple `titreLong` / `soustitre` est la formulation ÉDITORIALE, celle du
+/// héros de la page dédiée. Les fondre donnerait un titre de carte long de
+/// deux lignes, ou un H1 qui ne dit rien de plus que l'étiquette.
+model ComposanteTranslation {
+  id           String     @id @default(cuid())
+  composanteId String
+  composante   Composante @relation(fields: [composanteId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale       String
+
+  /// Intitulé court du MEP (« Accès & inclusion numériques »).
+  titre     String?
+  /// Description courte, affichée sur les cartes et les lignes d'aperçu.
+  desc      String?
+  /// H1 éditorial de la page dédiée.
+  titreLong String?
+  /// Chapô du héros de la page dédiée.
+  soustitre String?
+
+  /// En-tête de « La problématique ».
+  pbTitre String?
+  pbLead  String?
+
+  /// En-tête de « L'écosystème » (section sombre).
+  ecoTitre String?
+  ecoLead  String?
+
+  /// En-tête de « La finalité ».
+  finTitre String?
+  finLead  String?
+
+  /// Titre de la vidéo de présentation, qui sert aussi d'alternative au poster.
+  videoTitre String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([composanteId, locale])
+  @@index([locale])
+}
+
+/// Une ligne d'une des huit listes d'une composante (cf. `ComposanteBlocType`).
+model ComposanteBloc {
+  id           String     @id @default(cuid())
+  composanteId String
+  composante   Composante @relation(fields: [composanteId], references: [id], onDelete: Cascade)
+
+  type     ComposanteBlocType
+  position Int                @default(0)
+  status   ProjetStatus       @default(PUBLISHED)
+
+  /// Référence affichée en mono : « 1.2 » pour une sous-composante, « 01 » pour
+  /// un projet phare. Une chaîne, parce qu'elle est rédigée et non calculée.
+  reference String?
+  /// Sigle d'un projet phare (« GOVNET »), affiché devant son titre.
+  sigle     String?
+  /// Ancre d'un projet phare dans la page (« cloud-souverain »).
+  slug      String?
+  /// Dotation d'une sous-composante, en millions de dollars.
+  montant   Float?
+  /// Code de la composante visée par un renvoi (`PB_LIEN`). Vide : renvoi hors
+  /// projet, qui s'affiche alors sans lien.
+  cible     String?
+
+  /// Visuel d'un projet phare.
+  coverMediaId String?
+  coverMedia   MediaAsset? @relation("ComposanteBlocVisuel", fields: [coverMediaId], references: [id], onDelete: SetNull)
+  coverKey     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ComposanteBlocTranslation[]
+
+  @@index([composanteId, type, position])
+}
+
+/// Version d'un bloc dans une langue.
+///
+/// Deux champs de LIGNES s'ajoutent aux trois champs de texte : un projet phare
+/// se compose de plusieurs paragraphes et d'une liste de puces, que rien
+/// n'obligerait à saisir dans un ordre figé. Les stocker en tableau évite un
+/// niveau de table de plus pour une liste qui ne porte ni ordre propre ni
+/// réglage.
+model ComposanteBlocTranslation {
+  id     String         @id @default(cuid())
+  blocId String
+  bloc   ComposanteBloc @relation(fields: [blocId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale String
+
+  /// Intitulé de la ligne : l'axe, l'objectif, le projet, la couche, le point.
+  titre           String?
+  /// Corps principal : la description d'un axe, la chute d'un projet phare, le
+  /// paragraphe d'un contexte ou d'un appui.
+  texte           String?
+  /// Ligne courte propre à un gabarit : le statut affiché d'un projet phare.
+  texteSecondaire String?
+
+  /// Paragraphes du corps d'un projet phare, un par entrée.
+  paragraphes String[] @default([])
+  /// Puces d'un projet phare, une par entrée.
+  puces       String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([blocId, locale])
+  @@index([locale])
+}
+
+/// Famille d'un indicateur du cadre de résultats.
+enum IndicateurFamille {
+  /// Indicateur de l'Objectif de Développement du Projet. Quatre, affichés en
+  /// grille sur l'accueil, « Le projet », « Résultats » et les composantes.
+  ODP
+  /// Indicateur de résultat intermédiaire. Seule la page « Résultats » les
+  /// porte.
+  INTERMEDIAIRE
+}
+
+/// Un indicateur du cadre de résultats.
+model Indicateur {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché — ancrage de l'amorçage.
+  key String @unique
+
+  famille  IndicateurFamille
+  /// Code affiché en mono (« ODP-1 »). Vide pour un indicateur intermédiaire,
+  /// dont le dessin n'en montre pas.
+  code     String?
+  status   ProjetStatus      @default(DRAFT)
+  position Int               @default(0)
+
+  /// Valeur telle qu'elle doit s'afficher, séparateurs compris : « 10 000 ».
+  /// Une chaîne, parce que ce qui se lit n'est pas toujours un nombre.
+  valeur    String
+  /// La même valeur en nombre, quand le dessin l'anime au défilement (les ODP).
+  /// Vide : la valeur s'affiche telle quelle, sans compteur.
+  valeurNum Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations IndicateurTranslation[]
+
+  @@index([famille, position])
+  @@index([status])
+}
+
+/// Version d'un indicateur dans une langue.
+model IndicateurTranslation {
+  id           String     @id @default(cuid())
+  indicateurId String
+  indicateur   Indicateur @relation(fields: [indicateurId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale       String
+
+  /// Ce que l'indicateur mesure.
+  label    String?
+  /// Point de départ, tel qu'il doit se lire (« 6,56 kbit/s »). La virgule
+  /// décimale du français devient un point en anglais : le champ se traduit.
+  baseline String?
+  /// Précision affichée en pastille d'accent (« dont environ la moitié de
+  /// femmes »). Vide : aucune pastille.
+  note     String?
+
+  /// Unité affichée à droite de la valeur (« millions », « jours », « km »).
+  ///
+  /// Même raison que `ArticleTranslation.authorRole` : « millions » et
+  /// « jours » se traduisent, et une colonne unique sur la fiche les laissait
+  /// en français sur la grille anglaise. Les unités symboliques (« km »,
+  /// « kbit/s ») se recopient simplement à l'identique.
+  unit     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([indicateurId, locale])
+  @@index([locale])
+}
+
+/// ===========================================================================
+/// « L'UGPTN » — la gouvernance du Projet.
+///
+/// Le menu « L'UGPTN » du site tient deux pages. La première, « L'Unité »,
+/// était déjà administrable bloc par bloc (cf. `ImpactSection`, emplacements
+/// `UGPTN_*`). La seconde, « Gouvernance », ne l'était pas du tout : les trois
+/// organes vivaient dans `src/content/data.ts`, la chronique de leurs décisions
+/// dans `src/content/carbon.ts`, et — plus gênant — la COMPOSITION du comité de
+/// pilotage et du comité technique était écrite dans le DICTIONNAIRE DE
+/// TRADUCTION, à côté des libellés d'interface. Corriger un siège demandait
+/// d'éditer `i18n.ts` ; ajouter un organe demandait de réécrire la page, dont
+/// la section « Composition » nommait COPIL et CTP en toutes lettres.
+///
+/// ⚠️ Ces données sont CANONIQUES au sens de l'arrêté : sigles, présidence,
+/// règles de décision et fréquences ne sont pas de la rédaction. Les rendre
+/// administrables ne les rend pas discutables — cela évite qu'un remaniement
+/// demande une mise en production.
+/// ===========================================================================
+
+enum GouvernanceStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Un organe de gouvernance : comité de pilotage, comité technique, Unité.
+model Organe {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché — ancrage de l'amorçage
+  /// (cf. src/lib/gouvernance/bootstrap.ts).
+  key String @unique
+
+  /// Sigle affiché en grand sur la carte (« COPIL »). Il sert aussi à
+  /// rattacher une décision à l'organe qui l'a prise.
+  sigle    String            @unique
+  status   GouvernanceStatus @default(DRAFT)
+  /// Ordre de lecture : du plus stratégique au plus opérationnel.
+  position Int               @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations OrganeTranslation[]
+
+  @@index([status, position])
+}
+
+/// Version d'un organe dans une langue.
+///
+/// La COMPOSITION vit ici et non dans une table de sièges : un siège est un
+/// intitulé d'institution (« MPTN — Président », « MIS ×2 »), sans attribut ni
+/// ordre propre. Une table de plus demanderait un écran de plus pour saisir ce
+/// qu'une liste de lignes dit déjà — même raisonnement que les puces d'un
+/// projet phare (cf. `ComposanteBlocTranslation`).
+model OrganeTranslation {
+  id       String @id @default(cuid())
+  organeId String
+  organe   Organe @relation(fields: [organeId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale   String
+
+  /// Nom développé (« Comité de Pilotage »).
+  nom       String?
+  /// Ce qu'il est (« Stratégique / décisionnel »).
+  nature    String?
+  /// Effectif tel qu'il doit se lire (« 8 membres »). Bilingue : « 8 membres »
+  /// restait en français sur la version anglaise avant la reprise.
+  effectif  String?
+  presidence String?
+  decision  String?
+  frequence String?
+
+  /// Ce que l'organe fait, en un paragraphe. Sans lui, l'organe ne paraît pas
+  /// dans la section « Composition » — seulement dans la grille des cartes.
+  composition String?
+  /// Un siège par entrée, dans l'ordre où ils s'affichent.
+  membres     String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organeId, locale])
+  @@index([locale])
+}
+
+/// Une décision ou une mission datée, portée à la chronique de la gouvernance.
+model GouvActivite {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché — ancrage de l'amorçage.
+  key String @unique
+
+  status   GouvernanceStatus @default(DRAFT)
+  /// Ordre d'affichage, du plus récent au plus ancien. Saisi et non déduit de
+  /// `dateAt` : la chronique mêle des dates exactes et des mois, et un tri
+  /// automatique ferait remonter « Juin 2026 » au-dessus d'un jour de juin.
+  position Int               @default(0)
+
+  /// Instance à l'origine du fait, telle qu'elle s'affiche en pastille. Une
+  /// chaîne libre et non le sigle d'un `Organe` : la chronique porte aussi des
+  /// faits de « Coordination », qui n'est pas un organe de gouvernance.
+  org   String
+  /// Couleur de la pastille et du filet gauche.
+  color String
+
+  /// Date réelle, quand elle est connue. Elle ne sert qu'à ranger la saisie en
+  /// console ; ce qui s'affiche est le libellé traduit.
+  dateAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations GouvActiviteTranslation[]
+
+  @@index([status, position])
+}
+
+/// Version d'une décision dans une langue.
+model GouvActiviteTranslation {
+  id         String       @id @default(cuid())
+  activiteId String
+  activite   GouvActivite @relation(fields: [activiteId], references: [id], onDelete: Cascade)
+  /// Code de langue du site (« fr », « en » — cf. src/lib/params.ts).
+  locale     String
+
+  /// Date affichée, rédigée (« Juin 2026 », « Jun 2026 »).
+  dateLabel String?
+  titre     String?
+  /// Ce que la décision emporte, en une phrase.
+  note      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([activiteId, locale])
+  @@index([locale])
+}
+
+/// ===========================================================================
+/// Traduction assistée
+///
+/// Le site s'écrit dans une langue puis se traduit. Le module d'assistance
+/// prend la relève dès l'enregistrement : il compose la version manquante et
+/// la dépose dans la table de traduction de l'entité, comme l'aurait fait un
+/// traducteur. Ce qu'il produit est du contenu ORDINAIRE — les pages publiques
+/// n'ont rien à savoir de son origine.
+///
+/// Ce qui vit ici n'est donc pas le texte, mais la TÂCHE : ce qui a été
+/// demandé, ce qui a abouti, ce qui a échoué, et ce qu'un humain a relu.
+/// Trois raisons de la loger dans une table à part plutôt qu'en colonnes sur
+/// chacune des onze tables de traduction :
+///
+///   1. c'est un état de traitement, avec ses échecs et ses reprises, pas un
+///      attribut du contenu ;
+///   2. onze copies du même cycle de vie divergeraient à la première évolution ;
+///   3. un site institutionnel doit pouvoir établir ce qui a été rédigé par une
+///      machine, et sur quel modèle — c'est le journal qui l'établit.
+///
+/// L'entité est désignée par un COUPLE (`entite`, `entiteId`) et non par une
+/// clé étrangère : onze relations facultatives vers onze tables donneraient
+/// onze colonnes nulles sur chaque ligne. La contrepartie est qu'aucune
+/// cascade ne joue à la suppression — c'est `oublierTraductions()`
+/// (src/lib/ia/suivi.ts) qui s'en charge, appelé par les actions de
+/// suppression.
+/// ===========================================================================
+
+/// Où en est la version d'une entité dans une langue.
+///
+/// `RELUE` ne signifie pas « corrigée » : il signifie qu'une personne a ouvert
+/// cette langue et l'a enregistrée. C'est le geste que la console peut
+/// constater, et le seul qui vaille engagement.
+enum TraductionStatut {
+  /// Demandée, pas encore traitée. Une reprise peut la reprendre.
+  EN_ATTENTE
+  /// Confiée au modèle. Au-delà du délai de garde, réputée interrompue.
+  EN_COURS
+  /// Écrite en base, jamais relue.
+  GENEREE
+  /// Enregistrée par une personne depuis la console.
+  RELUE
+  /// Le modèle n'a rien rendu d'exploitable. `erreur` dit quoi.
+  ECHEC
+}
+
+/// Une tâche de traduction : une entité, une langue produite.
+///
+/// Une seule ligne par couple (entité, langue) : une nouvelle demande sur une
+/// langue déjà traitée réécrit celle-ci plutôt que d'empiler un historique que
+/// personne ne lirait. Le journal utile est celui des ÉTATS courants — ce qui
+/// reste à relire, ce qui a échoué.
+model TraductionAssistee {
+  id String @id @default(cuid())
+
+  /// Clé de l'entité dans le registre (cf. src/lib/ia/registre.ts) :
+  /// « article », « evenement », « organe »…
+  entite   String
+  /// Identifiant de l'entité PORTEUSE (l'article, l'organe), jamais celui de
+  /// la ligne de traduction.
+  entiteId String
+
+  /// Langue PRODUITE.
+  locale       String
+  /// Langue lue pour la produire.
+  sourceLocale String
+
+  statut TraductionStatut @default(EN_ATTENTE)
+
+  /// Modèle qui a rendu le texte, tel que le fournisseur le nomme. Conservé
+  /// même après relecture : c'est la trace qui permet d'établir l'origine.
+  modele String?
+  /// Champs effectivement écrits, pour dire à la console ce qui a bougé.
+  champs String[] @default([])
+
+  /// Intitulé du contenu au moment du traitement, RECOPIÉ et non lu à la
+  /// demande. L'écran de suivi liste des contenus de onze types différents :
+  /// les nommer autrement supposerait onze lectures par affichage, pour un
+  /// libellé qui ne sert qu'à s'y retrouver.
+  intitule String?
+
+  /// Motif d'échec, rendu tel quel à la console. Vidé à la reprise.
+  erreur String?
+
+  demandeeLe DateTime  @default(now())
+  produiteLe DateTime?
+  relueLe    DateTime?
+
+  /// Qui a relu. `SetNull` : la suppression d'un compte ne doit pas effacer le
+  /// fait qu'une relecture a eu lieu.
+  relueParId String?
+  reluePar   User?   @relation("TraductionReluePar", fields: [relueParId], references: [id], onDelete: SetNull)
+
+  @@unique([entite, entiteId, locale])
+  @@index([statut])
+  @@index([entite, statut])
 }

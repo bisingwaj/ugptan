@@ -9,7 +9,7 @@ import { db } from "@/lib/db";
 import { lectureConsole } from "@/lib/lecture";
 import { formatDateTime, toDateInput } from "@/lib/format";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
-import { composantes } from "@/content/data";
+import { referentielComposantes } from "@/lib/projet/query";
 import type { DocumentSaisie, ReferentielsDocSaisie } from "@/lib/docs/saisie";
 import type { DocLangue, DocStatut, DocSupport, DocType } from "@/lib/docs/statut";
 
@@ -53,7 +53,7 @@ export async function chargerReferentielsDoc(): Promise<ReferentielsDoc> {
   return {
     referentiels: {
       categories: categories.map((item) => ({ id: item.id, nom: item.nomFr })),
-      composantes: composantes.map((composante) => ({ code: composante.code, titre: composante.titre.fr })),
+      composantes: await referentielComposantes(),
       // `name` est requis par Better Auth mais peut valoir l'adresse elle-même :
       // `||` et non `??`, pour qu'une chaîne vide retombe aussi sur l'adresse.
       auteurs: comptes.map((compte) => ({ id: compte.id, nom: compte.name || compte.email })),

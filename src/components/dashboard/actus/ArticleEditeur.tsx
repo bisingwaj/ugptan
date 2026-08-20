@@ -26,6 +26,8 @@ import type { ArticleSaisie, ReferentielsSaisie } from "@/lib/actus/saisie";
 import type { MediaRef } from "@/lib/medias";
 import { ArticleReglages } from "@/components/dashboard/actus/ArticleReglages";
 import { ArticleTraduction } from "@/components/dashboard/actus/ArticleTraduction";
+import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
+import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
 
 const LANG_LABEL: Record<Lang, string> = { fr: "Français", en: "English" };
 
@@ -35,9 +37,15 @@ type Props = {
   assets: MediaRef[];
   /** Lien d'aperçu signé (cf. lib/actus/apercu.ts). */
   apercuUrl: string | null;
+  /**
+   * État de l'assistance à la traduction, par langue. Absent pour une langue
+   * que l'assistance n'a jamais touchée — ce qui est le cas de tout contenu
+   * antérieur à sa mise en service.
+   */
+  etatsIA: Partial<Record<Lang, EtatVue>>;
 };
 
-export function ArticleEditeur({ article, referentiels, assets, apercuUrl }: Props) {
+export function ArticleEditeur({ article, referentiels, assets, apercuUrl, etatsIA }: Props) {
   const t = ADMIN_ACTUS;
   const [langue, setLangue] = useState<Lang>("fr");
 
@@ -62,6 +70,9 @@ export function ArticleEditeur({ article, referentiels, assets, apercuUrl }: Pro
                 <span className={`adm-tab__etat${tr.complete ? " is-ok" : tr.existe ? " is-partiel" : ""}`}>
                   {etat}
                 </span>
+                {/* D'où vient cette langue, et si quelqu'un l'a lue. Muette sur
+                    une version relue : c'est l'état normal du site. */}
+                <PastilleTraduction etat={etatsIA[lang]} />
               </button>
             );
           })}
@@ -75,6 +86,8 @@ export function ArticleEditeur({ article, referentiels, assets, apercuUrl }: Pro
             valeurs={article.traductions[lang]}
             assets={assets}
             visible={langue === lang}
+            etatIA={etatsIA[lang]}
+            sourceIA={sourcePourTraduire(lang, (l) => article.traductions[l].existe)}
           />
         ))}
       </div>

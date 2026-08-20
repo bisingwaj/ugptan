@@ -109,6 +109,17 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M11.3 12.3h1.4v1.4h-1.4z" />
     </>
   ),
+  /* Traductions : deux glyphes de langue, et le passage de l'un à l'autre */
+  traductions: (
+    <>
+      <path d="M3 5h8" />
+      <path d="M7 3.5v1.5" />
+      <path d="M9.5 8.5c-1.6 3.2-4 5-6.5 5.5" />
+      <path d="M5 9c1 2.2 2.8 3.8 5 4.5" />
+      <path d="M13 20.5l4-9 4 9" />
+      <path d="M14.4 17.5h5.2" />
+    </>
+  ),
   /* i18n & réglages : les curseurs de configuration */
   reglages: (
     <>

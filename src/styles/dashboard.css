@@ -179,6 +179,31 @@
     @apply flex-none font-mono text-[10px] tracking-[0.06em] uppercase text-c-70 border border-c-80 px-1.5 py-0.5;
   }
 
+  /* --- Écrans d'un module --------------------------------------------------
+     Dépliés sous le seul module actif (cf. AdminSidebar). Ils reproduisent le
+     sous-menu du site public : sans retrait ni filet, ils se liraient comme
+     trois modules de plus. Le filet vertical tient lieu de rattachement, à
+     l'aplomb de la bordure d'état du parent. */
+  .adm__nav-sub { @apply flex flex-col; }
+  .adm__nav-subitem {
+    @apply flex items-center pl-[46px] pr-5 py-2 text-[13px] text-c-50 border-l-2 border-c-80;
+    transition: background 0.16s, color 0.16s, border-color 0.16s;
+  }
+  a.adm__nav-subitem:hover { @apply bg-c-90 text-white; }
+  .adm__nav-subitem.is-active { @apply text-white border-l-ac; }
+
+  @media (min-width: 901px) {
+    /* En rail d'icônes, les écrans n'ont plus de libellé à montrer : le module
+       reste atteignable, ses écrans se choisissent dans la sous-barre de la
+       page. Les garder afficherait trois lignes vides. */
+    .adm[data-collapsed] .adm__nav-sub { @apply hidden; }
+  }
+  @media (max-width: 900px) {
+    /* La barre est un ruban horizontal : un dépliant vertical y crèverait la
+       hauteur. La sous-barre de la page porte alors seule les trois écrans. */
+    .adm__nav-sub { @apply hidden; }
+  }
+
   /* Pied de la barre : déconnexion puis bascule de repli, à distance constante
      du bas. La déconnexion y est plutôt que dans la barre du haut parce qu'elle
      referme la navigation : elle appartient au même bloc qu'elle. */
@@ -474,6 +499,20 @@
   .adm-edit__cover-vide { font-size: 12.5px; color: var(--c-50); }
 
   /* --- Onglets de langue --------------------------------------------------- */
+  /* --- Sous-barre d'un module à plusieurs écrans ---------------------------
+     Trois onglets et le chapô de l'écran ouvert, en tête de page. Elle vit
+     au-dessus du titre parce qu'elle situe : on lit d'abord où l'on est, puis
+     ce qu'on y fait. */
+  .adm-subnav { @apply border-b border-c-20 mb-7; }
+  .adm-subnav__tabs { @apply flex flex-wrap gap-0 -mb-px; }
+  .adm-subnav__tab {
+    @apply px-[18px] py-3 text-[14px] text-c-60 border-b-2 border-transparent whitespace-nowrap;
+    transition: color 0.16s, border-color 0.16s;
+  }
+  a.adm-subnav__tab:hover { @apply text-c-black; }
+  .adm-subnav__tab.is-on { @apply text-c-black font-medium border-b-ac; }
+  .adm-subnav__hint { @apply max-w-[78ch] pb-3.5 pt-2.5 text-[13px] leading-[1.5] text-c-60; }
+
   .adm-tabs { display: flex; flex-wrap: wrap; gap: 0; }
   .adm-tab {
     display: flex; align-items: center; gap: 9px;
@@ -1081,7 +1120,77 @@
   }
   .adm-item__grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
 
+  /* --- Fiche à sections ----------------------------------------------------
+     Le sommaire à gauche, la section ouverte à droite. Le sommaire est COLLANT :
+     une page de composante compte neuf sections et plusieurs écrans de haut, et
+     perdre le plan en descendant obligerait à remonter pour changer de section.
+
+     Il tient à gauche, contrairement aux réglages d'un article qui tiennent à
+     droite : ce n'est pas un panneau de réglages mais une table des matières, et
+     une table des matières se lit avant le texte, pas après. */
+  .adm-fiche { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .adm-fiche__sommaire {
+    position: sticky; top: 88px;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--c-20); background: #fff; padding: 16px 14px;
+  }
+  .adm-fiche__sommaire-titre { margin-bottom: 6px; }
+  .adm-fiche__lien {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; text-align: left; font-size: 13.5px; line-height: 1.35;
+    color: var(--c-70); border-left: 2px solid transparent;
+    transition: background 0.16s, color 0.16s, border-color 0.16s;
+  }
+  .adm-fiche__lien:hover { background: var(--c-10); color: var(--c-black); }
+  .adm-fiche__lien.is-on { background: var(--ac-pale); color: var(--c-black); border-left-color: var(--ac); font-weight: 500; }
+  .adm-fiche__n { flex: 0 0 auto; font-size: 11px; color: var(--c-50); }
+  .adm-fiche__lien.is-on .adm-fiche__n { color: var(--ac); }
+  .adm-fiche__label { min-width: 0; flex: 1 1 auto; }
+  /* Le compte d'entrées répond, sans ouvrir la section, à la seule question
+     qu'on se pose devant une fiche : ce qui reste à écrire. */
+  .adm-fiche__compte {
+    flex: 0 0 auto; min-width: 22px; text-align: center;
+    font-family: var(--font-mono); font-size: 11px;
+    padding: 2px 6px; border: 1px solid var(--c-20); background: var(--c-10); color: var(--c-60);
+  }
+  .adm-fiche__compte.is-vide { border-style: dashed; color: var(--c-50); }
+
+  .adm-fiche__panneaux { min-width: 0; }
+  .adm-panneau { display: flex; flex-direction: column; gap: 18px; }
+  /* Même remarque que pour `.adm-edit__langue` : sans cette règle, la section
+     masquée resterait visible, `display: flex` l'emportant sur `[hidden]`. */
+  .adm-panneau[hidden] { display: none; }
+  .adm-panneau__titre { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .adm-panneau__hint { max-width: 74ch; margin-top: -10px; font-size: 13px; line-height: 1.55; color: var(--c-60); }
+  .adm-panneau__form { border: 1px solid var(--c-20); background: #fff; padding: clamp(18px, 2.4vw, 26px); }
+
+
+  /* --- Assistance à la traduction ------------------------------------------ */
+  /* Un bandeau, pas une carte : il coiffe le formulaire de la langue concernée
+     et doit se lire avant lui, sans détourner l'attention du champ de saisie.
+     Le liseré coloré porte l'état à lui seul, ce qui laisse le fond blanc du
+     formulaire intact. */
+  .adm-ia { border: 1px solid var(--c-20); border-left-width: 3px; background: #fff; padding: 12px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .adm-ia--attente { border-left-color: var(--c-40); }
+  .adm-ia--cours { border-left-color: var(--ac); }
+  .adm-ia--relire { border-left-color: var(--orange); background: #fffaf5; }
+  .adm-ia--echec { border-left-color: var(--red); background: #fff5f5; }
+  .adm-ia__texte { flex: 1 1 22rem; min-width: 0; font-size: 13px; line-height: 1.55; color: var(--c-70); }
+  .adm-ia__titre { display: block; font-weight: 600; color: var(--c-90); }
+  .adm-ia__gestes { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* Pastille d'état d'une langue, posée dans un onglet ou une carte. Reprend la
+     géométrie d'`.adm-badge` pour rester lisible à côté de lui. */
+  .adm-ia-pastille { display: inline-block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border: 1px solid var(--c-30); color: var(--c-60); white-space: nowrap; }
+  .adm-ia-pastille--relire { border-color: var(--orange); background: #fff2e8; color: #8a3800; }
+  .adm-ia-pastille--cours { border-color: var(--ac-line); background: var(--ac-pale); color: var(--ac); }
+  .adm-ia-pastille--echec { border-color: var(--red); background: #fff5f5; color: var(--red); }
+
   @media (max-width: 1100px) {
+    /* Le sommaire repasse au-dessus et cesse de coller : sur une colonne, un
+       bloc collant mangerait la moitié de la hauteur utile. */
+    .adm-fiche { grid-template-columns: 1fr; }
+    .adm-fiche__sommaire { position: static; }
     .adm-edit { grid-template-columns: 1fr; }
     /* Les réglages passent AVANT le texte une fois la colonne unique : statut et
        date sont ce qu'on vient vérifier en premier sur un écran étroit. */

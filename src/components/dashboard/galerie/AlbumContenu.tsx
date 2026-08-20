@@ -28,6 +28,7 @@ import {
 } from "@/actions/admin-galerie";
 import { ADMIN_GALERIE } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
+import { vignette } from "@/lib/images";
 import type { ContenuAlbum } from "@/lib/galerie/edition";
 
 const etatInitial: GalFormState = { error: null, ok: null };
@@ -146,7 +147,7 @@ function CarteContenu({
           // Balise nue plutôt que `next/image` : écran d'administration servi à
           // la demande, où l'optimiseur n'ajouterait qu'une transformation.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.imageUrl} alt={item.altFr || item.titreFr} loading="lazy" decoding="async" />
+          <img src={vignette(item.imageUrl, 480)} alt={item.altFr || item.titreFr} loading="lazy" decoding="async" />
         ) : (
           <span className="adm-gal__vignette-vide mono">{t.vignetteAbsente}</span>
         )}

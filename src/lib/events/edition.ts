@@ -13,7 +13,7 @@ import { mediaSrc, type MediaRef } from "@/lib/medias";
 import { LOCALES } from "@/lib/params";
 import type { Lang } from "@/lib/pick";
 import { media as registre } from "@/content/media";
-import { composantes } from "@/content/data";
+import { referentielComposantes } from "@/lib/projet/query";
 import type { ImgKey } from "@/content/types";
 import type {
   EvenementSaisie, ReferentielsEvtSaisie, TraductionEvtSaisie,
@@ -48,7 +48,7 @@ export async function chargerReferentielsEvt(): Promise<ReferentielsEvt> {
   return {
     referentiels: {
       categories: categories.map((item) => ({ id: item.id, nom: item.nomFr })),
-      composantes: composantes.map((composante) => ({ code: composante.code, titre: composante.titre.fr })),
+      composantes: await referentielComposantes(),
     },
     assets,
   };
