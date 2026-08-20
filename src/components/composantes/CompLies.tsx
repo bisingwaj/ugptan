@@ -6,7 +6,8 @@ import type { Lang } from "@/lib/pick";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { derniersArticles } from "@/lib/actus/query";
-import { marches } from "@/content/marches";
+import { formatArticleDate } from "@/lib/format";
+import { marchesOuvertsDe } from "@/lib/digiprocure";
 import { ressources } from "@/content/carbon";
 import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
@@ -21,7 +22,7 @@ export async function CompLies({ code, lang }: { code: string; lang: Lang }) {
   const c = t.comp;
 
   const actus = await derniersArticles(lang, 4, code);
-  const avis = marches.filter((m) => m.comp === code && m.statut === "ouvert");
+  const avis = await marchesOuvertsDe(code);
   const docs = ressources.filter((r) => r.comp === code);
 
   if (!actus.length && !avis.length && !docs.length) return null;
@@ -71,7 +72,7 @@ export async function CompLies({ code, lang }: { code: string; lang: Lang }) {
                 {avis.map((m) => (
                   <RevealItem key={m.ref}>
                     <Link href={route(lang, NAV.marches)} className="comp-lie">
-                      <span className="mono comp-lie__meta">{m.ref} · {t.marches.deadline} {m.limite}</span>
+                      <span className="mono comp-lie__meta">{m.ref} · {t.marches.deadline} {formatArticleDate(new Date(m.limiteISO), lang)}</span>
                       <span className="comp-lie__t">{pick(m.objet, lang)}</span>
                       <span className="mono comp-lie__go" aria-hidden>→</span>
                     </Link>

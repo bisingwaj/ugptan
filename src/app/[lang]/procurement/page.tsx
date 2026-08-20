@@ -4,6 +4,7 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { marchesMethodes, candidature } from "@/content/marches";
+import { chargerMarches } from "@/lib/digiprocure";
 import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
 import { Icon, type IconName } from "@/components/ui/Icon";
@@ -25,6 +26,11 @@ export default async function MarchesPage(props: { params: Promise<{ lang: strin
   const lang = asLang(params.lang);
   const t = dict(lang);
 
+  /* Les avis viennent de DigiProcure, source unique. En cas d'indisponibilité,
+     `chargerMarches` rend une liste vide plutôt que de faire échouer la page :
+     le site institutionnel ne tombe pas parce que la plateforme redémarre. */
+  const marches = await chargerMarches();
+
   return (
     <div>
       <PageHero crumb={`UGPTN / ${t.nav.marches}`} title={t.marches.heroTitle} lead={t.marches.heroLead}>
@@ -40,7 +46,7 @@ export default async function MarchesPage(props: { params: Promise<{ lang: strin
 
       <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(64px,8vw,110px)" }}>
         <div className="section__inner">
-          <MarchesClient lang={lang} />
+          <MarchesClient lang={lang} marches={marches} />
 
           <Reveal style={{ marginTop: "clamp(48px,6vw,80px)", background: "var(--c-black)", color: "#fff", padding: "clamp(30px,4vw,52px)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
             <div style={{ maxWidth: 560 }}>

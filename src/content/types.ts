@@ -85,15 +85,40 @@ export type Actualite = {
 
 export type Addendum = { n: string; date: string; note: Bilingual };
 export type Piece = { nom: Bilingual; taille: string };
-export type CalEtape = { date: string; fr: string; en: string; done: boolean };
-export type MarcheStatut = "ouvert" | "cloture" | "attribue";
+/** Une étape du calendrier. La date est ISO : le franchissement se calcule à
+ *  l'affichage, sinon une page mise en cache montre « à venir » sur une
+ *  échéance passée. */
+export type CalEtape = { dateISO: string; fr: string; en: string };
+export type MarcheStatut = "ouvert" | "cloture" | "attribue" | "infructueux" | "annule";
+
+/**
+ * Un avis de marché, tel que le site l'affiche.
+ *
+ * ⚠️ CE TYPE N'EST PLUS ALIMENTÉ PAR CE DÉPÔT. Les avis viennent de
+ * DigiProcure (`src/lib/digiprocure.ts`), qui tient la référence, le
+ * calendrier, les pièces et les additifs.
+ *
+ * Trois champs ont disparu avec la bascule, et leur absence est délibérée :
+ * le nombre d'offres reçues, celui de retraits du dossier et celui de vues.
+ * Les deux premiers sont une information de marché — savoir que deux
+ * entreprises seulement ont déposé la veille de la clôture change le prix
+ * qu'une troisième proposera — et le dernier ne mesure rien.
+ */
 export type Marche = {
   ref: string; type: string; comp: string;
-  publie: string; limite: string; limiteISO: string;
-  statut: MarcheStatut; revue: Bilingual; budget: string; lieu: Bilingual; lots: number;
-  objet: Bilingual; resume: Bilingual; attributaire?: Bilingual;
+  /** Dates ISO. Le formatage dépend de la langue, il se fait à l'affichage. */
+  publieISO: string; limiteISO: string;
+  statut: MarcheStatut; budget: Bilingual; lieu: Bilingual; lots: number;
+  objet: Bilingual; resume: Bilingual;
+  /** Où se procurer le dossier tant qu'il n'est pas téléchargeable. */
+  retrait: Bilingual;
+  /** Motif d'annulation ou d'infructuosité : c'est ce qu'un candidat vient lire. */
+  motif: string | null;
+  /** Renseigné au lot 8, quand l'attribution se publie. */
+  attributaire?: Bilingual;
   addenda: Addendum[]; pieces: Piece[]; calendrier: CalEtape[];
-  soum: number; vues: number; questions: number;
+  /** Fiche de l'avis sur DigiProcure, où le dossier se retire. */
+  url: string | null;
 };
 export type MethodePassation = { sigle: string; label: Bilingual };
 export type EtapeCandidature = { n: string; titre: Bilingual; desc: Bilingual };

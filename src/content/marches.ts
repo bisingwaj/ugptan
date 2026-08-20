@@ -1,24 +1,7 @@
-/* Marchés publics (appels d'offres), méthodes de passation, candidature, documents. */
-import type {
-  Marche, MethodePassation, EtapeCandidature,
-} from "./types";
-
-/**
- * Avis d'appel d'offres publiés.
- *
- * ⚠️ VIDE, et volontairement. Cette liste a porté jusqu'ici six avis de
- * démonstration — références, budgets, lots, calendriers, additifs et jusqu'à
- * des compteurs d'offres reçues. Sur le site d'une unité de gestion de projet
- * public, un avis inventé se lit comme un vrai : une entreprise pouvait
- * préparer une réponse à un marché qui n'existe pas.
- *
- * Les avis réels viendront de DigiProcure, la plateforme de passation, et non
- * d'un fichier écrit en dur : c'est elle qui tient la référence, le calendrier,
- * les pièces et les additifs, et elle seule peut garantir qu'un avis affiché
- * ici correspond à une procédure ouverte. `MarchesClient` sait déjà afficher
- * une liste vide (cf. `t.marches.aucunAvis`).
- */
-export const marches: Marche[] = [];
+/* Méthodes de passation et parcours du soumissionnaire.
+   ⚠️ Les AVIS ne vivent plus ici : ils viennent de DigiProcure, la plateforme
+   de passation (cf. src/lib/digiprocure.ts). */
+import type { MethodePassation, EtapeCandidature } from "./types";
 
 /**
  * Les méthodes de passation, telles que les Règlements de la Banque mondiale
@@ -50,5 +33,3 @@ export const candidature: EtapeCandidature[] = [
    publications » sur /transparency. `scripts/seed-documents-transparence.mjs`
    les a reprises. Les garder en double aurait fait diverger la liste écrite en
    dur de celle que l'Unité tient à jour. */
-
-export const marchesOuverts = marches.filter((m) => m.statut === "ouvert").length;

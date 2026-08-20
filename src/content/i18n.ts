@@ -793,6 +793,16 @@ export function dict(lang: Lang) {
       lots: t("Lots", "Lots"),
       review: t("Revue", "Review"),
       docsTitle: t("Pièces du dossier", "Bidding documents"),
+      /* Le retrait du dossier se fait sur DigiProcure, ou au bureau tant que
+         les pièces n'y sont pas déposées. Un avis qui ne dit pas où se procurer
+         le dossier n'ouvre aucune concurrence. */
+      retraitTitle: t("Retrait du dossier", "Obtaining the documents"),
+      arretTitle: t("Procédure arrêtée", "Procedure stopped"),
+      surPlateforme: t("Ouvrir sur DigiProcure", "Open on DigiProcure"),
+      docsSurPlateforme: t(
+        "Les pièces se téléchargent sur DigiProcure, après inscription. C'est cette inscription qui vous fait recevoir les additifs.",
+        "The documents are downloaded from DigiProcure, after registration. That registration is what makes you receive addenda.",
+      ),
       scheduleTitle: t("Calendrier prévisionnel", "Indicative schedule"),
       addendaTitle: t("Addenda", "Addenda"),
       summary: t("Résumé", "Summary"),
