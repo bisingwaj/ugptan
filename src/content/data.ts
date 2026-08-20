@@ -50,7 +50,7 @@ export const odp: Odp[] = [
 ];
 
 export const intermediaires: Intermediaire[] = [
-  { value: "10 000", unit: { fr: "km", en: "km" }, text: { fr: "de fibre optique additionnelle visés à l'horizon du projet", en: "of additional fibre optic targeted over the project horizon" } },
+  { value: "11 500", unit: { fr: "km", en: "km" }, text: { fr: "de fibre optique résiliente au climat, visés à l'horizon du projet", en: "of climate-resilient fibre optic targeted over the project horizon" } },
   { value: "650", unit: { fr: "", en: "" }, text: { fr: "nouvelles communautés à couvrir en mobile haut débit", en: "new communities to be covered by mobile broadband" } },
   { value: "1 000", unit: { fr: "", en: "" }, text: { fr: "institutions publiques à raccorder", en: "public institutions to be connected" } },
   { value: "100", unit: { fr: "", en: "" }, text: { fr: "startups à soutenir, dont environ un tiers dirigées par des femmes", en: "startups to support, around a third of them women-led" } },
