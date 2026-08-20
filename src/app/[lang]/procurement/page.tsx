@@ -54,7 +54,10 @@ export default async function MarchesPage(props: { params: Promise<{ lang: strin
               <div style={{ fontWeight: 600, fontSize: "clamp(20px,2.4vw,30px)", letterSpacing: "-0.02em" }}>{t.marches.bidderTitle}</div>
               <p style={{ margin: "9px 0 0", fontSize: 14.5, color: "var(--c-30)", lineHeight: 1.55 }}>{t.marches.bidderLead}</p>
             </div>
-            <Link href={route(lang, NAV.contact)} className="btn btn--primary" style={{ whiteSpace: "nowrap", padding: "16px 26px" }}>{t.marches.bidderCta} →</Link>
+            {/* ⚠️ Menait au formulaire de contact, ce qui promettait un
+                échange humain là où le parcours est en libre-service. Il mène
+                désormais à la page qui l'explique et ouvre l'inscription. */}
+            <Link href={route(lang, NAV.soumissionnaires)} className="btn btn--primary" style={{ whiteSpace: "nowrap", padding: "16px 26px" }}>{t.marches.bidderCta} →</Link>
           </Reveal>
 
           <RevealGroup className="grid-4" style={{ marginTop: 1 }} gap={0.045}>

@@ -18,6 +18,7 @@ export function dict(lang: Lang) {
       ugptn: t("L'UGPTN", "The UGPTN"),
       gouvernance: t("Gouvernance", "Governance"),
       marches: t("Marchés", "Tenders"),
+      soumissionnaires: t("Devenir soumissionnaire", "Become a bidder"),
       transparence: t("Transparence", "Transparency"),
       actualites: t("Actualités", "News"),
       resultats: t("Résultats", "Results"),
@@ -35,6 +36,9 @@ export function dict(lang: Lang) {
     navSub: {
       projet: t("Vue d'ensemble", "Overview"),
       ugptn: t("L'Unité", "The Unit"),
+      /* Sous « Marchés », répéter « Marchés » n'apprendrait rien : ce que le
+         lecteur choisit ici, c'est entre consulter et candidater. */
+      marches: t("Avis d'appel d'offres", "Invitations to bid"),
       transparence: t("Documents publiés", "Published documents"),
       actualites: t("Communiqués", "Releases"),
     } as Partial<Record<NavKey, string>>,
@@ -65,6 +69,10 @@ export function dict(lang: Lang) {
       marches: t(
         "Avis en cours, méthode de passation, pièces exigées et délais.",
         "Open notices, procurement method, required documents and deadlines.",
+      ),
+      soumissionnaires: t(
+        "Créer un compte, rattacher votre entreprise, retirer un dossier.",
+        "Create an account, attach your company, obtain a bidding file.",
       ),
       transparence: t(
         "Rapports, études et pièces de référence, versionnés et datés.",
@@ -812,10 +820,71 @@ export function dict(lang: Lang) {
       bidderKicker: t("Candidature", "Bidding"),
       bidderTitle: t("Candidater : ce que cela suppose", "Bidding: what it involves"),
       bidderLead: t(
-        "Le dossier complet s'obtient auprès de la cellule passation, qui enregistre votre manifestation d'intérêt : c'est cet enregistrement qui déclenche la notification des addenda. Le dépôt est horodaté — et c'est cet horodatage qui fait foi en cas de contestation sur la recevabilité.",
-        "The full file is obtained from the procurement unit, which records your expression of interest: that record is what triggers notification of addenda. Submission is timestamped — and that timestamp is what counts if admissibility is disputed.",
+        "Le dossier complet se retire sur DigiProcure, après inscription. C'est cette inscription qui vous inscrit au registre des retraits, et c'est ce registre qui déclenche l'envoi des additifs. Une entreprise qui retire le dossier hors plateforme ne les reçoit pas.",
+        "The full file is obtained on DigiProcure, after registration. That registration enters you in the register of withdrawals, and it is that register which triggers the sending of addenda. A company obtaining the file outside the platform does not receive them.",
       ),
-      bidderCta: t("Nous contacter", "Contact us"),
+      bidderCta: t("Devenir soumissionnaire", "Become a bidder"),
+    },
+
+    /* --- Devenir soumissionnaire ------------------------------------------ */
+    /* La porte des entreprises. Elle n'héberge aucun formulaire : le compte se
+       crée sur DigiProcure, qui tient la base, la session et le dépôt. */
+    soumissionner: {
+      heroTitle: t(
+        "Répondre à un appel d'offres de l'UGPTN.",
+        "Responding to a UGPTN invitation to bid.",
+      ),
+      heroLead: t(
+        "L'inscription est gratuite et ouverte à toute entreprise, congolaise ou étrangère. Elle ne vous engage à rien : elle vous donne accès aux dossiers d'appel d'offres et vous fait recevoir les additifs qui les modifient.",
+        "Registration is free and open to any company, Congolese or foreign. It commits you to nothing: it gives you access to the bidding documents and makes you receive the addenda that amend them.",
+      ),
+      etapesKicker: t("Le parcours", "The process"),
+      etapesTitre: t("Quatre étapes", "Four steps"),
+      etape1Titre: t("Créer votre compte", "Create your account"),
+      etape1Texte: t(
+        "Un nom, une adresse électronique, un mot de passe. Vous recevez un lien de confirmation : tant qu'il n'est pas suivi, le compte n'ouvre rien. C'est par cette adresse que passeront les additifs et les réponses aux questions.",
+        "A name, an email address, a password. You receive a confirmation link: until it is followed, the account opens nothing. It is through this address that addenda and answers to questions will travel.",
+      ),
+      etape2Titre: t("Rattacher votre entreprise", "Attach your company"),
+      etape2Texte: t(
+        "Le compte est personnel, l'entreprise ne l'est pas. Vous renseignez son identité juridique — dénomination, RCCM, identifiant national — puis vous invitez vos collègues avec leur rôle. L'entreprise survit ainsi au départ de celui qui l'a inscrite.",
+        "The account is personal, the company is not. You enter its legal identity — name, trade register number, national ID — then invite your colleagues with their roles. The company thus outlives whoever registered it.",
+      ),
+      etape3Titre: t("Retirer le dossier", "Obtain the file"),
+      etape3Texte: t(
+        "Gratuitement, en un clic, sur chaque avis ouvert. Le retrait vous inscrit au registre : vous recevrez chaque additif et chaque réponse publiée, et vous pourrez prouver quelle version du dossier vous détenez.",
+        "Free of charge, in one click, on every open notice. The withdrawal enters you in the register: you will receive every addendum and every published answer, and you will be able to prove which version of the file you hold.",
+      ),
+      etape4Titre: t("Déposer votre offre", "Submit your bid"),
+      etape4Texte: t(
+        "Le dépôt en ligne ouvrira prochainement. D'ici là, les offres se remettent selon les modalités indiquées sur chaque avis. Publier d'abord, déposer ensuite : aucune procédure en cours n'est mise en risque.",
+        "Online submission will open shortly. Until then, bids are delivered as stated on each notice. Publish first, submit later: no ongoing procedure is put at risk.",
+      ),
+      aVenir: t("À venir", "Coming"),
+      ctaCreer: t("Créer un compte", "Create an account"),
+      ctaConnexion: t("J'ai déjà un compte", "I already have an account"),
+      ctaAvis: t("Voir les avis ouverts", "See open notices"),
+      /* ⚠️ Affiché tant que l'adresse de la plateforme n'est pas configurée.
+         Un bouton mort sur le site d'une unité de gestion de projet se lit
+         comme une panne ; une phrase datée se lit comme une information. */
+      bientot: t(
+        "L'inscription en ligne ouvre prochainement. En attendant, la cellule passation de l'UGPTN répond aux entreprises intéressées.",
+        "Online registration opens shortly. In the meantime, the UGPTN procurement unit answers interested companies.",
+      ),
+      reserveKicker: t("À savoir", "Worth knowing"),
+      reserveTitre: t("Trois points avant de commencer", "Three points before you start"),
+      reserve1: t(
+        "L'accès au dossier est gratuit. Aucun paiement n'est exigé pour retirer un dossier d'appel d'offres de l'UGPTN. Si quelqu'un vous en réclame un, ce n'est pas nous.",
+        "Access to the file is free. No payment is required to obtain a UGPTN bidding document. If someone asks you for one, it is not us.",
+      ),
+      reserve2: t(
+        "Une entreprise, un compte d'organisation. Plusieurs personnes s'y rattachent avec des rôles distincts : qui prépare n'est pas nécessairement qui signe.",
+        "One company, one organisation account. Several people attach to it with distinct roles: whoever prepares is not necessarily whoever signs.",
+      ),
+      reserve3: t(
+        "Les délais sont opposables. L'heure qui fait foi est celle du serveur, à Kinshasa, et une clôture ne se reporte que par un additif publié.",
+        "Deadlines are binding. The time that counts is the server's, in Kinshasa, and a deadline is postponed only by a published addendum.",
+      ),
     },
 
     /* --- Transparence documentaire --------------------------------------- */

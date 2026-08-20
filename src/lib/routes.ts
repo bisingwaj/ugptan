@@ -5,6 +5,7 @@ export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 
 export type NavKey =
   | "accueil" | "projet" | "composantes" | "ugptn" | "gouvernance" | "marches" | "transparence"
+  | "soumissionnaires"
   | "actualites" | "resultats" | "evenements" | "galerie" | "contact" | "mgp"
   | "mgpSuivi" | "confidentialite" | "conditions";
 
@@ -28,7 +29,12 @@ export type NavItem = { slug: string; key: NavKey };
 export const NAV: Record<NavKey, string> = {
   accueil: "", projet: "/project", composantes: "/components", ugptn: "/ugptn",
   gouvernance: "/governance",
-  marches: "/procurement", transparence: "/transparency", actualites: "/news",
+  marches: "/procurement",
+  /* La porte des entreprises candidates. Elle explique le parcours et renvoie
+     vers DigiProcure, qui tient les comptes : une seule base, une seule
+     session, une seule règle de mot de passe. */
+  soumissionnaires: "/bidders",
+  transparence: "/transparency", actualites: "/news",
   resultats: "/results", evenements: "/events",
   galerie: "/gallery",
   contact: "/contact", mgp: "/grievances", mgpSuivi: "/grievances/track",
@@ -174,7 +180,7 @@ export const documentRoute = (lang: Lang, slug: string) =>
  * `labelKey` réutilise le libellé de la page mère (t.nav) ; les enfants
  * portent, si besoin, un libellé abrégé propre au sous-menu (t.navSub).
  */
-export type NavGroupKey = "gprojet" | "gunite" | "gtransparence" | "gactus";
+export type NavGroupKey = "gprojet" | "gunite" | "gmarches" | "gtransparence" | "gactus";
 export type NavGroup = { key: NavGroupKey; labelKey: NavKey; children: NavItem[] };
 export type NavNode = NavItem | NavGroup;
 
@@ -208,6 +214,26 @@ const G_UNITE: NavGroup = {
   ],
 };
 
+/**
+ * Les marchés, désormais un groupe et non plus une feuille.
+ *
+ * ⚠️ La note précédente disait de garder les marchés au premier niveau, « porte
+ * d'entrée des soumissionnaires ». Elle reste vraie, et c'est pourquoi le
+ * GROUPE occupe cette place : son libellé ne bouge pas de l'en-tête. Ce qui
+ * change, c'est qu'une entreprise y trouve maintenant DEUX choses — les avis
+ * ouverts, et ce qu'il faut faire pour y répondre. La seconde n'existait nulle
+ * part dans la navigation, et le bouton qui y menait pointait vers le
+ * formulaire de contact.
+ */
+const G_MARCHES: NavGroup = {
+  key: "gmarches",
+  labelKey: "marches",
+  children: [
+    { slug: NAV.marches, key: "marches" },
+    { slug: NAV.soumissionnaires, key: "soumissionnaires" },
+  ],
+};
+
 const G_TRANSPARENCE: NavGroup = {
   key: "gtransparence",
   labelKey: "transparence",
@@ -233,9 +259,7 @@ const G_ACTUS: NavGroup = {
 export const NAV_TREE: NavNode[] = [
   G_PROJET,
   G_UNITE,
-  /* Les marchés restent au premier niveau : c'est la porte d'entrée des
-     soumissionnaires, elle ne se cache pas derrière un sous-menu. */
-  { slug: NAV.marches, key: "marches" },
+  G_MARCHES,
   G_TRANSPARENCE,
   G_ACTUS,
   { slug: NAV.contact, key: "contact" },
@@ -252,6 +276,6 @@ export const NAV_DRAWER: NavNode[] = [{ slug: NAV.accueil, key: "accueil" }, ...
 export const NAV_FOOTER: NavGroup[] = [
   G_PROJET,
   { ...G_UNITE, children: [...G_UNITE.children, { slug: NAV.contact, key: "contact" }] },
-  { ...G_TRANSPARENCE, children: [{ slug: NAV.marches, key: "marches" }, ...G_TRANSPARENCE.children] },
+  { ...G_TRANSPARENCE, children: [...G_MARCHES.children, ...G_TRANSPARENCE.children] },
   G_ACTUS,
 ];
