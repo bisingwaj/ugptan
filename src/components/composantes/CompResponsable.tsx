@@ -66,7 +66,16 @@ export function CompResponsable({
               )}
               <div className="comp-resp__role">{membre.role}</div>
 
-              {membre.bio && <p className="comp-resp__bio">{membre.bio}</p>}
+              {/* La biographie d'abord, le périmètre à défaut.
+                  Les deux champs disent des choses différentes : « Biographie »
+                  présente la personne, « Responsabilités » dit ce dont elle
+                  répond. Une fiche de composante sans biographie affichait
+                  jusqu'ici un nom et un intitulé, sans un mot sur le travail
+                  couvert — alors que le périmètre, lui, était renseigné et ne
+                  servait qu'aux cartes de gouvernance. */}
+              {(membre.bio || membre.mandat) && (
+                <p className="comp-resp__bio">{membre.bio || membre.mandat}</p>
+              )}
 
               {membre.verbatim && (
                 <blockquote className="comp-resp__verbatim">« {membre.verbatim} »</blockquote>

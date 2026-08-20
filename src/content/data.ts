@@ -43,8 +43,8 @@ export const reperes: Repere[] = [
 ];
 
 export const odp: Odp[] = [
-  { code: "ODP-1", value: 30, unit: "millions", baseline: "0", femmes: "dont environ la moitié de femmes", label: { fr: "Personnes utilisant l'internet haut débit", en: "People using broadband internet" } },
-  { code: "ODP-2", value: 20, unit: "kbit/s", baseline: "6,56 kbit/s", femmes: null, label: { fr: "Bande passante internationale par habitant", en: "International bandwidth per capita" } },
+  { code: "ODP-1", value: 30, unit: "millions", baseline: "0", femmes: "dont 15 millions de femmes", label: { fr: "Personnes utilisant l'internet haut débit", en: "People using broadband internet" } },
+  { code: "ODP-2", value: 20, unit: "kbit/s", baseline: "6,65 kbit/s", femmes: null, label: { fr: "Bande passante internationale par habitant", en: "International bandwidth per capita" } },
   { code: "ODP-3", value: 1, unit: "million", baseline: "0", femmes: "dont environ la moitié de femmes", label: { fr: "Personnes utilisant des services numériques", en: "People using digital services" } },
   { code: "ODP-4", value: 3000, unit: "", baseline: "0", femmes: "dont environ un tiers de femmes", label: { fr: "Diplômés de formations numériques avancées", en: "Graduates of advanced digital training" } },
 ];
