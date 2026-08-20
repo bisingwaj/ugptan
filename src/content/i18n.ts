@@ -1211,6 +1211,25 @@ export function dict(lang: Lang) {
       accueil: t("Retour à l'accueil", "Back to home"),
       reference: t("Référence", "Reference"),
     },
+
+    /* Adresse qui ne correspond à rien : article retiré, lien mal recopié,
+       publication dépubliée depuis qu'un moteur l'a indexée. À distinguer de
+       `erreur`, qui parle d'une panne — ici le site fonctionne, c'est la page
+       qui n'existe pas. Les sorties proposées sont donc des chemins, pas un
+       bouton « réessayer » qui ne changerait rien. */
+    introuvable: {
+      code: "404",
+      titre: t("Cette page n'existe pas", "This page does not exist"),
+      corps: t(
+        "L'adresse demandée ne correspond à aucune page du site. Elle a pu être retirée, renommée, ou le lien que vous avez suivi comportait une erreur.",
+        "The requested address matches no page on this site. It may have been removed or renamed, or the link you followed contained a mistake.",
+      ),
+      pistes: t("Reprendre par une de ces entrées :", "Start again from one of these:"),
+      accueil: t("Accueil", "Home"),
+      actus: t("Actualités", "News"),
+      docs: t("Documents publiés", "Published documents"),
+      contact: t("Contact", "Contact"),
+    },
   };
 }
 
