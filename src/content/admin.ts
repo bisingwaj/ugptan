@@ -28,8 +28,11 @@ export const ADMIN = {
     submitting: "Vérification…",
     noSignup: "Les comptes sont créés par un administrateur. Aucune inscription n'est ouverte.",
     expired: "Votre session n'est plus valide. Reconnectez-vous pour reprendre là où vous en étiez.",
-    biddersPrompt: "Vous êtes soumissionnaire ?",
-    biddersLink: "Accéder à votre espace",
+    /* Cet écran est celui de la console de l'UGPTN. Un soumissionnaire qui y
+       atterrit s'est trompé de porte : on le renvoie à la sienne plutôt que de
+       le laisser essayer des identifiants qui n'existent pas ici. */
+    biddersPrompt: "Vous cherchez la plateforme des marchés ?",
+    biddersLink: "Ouvrir DigiProcure",
   },
 
   setPassword: {

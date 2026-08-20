@@ -99,18 +99,29 @@ export function dict(lang: Lang) {
       more: t("En savoir plus", "Learn more"),
       all: t("Tout voir", "View all"),
       report: t("Déposer une plainte", "File a grievance"),
-      /* Renvoie au portail des soumissionnaires, hébergé par un tiers
-         (cf. lib/external.ts). Aucun lien du site public ne mène à la console
-         d'administration de l'UGPTN. */
-      login: t("Se connecter", "Sign in"),
+      /* Nom de la plateforme de passation et d'approvisionnement du projet,
+         hébergée hors de notre périmètre avec ses propres comptes
+         (cf. lib/external.ts). C'est un nom propre : il ne se traduit pas et ne
+         se remplace pas par « Se connecter », qui ne disait pas où l'on entre.
+         Aucun lien du site public ne mène à la console d'administration de
+         l'UGPTN, qui est un tout autre espace. */
+      login: t("DigiProcure", "DigiProcure"),
       /* Sorties de page ajoutées avec le partage du propos : chaque page qui
          montre un aperçu doit dire où se trouve le détail. */
       resultats: t("Voir le cadre de résultats", "See the results framework"),
       toutEquipe: t("Toute l'équipe", "The whole team"),
       voirUnite: t("Voir l'Unité", "See the Unit"),
+      /* Le nom seul n'apprend rien à qui ne connaît pas la plateforme : cette
+         phrase porte l'infobulle ET le libellé lu par les lecteurs d'écran. */
       loginHint: t(
-        "Espace des soumissionnaires — plateforme partenaire, ouverture dans un nouvel onglet",
-        "Bidders' space — partner platform, opens in a new tab",
+        "DigiProcure, la plateforme de passation des marchés et des approvisionnements du projet. Ouverture dans un nouvel onglet.",
+        "DigiProcure, the project's procurement and supply management platform. Opens in a new tab.",
+      ),
+      /* Légende du tiroir mobile : là, pas de survol, donc pas d'infobulle.
+         Tenue courte pour ne pas casser l'équilibre du pied de tiroir. */
+      loginNote: t(
+        "Marchés et approvisionnements du projet",
+        "Project procurement and supply",
       ),
     },
     sec: {

@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { loginAction, type LoginState } from "@/actions/admin-auth";
 import { ADMIN } from "@/content/admin";
-import { BIDDERS_PORTAL_URL } from "@/lib/external";
+import { DIGIPROCURE_URL } from "@/lib/external";
 import { Marque } from "@/components/chrome/Marque";
 
 const initialState: LoginState = { error: null };
@@ -112,13 +112,13 @@ export function AdminLoginForm({
 
           <p style={{ margin: "22px 0 0", fontSize: 12.5, lineHeight: 1.5, color: "var(--c-50)" }}>{t.noSignup}</p>
 
-          {/* Le portail des soumissionnaires est une plateforme tierce : lien
-              sortant, jamais une route de ce site. */}
-          {BIDDERS_PORTAL_URL && (
+          {/* DigiProcure est une plateforme distincte, avec ses propres
+              comptes : lien sortant, jamais une route de ce site. */}
+          {DIGIPROCURE_URL && (
             <p style={{ margin: "14px 0 0", fontSize: 12.5, lineHeight: 1.5, color: "var(--c-50)" }}>
               {t.biddersPrompt}{" "}
               <a
-                href={BIDDERS_PORTAL_URL}
+                href={DIGIPROCURE_URL}
                 target="_blank"
                 rel="noopener noreferrer external"
                 style={{ color: "var(--ac)", textDecoration: "underline", textUnderlineOffset: 3 }}
