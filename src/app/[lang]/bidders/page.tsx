@@ -50,7 +50,14 @@ const ICONES: IconName[] = ["compte", "dossier", "depot", "attribution"];
  * peut pas déposer.
  *
  * Ce que cette page doit faire, elle le fait : dire le parcours en entier, dire
- * ce qui est gratuit, et ouvrir la bonne porte.
+ * ce qui engage l'entreprise, et ouvrir la bonne porte.
+ *
+ * ⚠️ Elle ne dit RIEN du prix du dossier, et c'est délibéré. Un module de
+ * paiement du dossier est prévu, activable marché par marché sur décision du
+ * RPM : le jour où un marché l'active, toute promesse de gratuité écrite ici
+ * devient une contrevérité qu'un candidat peut opposer. Ce qui décide un
+ * candidat n'est de toute façon pas le prix, c'est le registre — et le registre
+ * est ce qui lui fera parvenir les additifs.
  */
 export default async function SoumissionnairesPage(props: {
   params: Promise<{ lang: string }>;

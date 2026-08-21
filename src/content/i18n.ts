@@ -839,8 +839,8 @@ export function dict(lang: Lang) {
         "Responding to a UGPTN invitation to bid.",
       ),
       heroLead: t(
-        "L'inscription est gratuite et ouverte à toute entreprise, congolaise ou étrangère. Elle ne vous engage à rien : elle vous donne accès aux dossiers d'appel d'offres et vous fait recevoir les additifs qui les modifient.",
-        "Registration is free and open to any company, Congolese or foreign. It commits you to nothing: it gives you access to the bidding documents and makes you receive the addenda that amend them.",
+        "L'inscription est ouverte à toute entreprise, congolaise ou étrangère. Elle ne vous engage à rien : elle vous donne accès aux dossiers d'appel d'offres et vous fait recevoir les additifs qui les modifient.",
+        "Registration is open to any company, Congolese or foreign. It commits you to nothing: it gives you access to the bidding documents and makes you receive the addenda that amend them.",
       ),
       etapesKicker: t("Le parcours", "The process"),
       etapesTitre: t("Quatre étapes", "Four steps"),
@@ -862,8 +862,8 @@ export function dict(lang: Lang) {
       ),
       etape3Titre: t("Retirer le dossier", "Obtain the file"),
       etape3Texte: t(
-        "Gratuitement, en un clic, sur chaque avis ouvert. Le retrait vous inscrit au registre : vous recevrez chaque additif et chaque réponse publiée, et vous pourrez prouver quelle version du dossier vous détenez.",
-        "Free of charge, in one click, on every open notice. The withdrawal enters you in the register: you will receive every addendum and every published answer, and you will be able to prove which version of the file you hold.",
+        "En un clic, sur chaque avis ouvert. Le retrait vous inscrit au registre : vous recevrez chaque additif et chaque réponse publiée, et vous pourrez prouver quelle version du dossier vous détenez.",
+        "In one click, on every open notice. The withdrawal enters you in the register: you will receive every addendum and every published answer, and you will be able to prove which version of the file you hold.",
       ),
       etape4Titre: t("Déposer votre offre", "Submit your bid"),
       etape4Texte: t(
@@ -884,8 +884,8 @@ export function dict(lang: Lang) {
       reserveKicker: t("À savoir", "Worth knowing"),
       reserveTitre: t("Trois points avant de commencer", "Three points before you start"),
       reserve1: t(
-        "L'accès au dossier est gratuit. Aucun paiement n'est exigé pour retirer un dossier d'appel d'offres de l'UGPTN. Si quelqu'un vous en réclame un, ce n'est pas nous.",
-        "Access to the file is free. No payment is required to obtain a UGPTN bidding document. If someone asks you for one, it is not us.",
+        "Aucun paiement ne se règle de la main à la main. Tout ce qui concerne un dossier de l'UGPTN se fait sur la plateforme et nulle part ailleurs : quiconque vous réclame de l'argent en espèces ou sur un compte personnel n'agit pas pour nous.",
+        "No payment is ever settled hand to hand. Everything concerning a UGPTN bidding document happens on the platform and nowhere else: anyone asking you for money in cash or into a personal account is not acting for us.",
       ),
       reserve2: t(
         "Une entreprise, un compte d'organisation. Plusieurs personnes s'y rattachent avec des rôles distincts : qui prépare n'est pas nécessairement qui signe.",
