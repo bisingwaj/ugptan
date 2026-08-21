@@ -845,9 +845,15 @@ export function dict(lang: Lang) {
       etapesKicker: t("Le parcours", "The process"),
       etapesTitre: t("Quatre étapes", "Four steps"),
       etape1Titre: t("Créer votre compte", "Create your account"),
+      /* ⚠️ Un CODE à six chiffres, et non un lien : DigiProcure a remplacé
+         l'un par l'autre. Un lien de confirmation se fait « visiter » par les
+         antivirus de messagerie d'entreprise, qui le consomment avant son
+         destinataire, et casse quand le courriel s'ouvre sur un autre appareil
+         que celui où l'inscription est en cours. Ce texte doit dire ce que la
+         plateforme fait, sinon le candidat cherche un lien qui n'existe pas. */
       etape1Texte: t(
-        "Un nom, une adresse électronique, un mot de passe. Vous recevez un lien de confirmation : tant qu'il n'est pas suivi, le compte n'ouvre rien. C'est par cette adresse que passeront les additifs et les réponses aux questions.",
-        "A name, an email address, a password. You receive a confirmation link: until it is followed, the account opens nothing. It is through this address that addenda and answers to questions will travel.",
+        "Un nom, une adresse électronique, un mot de passe. Un code à six chiffres vous parvient et confirme l'adresse : tant qu'elle ne l'est pas, le compte n'ouvre rien. C'est par elle que passeront les additifs et les réponses aux questions.",
+        "A name, an email address, a password. A six-digit code reaches you and confirms the address: until it is confirmed, the account opens nothing. It is through this address that addenda and answers to questions will travel.",
       ),
       etape2Titre: t("Rattacher votre entreprise", "Attach your company"),
       etape2Texte: t(
