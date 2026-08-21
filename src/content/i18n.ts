@@ -806,7 +806,11 @@ export function dict(lang: Lang) {
          le dossier n'ouvre aucune concurrence. */
       retraitTitle: t("Retrait du dossier", "Obtaining the documents"),
       arretTitle: t("Procédure arrêtée", "Procedure stopped"),
-      surPlateforme: t("Ouvrir sur DigiProcure", "Open on DigiProcure"),
+      /* ⚠️ Le libellé dit l'ACTE, pas la destination. « Ouvrir sur
+         DigiProcure » promettait une seconde lecture du même avis, et
+         DigiProcure n'affiche plus d'avis : cette page-ci est la seule.
+         Ce que la plateforme apporte, c'est le retrait. */
+      surPlateforme: t("Retirer le dossier", "Obtain the documents"),
       docsSurPlateforme: t(
         "Les pièces se téléchargent sur DigiProcure, après inscription. C'est cette inscription qui vous fait recevoir les additifs.",
         "The documents are downloaded from DigiProcure, after registration. That registration is what makes you receive addenda.",

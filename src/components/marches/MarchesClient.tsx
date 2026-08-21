@@ -45,12 +45,33 @@ const STATUTS: Record<MarcheStatut, { fr: string; en: string; c: string }> = {
   annule: { fr: "Annulé", en: "Cancelled", c: "#da1e28" },
 };
 
-export function MarchesClient({ lang, marches }: { lang: Lang; marches: Marche[] }) {
+/**
+ * ⚠️ `ouvrir` porte la référence à déplier au premier rendu.
+ *
+ * Elle arrive du serveur, lue dans `?avis=` par la page, et non d'un
+ * `useSearchParams` ici : le composant resterait sinon suspendu au rendu
+ * statique, ce qui coûterait le pré-rendu de toute la page Marchés pour un
+ * paramètre que quatre-vingt-dix-neuf visiteurs sur cent n'utilisent pas.
+ *
+ * C'est ce paramètre qui rattrape les anciennes adresses `/notices/<référence>`
+ * de DigiProcure : elles y redirigent, et le visiteur retombe sur l'avis qu'il
+ * cherchait plutôt que sur la liste. Une référence inconnue n'ouvre rien et
+ * laisse la liste — pas une erreur, simplement un avis qui n'existe plus.
+ */
+export function MarchesClient({
+  lang,
+  marches,
+  ouvrir = null,
+}: {
+  lang: Lang;
+  marches: Marche[];
+  ouvrir?: string | null;
+}) {
   const t = dict(lang).marches;
   const openVideo = useVideo();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<string>("tous");
-  const [selRef, setSelRef] = useState<string | null>(null);
+  const [selRef, setSelRef] = useState<string | null>(ouvrir);
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
