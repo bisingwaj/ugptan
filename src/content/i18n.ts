@@ -817,6 +817,11 @@ export function dict(lang: Lang) {
       ),
       scheduleTitle: t("Calendrier prévisionnel", "Indicative schedule"),
       addendaTitle: t("Addenda", "Addenda"),
+      addendaIntro: t(
+        "Un addendum fait partie intégrante du dossier : une offre s'apprécie au regard du dossier tel qu'il est à l'heure limite, addenda compris. Le texte complet est adressé aux entreprises inscrites au registre des retraits.",
+        "An addendum forms part of the bidding documents: a bid is assessed against the file as it stands at the deadline, addenda included. The full text is sent to the companies entered in the register of withdrawals.",
+      ),
+      addendaReport: t("Nouvelle date limite de remise", "New submission deadline"),
       summary: t("Résumé", "Summary"),
       awardee: t("Attributaire", "Awardee"),
       filtersAll: t("Tous", "All"),

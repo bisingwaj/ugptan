@@ -83,7 +83,27 @@ export type Actualite = {
   comps?: string[];
 };
 
-export type Addendum = { n: string; date: string; note: Bilingual };
+/**
+ * Un additif à un avis, tel que le public en est informé.
+ *
+ * ⚠️ La date est ISO et se met en forme à l'AFFICHAGE, comme celle d'une étape
+ * de calendrier : une date préformatée dans la donnée se fige dans la langue et
+ * le fuseau du serveur qui l'a rendue, et une page mise en cache l'affiche
+ * ensuite en français à un lecteur anglophone.
+ *
+ * ⚠️ `note` porte l'OBJET de l'additif, pas son texte. Le texte modifie le
+ * dossier d'appel d'offres, et le dossier s'obtient sur DigiProcure après
+ * inscription : c'est l'inscription qui produit le registre des retraits, et
+ * c'est lui qui fait parvenir les additifs suivants. Publier le texte ici
+ * donnerait l'illusion qu'on peut suivre une procédure sans y entrer.
+ */
+export type Addendum = {
+  n: string;
+  dateISO: string;
+  note: Bilingual;
+  /** Nouvelle date limite de remise, quand l'additif la déplace. */
+  reportISO: string | null;
+};
 export type Piece = { nom: Bilingual; taille: string };
 /** Une étape du calendrier. La date est ISO : le franchissement se calcule à
  *  l'affichage, sinon une page mise en cache montre « à venir » sur une

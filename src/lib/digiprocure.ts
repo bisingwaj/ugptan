@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { Marche, MarcheStatut, Piece } from "@/content/types";
+import type { Addendum, Marche, MarcheStatut, Piece } from "@/content/types";
 import { DIGIPROCURE_URL } from "@/lib/external";
 
 /**
@@ -51,6 +51,11 @@ type AvisPublic = {
   lots: { numero: number; intitule: Bilingue; description: Bilingue; budget: Bilingue }[];
   calendrier: { type: string; instantISO: string; version: number; motif: string | null }[];
   pieces: { code: string; intitule: Bilingue; tailleOctets: string; typeMime: string }[];
+  /* ⚠️ DigiProcure ne sert PAS le texte d'un additif, seulement son objet. Le
+     texte modifie le dossier, et le dossier s'obtient après inscription : c'est
+     l'inscription qui produit le registre des retraits, et lui qui fait
+     parvenir les additifs suivants. */
+  additifs: { numero: number; objet: Bilingue; publieISO: string; reportClotureISO: string }[];
 };
 
 /**
@@ -142,6 +147,23 @@ function convertir(brut: unknown): Marche | null {
     return nom ? [{ nom, taille: taille(String(p?.tailleOctets ?? "")) }] : [];
   });
 
+  /* Les additifs parus. Un objet illisible ou une date invalide écartent la
+     ligne, jamais l'avis entier : un additif mal formé ne doit pas faire
+     disparaître un marché de la vitrine. */
+  const addenda: Addendum[] = (Array.isArray(a.additifs) ? a.additifs : []).flatMap((ad) => {
+    const note = texteBilingue(ad?.objet);
+    const dateISO = dateValide(ad?.publieISO);
+    if (!note || !dateISO || typeof ad?.numero !== "number") return [];
+    return [
+      {
+        n: String(ad.numero).padStart(2, "0"),
+        dateISO,
+        note,
+        reportISO: dateValide(ad?.reportClotureISO),
+      },
+    ];
+  });
+
   return {
     ref: a.reference,
     type: a.etiquette,
@@ -160,7 +182,7 @@ function convertir(brut: unknown): Marche | null {
       .map(([type, { instantISO }]) => ({ dateISO: instantISO, ...ETAPES[type]! }))
       .sort((x, y) => x.dateISO.localeCompare(y.dateISO)),
     pieces,
-    addenda: [],
+    addenda,
     url: typeof a.url === "string" && /^https?:\/\//i.test(a.url) ? a.url : null,
   };
 }

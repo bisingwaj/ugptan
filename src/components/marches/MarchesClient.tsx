@@ -293,11 +293,18 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
           {m.addenda.length > 0 && (
             <>
               <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "#8a3800", marginBottom: 12 }}>{t.addendaTitle}</div>
+              {/* Ce qu'un addendum ENGAGE, avant de les lister. Sans cette
+                  phrase, il se lit comme une information de courtoisie, et un
+                  candidat remet une offre conforme à la version d'origine. */}
+              <p style={{ margin: "0 0 12px", fontSize: 12.5, lineHeight: 1.55, color: "var(--c-60)" }}>{t.addendaIntro}</p>
               <div style={{ marginBottom: 32, display: "flex", flexDirection: "column", gap: 9 }}>
                 {m.addenda.map((a) => (
                   <div key={a.n} style={{ border: "1px solid #ffd9a8", background: "#fff3e0", padding: "14px 16px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}><span className="mono" style={{ fontSize: 12, fontWeight: 600, color: "#8a3800" }}>Addendum {a.n}</span><span className="mono" style={{ fontSize: 11.5, color: "#9a6b3a" }}>{a.date}</span></div>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}><span className="mono" style={{ fontSize: 12, fontWeight: 600, color: "#8a3800" }}>Addendum {a.n}</span><span className="mono" style={{ fontSize: 11.5, color: "#9a6b3a" }}>{formaterDate(a.dateISO, lang)}</span></div>
                     <p style={{ margin: "8px 0 0", fontSize: 13.5, lineHeight: 1.55, color: "#6f5230" }}>{pick(a.note, lang)}</p>
+                    {a.reportISO && (
+                      <p style={{ margin: "8px 0 0", fontSize: 13, fontWeight: 600, color: "#8a3800" }}>{t.addendaReport} : {formaterDate(a.reportISO, lang, true)}</p>
+                    )}
                   </div>
                 ))}
               </div>
