@@ -11,6 +11,7 @@ import logoBanqueMondiale from "@/../public/partenaires/banque-mondiale.png";
 import logoAfd from "@/../public/partenaires/afd.png";
 import logoMptn from "@/../public/partenaires/mptn.png";
 import logoEconomieNumerique from "@/../public/partenaires/economie-numerique.png";
+import logoInterieur from "@/../public/partenaires/interieur.png";
 import logoArptc from "@/../public/partenaires/arptc.png";
 import logoAdn from "@/../public/partenaires/adn.png";
 import logoOnip from "@/../public/partenaires/onip.png";
@@ -40,7 +41,7 @@ export const events: Evenement[] = [
   { id: "femmes", date: { fr: "3 oct. 2026", en: "3 Oct 2026" }, type: { fr: "Atelier", en: "Workshop" }, lieu: { fr: "Goma", en: "Goma" }, color: "#8a3ffc", statut: "avenir", img: "femmes", titre: { fr: "Atelier — compétences numériques pour les femmes", en: "Workshop — digital skills for women" }, desc: { fr: "Formation pratique et mentorat, dans le cadre du volet inclusion des femmes.", en: "Hands-on training and mentoring, part of the women's inclusion strand." }, places: { fr: "80 places", en: "80 seats" } },
   { id: "webinaire", date: { fr: "25 août 2026", en: "25 Aug 2026" }, type: { fr: "Webinaire", en: "Webinar" }, lieu: { fr: "En ligne", en: "Online" }, color: "#009d9a", statut: "avenir", img: "data", titre: { fr: "Webinaire soumissionnaires — répondre à un AOI", en: "Bidders' webinar — how to respond to an ICB" }, desc: { fr: "Une session pratique pour les entreprises candidates aux marchés du Projet.", en: "A practical session for companies bidding on Project contracts." }, places: { fr: "Illimité", en: "Unlimited" } },
   { id: "consultation", date: { fr: "20 oct. 2026", en: "20 Oct 2026" }, type: { fr: "Consultation publique", en: "Public consultation" }, lieu: { fr: "Goma — provinces de l'Est", en: "Goma — Eastern provinces" }, color: "#ff832b", statut: "avenir", img: "ville", titre: { fr: "Consultation publique — sauvegardes E&S (Est)", en: "Public consultation — E&S safeguards (East)" }, desc: { fr: "Écouter les communautés affectées avant les travaux fibre de l'Est.", en: "Listening to affected communities ahead of the Eastern fibre works." }, places: { fr: "Ouvert à tous", en: "Open to all" } },
-  { id: "lancement", date: { fr: "oct. 2025", en: "Oct 2025" }, type: { fr: "Jalon", en: "Milestone" }, lieu: { fr: "Kinshasa", en: "Kinshasa" }, color: "#6f6f6f", statut: "passe", img: "hero", titre: { fr: "Lancement officiel du PTN-RDC", en: "Official launch of the DRC Digital Transformation Project" }, desc: { fr: "Le Projet est entré en vigueur — décaissements et premiers marchés lancés.", en: "The Project became effective — disbursements and first contracts began." }, places: { fr: "", en: "" } },
+  { id: "lancement", date: { fr: "juin 2025", en: "Jun 2025" }, type: { fr: "Jalon", en: "Milestone" }, lieu: { fr: "Kinshasa", en: "Kinshasa" }, color: "#6f6f6f", statut: "passe", img: "hero", titre: { fr: "Lancement officiel du PTN-RDC", en: "Official launch of the DRC Digital Transformation Project" }, desc: { fr: "Le Projet est entré en vigueur — décaissements et premiers marchés lancés.", en: "The Project became effective — disbursements and first contracts began." }, places: { fr: "", en: "" } },
 ];
 
 /* --- Gouvernance : activité récente ---------------------------------------- */
@@ -88,6 +89,7 @@ export const partners: Partner[] = [
   { name: "AFD", kind: { fr: "Bailleur", en: "Donor" }, logo: logoAfd },
   { name: "MPTN", kind: { fr: "Tutelle", en: "Supervision" }, logo: logoMptn },
   { name: "Ministère de l'Économie Numérique", kind: { fr: "Ministère", en: "Ministry" }, logo: logoEconomieNumerique },
+  { name: "Ministère de l'Intérieur, de la Sécurité, de la Décentralisation et des Affaires coutumières", kind: { fr: "Ministère", en: "Ministry" }, logo: logoInterieur },
   { name: "ARPTC", kind: { fr: "Régulateur", en: "Regulator" }, logo: logoArptc },
   { name: "ADN", kind: { fr: "Agence du Numérique", en: "Digital Agency" }, logo: logoAdn },
   { name: "ONIP", kind: { fr: "Identité", en: "Identity" }, logo: logoOnip },

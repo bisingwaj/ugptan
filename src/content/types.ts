@@ -74,7 +74,6 @@ export type Pole = {
 };
 export type Province = { nom: string; x: number; y: number; prio: boolean };
 export type Langue = { code: string; label: string; greeting: string };
-export type Profil = { label: Bilingual; page: Bilingual };
 
 export type Actualite = {
   date: string; dateISO: string; cat: Bilingual; img: ImgKey; lieu: string;

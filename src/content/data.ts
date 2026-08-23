@@ -4,7 +4,7 @@
    ========================================================================== */
 import type {
   Meta, Chiffre, Repere, Odp, Intermediaire, Composante, GouvBody,
-  Pole, Province, Langue, Profil, CompColorMap,
+  Pole, Province, Langue, CompColorMap,
 } from "./types";
 import type { Bilingual } from "@/lib/pick";
 
@@ -250,17 +250,6 @@ export const langues: Langue[] = [
   { code: "sw", label: "Kiswahili", greeting: "Karibu" },
   { code: "lu", label: "Tshiluba", greeting: "Moyo" },
   { code: "kg", label: "Kikongo", greeting: "Mbote" },
-];
-
-export const profils: Profil[] = [
-  { label: { fr: "UGPTN / Gouvernement", en: "UGPTN / Government" }, page: { fr: "Cockpit", en: "Cockpit" } },
-  { label: { fr: "Entité bénéficiaire (MDA)", en: "Beneficiary entity (MDA)" }, page: { fr: "Tableau de bord", en: "Dashboard" } },
-  { label: { fr: "Partenaire", en: "Partner" }, page: { fr: "Espace partenaire", en: "Partner space" } },
-  { label: { fr: "Bailleur (BM / AFD)", en: "Donor (WB / AFD)" }, page: { fr: "Portefeuille", en: "Portfolio" } },
-  { label: { fr: "Soumissionnaire", en: "Bidder" }, page: { fr: "Marketplace", en: "Marketplace" } },
-  { label: { fr: "Bénéficiaire SBP", en: "PBG beneficiary" }, page: { fr: "Mon programme", en: "My programme" } },
-  { label: { fr: "Auditeur / Contrôle", en: "Auditor / Control" }, page: { fr: "Plan d'audit", en: "Audit plan" } },
-  { label: { fr: "Gouvernance (COPIL / CTP)", en: "Governance (Steering / Technical)" }, page: { fr: "Sessions", en: "Sessions" } },
 ];
 
 export const question: Bilingual = {

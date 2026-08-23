@@ -140,7 +140,7 @@ export function dict(lang: Lang) {
       gouvernance: t("Architecture de gouvernance", "Governance architecture"),
       equipe: t("L'équipe de l'Unité", "The Unit's team"),
       actus: t("Actualités & communiqués", "News & releases"),
-      plateforme: t("La plateforme métier — 8 espaces", "The business platform — 8 spaces"),
+      repondre: t("Répondre à un marché", "Respond to a tender"),
     },
     lbl: {
       baseline: t("Point de départ", "Starting point"),
@@ -223,7 +223,7 @@ export function dict(lang: Lang) {
         "Trois chantiers, et une seule logique : un réseau qui atteint les territoires, un socle numérique commun à l'État, et les compétences pour faire vivre l'un et l'autre. Pris séparément, aucun ne produit d'effet durable ; c'est leur enchaînement qui compte.",
         "Three efforts, one logic: a network that reaches the territories, a digital foundation shared across the State, and the skills to keep both running. Taken separately, none produces lasting effects; it is their sequence that matters.",
       ),
-      statusEffective: t("Entrée en vigueur 31.10.2025", "Effectiveness 31.10.2025"),
+      statusEffective: t("Entrée en vigueur 24.06.2025", "Effectiveness 24.06.2025"),
       statusCompletion: t("Achèvement technique 31.12.2029", "Technical completion 31.12.2029"),
       resultatsTitle: t(
         "Des ambitions mesurables à l'horizon 2029 — l'impact et l'inclusion au cœur.",
@@ -272,11 +272,46 @@ export function dict(lang: Lang) {
         "Un projet de cette nature ne se conduit pas depuis une seule institution : le régulateur, les ministères sectoriels, l'agence du numérique et l'organisme d'identification portent chacun une part du résultat.",
         "A project of this kind cannot be run from a single institution: the regulator, sector ministries, the digital agency and the identification body each carry part of the result.",
       ),
-      plateformeTitle: t("Une plateforme, huit espaces sur mesure.", "One platform, eight tailored spaces."),
-      plateformeLead: t(
-        "Un soumissionnaire, un auditeur et un ministère bénéficiaire n'ont ni les mêmes droits d'accès ni les mêmes besoins. La plateforme métier attribue à chaque profil son espace et ses outils, sur une base de données commune et cloisonnée.",
-        "A bidder, an auditor and a beneficiary ministry have neither the same access rights nor the same needs. The business platform gives each profile its own space and tools, on a shared and compartmentalised data foundation.",
+      repondreTitle: t(
+        "Les marchés du projet sont ouverts aux entreprises congolaises.",
+        "The project's tenders are open to Congolese companies.",
       ),
+      repondreLead: t(
+        "Les avis paraissent au fil de la mise en œuvre, sur cinq composantes et vingt-six provinces. Répondre suppose un compte : c'est lui qui donne accès aux dossiers et qui fait parvenir les additifs, sans lesquels une offre est écartée.",
+        "Notices are published as implementation proceeds, across five components and twenty-six provinces. Responding requires an account: it gives access to the bidding files and delivers the addenda, without which a bid is set aside.",
+      ),
+      /* ⚠️ Trois étapes, et rien de plus. Ce parcours engage une entreprise qui
+         prépare une offre : lui annoncer un délai, un coût ou une disponibilité
+         que la plateforme de passation pourrait démentir se paierait en
+         contentieux, pas en malentendu. */
+      repondreEtapes: [
+        {
+          n: "01",
+          titre: t("Créer un compte", "Create an account"),
+          texte: t(
+            "Une adresse électronique, confirmée par un code à six chiffres.",
+            "An email address, confirmed by a six-digit code.",
+          ),
+        },
+        {
+          n: "02",
+          titre: t("Rattacher votre entreprise", "Attach your company"),
+          texte: t(
+            "L'entreprise est titulaire du compte, pas la personne : elle survit au départ de celui qui l'a inscrite.",
+            "The company holds the account, not the individual: it outlives whoever registered it.",
+          ),
+        },
+        {
+          n: "03",
+          titre: t("Retirer le dossier", "Obtain the bidding file"),
+          texte: t(
+            "Le retrait vous inscrit au registre. C'est lui qui vous fait parvenir chaque additif.",
+            "Obtaining the file registers you. That is what delivers every addendum to you.",
+          ),
+        },
+      ],
+      repondreCta: t("Devenir soumissionnaire", "Become a bidder"),
+      repondreAvis: t("Voir les avis en cours", "View open notices"),
     },
 
     /* --- Newsletter ------------------------------------------------------- */
