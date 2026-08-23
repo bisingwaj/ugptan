@@ -400,8 +400,8 @@ calibrer une offre, pas un argument de communication.
 ## 14. Exigence éditoriale : écrire depuis un métier
 
 La doctrine de rédaction du site est écrite dans
-[`.claude/skills/redaction-institutionnelle/SKILL.md`](../.claude/skills/redaction-institutionnelle/SKILL.md).
-Elle est à charger **avant** d'écrire ou de réviser tout contenu. Elle fixe :
+[`docs/doctrine-redactionnelle.md`](doctrine-redactionnelle.md).
+Elle est à lire **avant** d'écrire ou de réviser tout contenu. Elle fixe :
 
 - le **profil d'expert à endosser** selon la matière (économiste des
   infrastructures télécoms pour C1, architecte d'e-gouvernement pour C2,
