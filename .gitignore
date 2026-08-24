@@ -35,3 +35,9 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# outillage agents (skills installés localement, réglages personnels)
+# la doctrine de rédaction vit dans docs/doctrine-redactionnelle.md
+/.claude/
+/.agents/
+/.windsurf/
