@@ -42,10 +42,14 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     description,
     applicationName: "UGPTN",
     authors: [{ name: meta.uniteLong }],
-    keywords: ["UGPTN", "PTN-RDC", "transformation numérique", "RDC", "Banque mondiale", "AFD", meta.code],
+    keywords: ["UGPTN", "PTN-RDC", "transformation numérique", "RDC", "Banque mondiale", "AFD", "P180495", "CCD1198"],
     openGraph: { title, description, url: `/${lang}`, siteName: "UGPTN", locale: lang === "en" ? "en_US" : "fr_FR", type: "website" },
     twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `/${lang}`, languages: { fr: "/fr", en: "/en" } },
+    /* Pendant une fermeture, le moteur ne voit jamais cette page : le proxy
+       répond 503 et sert l'écran de maintenance, lui-même en `noindex`. Rien à
+       conditionner ici, et surtout rien à lire en base — cette valeur est figée
+       à la construction et serait fausse le jour où elle compterait. */
     robots: { index: true, follow: true },
   };
 }
@@ -74,6 +78,7 @@ export default async function LangLayout(props: { children: React.ReactNode; par
   if (!estLocale(params.lang)) notFound();
 
   const lang = asLang(params.lang);
+
   return (
     // suppressHydrationWarning : les extensions de navigateur (gestionnaires de
     // mots de passe, pipettes à couleurs, traducteurs) posent leurs propres

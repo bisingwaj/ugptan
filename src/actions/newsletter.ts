@@ -25,6 +25,7 @@ import { db } from "@/lib/db";
 import { isValidEmail } from "@/lib/auth/validate";
 import { LANGS, type Lang } from "@/lib/pick";
 import { rateLimit, requestIp } from "@/lib/rate-limit";
+import { ecrituresSuspendues } from "@/lib/reglages/maintenance";
 import { emailConfigured } from "@/lib/email/config";
 import { sendEmail } from "@/lib/email/send";
 import {
@@ -62,7 +63,7 @@ const asLang = (valeur: unknown): Lang => (LANGS.includes(valeur as Lang) ? (val
 export type SubscribeCode = "subscribed" | "already" | "confirm";
 
 /** Motifs de refus. Chacun a sa phrase dans `dict(lang).nl.erreurs`. */
-export type SubscribeError = "invalid" | "rate" | "robot" | "mail" | "server";
+export type SubscribeError = "invalid" | "rate" | "robot" | "mail" | "server" | "ferme";
 
 export type SubscribeResult =
   | { ok: true; code: SubscribeCode }
@@ -89,7 +90,12 @@ export async function subscribeNewsletter(draft: SubscribeDraft): Promise<Subscr
     return { ok: false, error: "robot" };
   }
 
-  // 2. Débit par adresse IP : ralentisseur contre l'inondation de la liste
+  /* 2. Site fermé : on n'inscrit personne pendant une intervention. Le
+        DÉSABONNEMENT et la CONFIRMATION, eux, restent ouverts plus bas : ils
+        sont dus à la personne, fermeture ou pas. */
+  if (await ecrituresSuspendues()) return { ok: false, error: "ferme" };
+
+  // 3. Débit par adresse IP : ralentisseur contre l'inondation de la liste
   //    (cf. la portée réelle de la limite, lib/rate-limit.ts).
   const ip = requestIp(await headers());
   if (!rateLimit(`nl:sub:${ip}`, SUBSCRIBE_LIMIT, SUBSCRIBE_WINDOW_MS).allowed) {

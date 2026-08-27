@@ -22,6 +22,7 @@ import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { isValidEmail } from "@/lib/auth/validate";
 import { rateLimit, requestIp } from "@/lib/rate-limit";
+import { ecrituresSuspendues } from "@/lib/reglages/maintenance";
 import { LANGS, type Lang } from "@/lib/pick";
 import { phaseEvenement } from "@/lib/events/statut";
 import { INSCRIPTION_LIMITES, type InscriptionState } from "@/lib/events/inscription";
@@ -52,6 +53,17 @@ export async function inscrireAction(
 ): Promise<InscriptionState> {
   const lang = asLang(formData.get("lang"));
   const t = (fr: string, en: string) => (lang === "en" ? en : fr);
+
+  /* --- 0. Site fermé ------------------------------------------------------
+     Une inscription enregistrée pendant une intervention n'est vue par
+     personne au moment où elle compte : elle est refusée, avec la conduite à
+     tenir. */
+  if (await ecrituresSuspendues()) {
+    return echec(t(
+      "Le portail est momentanément fermé pour intervention technique. Votre inscription n'a pas été enregistrée : reprenez-la à la réouverture, ou écrivez à info@ugptn.cd.",
+      "The portal is temporarily closed for technical work. Your registration has not been recorded: please register again once the site reopens, or write to info@ugptn.cd.",
+    ));
+  }
 
   /* --- 1. Débit ---------------------------------------------------------- */
   const limite = rateLimit(`evt:inscription:${requestIp(await headers())}`, LIMITE, FENETRE_MS);

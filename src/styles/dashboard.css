@@ -1186,6 +1186,16 @@
   .adm-ia-pastille--cours { border-color: var(--ac-line); background: var(--ac-pale); color: var(--ac); }
   .adm-ia-pastille--echec { border-color: var(--red); background: #fff5f5; color: var(--red); }
 
+  /* --- Réglages : aperçu de l'écran de fermeture --------------------------
+     Fond noir dans une console blanche, à dessein : l'aperçu doit être lu comme
+     une citation du site public, pas comme un bloc de la console. C'est aussi
+     le seul moyen de juger un texte qui sera affiché sur cette surface-là. */
+  .adm-reglages__apercus { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 12px; }
+  .adm-reglages__apercu { background: var(--c-black); border-left: 3px solid var(--ac); padding: 18px 20px; }
+  .adm-reglages__apercu-langue { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ac-light); }
+  .adm-reglages__apercu-titre { margin-top: 10px; font-size: 17px; font-weight: 600; line-height: 1.2; color: #fff; }
+  .adm-reglages__apercu-corps { margin-top: 8px; font-size: 13px; line-height: 1.6; color: var(--c-30); }
+
   @media (max-width: 1100px) {
     /* Le sommaire repasse au-dessus et cesse de coller : sur une colonne, un
        bloc collant mangerait la moitié de la hauteur utile. */
