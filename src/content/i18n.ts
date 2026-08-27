@@ -371,6 +371,10 @@ export function dict(lang: Lang) {
           "L'enregistrement a échoué. Réessayez dans un instant.",
           "Registration failed. Try again shortly.",
         ),
+        ferme: t(
+          "Le portail est momentanément fermé pour intervention technique. Votre inscription n'a pas été enregistrée : reprenez-la à la réouverture.",
+          "The portal is temporarily closed for technical work. Your subscription has not been recorded: please subscribe again once the site reopens.",
+        ),
       },
     },
 
@@ -1366,6 +1370,47 @@ export function dict(lang: Lang) {
       actus: t("Actualités", "News"),
       docs: t("Documents publiés", "Published documents"),
       contact: t("Contact", "Contact"),
+    },
+
+    /* --- Site fermé pour intervention -------------------------------------- */
+    /* Écran substitué à toute page publique quand la console ferme le site
+       (cf. lib/reglages/maintenance.ts). Le texte par défaut vaut pour le cas
+       courant ; la console peut lui substituer un message circonstancié, langue
+       par langue, sans passer par une mise en production. */
+    maintenance: {
+      kicker: t("Intervention en cours", "Work in progress"),
+      titre: t("Le portail est momentanément fermé", "The portal is temporarily closed"),
+      corps: t(
+        "Une intervention technique est en cours sur le portail de l'UGPTN. La consultation des publications, les avis de marchés et le dépôt d'une plainte reprendront à la fin de l'opération.",
+        "Technical work is under way on the UGPTN portal. Access to publications, procurement notices and grievance filing will resume once the work is complete.",
+      ),
+      retour: t("Réouverture annoncée", "Announced reopening"),
+      /* Ce qui reste ouvert pendant la fermeture. Une échéance de procédure ne
+         s'interrompt pas parce qu'un site est en maintenance : le dire évite à
+         un soumissionnaire de croire son délai suspendu. */
+      recours: t("Pendant la fermeture", "While the site is closed"),
+      recoursCorps: t(
+        "Les services de l'Unité restent joignables. Les délais des procédures de passation en cours ne sont pas suspendus par la fermeture du portail : une demande d'éclaircissement se dépose par courriel et reçoit un accusé de réception.",
+        "The Unit's services remain reachable. Deadlines in ongoing procurement procedures are not suspended by the closure of the portal: requests for clarification may be sent by email and are acknowledged.",
+      ),
+      accesTitre: t("Accès pendant l'intervention", "Access during the work"),
+      accesAide: t(
+        "Les personnes qui suivent la reprise disposent d'un code à six chiffres. Il ouvre le site entier, pour douze heures.",
+        "Those following the work have a six-digit code. It opens the whole site, for twelve hours.",
+      ),
+      accesLabel: t("Code d'accès", "Access code"),
+      accesBouton: t("Ouvrir le site", "Open the site"),
+      accesEnCours: t("Vérification", "Checking"),
+      erreurForme: t("Le code compte six chiffres.", "The code is six digits long."),
+      erreurRefus: t("Ce code ne correspond pas à celui en vigueur.", "This code does not match the one in force."),
+      erreurTrop: t(
+        "Trop de tentatives depuis cette adresse. Reprenez dans quelques minutes.",
+        "Too many attempts from this address. Try again in a few minutes.",
+      ),
+      erreurIndispo: t(
+        "La vérification du code est indisponible sur cet hébergement. Prévenez l'administrateur du site.",
+        "Code checking is unavailable on this deployment. Please notify the site administrator.",
+      ),
     },
   };
 }
