@@ -18,7 +18,16 @@ import type { EtatMaintenance } from "@/lib/reglages/maintenance";
 import { BrandLogo } from "@/components/chrome/BrandLogo";
 import { FormulaireAcces, LangueMaintenance } from "@/components/maintenance/FormulaireAcces";
 
-export function EcranMaintenance({ lang, etat }: { lang: Lang; etat: EtatMaintenance }) {
+export function EcranMaintenance({
+  lang,
+  etat,
+  chemin,
+}: {
+  lang: Lang;
+  etat: EtatMaintenance;
+  /** Adresse demandée par le visiteur, conservée par la réécriture du proxy. */
+  chemin: string;
+}) {
   const t = dict(lang).maintenance;
 
   // Message de circonstance saisi en console, à défaut le texte par défaut.
@@ -33,7 +42,7 @@ export function EcranMaintenance({ lang, etat }: { lang: Lang; etat: EtatMainten
       <div className="mnt__cadre">
         <header className="mnt__tete">
           <BrandLogo format="signature" sombre className="mnt__logo" priority />
-          <LangueMaintenance lang={lang} />
+          <LangueMaintenance lang={lang} chemin={chemin} />
         </header>
 
         <p className="mnt__kicker mono">{t.kicker}</p>
@@ -60,7 +69,7 @@ export function EcranMaintenance({ lang, etat }: { lang: Lang; etat: EtatMainten
         <section className="mnt__bloc mnt__bloc--acces">
           <h2 className="label-mono">{t.accesTitre}</h2>
           <p className="mnt__note">{t.accesAide}</p>
-          <FormulaireAcces lang={lang} />
+          <FormulaireAcces lang={lang} chemin={chemin} />
         </section>
       </div>
     </main>

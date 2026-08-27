@@ -7,10 +7,13 @@
  * Le formulaire le renvoie à l'action, qui y ramène la personne une fois le
  * laissez-passer posé ; la bascule de langue n'échange que le préfixe, pour ne
  * pas renvoyer à l'accueil quelqu'un qui visait une page précise.
+ *
+ * ⚠️ Le chemin est PASSÉ en propriété, et non lu par `usePathname`. La page est
+ * atteinte par réécriture du proxy : l'adresse du navigateur et celle du rendu
+ * serveur diffèrent, et s'en remettre au crochet ferait diverger les deux.
  */
 import { useActionState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ouvrirAvecCodeAction, type AccesErreur, type AccesState } from "@/actions/maintenance";
 import { dict } from "@/content/i18n";
 import { LANGS, type Lang } from "@/lib/pick";
@@ -19,9 +22,8 @@ const LANG_LABEL: Record<Lang, string> = { fr: "Français", en: "English" };
 
 const etatInitial: AccesState = { erreur: null };
 
-export function FormulaireAcces({ lang }: { lang: Lang }) {
+export function FormulaireAcces({ lang, chemin }: { lang: Lang; chemin: string }) {
   const t = dict(lang).maintenance;
-  const chemin = usePathname();
   const [etat, action, enCours] = useActionState(ouvrirAvecCodeAction, etatInitial);
 
   const messages: Record<AccesErreur, string> = {
@@ -66,9 +68,7 @@ export function FormulaireAcces({ lang }: { lang: Lang }) {
 }
 
 /** Bascule FR/EN, sur le chemin demandé et non sur l'accueil. */
-export function LangueMaintenance({ lang }: { lang: Lang }) {
-  const chemin = usePathname();
-
+export function LangueMaintenance({ lang, chemin }: { lang: Lang; chemin: string }) {
   return (
     <nav className="mnt__langues" aria-label={lang === "en" ? "Language" : "Langue"}>
       {LANGS.map((autre) => {

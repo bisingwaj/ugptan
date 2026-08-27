@@ -11,6 +11,17 @@
  * dans `maintenance.ts`, côté serveur exclusivement.
  */
 
+/**
+ * Nom du cookie de laissez-passer.
+ *
+ * Sans point ni caractère réservé : le nom se retrouve tel quel dans l'en-tête
+ * `Cookie`, et un point y passerait mais complique les inspections manuelles.
+ */
+export const COOKIE_ACCES = "ugptn_acces_maintenance";
+
+/** Durée du laissez-passer. Une reprise s'étale rarement au-delà. */
+export const ACCES_DUREE_S = 12 * 60 * 60;
+
 /** Forme attendue d'un code : six chiffres, ni plus ni moins. */
 export const CODE_MOTIF = /^[0-9]{6}$/;
 

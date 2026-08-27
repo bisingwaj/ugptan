@@ -19,11 +19,8 @@
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { rateLimit, requestIp } from "@/lib/rate-limit";
-import { CODE_MOTIF } from "@/lib/reglages/code";
-import {
-  ACCES_DUREE_S, COOKIE_ACCES,
-  codeValide, etatMaintenance, laissezPasser,
-} from "@/lib/reglages/maintenance";
+import { ACCES_DUREE_S, CODE_MOTIF, COOKIE_ACCES } from "@/lib/reglages/code";
+import { codeValide, etatMaintenance, laissezPasser } from "@/lib/reglages/maintenance";
 
 /* Types seuls : un fichier « use server » n'exporte que des fonctions
    asynchrones, chaque export y étant un point d'entrée réseau. */
