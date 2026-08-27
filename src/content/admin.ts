@@ -1688,6 +1688,49 @@ export const PALETTE_ACCENT: { hex: string; nom: string }[] = [
 ];
 
 /** Un module de la console. `key` est aussi la permission qui l'ouvre. */
+/* ---------------------------------------------------------------------------
+   Module « Réglages » — fermeture du site public.
+--------------------------------------------------------------------------- */
+export const ADMIN_REGLAGES = {
+  title: "Réglages",
+  lead: "Fermeture du site public pendant une intervention, et code d'accès des personnes qui la suivent.",
+
+  etatTitre: "État du site public",
+  etatOuvert: "Ouvert",
+  etatFerme: "Fermé",
+  etatOuvertAide: "Toutes les pages publiques répondent normalement.",
+  etatFermeAide: "Les pages publiques sont remplacées par l'écran de maintenance. La console, elle, reste accessible.",
+  depuis: "Fermé depuis",
+  derniereMaj: "Dernier réglage",
+  parQui: "par",
+
+  fermer: "Fermer le site au public",
+  fermerEnCours: "Fermeture",
+  rouvrir: "Rouvrir le site",
+  rouvrirEnCours: "Réouverture",
+  fermerConfirmation: "Fermer le site au public ? Toutes les pages seront remplacées par l'écran de maintenance jusqu'à réouverture.",
+
+  accesTitre: "Code d'accès",
+  accesAide: "Six chiffres. Il ouvre le site entier pendant douze heures à qui le saisit, et se communique de la main à la main. Le modifier annule tous les accès déjà ouverts.",
+  accesLabel: "Code à six chiffres",
+  accesTirer: "Tirer un code",
+  accesManquant: "Aucun code enregistré. Le site ne peut pas être fermé tant qu'il n'y en a pas.",
+
+  publicTitre: "Ce que verra le public",
+  publicAide: "Laissés vides, les deux messages cèdent la place au texte par défaut du site, qui couvre le cas courant.",
+  retourLabel: "Réouverture annoncée",
+  retourAide: "Facultative, à l'heure de Kinshasa. Une échéance dépassée cesse d'être affichée au public plutôt que de rester à démentir l'écran.",
+  messageFr: "Message en français",
+  messageEn: "Message en anglais",
+  messageAide: "Les deux langues ou aucune. Six cents caractères au plus.",
+
+  apercuTitre: "Aperçu",
+  apercuAide: "Le texte tel qu'il s'affichera, langue par langue.",
+
+  enregistrer: "Enregistrer les réglages",
+  enregistrement: "Enregistrement",
+};
+
 export type AdminNavItem = {
   key: Permission;
   label: string;
@@ -1813,7 +1856,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     label: "Administration",
     items: [
       { key: "utilisateurs", label: "Utilisateurs", slug: "/users" },
-      { key: "reglages", label: "i18n & réglages", soon: true },
+      { key: "reglages", label: "Réglages", slug: "/settings" },
     ],
   },
 ];

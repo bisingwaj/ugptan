@@ -347,7 +347,7 @@ export function renderEmail({
               </p>
               <p style="margin:0;font-family:${FONT_MONO};font-size:10.5px;line-height:1.7;letter-spacing:0.04em;color:${PALETTE.grey50};">
                 Financement Banque mondiale (IDA) et Agence Française de Développement<br>
-                Tutelle : Ministère du Numérique · PTN-RDC · P180495
+                Tutelle : Ministère du Numérique · PTN-RDC · P180495/CCD1198
               </p>
             </td>
           </tr>

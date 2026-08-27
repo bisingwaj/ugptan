@@ -15,6 +15,8 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 import { NavigationProgress } from "@/components/motion/NavigationProgress";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { Cursor } from "@/components/motion/Cursor";
+import { EcranMaintenance } from "@/components/maintenance/EcranMaintenance";
+import { etatMaintenance, fermetureApplicable } from "@/lib/reglages/maintenance";
 import { policesClassName } from "@/lib/fonts";
 
 export function generateStaticParams() {
@@ -42,11 +44,15 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     description,
     applicationName: "UGPTN",
     authors: [{ name: meta.uniteLong }],
-    keywords: ["UGPTN", "PTN-RDC", "transformation numérique", "RDC", "Banque mondiale", "AFD", meta.code],
+    keywords: ["UGPTN", "PTN-RDC", "transformation numérique", "RDC", "Banque mondiale", "AFD", "P180495", "CCD1198"],
     openGraph: { title, description, url: `/${lang}`, siteName: "UGPTN", locale: lang === "en" ? "en_US" : "fr_FR", type: "website" },
     twitter: { card: "summary_large_image", title, description },
     alternates: { canonical: `/${lang}`, languages: { fr: "/fr", en: "/en" } },
-    robots: { index: true, follow: true },
+    /* Site fermé : plus rien ne doit être indexé tant que dure l'intervention.
+       Un moteur ne porte aucun laissez-passer, il ne verrait donc que l'écran
+       de maintenance ; l'indexer reviendrait à remplacer, dans les résultats de
+       recherche, le résumé de chaque page par « le portail est fermé ». */
+    robots: (await etatMaintenance()).ferme ? { index: false, follow: false } : { index: true, follow: true },
   };
 }
 
@@ -74,6 +80,31 @@ export default async function LangLayout(props: { children: React.ReactNode; par
   if (!estLocale(params.lang)) notFound();
 
   const lang = asLang(params.lang);
+
+  /**
+   * Fermeture du site, décidée depuis la console (cf. lib/reglages/maintenance.ts).
+   *
+   * Substitution ici, et non redirection vers une page dédiée : l'adresse
+   * demandée est conservée, donc la personne qui saisit le code retombe sur la
+   * page qu'elle visait, et non sur l'accueil. La coquille animée n'est pas
+   * montée du tout — un écran de maintenance n'a ni défilement piloté, ni
+   * curseur personnalisé, ni barre de navigation qui mènerait au même écran.
+   *
+   * ⚠️ La page est tout de même rendue en parallèle par l'App Router : la
+   * substitution masque son résultat, elle n'annule pas son exécution. Sans
+   * conséquence ici, ces pages ne faisant que lire.
+   */
+  const fermeture = await fermetureApplicable();
+  if (fermeture) {
+    return (
+      <html lang={lang} className={policesClassName} suppressHydrationWarning>
+        <body suppressHydrationWarning>
+          <EcranMaintenance lang={lang} etat={fermeture} />
+        </body>
+      </html>
+    );
+  }
+
   return (
     // suppressHydrationWarning : les extensions de navigateur (gestionnaires de
     // mots de passe, pipettes à couleurs, traducteurs) posent leurs propres
