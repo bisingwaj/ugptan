@@ -116,9 +116,12 @@ async function fermeture(req: NextRequest, locale: string) {
   url.search = "";
   url.searchParams.set("depuis", `${req.nextUrl.pathname}${req.nextUrl.search}`);
 
-  /* 503 et non 200 : c'est la réponse juste pour un service momentanément
-     retiré, et elle épargne aux moteurs d'indexer l'écran de fermeture. */
-  return NextResponse.rewrite(url, { status: 503 });
+  /* ⚠️ PAS de statut 503 ici. Une réécriture assortie d'un 5xx est interceptée
+     par la plateforme, qui remplace la page par son propre écran « deployment
+     unavailable » : essayé le 27 août 2026, le site entier a servi cette page.
+     La réponse reste donc un 200, et c'est le `noindex` de l'écran de
+     maintenance qui tient les moteurs à l'écart. */
+  return NextResponse.rewrite(url);
 }
 
 function redirectTo(req: NextRequest, pathname: string, next?: string) {
