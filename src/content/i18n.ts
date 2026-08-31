@@ -1222,10 +1222,6 @@ export function dict(lang: Lang) {
       pour: (q: string) => t(`pour « ${q} »`, `for “${q}”`),
       compte: (n: number) =>
         t(`${n} résultat${n > 1 ? "s" : ""}`, `${n} result${n > 1 ? "s" : ""}`),
-      invite: t(
-        "Saisissez un mot pour commencer. La recherche porte sur les titres, les résumés et le corps des textes publiés.",
-        "Type a word to begin. The search covers titles, summaries and the body of published texts.",
-      ),
       aucun: t("Aucun résultat.", "No results."),
       aucunConseil: t(
         "Vérifiez l'orthographe, essayez un mot plus court, ou retirez le filtre de nature.",

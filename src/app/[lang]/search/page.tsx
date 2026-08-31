@@ -4,8 +4,12 @@ import { asLang } from "@/lib/params";
 import { dict } from "@/content/i18n";
 import { SITE_URL } from "@/lib/site";
 import { NAV, route } from "@/lib/routes";
-import { estTypeResultat, rechercher, MIN_CARACTERES, type TypeResultat } from "@/lib/recherche/query";
-import { PageHero } from "@/components/ui/PageHero";
+import {
+  estTypeResultat,
+  rechercher,
+  MIN_CARACTERES,
+  type TypeResultat,
+} from "@/lib/recherche/query";
 import { LigneResultat } from "@/components/recherche/LigneResultat";
 
 /**
@@ -52,12 +56,23 @@ export async function generateMetadata(props: {
        l'index d'adresses qui ne mènent qu'à des listes de liens. `follow` est
        maintenu dans les deux cas : les fiches trouvées, elles, doivent être
        suivies. */
-    robots: saisie ? { index: false, follow: true } : { index: true, follow: true },
+    robots: saisie
+      ? { index: false, follow: true }
+      : { index: true, follow: true },
   };
 }
 
 /** Les six portes proposées quand la page s'ouvre sans requête. */
-const PORTES: { slug: string; cle: "transparence" | "actualites" | "composantes" | "marches" | "evenements" | "galerie" }[] = [
+const PORTES: {
+  slug: string;
+  cle:
+    | "transparence"
+    | "actualites"
+    | "composantes"
+    | "marches"
+    | "evenements"
+    | "galerie";
+}[] = [
   { slug: NAV.transparence, cle: "transparence" },
   { slug: NAV.actualites, cle: "actualites" },
   { slug: NAV.composantes, cle: "composantes" },
@@ -76,7 +91,8 @@ export default async function RecherchePage(props: {
   const r = t.recherche;
 
   const q = sp.q?.trim() ?? "";
-  const type: TypeResultat | null = sp.type && estTypeResultat(sp.type) ? sp.type : null;
+  const type: TypeResultat | null =
+    sp.type && estTypeResultat(sp.type) ? sp.type : null;
 
   /* Une requête trop courte n'est pas une requête vide : le champ garde ce qui a
      été tapé, et l'écran redit ce qu'il attend plutôt que d'annoncer zéro
@@ -98,15 +114,30 @@ export default async function RecherchePage(props: {
 
   return (
     <div>
-      <PageHero crumb={`UGPTN / ${r.titre}`} title={r.hero} lead={r.lead} />
+      {/* Pas de `PageHero` ici, à la différence de toutes les autres pages du
+          site, et ce n'est pas un oubli.
 
-      <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(64px,8vw,110px)" }}>
+          Un héros PRÉSENTE un contenu : il pose un grand titre, une accroche, et
+          prépare ce qui suit. Une page de recherche ne présente rien — elle pose
+          une question. Le bandeau n'y tenait donc qu'un titre sur une bande vide
+          aux deux tiers, et repoussait sous un filet la seule chose que le
+          visiteur vient utiliser.
+
+          Le titre reste, ramené à sa fonction : dire, juste au-dessus du champ,
+          ce que le champ interroge. */}
+      <section className="rec-page">
         <div className="section__inner">
+          <h1 className="rec-titre">{r.hero}</h1>
           {/* Formulaire GET : la requête vit dans l'URL, donc partageable,
               rejouable par le bouton « précédent » et opérante sans JavaScript.
               Le filtre de nature voyage en champ caché pour survivre à une
               nouvelle recherche. */}
-          <form method="get" role="search" aria-label={r.ariaFormulaire} className="rec-form">
+          <form
+            method="get"
+            role="search"
+            aria-label={r.ariaFormulaire}
+            className="rec-form"
+          >
             {type && <input type="hidden" name="type" value={type} />}
             <input
               type="search"
@@ -121,16 +152,22 @@ export default async function RecherchePage(props: {
                  sauterait par-dessus ce que le visiteur vient chercher. */
               autoFocus={!interroge}
             />
-            <button type="submit" className="btn btn--primary">{r.action}</button>
+            <button type="submit" className="btn btn--primary">
+              {r.action}
+            </button>
           </form>
 
           {!interroge ? (
             <>
-              <p className="rec-invite">{r.invite}</p>
+              <p className="rec-invite">{r.lead}</p>
               <nav className="rec-portes" aria-label={r.parcourir}>
                 <span className="mono rec-portes__label">{r.parcourir}</span>
                 {PORTES.map((porte) => (
-                  <Link key={porte.cle} href={route(lang, porte.slug)} className="chip">
+                  <Link
+                    key={porte.cle}
+                    href={route(lang, porte.slug)}
+                    className="chip"
+                  >
                     {t.nav[porte.cle]}
                   </Link>
                 ))}
@@ -142,7 +179,11 @@ export default async function RecherchePage(props: {
                 <span className="mono">
                   {r.compte(resultats!.total)} {r.pour(q)}
                 </span>
-                <Link href={route(lang, NAV.recherche)} className="actu-avis__lien" scroll={false}>
+                <Link
+                  href={route(lang, NAV.recherche)}
+                  className="actu-avis__lien"
+                  scroll={false}
+                >
                   {r.reinitialiser}
                 </Link>
               </div>
@@ -150,7 +191,11 @@ export default async function RecherchePage(props: {
               {(naturesTrouvees.length > 1 || type) && (
                 <nav className="doc-filtres" aria-label={r.filtre}>
                   <span className="doc-filtres__label mono">{r.filtre}</span>
-                  <Link href={lienFiltre(null)} className={type ? "chip" : "chip chip--on"} scroll={false}>
+                  <Link
+                    href={lienFiltre(null)}
+                    className={type ? "chip" : "chip chip--on"}
+                    scroll={false}
+                  >
                     {r.tout}
                   </Link>
                   {type ? (
@@ -163,7 +208,8 @@ export default async function RecherchePage(props: {
                         className="chip"
                         scroll={false}
                       >
-                        {r.groupes[groupe.type]} <span style={{ opacity: 0.6 }}>{groupe.total}</span>
+                        {r.groupes[groupe.type]}{" "}
+                        <span style={{ opacity: 0.6 }}>{groupe.total}</span>
                       </Link>
                     ))
                   )}
@@ -176,16 +222,27 @@ export default async function RecherchePage(props: {
                 </p>
               ) : (
                 resultats!.groupes.map((groupe) => (
-                  <section key={groupe.type} className="rec-groupe" aria-label={r.groupes[groupe.type]}>
+                  <section
+                    key={groupe.type}
+                    className="rec-groupe"
+                    aria-label={r.groupes[groupe.type]}
+                  >
                     <div className="rec-groupe__tete">
-                      <h2 className="rec-groupe__titre">{r.groupes[groupe.type]}</h2>
-                      <span className="mono rec-groupe__compte">{groupe.total}</span>
+                      <h2 className="rec-groupe__titre">
+                        {r.groupes[groupe.type]}
+                      </h2>
+                      <span className="mono rec-groupe__compte">
+                        {groupe.total}
+                      </span>
                     </div>
 
                     <ul className="rec-liste">
                       {groupe.items.map((item) => (
                         <li key={item.cle}>
-                          <LigneResultat resultat={item} etiquette={r.etiquettes[item.type]} />
+                          <LigneResultat
+                            resultat={item}
+                            etiquette={r.etiquettes[item.type]}
+                          />
                         </li>
                       ))}
                     </ul>

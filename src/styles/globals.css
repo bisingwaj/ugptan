@@ -1981,6 +1981,18 @@ a.mnt__langue:hover { color: #fff; }
    sur fond blanc, ce dernier tombe à 3,3:1, sous le seuil AA de 4,5:1.
 =========================================================================== */
 
+/* --- En-tête ----------------------------------------------------------------
+   La page n'a pas de `.page-hero` (cf. le commentaire de sa page) : le titre
+   tient sur une ligne, au-dessus du champ, et le rembourrage haut est celui
+   d'une section ordinaire et non d'un héros. Le titre reste un <h1> — le retirer
+   pour gagner de la hauteur laisserait la page sans en-tête de niveau 1. */
+.rec-page { padding: clamp(34px, 4vw, 52px) max(var(--pad-x), var(--sa-r)) clamp(64px, 8vw, 110px) max(var(--pad-x), var(--sa-l)); }
+.rec-titre {
+  margin-bottom: clamp(20px, 2.4vw, 28px);
+  font-weight: 600; font-size: clamp(26px, 3.2vw, 40px);
+  line-height: 1.08; letter-spacing: -0.025em; max-width: 20ch;
+}
+
 /* --- Barre de recherche -----------------------------------------------------
    Plus haute et plus large que le champ des pages de section : ici, c'est la
    seule action de la page, et le champ doit se voir depuis le haut de l'écran. */
@@ -1994,7 +2006,7 @@ a.mnt__langue:hover { color: #fff; }
 .rec-form__champ:focus { outline: 2px solid var(--ac); outline-offset: -1px; border-color: var(--ac); }
 
 /* --- Page ouverte sans requête ---------------------------------------------- */
-.rec-invite { margin: 26px 0 0; max-width: 62ch; font-size: 15.5px; line-height: 1.65; color: var(--c-70); }
+.rec-invite { margin: 22px 0 0; max-width: 68ch; font-size: 15.5px; line-height: 1.65; color: var(--c-70); }
 .rec-portes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 26px; }
 .rec-portes__label {
   font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
