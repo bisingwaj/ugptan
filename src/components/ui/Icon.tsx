@@ -9,9 +9,21 @@ export type IconName =
   /* Parcours soumissionnaire */
   | "compte" | "dossier" | "depot" | "attribution"
   /* Modes de saisine du mécanisme de plaintes */
-  | "formulaire" | "sms" | "email" | "pointfocal";
+  | "formulaire" | "sms" | "email" | "pointfocal"
+  /* Navigation */
+  | "recherche";
 
 const PATHS: Record<IconName, ReactElement> = {
+  /* Recherche : loupe à VERRE CARRÉ. Le cercle de la loupe usuelle serait la
+     seule courbe du jeu, dont tout le vocabulaire est rectiligne (cf. l'en-tête
+     de ce fichier). Le carré incliné garde le geste de la loupe — un verre et
+     son manche en diagonale — dans la grammaire des autres icônes. */
+  recherche: (
+    <>
+      <path d="M4 4h12v12H4z" />
+      <path d="M16 16l4 4" />
+    </>
+  ),
   /* Compte vérifié : carte d'identification d'entreprise + coche de vérification */
   compte: (
     <>

@@ -1967,4 +1967,101 @@ a.mnt__langue:hover { color: #fff; }
   .mnt__btn { min-height: 48px; }
 }
 
+
+/* ===========================================================================
+   RECHERCHE GLOBALE  (/[lang]/search)
+
+   Une seule page interroge les six fonds du site. Sa mise en forme doit donc
+   faire une chose qu'aucune page de section n'a à faire : rendre COMPARABLES
+   des fiches de natures différentes. D'où des lignes uniformes plutôt que les
+   cartes illustrées des sections — une vignette ferait passer le fonds le plus
+   imagé pour le plus pertinent (cf. components/recherche/LigneResultat.tsx).
+
+   Les gris de texte sont pris à --c-60 et --c-70, jamais à --c-50 : à 11-13 px
+   sur fond blanc, ce dernier tombe à 3,3:1, sous le seuil AA de 4,5:1.
+=========================================================================== */
+
+/* --- Barre de recherche -----------------------------------------------------
+   Plus haute et plus large que le champ des pages de section : ici, c'est la
+   seule action de la page, et le champ doit se voir depuis le haut de l'écran. */
+.rec-form { display: flex; flex-wrap: wrap; gap: 10px; }
+.rec-form__champ {
+  flex: 1 1 320px; min-width: 0;
+  border: 1px solid var(--c-30); background: #fff; color: var(--c-black);
+  padding: 14px 18px; font-size: 16px; font-family: inherit;
+}
+.rec-form__champ::placeholder { color: var(--c-60); }
+.rec-form__champ:focus { outline: 2px solid var(--ac); outline-offset: -1px; border-color: var(--ac); }
+
+/* --- Page ouverte sans requête ---------------------------------------------- */
+.rec-invite { margin: 26px 0 0; max-width: 62ch; font-size: 15.5px; line-height: 1.65; color: var(--c-70); }
+.rec-portes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 26px; }
+.rec-portes__label {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--c-60); margin-right: 4px;
+}
+
+/* --- Décompte ---------------------------------------------------------------- */
+.rec-compte {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 26px 0 0; padding-bottom: 14px; border-bottom: 1px solid var(--c-20);
+  font-size: 12.5px; color: var(--c-60);
+}
+
+/* --- Groupe par fonds --------------------------------------------------------
+   L'intertitre porte le décompte du fonds : le visiteur sait ce qu'il regarde
+   ET ce qu'il ne regarde pas encore, avant d'avoir fait défiler. */
+.rec-groupe { margin-top: clamp(38px, 5vw, 56px); }
+.rec-groupe__tete {
+  display: flex; align-items: baseline; gap: 14px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--c-black);
+}
+.rec-groupe__titre {
+  margin: 0; font-size: clamp(17px, 1.9vw, 21px); font-weight: 600; letter-spacing: -0.02em;
+}
+.rec-groupe__compte { font-size: 12px; color: var(--c-60); }
+.rec-groupe__tout {
+  display: inline-flex; align-items: center; gap: 9px; margin-top: 18px;
+  font-size: 14px; font-weight: 600; color: var(--ac);
+}
+.rec-groupe__tout:hover { color: var(--acd); }
+.rec-groupe__tout:focus-visible { outline: 2px solid var(--ac); outline-offset: 3px; }
+
+/* --- Lignes de résultat -------------------------------------------------------
+   Une vraie <ul> de liens : c'est ce que lit un lecteur d'écran et ce
+   qu'explore un robot. Le filet vit sur la ligne, pas sur la liste, pour que le
+   survol puisse le colorer sans décaler la mise en page. */
+.rec-liste { margin: 0; padding: 0; list-style: none; }
+.rec-item {
+  display: grid; gap: 7px; padding: 20px 0 22px;
+  border-bottom: 1px solid var(--c-20);
+  border-left: 2px solid transparent; padding-left: 0;
+  transition: border-left-color 0.18s, padding-left 0.18s, background 0.18s;
+}
+.rec-item:hover { border-left-color: var(--ac); padding-left: 14px; background: var(--c-10); }
+.rec-item:focus-visible { outline: 2px solid var(--ac); outline-offset: -2px; }
+
+.rec-item__haut { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.rec-item__type {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ac);
+}
+.rec-item__meta { font-size: 11px; letter-spacing: 0.04em; color: var(--c-60); }
+.rec-item__titre {
+  font-size: clamp(16px, 1.7vw, 18.5px); font-weight: 600; line-height: 1.35;
+  letter-spacing: -0.01em; color: var(--c-black); max-width: 60ch;
+}
+.rec-item:hover .rec-item__titre { color: var(--ac); }
+.rec-item__extrait { max-width: 78ch; font-size: 14.5px; line-height: 1.6; color: var(--c-70); }
+.rec-item__date { font-size: 11.5px; color: var(--c-60); }
+
+@media (max-width: 560px) {
+  /* Le champ et son bouton passent pleine largeur : chercher au pouce ne doit
+     pas se faire dans une boîte serrée contre un bouton. */
+  .rec-form__champ { flex: none; width: 100%; }
+  .rec-form .btn { width: 100%; justify-content: center; min-height: 48px; }
+  /* Le décalage au survol ne veut rien dire au tactile, et rognerait la ligne. */
+  .rec-item:hover { padding-left: 0; background: transparent; }
+}
+
 } /* fin @layer components */

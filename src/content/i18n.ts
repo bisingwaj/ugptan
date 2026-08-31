@@ -27,6 +27,7 @@ export function dict(lang: Lang) {
       contact: t("Contact", "Contact"),
       mgp: t("Plaintes (MGP)", "Grievances"),
       mgpSuivi: t("Suivre une plainte", "Track a grievance"),
+      recherche: t("Recherche", "Search"),
       confidentialite: t("Politique de confidentialité", "Privacy policy"),
       conditions: t("Conditions d'utilisation", "Terms of use"),
     },
@@ -1190,6 +1191,73 @@ export function dict(lang: Lang) {
         "Photographies et films produits pour le Projet ou pour ses partenaires d'exécution. Les fichiers sont hébergés sur le réseau de diffusion du Projet ; la date affichée est celle de la prise de vue lorsqu'elle est connue, à défaut celle de la mise en ligne.",
         "Photographs and films produced for the Project or for its implementing partners. Files are hosted on the Project's delivery network; the date shown is the shooting date where known, otherwise the date of publication.",
       ),
+    },
+
+    /* --- Recherche globale ------------------------------------------------ */
+    recherche: {
+      titre: t("Recherche", "Search"),
+      hero: t("Chercher dans tout le site.", "Search the whole site."),
+      lead: t(
+        "Une seule requête interroge les six fonds du site : communiqués, événements, documents publiés, galeries, composantes du Projet et avis de marché.",
+        "A single query covers the six collections on this site: releases, events, published documents, galleries, Project components and tender notices.",
+      ),
+
+      /* Champ et action. Le libellé du champ dit ce qui se cherche vraiment :
+         un sigle et une référence sont les entrées les plus fréquentes sur un
+         site de projet, avant les mots du texte. */
+      champ: t(
+        "Un mot, un sigle, une référence, une province…",
+        "A word, an acronym, a reference, a province…",
+      ),
+      action: t("Rechercher", "Search"),
+      ariaFormulaire: t("Rechercher sur le site", "Search this site"),
+      ariaLien: t("Rechercher", "Search"),
+
+      /* Filtre par nature de résultat. */
+      filtre: t("Affiner", "Narrow"),
+      tout: t("Tout", "All"),
+      reinitialiser: t("Effacer la recherche", "Clear search"),
+
+      /* États. */
+      pour: (q: string) => t(`pour « ${q} »`, `for “${q}”`),
+      compte: (n: number) =>
+        t(`${n} résultat${n > 1 ? "s" : ""}`, `${n} result${n > 1 ? "s" : ""}`),
+      invite: t(
+        "Saisissez un mot pour commencer. La recherche porte sur les titres, les résumés et le corps des textes publiés.",
+        "Type a word to begin. The search covers titles, summaries and the body of published texts.",
+      ),
+      aucun: t("Aucun résultat.", "No results."),
+      aucunConseil: t(
+        "Vérifiez l'orthographe, essayez un mot plus court, ou retirez le filtre de nature.",
+        "Check the spelling, try a shorter word, or remove the type filter.",
+      ),
+      /* Portes proposées quand la page s'ouvre sans requête : les quatre fonds
+         qu'un visiteur vient chercher le plus souvent. */
+      parcourir: t("Ou parcourir directement :", "Or browse directly:"),
+
+      /* En-têtes de groupe, au pluriel. */
+      groupes: {
+        actu: t("Communiqués", "Releases"),
+        evenement: t("Événements", "Events"),
+        publication: t("Documents publiés", "Published documents"),
+        album: t("Galeries", "Galleries"),
+        composante: t("Composantes du Projet", "Project components"),
+        marche: t("Avis de marché", "Tender notices"),
+      },
+
+      /* Pastille portée par un résultat, au singulier. */
+      etiquettes: {
+        actu: t("Communiqué", "Release"),
+        evenement: t("Événement", "Event"),
+        publication: t("Document", "Document"),
+        album: t("Galerie", "Gallery"),
+        composante: t("Composante", "Component"),
+        marche: t("Avis de marché", "Tender notice"),
+      },
+
+      /* Renvoi vers la recherche propre d'une section, requête conservée. */
+      voirTout: (n: number) =>
+        t(`Voir les ${n} résultats`, `See all ${n} results`),
     },
 
     /* --- MGP -------------------------------------------------------------- */
