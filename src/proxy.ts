@@ -61,6 +61,32 @@ export async function proxy(req: NextRequest) {
     return redirectTo(req, ADMIN_LOGIN, `${pathname}${req.nextUrl.search}`);
   }
 
+  /* --- Pages internes servies depuis le segment public ---------------------
+   *
+   * Le plan de tournage (`/<langue>/media`) n'est pas une page du site : c'est
+   * un document de travail des équipes de production. Sa page porte déjà sa
+   * garde — elle appelle `getCurrentUser()` et lève `notFound()` sans session,
+   * et c'est elle qui fait autorité.
+   *
+   * ⚠️ Cette garde-là protège le CONTENU, pas le STATUT. Mesuré sur un serveur
+   * de production : sans session, le corps servi est bien l'écran d'introuvable
+   * — aucune trace du plan — mais la réponse part en **200**, car la coquille et
+   * les métadonnées sont diffusées avant que la garde n'ait fini d'interroger la
+   * session. L'adresse répondait donc « rien à voir ici » avec le statut d'une
+   * page qui existe, et son titre annonçait « Plan médias ».
+   *
+   * Bloquer ici corrige les deux : le proxy s'exécute AVANT tout rendu, il n'y a
+   * donc rien à diffuser, et le 404 est franc.
+   *
+   * Contrôle OPTIMISTE, comme pour la console (voir plus haut) : on regarde si
+   * un cookie de session EXISTE, sans le valider. Il ne fait que bloquer les
+   * visiteurs anonymes ; c'est la page qui vérifie réellement. Un cookie périmé
+   * passe ici et se fait refuser là.
+   */
+  if (/^\/(?:fr|en)\/media\/?$/.test(pathname) && !getSessionCookie(req)) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   // --- Site public ---------------------------------------------------------
   /* Deux corrections possibles, traitées ensemble pour n'imposer qu'un seul
      aller-retour : le préfixe de langue absent, et l'ancien chemin français. */
