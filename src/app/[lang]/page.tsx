@@ -5,7 +5,7 @@ import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import {
   meta, reperes, poles,
-  profils, question,
+  question,
 } from "@/content/data";
 import { derniersArticles } from "@/lib/actus/query";
 import { composantesPubliques } from "@/lib/projet/query";
@@ -321,21 +321,52 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
       </section>
 
-      {/* ===== PLATEFORME / 8 PROFILS ===== */}
+      {/* ===== RÉPONDRE À UN MARCHÉ =====
+
+          Cette section a remplacé un inventaire des huit espaces de la
+          plateforme métier. Il décrivait l'architecture d'un outil INTERNE sur
+          la page d'accueil publique : un citoyen n'a rien à en faire, et les
+          huit tuiles se lisaient « Partenaire → Espace partenaire », c'est-à-dire
+          rien du tout.
+
+          ⚠️ La place compte autant que le contenu. C'est la dernière section
+          d'une page longue, donc le seul moment où l'on s'adresse à quelqu'un
+          qui a TOUT lu — le lecteur le plus disposé à agir de la journée. La
+          dépenser en architecture logicielle, c'est la perdre.
+
+          Pourquoi les entreprises, et pas une autre porte : le héros mène déjà
+          aux documents, aux avis et au mécanisme de plaintes, et le bloc
+          d'abonnement figure au pied de CHAQUE page. Les répéter ici ne
+          servirait personne. Il restait une audience majeure que la page
+          n'adressait nulle part, alors que la page existe pour elle et que
+          `/bidders` l'attend : les entreprises candidates. */}
       <section className="section section--pale">
         <div className="section__inner">
           <Reveal className="cols2" style={{ alignItems: "end", marginBottom: 46 }}>
-            <div><Kicker n="08">{t.sec.plateforme}</Kicker><h2 className="h2--sm">{t.home.plateformeTitle}</h2></div>
-            <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--c-80)", margin: 0, maxWidth: 460 }}>{t.home.plateformeLead}</p>
+            <div><Kicker n="08">{t.sec.repondre}</Kicker><h2 className="h2--sm">{t.home.repondreTitle}</h2></div>
+            <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--c-80)", margin: 0, maxWidth: 460 }}>{t.home.repondreLead}</p>
           </Reveal>
-          <RevealGroup className="grid-4" gap={0.045} style={{ background: "var(--ac-line)", borderColor: "var(--ac-line)" }}>
-            {profils.map((p, i) => (
-              <RevealItem key={i} style={{ background: "#fff", padding: "22px 20px", minHeight: 128, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                <div className="mono" style={{ fontSize: 11, color: "var(--ac)" }}>{String(i + 1).padStart(2, "0")}</div>
-                <div><div style={{ fontSize: 14.5, fontWeight: 600, lineHeight: 1.3 }}>{pick(p.label, lang)}</div><div style={{ fontSize: 12, color: "var(--c-60)", marginTop: 6 }}>→ {pick(p.page, lang)}</div></div>
+
+          {/* Trois étapes, numérotées : le parcours se lit d'un coup d'œil, et
+              son nombre fini est ce qui décide quelqu'un à le commencer. */}
+          <RevealGroup className="grid-3" gap={0.045} style={{ background: "var(--ac-line)", borderColor: "var(--ac-line)" }}>
+            {t.home.repondreEtapes.map((e) => (
+              <RevealItem key={e.n} style={{ background: "#fff", padding: "26px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
+                <div className="mono" style={{ fontSize: 11, color: "var(--ac)" }}>{e.n}</div>
+                <div style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.3 }}>{pick(e.titre, lang)}</div>
+                <div style={{ fontSize: 13.5, lineHeight: 1.55, color: "var(--c-70)" }}>{pick(e.texte, lang)}</div>
               </RevealItem>
             ))}
           </RevealGroup>
+
+          <Reveal style={{ marginTop: 34, display: "flex", flexWrap: "wrap", gap: 14 }}>
+            <Link href={route(lang, NAV.soumissionnaires)} className="btn btn--primary">
+              {t.home.repondreCta}<span className="arrow">→</span>
+            </Link>
+            <Link href={route(lang, NAV.marches)} className="btn btn--outline">
+              {t.home.repondreAvis}
+            </Link>
+          </Reveal>
         </div>
       </section>
     </div>

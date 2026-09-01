@@ -1,0 +1,16 @@
+# Conventions de travail
+
+- Utiliser TypeScript
+- Utiliser TailwindCSS
+- Utiliser Server Actions
+- Respecter l'architecture existante
+- Ne pas modifier les fichiers de configuration sans raison
+- Respecter strictement le design system existant
+- Répondre en français
+- Garantir un responsive parfait sur mobile, tablette et desktop
+- Optimiser systématiquement le SEO de chaque page (métadonnées, structure sémantique, titres et descriptions, etc...)
+- Éviter l’utilisation excessive de tirets longs (—) et de formulations typiques générées par les IA dans les textes du site
+- Les pathnames doivent etre en anglais
+
+La doctrine de rédaction des contenus éditoriaux est à part :
+[`docs/doctrine-redactionnelle.md`](docs/doctrine-redactionnelle.md).

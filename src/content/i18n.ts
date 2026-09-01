@@ -18,6 +18,7 @@ export function dict(lang: Lang) {
       ugptn: t("L'UGPTN", "The UGPTN"),
       gouvernance: t("Gouvernance", "Governance"),
       marches: t("Marchés", "Tenders"),
+      soumissionnaires: t("Devenir soumissionnaire", "Become a bidder"),
       transparence: t("Transparence", "Transparency"),
       actualites: t("Actualités", "News"),
       resultats: t("Résultats", "Results"),
@@ -35,6 +36,9 @@ export function dict(lang: Lang) {
     navSub: {
       projet: t("Vue d'ensemble", "Overview"),
       ugptn: t("L'Unité", "The Unit"),
+      /* Sous « Marchés », répéter « Marchés » n'apprendrait rien : ce que le
+         lecteur choisit ici, c'est entre consulter et candidater. */
+      marches: t("Avis d'appel d'offres", "Invitations to bid"),
       transparence: t("Documents publiés", "Published documents"),
       actualites: t("Communiqués", "Releases"),
     } as Partial<Record<NavKey, string>>,
@@ -65,6 +69,10 @@ export function dict(lang: Lang) {
       marches: t(
         "Avis en cours, méthode de passation, pièces exigées et délais.",
         "Open notices, procurement method, required documents and deadlines.",
+      ),
+      soumissionnaires: t(
+        "Créer un compte, rattacher votre entreprise, retirer un dossier.",
+        "Create an account, attach your company, obtain a bidding file.",
       ),
       transparence: t(
         "Rapports, études et pièces de référence, versionnés et datés.",
@@ -99,18 +107,29 @@ export function dict(lang: Lang) {
       more: t("En savoir plus", "Learn more"),
       all: t("Tout voir", "View all"),
       report: t("Déposer une plainte", "File a grievance"),
-      /* Renvoie au portail des soumissionnaires, hébergé par un tiers
-         (cf. lib/external.ts). Aucun lien du site public ne mène à la console
-         d'administration de l'UGPTN. */
-      login: t("Se connecter", "Sign in"),
+      /* Nom de la plateforme de passation et d'approvisionnement du projet,
+         hébergée hors de notre périmètre avec ses propres comptes
+         (cf. lib/external.ts). C'est un nom propre : il ne se traduit pas et ne
+         se remplace pas par « Se connecter », qui ne disait pas où l'on entre.
+         Aucun lien du site public ne mène à la console d'administration de
+         l'UGPTN, qui est un tout autre espace. */
+      login: t("DigiProcure", "DigiProcure"),
       /* Sorties de page ajoutées avec le partage du propos : chaque page qui
          montre un aperçu doit dire où se trouve le détail. */
       resultats: t("Voir le cadre de résultats", "See the results framework"),
       toutEquipe: t("Toute l'équipe", "The whole team"),
       voirUnite: t("Voir l'Unité", "See the Unit"),
+      /* Le nom seul n'apprend rien à qui ne connaît pas la plateforme : cette
+         phrase porte l'infobulle ET le libellé lu par les lecteurs d'écran. */
       loginHint: t(
-        "Espace des soumissionnaires — plateforme partenaire, ouverture dans un nouvel onglet",
-        "Bidders' space — partner platform, opens in a new tab",
+        "DigiProcure, la plateforme de passation des marchés et des approvisionnements du projet. Ouverture dans un nouvel onglet.",
+        "DigiProcure, the project's procurement and supply management platform. Opens in a new tab.",
+      ),
+      /* Légende du tiroir mobile : là, pas de survol, donc pas d'infobulle.
+         Tenue courte pour ne pas casser l'équilibre du pied de tiroir. */
+      loginNote: t(
+        "Marchés et approvisionnements du projet",
+        "Project procurement and supply",
       ),
     },
     sec: {
@@ -121,7 +140,7 @@ export function dict(lang: Lang) {
       gouvernance: t("Architecture de gouvernance", "Governance architecture"),
       equipe: t("L'équipe de l'Unité", "The Unit's team"),
       actus: t("Actualités & communiqués", "News & releases"),
-      plateforme: t("La plateforme métier — 8 espaces", "The business platform — 8 spaces"),
+      repondre: t("Répondre à un marché", "Respond to a tender"),
     },
     lbl: {
       baseline: t("Point de départ", "Starting point"),
@@ -204,7 +223,7 @@ export function dict(lang: Lang) {
         "Trois chantiers, et une seule logique : un réseau qui atteint les territoires, un socle numérique commun à l'État, et les compétences pour faire vivre l'un et l'autre. Pris séparément, aucun ne produit d'effet durable ; c'est leur enchaînement qui compte.",
         "Three efforts, one logic: a network that reaches the territories, a digital foundation shared across the State, and the skills to keep both running. Taken separately, none produces lasting effects; it is their sequence that matters.",
       ),
-      statusEffective: t("Entrée en vigueur 31.10.2025", "Effectiveness 31.10.2025"),
+      statusEffective: t("Entrée en vigueur 24.06.2025", "Effectiveness 24.06.2025"),
       statusCompletion: t("Achèvement technique 31.12.2029", "Technical completion 31.12.2029"),
       resultatsTitle: t(
         "Des ambitions mesurables à l'horizon 2029 — l'impact et l'inclusion au cœur.",
@@ -253,11 +272,46 @@ export function dict(lang: Lang) {
         "Un projet de cette nature ne se conduit pas depuis une seule institution : le régulateur, les ministères sectoriels, l'agence du numérique et l'organisme d'identification portent chacun une part du résultat.",
         "A project of this kind cannot be run from a single institution: the regulator, sector ministries, the digital agency and the identification body each carry part of the result.",
       ),
-      plateformeTitle: t("Une plateforme, huit espaces sur mesure.", "One platform, eight tailored spaces."),
-      plateformeLead: t(
-        "Un soumissionnaire, un auditeur et un ministère bénéficiaire n'ont ni les mêmes droits d'accès ni les mêmes besoins. La plateforme métier attribue à chaque profil son espace et ses outils, sur une base de données commune et cloisonnée.",
-        "A bidder, an auditor and a beneficiary ministry have neither the same access rights nor the same needs. The business platform gives each profile its own space and tools, on a shared and compartmentalised data foundation.",
+      repondreTitle: t(
+        "Les marchés du projet sont ouverts aux entreprises congolaises.",
+        "The project's tenders are open to Congolese companies.",
       ),
+      repondreLead: t(
+        "Les avis paraissent au fil de la mise en œuvre, sur cinq composantes et vingt-six provinces. Répondre suppose un compte : c'est lui qui donne accès aux dossiers et qui fait parvenir les additifs, sans lesquels une offre est écartée.",
+        "Notices are published as implementation proceeds, across five components and twenty-six provinces. Responding requires an account: it gives access to the bidding files and delivers the addenda, without which a bid is set aside.",
+      ),
+      /* ⚠️ Trois étapes, et rien de plus. Ce parcours engage une entreprise qui
+         prépare une offre : lui annoncer un délai, un coût ou une disponibilité
+         que la plateforme de passation pourrait démentir se paierait en
+         contentieux, pas en malentendu. */
+      repondreEtapes: [
+        {
+          n: "01",
+          titre: t("Créer un compte", "Create an account"),
+          texte: t(
+            "Une adresse électronique, confirmée par un code à six chiffres.",
+            "An email address, confirmed by a six-digit code.",
+          ),
+        },
+        {
+          n: "02",
+          titre: t("Rattacher votre entreprise", "Attach your company"),
+          texte: t(
+            "L'entreprise est titulaire du compte, pas la personne : elle survit au départ de celui qui l'a inscrite.",
+            "The company holds the account, not the individual: it outlives whoever registered it.",
+          ),
+        },
+        {
+          n: "03",
+          titre: t("Retirer le dossier", "Obtain the bidding file"),
+          texte: t(
+            "Le retrait vous inscrit au registre. C'est lui qui vous fait parvenir chaque additif.",
+            "Obtaining the file registers you. That is what delivers every addendum to you.",
+          ),
+        },
+      ],
+      repondreCta: t("Devenir soumissionnaire", "Become a bidder"),
+      repondreAvis: t("Voir les avis en cours", "View open notices"),
     },
 
     /* --- Newsletter ------------------------------------------------------- */
@@ -316,6 +370,10 @@ export function dict(lang: Lang) {
         server: t(
           "L'enregistrement a échoué. Réessayez dans un instant.",
           "Registration failed. Try again shortly.",
+        ),
+        ferme: t(
+          "Le portail est momentanément fermé pour intervention technique. Votre inscription n'a pas été enregistrée : reprenez-la à la réouverture.",
+          "The portal is temporarily closed for technical work. Your subscription has not been recorded: please subscribe again once the site reopens.",
         ),
       },
     },
@@ -768,14 +826,41 @@ export function dict(lang: Lang) {
       viewDetail: t("Voir le détail", "View details"),
       noResult: t("Aucun avis ne correspond à votre recherche.", "No notice matches your search."),
       reset: t("Réinitialiser", "Reset"),
+      /* Liste vide pour de bon, à distinguer d'une recherche infructueuse : il
+         n'y a rien à réinitialiser, et le visiteur doit savoir où s'adresser
+         plutôt que de conclure que la page est en panne. */
+      aucunAvis: t("Aucun avis n'est ouvert en ce moment.", "No notice is open at this time."),
+      aucunAvisLead: t(
+        "Les prochains appels d'offres et avis à manifestation d'intérêt paraîtront sur cette page dès leur publication. D'ici là, la cellule passation de l'UGPTN répond aux questions des entreprises intéressées.",
+        "Upcoming invitations to bid and requests for expressions of interest will appear on this page as soon as they are published. Until then, the UGPTN procurement unit answers questions from interested companies.",
+      ),
       published: t("Publié le", "Published"),
       budget: t("Budget estimé", "Estimated budget"),
       place: t("Lieu d'exécution", "Place of performance"),
       lots: t("Lots", "Lots"),
       review: t("Revue", "Review"),
       docsTitle: t("Pièces du dossier", "Bidding documents"),
+      /* Le retrait du dossier se fait sur DigiProcure, ou au bureau tant que
+         les pièces n'y sont pas déposées. Un avis qui ne dit pas où se procurer
+         le dossier n'ouvre aucune concurrence. */
+      retraitTitle: t("Retrait du dossier", "Obtaining the documents"),
+      arretTitle: t("Procédure arrêtée", "Procedure stopped"),
+      /* ⚠️ Le libellé dit l'ACTE, pas la destination. « Ouvrir sur
+         DigiProcure » promettait une seconde lecture du même avis, et
+         DigiProcure n'affiche plus d'avis : cette page-ci est la seule.
+         Ce que la plateforme apporte, c'est le retrait. */
+      surPlateforme: t("Retirer le dossier", "Obtain the documents"),
+      docsSurPlateforme: t(
+        "Les pièces se téléchargent sur DigiProcure, après inscription. C'est cette inscription qui vous fait recevoir les additifs.",
+        "The documents are downloaded from DigiProcure, after registration. That registration is what makes you receive addenda.",
+      ),
       scheduleTitle: t("Calendrier prévisionnel", "Indicative schedule"),
       addendaTitle: t("Addenda", "Addenda"),
+      addendaIntro: t(
+        "Un addendum fait partie intégrante du dossier : une offre s'apprécie au regard du dossier tel qu'il est à l'heure limite, addenda compris. Le texte complet est adressé aux entreprises inscrites au registre des retraits.",
+        "An addendum forms part of the bidding documents: a bid is assessed against the file as it stands at the deadline, addenda included. The full text is sent to the companies entered in the register of withdrawals.",
+      ),
+      addendaReport: t("Nouvelle date limite de remise", "New submission deadline"),
       summary: t("Résumé", "Summary"),
       awardee: t("Attributaire", "Awardee"),
       filtersAll: t("Tous", "All"),
@@ -783,10 +868,77 @@ export function dict(lang: Lang) {
       bidderKicker: t("Candidature", "Bidding"),
       bidderTitle: t("Candidater : ce que cela suppose", "Bidding: what it involves"),
       bidderLead: t(
-        "Le dossier complet s'obtient auprès de la cellule passation, qui enregistre votre manifestation d'intérêt : c'est cet enregistrement qui déclenche la notification des addenda. Le dépôt est horodaté — et c'est cet horodatage qui fait foi en cas de contestation sur la recevabilité.",
-        "The full file is obtained from the procurement unit, which records your expression of interest: that record is what triggers notification of addenda. Submission is timestamped — and that timestamp is what counts if admissibility is disputed.",
+        "Le dossier complet se retire sur DigiProcure, après inscription. C'est cette inscription qui vous inscrit au registre des retraits, et c'est ce registre qui déclenche l'envoi des additifs. Une entreprise qui retire le dossier hors plateforme ne les reçoit pas.",
+        "The full file is obtained on DigiProcure, after registration. That registration enters you in the register of withdrawals, and it is that register which triggers the sending of addenda. A company obtaining the file outside the platform does not receive them.",
       ),
-      bidderCta: t("Nous contacter", "Contact us"),
+      bidderCta: t("Devenir soumissionnaire", "Become a bidder"),
+    },
+
+    /* --- Devenir soumissionnaire ------------------------------------------ */
+    /* La porte des entreprises. Elle n'héberge aucun formulaire : le compte se
+       crée sur DigiProcure, qui tient la base, la session et le dépôt. */
+    soumissionner: {
+      heroTitle: t(
+        "Répondre à un appel d'offres de l'UGPTN.",
+        "Responding to a UGPTN invitation to bid.",
+      ),
+      heroLead: t(
+        "L'inscription est ouverte à toute entreprise, congolaise ou étrangère. Elle ne vous engage à rien : elle vous donne accès aux dossiers d'appel d'offres et vous fait recevoir les additifs qui les modifient.",
+        "Registration is open to any company, Congolese or foreign. It commits you to nothing: it gives you access to the bidding documents and makes you receive the addenda that amend them.",
+      ),
+      etapesKicker: t("Le parcours", "The process"),
+      etapesTitre: t("Quatre étapes", "Four steps"),
+      etape1Titre: t("Créer votre compte", "Create your account"),
+      /* ⚠️ Un CODE à six chiffres, et non un lien : DigiProcure a remplacé
+         l'un par l'autre. Un lien de confirmation se fait « visiter » par les
+         antivirus de messagerie d'entreprise, qui le consomment avant son
+         destinataire, et casse quand le courriel s'ouvre sur un autre appareil
+         que celui où l'inscription est en cours. Ce texte doit dire ce que la
+         plateforme fait, sinon le candidat cherche un lien qui n'existe pas. */
+      etape1Texte: t(
+        "Un nom, une adresse électronique, un mot de passe. Un code à six chiffres vous parvient et confirme l'adresse : tant qu'elle ne l'est pas, le compte n'ouvre rien. C'est par elle que passeront les additifs et les réponses aux questions.",
+        "A name, an email address, a password. A six-digit code reaches you and confirms the address: until it is confirmed, the account opens nothing. It is through this address that addenda and answers to questions will travel.",
+      ),
+      etape2Titre: t("Rattacher votre entreprise", "Attach your company"),
+      etape2Texte: t(
+        "Le compte est personnel, l'entreprise ne l'est pas. Vous renseignez son identité juridique — dénomination, RCCM, identifiant national — puis vous invitez vos collègues avec leur rôle. L'entreprise survit ainsi au départ de celui qui l'a inscrite.",
+        "The account is personal, the company is not. You enter its legal identity — name, trade register number, national ID — then invite your colleagues with their roles. The company thus outlives whoever registered it.",
+      ),
+      etape3Titre: t("Retirer le dossier", "Obtain the file"),
+      etape3Texte: t(
+        "En un clic, sur chaque avis ouvert. Le retrait vous inscrit au registre : vous recevrez chaque additif et chaque réponse publiée, et vous pourrez prouver quelle version du dossier vous détenez.",
+        "In one click, on every open notice. The withdrawal enters you in the register: you will receive every addendum and every published answer, and you will be able to prove which version of the file you hold.",
+      ),
+      etape4Titre: t("Déposer votre offre", "Submit your bid"),
+      etape4Texte: t(
+        "Le dépôt en ligne ouvrira prochainement. D'ici là, les offres se remettent selon les modalités indiquées sur chaque avis. Publier d'abord, déposer ensuite : aucune procédure en cours n'est mise en risque.",
+        "Online submission will open shortly. Until then, bids are delivered as stated on each notice. Publish first, submit later: no ongoing procedure is put at risk.",
+      ),
+      aVenir: t("À venir", "Coming"),
+      ctaCreer: t("Créer un compte", "Create an account"),
+      ctaConnexion: t("J'ai déjà un compte", "I already have an account"),
+      ctaAvis: t("Voir les avis ouverts", "See open notices"),
+      /* ⚠️ Affiché tant que l'adresse de la plateforme n'est pas configurée.
+         Un bouton mort sur le site d'une unité de gestion de projet se lit
+         comme une panne ; une phrase datée se lit comme une information. */
+      bientot: t(
+        "L'inscription en ligne ouvre prochainement. En attendant, la cellule passation de l'UGPTN répond aux entreprises intéressées.",
+        "Online registration opens shortly. In the meantime, the UGPTN procurement unit answers interested companies.",
+      ),
+      reserveKicker: t("À savoir", "Worth knowing"),
+      reserveTitre: t("Trois points avant de commencer", "Three points before you start"),
+      reserve1: t(
+        "Aucun paiement ne se règle de la main à la main. Tout ce qui concerne un dossier de l'UGPTN se fait sur la plateforme et nulle part ailleurs : quiconque vous réclame de l'argent en espèces ou sur un compte personnel n'agit pas pour nous.",
+        "No payment is ever settled hand to hand. Everything concerning a UGPTN bidding document happens on the platform and nowhere else: anyone asking you for money in cash or into a personal account is not acting for us.",
+      ),
+      reserve2: t(
+        "Une entreprise, un compte d'organisation. Plusieurs personnes s'y rattachent avec des rôles distincts : qui prépare n'est pas nécessairement qui signe.",
+        "One company, one organisation account. Several people attach to it with distinct roles: whoever prepares is not necessarily whoever signs.",
+      ),
+      reserve3: t(
+        "Les délais sont opposables. L'heure qui fait foi est celle du serveur, à Kinshasa, et une clôture ne se reporte que par un additif publié.",
+        "Deadlines are binding. The time that counts is the server's, in Kinshasa, and a deadline is postponed only by a published addendum.",
+      ),
     },
 
     /* --- Transparence documentaire --------------------------------------- */
@@ -1199,6 +1351,66 @@ export function dict(lang: Lang) {
       reessayer: t("Réessayer", "Try again"),
       accueil: t("Retour à l'accueil", "Back to home"),
       reference: t("Référence", "Reference"),
+    },
+
+    /* Adresse qui ne correspond à rien : article retiré, lien mal recopié,
+       publication dépubliée depuis qu'un moteur l'a indexée. À distinguer de
+       `erreur`, qui parle d'une panne — ici le site fonctionne, c'est la page
+       qui n'existe pas. Les sorties proposées sont donc des chemins, pas un
+       bouton « réessayer » qui ne changerait rien. */
+    introuvable: {
+      code: "404",
+      titre: t("Cette page n'existe pas", "This page does not exist"),
+      corps: t(
+        "L'adresse demandée ne correspond à aucune page du site. Elle a pu être retirée, renommée, ou le lien que vous avez suivi comportait une erreur.",
+        "The requested address matches no page on this site. It may have been removed or renamed, or the link you followed contained a mistake.",
+      ),
+      pistes: t("Reprendre par une de ces entrées :", "Start again from one of these:"),
+      accueil: t("Accueil", "Home"),
+      actus: t("Actualités", "News"),
+      docs: t("Documents publiés", "Published documents"),
+      contact: t("Contact", "Contact"),
+    },
+
+    /* --- Site fermé pour intervention -------------------------------------- */
+    /* Écran substitué à toute page publique quand la console ferme le site
+       (cf. lib/reglages/maintenance.ts). Le texte par défaut vaut pour le cas
+       courant ; la console peut lui substituer un message circonstancié, langue
+       par langue, sans passer par une mise en production. */
+    maintenance: {
+      kicker: t("Intervention en cours", "Work in progress"),
+      titre: t("Le portail est momentanément fermé", "The portal is temporarily closed"),
+      corps: t(
+        "Une intervention technique est en cours sur le portail de l'UGPTN. La consultation des publications, les avis de marchés et le dépôt d'une plainte reprendront à la fin de l'opération.",
+        "Technical work is under way on the UGPTN portal. Access to publications, procurement notices and grievance filing will resume once the work is complete.",
+      ),
+      retour: t("Réouverture annoncée", "Announced reopening"),
+      /* Ce qui reste ouvert pendant la fermeture. Une échéance de procédure ne
+         s'interrompt pas parce qu'un site est en maintenance : le dire évite à
+         un soumissionnaire de croire son délai suspendu. */
+      recours: t("Pendant la fermeture", "While the site is closed"),
+      recoursCorps: t(
+        "Les services de l'Unité restent joignables. Les délais des procédures de passation en cours ne sont pas suspendus par la fermeture du portail : une demande d'éclaircissement se dépose par courriel et reçoit un accusé de réception.",
+        "The Unit's services remain reachable. Deadlines in ongoing procurement procedures are not suspended by the closure of the portal: requests for clarification may be sent by email and are acknowledged.",
+      ),
+      accesTitre: t("Accès pendant l'intervention", "Access during the work"),
+      accesAide: t(
+        "Les personnes qui suivent la reprise disposent d'un code à six chiffres. Il ouvre le site entier, pour douze heures.",
+        "Those following the work have a six-digit code. It opens the whole site, for twelve hours.",
+      ),
+      accesLabel: t("Code d'accès", "Access code"),
+      accesBouton: t("Ouvrir le site", "Open the site"),
+      accesEnCours: t("Vérification", "Checking"),
+      erreurForme: t("Le code compte six chiffres.", "The code is six digits long."),
+      erreurRefus: t("Ce code ne correspond pas à celui en vigueur.", "This code does not match the one in force."),
+      erreurTrop: t(
+        "Trop de tentatives depuis cette adresse. Reprenez dans quelques minutes.",
+        "Too many attempts from this address. Try again in a few minutes.",
+      ),
+      erreurIndispo: t(
+        "La vérification du code est indisponible sur cet hébergement. Prévenez l'administrateur du site.",
+        "Code checking is unavailable on this deployment. Please notify the site administrator.",
+      ),
     },
   };
 }

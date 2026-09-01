@@ -86,19 +86,19 @@ model User {
   evenementsSaisis Evenement[] @relation("EvenementSaisiPar")
 
   /// Rapports et documents déposés par ce compte — trace interne.
-  documentsDeposes Document[]      @relation("DocumentDeposePar")
+  documentsDeposes   Document[]      @relation("DocumentDeposePar")
   /// Rapports dont ce compte est l'AUTEUR affiché (signature publique).
-  documentsSignes  Document[]      @relation("DocumentAuteur")
+  documentsSignes    Document[]      @relation("DocumentAuteur")
   /// Sections « Histoires & impact » saisies par ce compte — trace interne.
-  impactSaisi      ImpactSection[] @relation("ImpactSaisiPar")
+  impactSaisi        ImpactSection[] @relation("ImpactSaisiPar")
   /// Fiches de l'équipe saisies par ce compte — trace interne.
-  equipeSaisie     TeamMember[]    @relation("TeamMemberSaisiPar")
+  equipeSaisie       TeamMember[]    @relation("TeamMemberSaisiPar")
   /// Photos et vidéos publiées dans la galerie par ce compte — trace interne.
-  galerieSaisie    GalerieItem[]   @relation("GalerieSaisiPar")
+  galerieSaisie      GalerieItem[]   @relation("GalerieSaisiPar")
   /// Albums de la galerie créés par ce compte — trace interne.
-  albumsSaisis     GalerieAlbum[]  @relation("AlbumSaisiPar")
+  albumsSaisis       GalerieAlbum[]  @relation("AlbumSaisiPar")
   /// Composantes du Projet saisies par ce compte — trace interne.
-  composantesSaisies Composante[]  @relation("ComposanteSaisiePar")
+  composantesSaisies Composante[]    @relation("ComposanteSaisiePar")
 
   /// Traductions assistées relues par ce compte — trace interne.
   traductionsRelues TraductionAssistee[] @relation("TraductionReluePar")
@@ -362,15 +362,15 @@ model MediaAsset {
   createdById String?
   createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
-  couvertures Article[]
+  couvertures     Article[]
   /// Événements dont ce média est l'image de couverture.
-  affiches    Evenement[]
+  affiches        Evenement[]
   /// Entrées « Histoires & impact » illustrées par ce média.
-  impacts     ImpactItem[]
+  impacts         ImpactItem[]
   /// Portraits des membres de l'équipe.
-  portraits   TeamMember[]
+  portraits       TeamMember[]
   /// Rapports rédigés en ligne dont ce média est l'image de couverture.
-  couverturesDoc Document[]
+  couverturesDoc  Document[]
   /// Visuels de héros des pages de composante.
   herosComposante Composante[]     @relation("ComposanteCouverture")
   /// Visuels des projets phares d'une composante.
@@ -501,7 +501,7 @@ model ArticleTranslation {
   /// communication » paraissait donc tel quel sous un article anglais. C'est un
   /// LIBELLÉ, pas un nom propre — sa place est ici, avec le reste de ce qui se
   /// lit. Le nom, lui, reste sur la fiche : « UGPTN » ne se traduit pas.
-  authorRole     String?
+  authorRole String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1925,15 +1925,15 @@ model Composante {
 
   /// Code du MEP (« C1 »). Il s'affiche partout et sert de clé de rattachement
   /// aux fiches de l'équipe, aux marchés et aux renvois entre composantes.
-  code   String @unique
+  code     String       @unique
   /// Segment d'URL de la page dédiée (« c1 »).
-  slug   String @unique
+  slug     String       @unique
   /// Accent de la composante, en hexadécimal. Il teinte la page entière
   /// (cf. `compTint` dans src/lib/comp.ts).
-  color  String
-  status ProjetStatus @default(DRAFT)
+  color    String
+  status   ProjetStatus @default(DRAFT)
   /// Ordre de lecture, de C1 à C5.
-  position Int @default(0)
+  position Int          @default(0)
 
   /// --- Données canoniques du MEP ------------------------------------------
   /// Dotation en millions de dollars. `0` pour une composante non dotée (CERC).
@@ -2153,7 +2153,7 @@ model IndicateurTranslation {
   /// « jours » se traduisent, et une colonne unique sur la fiche les laissait
   /// en français sur la grille anglaise. Les unités symboliques (« km »,
   /// « kbit/s ») se recopient simplement à l'identique.
-  unit     String?
+  unit String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -2224,15 +2224,15 @@ model OrganeTranslation {
   locale   String
 
   /// Nom développé (« Comité de Pilotage »).
-  nom       String?
+  nom        String?
   /// Ce qu'il est (« Stratégique / décisionnel »).
-  nature    String?
+  nature     String?
   /// Effectif tel qu'il doit se lire (« 8 membres »). Bilingue : « 8 membres »
   /// restait en français sur la version anglaise avant la reprise.
-  effectif  String?
+  effectif   String?
   presidence String?
-  decision  String?
-  frequence String?
+  decision   String?
+  frequence  String?
 
   /// Ce que l'organe fait, en un paragraphe. Sans lui, l'organe ne paraît pas
   /// dans la section « Composition » — seulement dans la grille des cartes.
@@ -2396,4 +2396,48 @@ model TraductionAssistee {
   @@unique([entite, entiteId, locale])
   @@index([statut])
   @@index([entite, statut])
+}
+
+/// ===========================================================================
+/// Réglages du site — une seule ligne.
+/// ===========================================================================
+
+/// Réglages généraux du site public.
+///
+/// Une ligne, jamais deux : `id` porte une valeur fixe, ce qui rend l'`upsert`
+/// trivial depuis la console comme depuis le rendu, et interdit par
+/// construction deux états de fermeture contradictoires.
+model Reglages {
+  id String @id @default("site")
+
+  /// Site fermé au public. La console n'est pas concernée : elle vit hors du
+  /// segment `[lang]`, seul endroit où la fermeture est appliquée.
+  maintenance Boolean @default(false)
+
+  /// Code à six chiffres qui rouvre le site à qui le détient.
+  ///
+  /// Stocké en clair, et c'est assumé : il n'authentifie personne, il se
+  /// communique par téléphone ou en réunion, et la console doit pouvoir le
+  /// rappeler à qui l'a oublié. Ce qui voyage jusqu'au navigateur, en revanche,
+  /// n'est jamais le code mais sa signature (cf. lib/reglages/maintenance.ts).
+  maintenanceCode String?
+
+  /// Horodatage de la fermeture. Affiché à la console seule : au public, savoir
+  /// depuis quand le site est fermé n'apporte rien.
+  maintenanceSince DateTime?
+
+  /// Réouverture annoncée au public. Facultative, et c'est délibéré : mieux vaut
+  /// n'annoncer aucune heure que manquer celle qu'on a affichée.
+  maintenanceUntil DateTime?
+
+  /// Message substitué au texte par défaut, une langue par champ. Vide, le site
+  /// affiche le texte de `src/content/i18n.ts`, qui couvre le cas courant.
+  maintenanceFr String?
+  maintenanceEn String?
+
+  updatedAt DateTime @updatedAt
+
+  /// Adresse du compte qui a réglé en dernier. Une chaîne et non une relation :
+  /// supprimer un compte ne doit pas effacer la trace du réglage.
+  updatedBy String?
 }

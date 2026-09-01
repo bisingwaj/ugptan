@@ -4,6 +4,7 @@ import { asLang } from "@/lib/params";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { marchesMethodes, candidature } from "@/content/marches";
+import { chargerMarches } from "@/lib/digiprocure";
 import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
 import { Icon, type IconName } from "@/components/ui/Icon";
@@ -20,10 +21,29 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
 /** Une icône par étape du parcours soumissionnaire (ordre de `candidature`). */
 const CANDIDATURE_ICONS: IconName[] = ["compte", "dossier", "depot", "attribution"];
 
-export default async function MarchesPage(props: { params: Promise<{ lang: string }> }) {
+export default async function MarchesPage(props: {
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<{ avis?: string | string[] }>;
+}) {
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
+
+  /* ⚠️ `?avis=<référence>` déplie directement cet avis. C'est par là que
+     reviennent les anciennes adresses publiques de DigiProcure, désormais
+     redirigées ici : sans ce paramètre, un lien d'additif déjà diffusé
+     retomberait sur la liste et le candidat devrait chercher son avis.
+     Une valeur répétée (`?avis=a&avis=b`) rend un tableau : on ne garde que la
+     première, plutôt que de concaténer deux références en une chaîne qui ne
+     correspondrait à rien. */
+  const sp = await props.searchParams;
+  const brut = Array.isArray(sp.avis) ? sp.avis[0] : sp.avis;
+  const ouvrir = typeof brut === "string" && brut.trim() ? brut.trim() : null;
+
+  /* Les avis viennent de DigiProcure, source unique. En cas d'indisponibilité,
+     `chargerMarches` rend une liste vide plutôt que de faire échouer la page :
+     le site institutionnel ne tombe pas parce que la plateforme redémarre. */
+  const marches = await chargerMarches();
 
   return (
     <div>
@@ -40,7 +60,7 @@ export default async function MarchesPage(props: { params: Promise<{ lang: strin
 
       <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(64px,8vw,110px)" }}>
         <div className="section__inner">
-          <MarchesClient lang={lang} />
+          <MarchesClient lang={lang} marches={marches} ouvrir={ouvrir} />
 
           <Reveal style={{ marginTop: "clamp(48px,6vw,80px)", background: "var(--c-black)", color: "#fff", padding: "clamp(30px,4vw,52px)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
             <div style={{ maxWidth: 560 }}>
@@ -48,7 +68,10 @@ export default async function MarchesPage(props: { params: Promise<{ lang: strin
               <div style={{ fontWeight: 600, fontSize: "clamp(20px,2.4vw,30px)", letterSpacing: "-0.02em" }}>{t.marches.bidderTitle}</div>
               <p style={{ margin: "9px 0 0", fontSize: 14.5, color: "var(--c-30)", lineHeight: 1.55 }}>{t.marches.bidderLead}</p>
             </div>
-            <Link href={route(lang, NAV.contact)} className="btn btn--primary" style={{ whiteSpace: "nowrap", padding: "16px 26px" }}>{t.marches.bidderCta} →</Link>
+            {/* ⚠️ Menait au formulaire de contact, ce qui promettait un
+                échange humain là où le parcours est en libre-service. Il mène
+                désormais à la page qui l'explique et ouvre l'inscription. */}
+            <Link href={route(lang, NAV.soumissionnaires)} className="btn btn--primary" style={{ whiteSpace: "nowrap", padding: "16px 26px" }}>{t.marches.bidderCta} →</Link>
           </Reveal>
 
           <RevealGroup className="grid-4" style={{ marginTop: 1 }} gap={0.045}>

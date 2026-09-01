@@ -41,8 +41,8 @@ export const composantesDetail: ComposanteDetail[] = [
         {
           t: { fr: "Une géographie qui multiplie les coûts fixes", en: "A geography that multiplies fixed costs" },
           d: {
-            fr: "Sur 2,3 millions de kilomètres carrés, la population congolaise se répartit entre quelques pôles urbains denses et un semis de localités éloignées, souvent mal reliées par la route. Chaque kilomètre de fibre y coûte plus cher à poser, à protéger et à maintenir que dans un pays compact — et dessert moins d'abonnés une fois posé. C'est cette équation, et non un retard technique, qui explique une bande passante internationale de 6,56 kbit/s par habitant au démarrage du projet.",
-            en: "Across 2.3 million square kilometres, the Congolese population is split between a few dense urban centres and a scattering of remote localities, often poorly served by road. Each kilometre of fibre costs more to lay, protect and maintain than in a compact country — and serves fewer subscribers once laid. That equation, not a technology lag, explains international bandwidth of 6.56 kbit/s per capita at project start.",
+            fr: "Sur 2,3 millions de kilomètres carrés, la population congolaise se répartit entre quelques pôles urbains denses et un semis de localités éloignées, souvent mal reliées par la route. Chaque kilomètre de fibre y coûte plus cher à poser, à protéger et à maintenir que dans un pays compact — et dessert moins d'abonnés une fois posé. C'est cette équation, et non un retard technique, qui explique une bande passante internationale de 6,65 kbit/s par habitant au démarrage du projet.",
+            en: "Across 2.3 million square kilometres, the Congolese population is split between a few dense urban centres and a scattering of remote localities, often poorly served by road. Each kilometre of fibre costs more to lay, protect and maintain than in a compact country — and serves fewer subscribers once laid. That equation, not a technology lag, explains international bandwidth of 6.65 kbit/s per capita at project start.",
           },
         },
         {
@@ -112,16 +112,16 @@ export const composantesDetail: ComposanteDetail[] = [
         statut: { fr: "Infrastructure structurante", en: "Structuring infrastructure" },
         corps: {
           fr: [
-            "L'extension des réseaux de transmission constitue la première brique de la connectivité nationale. Le projet vise le déploiement de plusieurs milliers de kilomètres de fibre optique additionnelle — de l'ordre de 10 000 km à l'horizon du projet —, en priorité sur les axes qui relient les provinces entre elles et aux points d'atterrissement internationaux.",
+            "L'extension des réseaux de transmission constitue la première brique de la connectivité nationale. Le cadre de résultats retient 11 500 kilomètres de fibre optique additionnelle, résiliente au climat, en priorité sur les axes qui relient les provinces entre elles et aux points d'atterrissement internationaux.",
             "Ces liaisons de transport constituent l'ossature sur laquelle les opérateurs et les fournisseurs d'accès construisent ensuite leurs réseaux de distribution. Sans elles, la couverture de proximité reste coûteuse, instable et cantonnée aux grands centres urbains.",
           ],
           en: [
-            "Extending transmission networks is the first building block of national connectivity. The project targets the deployment of several thousand kilometres of additional fibre optic — in the order of 10,000 km over the project horizon — prioritising the routes that link provinces to one another and to international landing points.",
+            "Extending transmission networks is the first building block of national connectivity. The results framework sets a target of 11,500 kilometres of additional, climate-resilient fibre optic, prioritising the routes that link provinces to one another and to international landing points.",
             "These transport links form the backbone on which operators and service providers then build their distribution networks. Without them, local coverage remains costly, unstable and confined to major urban centres.",
           ],
         },
         points: [
-          { fr: "de l'ordre de 10 000 km de fibre optique additionnelle", en: "in the order of 10,000 km of additional fibre optic" },
+          { fr: "11 500 km de fibre optique additionnelle, résiliente au climat", en: "11,500 km of additional, climate-resilient fibre optic" },
           { fr: "priorité aux axes interprovinciaux et aux corridors régionaux", en: "priority to interprovincial routes and regional corridors" },
           { fr: "ouverture des capacités aux opérateurs sur une base non discriminatoire", en: "capacity opened to operators on a non-discriminatory basis" },
           { fr: "résilience accrue par la redondance des itinéraires", en: "greater resilience through route redundancy" },
@@ -165,7 +165,7 @@ export const composantesDetail: ComposanteDetail[] = [
           ],
         },
         points: [
-          { fr: "de l'ordre d'un millier d'institutions publiques raccordées", en: "in the order of a thousand public institutions connected" },
+          { fr: "1 000 institutions publiques dotées d'un accès nouveau ou amélioré", en: "1,000 public institutions given new or improved access" },
           { fr: "priorité aux établissements de santé et d'enseignement", en: "priority to health and education facilities" },
           { fr: "articulation avec le réseau gouvernemental GOVNET (Composante 2)", en: "articulation with the GOVNET government network (Component 2)" },
           { fr: "prise en compte des coûts d'exploitation dans la durée", en: "operating costs factored in over time" },
@@ -215,16 +215,19 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "L'inclusion numérique et l'abordabilité", en: "Digital inclusion and affordability" },
         corps: {
           fr: [
-            "L'accès ne se réduit pas à la disponibilité du signal. Il suppose aussi un terminal, un forfait abordable, des contenus utiles et les compétences pour s'en servir. Le projet accorde une attention particulière aux femmes, aux populations rurales et aux publics vulnérables.",
-            "Le cadre de résultats retient une ambition explicite : parmi les personnes que le projet vise à connecter à l'horizon 2029, environ la moitié devraient être des femmes.",
+            "L'accès ne se réduit pas à la disponibilité du signal. Il suppose aussi un terminal, un forfait abordable, des contenus utiles et les compétences pour s'en servir. Un réseau disponible au-dessus des moyens de ceux qu'il couvre ne produit aucune inclusion : il déplace la barrière, il ne la lève pas.",
+            "C'est pourquoi l'abordabilité se mesure en part du revenu et non en valeur absolue. Le cadre de résultats suit le prix de détail d'un forfait mensuel standard de données mobiles rapporté au revenu national brut par habitant, et vise son passage de 10,3 % à 5,1 %. Diviser cet effort par deux ne se décrète pas : le prix de détail suit le coût de gros, lequel dépend de la capacité de transport disponible, du partage des infrastructures passives et de la concurrence effective sur le marché de gros. C'est l'articulation directe entre ce projet et les deux précédents.",
+            "L'usage effectif est la seule mesure qui compte au bout de la chaîne. Le cadre de résultats vise 30 millions de personnes utilisant l'internet à haut débit, dont 15 millions de femmes. Cette seconde cible n'est pas une déclinaison arithmétique de la première : sans ciblage explicite des dispositifs d'accès, l'extension de la couverture reproduit l'écart d'usage entre femmes et hommes au lieu de le réduire.",
           ],
           en: [
-            "Access is not just signal availability. It also requires a device, an affordable plan, useful content and the skills to use it. The project pays particular attention to women, rural populations and vulnerable groups.",
-            "The results framework sets an explicit ambition: of the people the project aims to bring online by 2029, around half should be women.",
+            "Access is not just signal availability. It also requires a device, an affordable plan, useful content and the skills to use it. A network available beyond the means of those it covers produces no inclusion: it moves the barrier rather than removing it.",
+            "Affordability is therefore measured as a share of income, not in absolute terms. The results framework tracks the retail price of a standard monthly mobile data plan against gross national income per capita, and targets a fall from 10.3 per cent to 5.1 per cent. Halving that effort cannot be decreed: retail prices follow wholesale costs, which depend on available transport capacity, passive infrastructure sharing and effective competition in the wholesale market. That is the direct articulation between this project and the two preceding ones.",
+            "Actual usage is the only measure that counts at the end of the chain. The results framework targets 30 million people using high-speed internet, of whom 15 million women. That second target is not an arithmetical restatement of the first: without explicit targeting of access schemes, extending coverage reproduces the usage gap between women and men instead of narrowing it.",
           ],
         },
         points: [
-          { fr: "environ la moitié de femmes parmi les utilisateurs visés à l'horizon 2029", en: "around half women among the users targeted by 2029" },
+          { fr: "prix d'un forfait mensuel standard : de 10,3 % à 5,1 % du RNB par habitant", en: "standard monthly plan price: from 10.3 to 5.1 per cent of GNI per capita" },
+          { fr: "30 millions d'utilisateurs de l'internet à haut débit visés, dont 15 millions de femmes", en: "30 million high-speed internet users targeted, of whom 15 million women" },
           { fr: "mesures d'abordabilité des terminaux et des forfaits", en: "affordability measures for devices and plans" },
           { fr: "attention portée aux zones rurales et aux publics vulnérables", en: "attention to rural areas and vulnerable groups" },
         ],
@@ -234,11 +237,11 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "La connectivité internationale et l'intégration régionale", en: "International connectivity and regional integration" },
         corps: {
           fr: [
-            "La bande passante internationale par habitant est l'indicateur le plus direct de la capacité d'un pays à participer à l'économie numérique. Le projet vise sa progression sensible à l'horizon 2029, d'un niveau de départ de 6,56 kbit/s vers un ordre de grandeur de 20 kbit/s.",
+            "La bande passante internationale par habitant est l'indicateur le plus direct de la capacité d'un pays à participer à l'économie numérique. Le projet vise sa progression sensible à l'horizon 2029, d'un niveau de départ de 6,65 kbit/s vers une cible de 20 kbit/s.",
             "Cette progression suppose des liaisons internationales renforcées et une meilleure intégration régionale, dans le cadre de l'approche APM IDEA de digitalisation inclusive en Afrique orientale et australe.",
           ],
           en: [
-            "International bandwidth per capita is the most direct measure of a country's ability to take part in the digital economy. The project targets a marked rise by 2029, from a starting level of 6.56 kbit/s towards an order of magnitude of 20 kbit/s.",
+            "International bandwidth per capita is the most direct measure of a country's ability to take part in the digital economy. The project targets a marked rise by 2029, from a starting level of 6.65 kbit/s towards a target of 20 kbit/s.",
             "That progression requires strengthened international links and deeper regional integration, within the APM IDEA approach to inclusive digitalisation in Eastern and Southern Africa.",
           ],
         },

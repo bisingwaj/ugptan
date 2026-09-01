@@ -8,7 +8,7 @@ import type { Lang } from "@/lib/pick";
 import { cn } from "@/lib/cn";
 import { dict } from "@/content/i18n";
 import { langues } from "@/content/data";
-import { BIDDERS_PORTAL_URL } from "@/lib/external";
+import { DIGIPROCURE_URL } from "@/lib/external";
 import { NAV, NAV_TREE, NAV_DRAWER, isGroup, route, type NavKey } from "@/lib/routes";
 import { usePrefersReducedMotion } from "@/components/motion/useReducedMotion";
 import { Marque } from "@/components/chrome/Marque";
@@ -230,17 +230,23 @@ export function Header({ lang }: { lang: Lang }) {
               )}
             </div>
 
-            {/* Bouton de connexion : il pointe vers le portail des
-                soumissionnaires, une plateforme tierce (cf. lib/external.ts).
-                La console d'administration de l'UGPTN, elle, n'est liée nulle
-                part. Réservé au desktop comme la navigation principale : en
-                deçà de 1120px, le lien vit dans le tiroir. */}
-            {BIDDERS_PORTAL_URL && (
+            {/* Entrée DigiProcure : la plateforme de passation et
+                d'approvisionnement du projet, hébergée hors de notre périmètre
+                avec ses propres comptes (cf. lib/external.ts). La console
+                d'administration de l'UGPTN, elle, n'est liée nulle part.
+                Réservé au desktop comme la navigation principale : en deçà de
+                1120px, le lien vit dans le tiroir.
+
+                `aria-label` porte la phrase entière : « DigiProcure » seul est
+                un nom propre, il ne dit pas où mène le lien à qui l'entend sans
+                le voir. */}
+            {DIGIPROCURE_URL && (
               <a
-                href={BIDDERS_PORTAL_URL}
+                href={DIGIPROCURE_URL}
                 target="_blank"
                 rel="noopener noreferrer external"
                 title={t.cta.loginHint}
+                aria-label={t.cta.loginHint}
                 className="nav-desktop items-center gap-2 border border-ac bg-ac px-[14px] py-2.5 text-[13.5px] font-semibold text-white transition-colors duration-200 hover:border-acd hover:bg-acd"
               >
                 {t.cta.login}
@@ -386,17 +392,26 @@ export function Header({ lang }: { lang: Lang }) {
                     </Link>
                   ))}
                 </div>
-                {BIDDERS_PORTAL_URL && (
+                {DIGIPROCURE_URL && (
                   <a
-                    href={BIDDERS_PORTAL_URL}
+                    href={DIGIPROCURE_URL}
                     target="_blank"
                     rel="noopener noreferrer external"
                     onClick={() => setNavOpen(false)}
+                    aria-label={t.cta.loginHint}
                     className="btn btn--primary justify-center"
                   >
                     {t.cta.login}
                     <span className="arrow">↗</span>
                   </a>
+                )}
+                {/* Sur mobile il n'y a pas de survol : sans cette ligne, le
+                    nom seul n'apprend rien à qui ne connaît pas encore la
+                    plateforme. */}
+                {DIGIPROCURE_URL && (
+                  <p className="-mt-1 text-center text-[12px] leading-[1.45] text-c-40">
+                    {t.cta.loginNote}
+                  </p>
                 )}
                 <Link href={route(lang, NAV.mgp)} onClick={() => setNavOpen(false)} className="btn btn--on-dark justify-center">{t.cta.mgp}</Link>
               </div>

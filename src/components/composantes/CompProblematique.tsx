@@ -1,6 +1,6 @@
 /* « La problématique » — le problème auquel la composante répond, exposé avant
    la description de ce qu'elle fait. Suit la chaîne d'argumentation définie
-   dans .claude/skills/redaction-institutionnelle : constat structurel →
+   dans docs/doctrine-redactionnelle.md : constat structurel →
    mécanisme du blocage → coût du statu quo → légitimité de l'intervention →
    interconnexions avec les autres composantes. */
 import Link from "next/link";

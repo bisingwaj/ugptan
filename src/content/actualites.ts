@@ -45,7 +45,7 @@ export const actualites: Actualite[] = [
     },
   },
   {
-    date: "31 oct. 2025", dateISO: "2025-10-31", cat: { fr: "Jalon", en: "Milestone" }, img: "fibre", lieu: "Kinshasa", comps: ["C1", "C4"],
+    date: "24 juin 2025", dateISO: "2025-06-24", cat: { fr: "Jalon", en: "Milestone" }, img: "fibre", lieu: "Kinshasa", comps: ["C1", "C4"],
     title: { fr: "Entrée en vigueur du Projet de Transformation Numérique de la RDC.", en: "Effectiveness of the DRC Digital Transformation Project." },
     corps: {
       fr: [

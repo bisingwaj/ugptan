@@ -4,7 +4,7 @@
    ========================================================================== */
 import type {
   Meta, Chiffre, Repere, Odp, Intermediaire, Composante, GouvBody,
-  Pole, Province, Langue, Profil, CompColorMap,
+  Pole, Province, Langue, CompColorMap,
 } from "./types";
 import type { Bilingual } from "@/lib/pick";
 
@@ -14,7 +14,7 @@ export const meta: Meta = {
   projet: "PTN-RDC",
   projetLong:
     "Projet de Transformation Numérique de la République Démocratique du Congo",
-  code: "P180495",
+  code: "P180495/CCD1198",
   tutelle: "MPTN",
   tutelleLong: "Ministère des Postes, Télécommunications et Numérique",
   bailleurs: "IDA (Banque mondiale) · AFD",
@@ -43,14 +43,14 @@ export const reperes: Repere[] = [
 ];
 
 export const odp: Odp[] = [
-  { code: "ODP-1", value: 30, unit: { fr: "millions", en: "million" }, baseline: "0", femmes: "dont environ la moitié de femmes", label: { fr: "Personnes utilisant l'internet haut débit", en: "People using broadband internet" } },
-  { code: "ODP-2", value: 20, unit: { fr: "kbit/s", en: "kbit/s" }, baseline: "6,56 kbit/s", femmes: null, label: { fr: "Bande passante internationale par habitant", en: "International bandwidth per capita" } },
+  { code: "ODP-1", value: 30, unit: { fr: "millions", en: "million" }, baseline: "0", femmes: "dont 15 millions de femmes", label: { fr: "Personnes utilisant l'internet haut débit", en: "People using broadband internet" } },
+  { code: "ODP-2", value: 20, unit: { fr: "kbit/s", en: "kbit/s" }, baseline: "6,65 kbit/s", femmes: null, label: { fr: "Bande passante internationale par habitant", en: "International bandwidth per capita" } },
   { code: "ODP-3", value: 1, unit: { fr: "million", en: "million" }, baseline: "0", femmes: "dont environ la moitié de femmes", label: { fr: "Personnes utilisant des services numériques", en: "People using digital services" } },
   { code: "ODP-4", value: 3000, unit: { fr: "", en: "" }, baseline: "0", femmes: "dont environ un tiers de femmes", label: { fr: "Diplômés de formations numériques avancées", en: "Graduates of advanced digital training" } },
 ];
 
 export const intermediaires: Intermediaire[] = [
-  { value: "10 000", unit: { fr: "km", en: "km" }, text: { fr: "de fibre optique additionnelle visés à l'horizon du projet", en: "of additional fibre optic targeted over the project horizon" } },
+  { value: "11 500", unit: { fr: "km", en: "km" }, text: { fr: "de fibre optique résiliente au climat, visés à l'horizon du projet", en: "of climate-resilient fibre optic targeted over the project horizon" } },
   { value: "650", unit: { fr: "", en: "" }, text: { fr: "nouvelles communautés à couvrir en mobile haut débit", en: "new communities to be covered by mobile broadband" } },
   { value: "1 000", unit: { fr: "", en: "" }, text: { fr: "institutions publiques à raccorder", en: "public institutions to be connected" } },
   { value: "100", unit: { fr: "", en: "" }, text: { fr: "startups à soutenir, dont environ un tiers dirigées par des femmes", en: "startups to support, around a third of them women-led" } },
@@ -250,17 +250,6 @@ export const langues: Langue[] = [
   { code: "sw", label: "Kiswahili", greeting: "Karibu" },
   { code: "lu", label: "Tshiluba", greeting: "Moyo" },
   { code: "kg", label: "Kikongo", greeting: "Mbote" },
-];
-
-export const profils: Profil[] = [
-  { label: { fr: "UGPTN / Gouvernement", en: "UGPTN / Government" }, page: { fr: "Cockpit", en: "Cockpit" } },
-  { label: { fr: "Entité bénéficiaire (MDA)", en: "Beneficiary entity (MDA)" }, page: { fr: "Tableau de bord", en: "Dashboard" } },
-  { label: { fr: "Partenaire", en: "Partner" }, page: { fr: "Espace partenaire", en: "Partner space" } },
-  { label: { fr: "Bailleur (BM / AFD)", en: "Donor (WB / AFD)" }, page: { fr: "Portefeuille", en: "Portfolio" } },
-  { label: { fr: "Soumissionnaire", en: "Bidder" }, page: { fr: "Marketplace", en: "Marketplace" } },
-  { label: { fr: "Bénéficiaire SBP", en: "PBG beneficiary" }, page: { fr: "Mon programme", en: "My programme" } },
-  { label: { fr: "Auditeur / Contrôle", en: "Auditor / Control" }, page: { fr: "Plan d'audit", en: "Audit plan" } },
-  { label: { fr: "Gouvernance (COPIL / CTP)", en: "Governance (Steering / Technical)" }, page: { fr: "Sessions", en: "Sessions" } },
 ];
 
 export const question: Bilingual = {

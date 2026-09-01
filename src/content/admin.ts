@@ -28,8 +28,11 @@ export const ADMIN = {
     submitting: "Vérification…",
     noSignup: "Les comptes sont créés par un administrateur. Aucune inscription n'est ouverte.",
     expired: "Votre session n'est plus valide. Reconnectez-vous pour reprendre là où vous en étiez.",
-    biddersPrompt: "Vous êtes soumissionnaire ?",
-    biddersLink: "Accéder à votre espace",
+    /* Cet écran est celui de la console de l'UGPTN. Un soumissionnaire qui y
+       atterrit s'est trompé de porte : on le renvoie à la sienne plutôt que de
+       le laisser essayer des identifiants qui n'existent pas ici. */
+    biddersPrompt: "Vous cherchez la plateforme des marchés ?",
+    biddersLink: "Ouvrir DigiProcure",
   },
 
   setPassword: {
@@ -1685,6 +1688,49 @@ export const PALETTE_ACCENT: { hex: string; nom: string }[] = [
 ];
 
 /** Un module de la console. `key` est aussi la permission qui l'ouvre. */
+/* ---------------------------------------------------------------------------
+   Module « Réglages » — fermeture du site public.
+--------------------------------------------------------------------------- */
+export const ADMIN_REGLAGES = {
+  title: "Réglages",
+  lead: "Fermeture du site public pendant une intervention, et code d'accès des personnes qui la suivent.",
+
+  etatTitre: "État du site public",
+  etatOuvert: "Ouvert",
+  etatFerme: "Fermé",
+  etatOuvertAide: "Toutes les pages publiques répondent normalement.",
+  etatFermeAide: "Les pages publiques sont remplacées par l'écran de maintenance. La console, elle, reste accessible.",
+  depuis: "Fermé depuis",
+  derniereMaj: "Dernier réglage",
+  parQui: "par",
+
+  fermer: "Fermer le site au public",
+  fermerEnCours: "Fermeture",
+  rouvrir: "Rouvrir le site",
+  rouvrirEnCours: "Réouverture",
+  fermerConfirmation: "Fermer le site au public ? Toutes les pages seront remplacées par l'écran de maintenance jusqu'à réouverture.",
+
+  accesTitre: "Code d'accès",
+  accesAide: "Six chiffres. Il ouvre le site entier pendant douze heures à qui le saisit, et se communique de la main à la main. Le modifier annule tous les accès déjà ouverts.",
+  accesLabel: "Code à six chiffres",
+  accesTirer: "Tirer un code",
+  accesManquant: "Aucun code enregistré. Le site ne peut pas être fermé tant qu'il n'y en a pas.",
+
+  publicTitre: "Ce que verra le public",
+  publicAide: "Laissés vides, les deux messages cèdent la place au texte par défaut du site, qui couvre le cas courant.",
+  retourLabel: "Réouverture annoncée",
+  retourAide: "Facultative, à l'heure de Kinshasa. Une échéance dépassée cesse d'être affichée au public plutôt que de rester à démentir l'écran.",
+  messageFr: "Message en français",
+  messageEn: "Message en anglais",
+  messageAide: "Les deux langues ou aucune. Six cents caractères au plus.",
+
+  apercuTitre: "Aperçu",
+  apercuAide: "Le texte tel qu'il s'affichera, langue par langue.",
+
+  enregistrer: "Enregistrer les réglages",
+  enregistrement: "Enregistrement",
+};
+
 export type AdminNavItem = {
   key: Permission;
   label: string;
@@ -1735,9 +1781,15 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     ],
   },
   {
-    /* Les entrées « Appels d'offres » et « Soumissionnaires » ont été retirées :
-       la passation se tient sur la plateforme nationale, la console n'a pas
-       vocation à la doubler. Il ne reste donc ici que le traitement des
+    /* Les entrées « Appels d'offres » et « Soumissionnaires » avaient été
+       retirées au motif que la passation se tenait sur une plateforme
+       nationale. Cette plateforme n'existe pas, et le motif tombe.
+
+       Elles ne reviennent pas ici pour autant : la passation se tiendra sur
+       DigiProcure, application distincte avec sa propre base, ses comptes
+       d'entreprises et ses plis scellés. Cette console administre le CONTENU du
+       site ; y loger des marchés mêlerait deux métiers dont les exigences de
+       sécurité n'ont rien de commun. Il ne reste donc ici que le traitement des
        plaintes, d'où le nom de la section. */
     key: "recours",
     label: "Recours",
@@ -1804,7 +1856,7 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
     label: "Administration",
     items: [
       { key: "utilisateurs", label: "Utilisateurs", slug: "/users" },
-      { key: "reglages", label: "i18n & réglages", soon: true },
+      { key: "reglages", label: "Réglages", slug: "/settings" },
     ],
   },
 ];
