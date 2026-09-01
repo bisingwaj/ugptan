@@ -94,6 +94,24 @@ const securityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
   { key: "X-DNS-Prefetch-Control", value: "on" },
+  /* Isole le contexte de navigation. Une page ouverte depuis un autre site
+     n'obtient plus de référence `window.opener` vers la nôtre : c'est ce qui
+     ferme le détournement d'onglet (une page tierce qui réécrit l'adresse de
+     l'onglet ouvrant vers une fausse page de connexion) et la famille des
+     fuites par canal auxiliaire entre fenêtres.
+
+     `same-origin-allow-popups` et non `same-origin` : les liens sortants du
+     site — DigiProcure au premier chef — s'ouvrent dans un nouvel onglet, et la
+     valeur stricte couperait aussi ce sens-là sans rien protéger de plus, nos
+     liens portant déjà `rel="noopener"`. */
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+  /* Un document de ce domaine n'est plus une origine partagée avec les autres
+     sous-domaines : une faille sur un sous-domaine voisin ne donne plus accès
+     au contexte de celui-ci. */
+  { key: "Origin-Agent-Cluster", value: "?1" },
+  /* Hérité de Flash et des lecteurs PDF, mais toujours lu par certains d'entre
+     eux : aucune politique inter-domaines n'est publiée par ce site. */
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
 ];
 
 const nextConfig = {

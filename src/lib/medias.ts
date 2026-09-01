@@ -56,6 +56,41 @@ export const mediaSrc = (asset: Pick<MediaRef, "id" | "url">): string =>
  */
 const HOTES_OPTIMISABLES = ["res.cloudinary.com", "images.unsplash.com", "cdn.ugptn.cd"];
 
+/**
+ * L'adresse peut-elle servir de CIBLE DE REDIRECTION depuis notre domaine ?
+ *
+ * Question distincte de `estOptimisable`, malgré la liste commune, et il faut
+ * les garder séparées : la première décide d'un CONFORT (redimensionner ou non
+ * une image), celle-ci décide d'une QUESTION DE SÉCURITÉ.
+ *
+ * `/api/medias/<id>` renvoie en 308 vers l'adresse enregistrée quand le fichier
+ * est hébergé ailleurs. Sans contrôle d'hôte, cette route est une REDIRECTION
+ * OUVERTE : un compte de la console — y compris un rôle « éditeur », qui n'a
+ * pas à disposer d'un tel pouvoir — enregistre un média externe pointant où il
+ * veut, et obtient un lien portant le domaine officiel de l'UGPTN qui conduit
+ * ailleurs. C'est exactement la matière première d'un hameçonnage crédible
+ * auprès d'entreprises candidates ou de plaignants.
+ *
+ * Trois différences avec `estOptimisable`, toutes voulues :
+ *   · `https` EXIGÉ — rediriger en clair depuis un domaine d'État, non ;
+ *   · un chemin relatif est REFUSÉ — il n'a rien à faire dans un `Location:`,
+ *     et `estOptimisable` l'accepte parce que « même origine » y est un cas
+ *     normal ;
+ *   · en cas de doute, on refuse. L'image ne s'affiche pas ; c'est un défaut
+ *     visible et réparable, là où une redirection ouverte ne se voit pas.
+ */
+export function estCibleDeRedirectionSure(url: string): boolean {
+  if (!url) return false;
+  let parsee: URL;
+  try {
+    parsee = new URL(url);
+  } catch {
+    return false;
+  }
+  if (parsee.protocol !== "https:") return false;
+  return HOTES_OPTIMISABLES.includes(parsee.hostname.toLowerCase());
+}
+
 /** `next/image` sait-il traiter cette source ? */
 export function estOptimisable(src: string): boolean {
   if (!src) return false;
