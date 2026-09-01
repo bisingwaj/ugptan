@@ -12,6 +12,7 @@ import { DIGIPROCURE_URL } from "@/lib/external";
 import { NAV, NAV_TREE, NAV_DRAWER, isGroup, route, type NavKey } from "@/lib/routes";
 import { usePrefersReducedMotion } from "@/components/motion/useReducedMotion";
 import { Marque } from "@/components/chrome/Marque";
+import { Icon } from "@/components/ui/Icon";
 
 /** Courbe unique du tiroir : sortie franche, arrivée posée. */
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -194,6 +195,29 @@ export function Header({ lang }: { lang: Lang }) {
           </nav>
 
           <div className="flex items-center gap-2.5">
+            {/* Porte de la recherche globale.
+                Une ICÔNE et non un champ : entre 1121 et 1280px la barre loge
+                déjà six entrées, le sélecteur de langue et le bouton
+                DigiProcure, et un champ déplié y aurait chassé une entrée de
+                menu. La page qui s'ouvre, elle, porte un vrai champ, au premier
+                plan et déjà focalisé.
+                `nav-desktop` comme la navigation : en deçà de 1120px, la porte
+                vit dans le tiroir, en tête de liste. */}
+            <Link
+              href={route(lang, NAV.recherche)}
+              title={t.recherche.titre}
+              aria-label={t.recherche.ariaLien}
+              aria-current={isActive(NAV.recherche) ? "page" : undefined}
+              className={cn(
+                "nav-desktop min-h-11 min-w-11 items-center justify-center border transition-colors duration-200",
+                isActive(NAV.recherche)
+                  ? "border-ac text-ac"
+                  : "border-c-20 text-c-80 hover:border-c-40",
+              )}
+            >
+              <Icon name="recherche" size={18} />
+            </Link>
+
             <div className="relative">
               {/* `min-h-11` : 44px, plancher tactile. Le bouton n'est pas un
                   `.btn` et n'héritait donc d'aucune hauteur minimale — il
@@ -334,6 +358,27 @@ export function Header({ lang }: { lang: Lang }) {
                 data-lenis-prevent
                 className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
               >
+                {/* La recherche ouvre le tiroir, détachée de l'arbre : elle
+                    n'est pas une section du site mais la façon d'en traverser
+                    toutes les sections. Sur téléphone, c'est sa seule porte —
+                    l'icône de la barre est réservée au desktop. */}
+                <Link
+                  href={route(lang, NAV.recherche)}
+                  onClick={() => setNavOpen(false)}
+                  aria-current={isActive(NAV.recherche) ? "page" : undefined}
+                  className={cn(
+                    "group flex w-full items-center justify-between gap-3 border-b border-[#232323] px-(--pad-x) py-[15px] text-[16.5px] font-medium",
+                    "transition-colors duration-200 hover:bg-c-90 active:bg-c-90",
+                    isActive(NAV.recherche) ? "text-ac-light" : "text-white",
+                  )}
+                >
+                  <span className="flex items-center gap-3">
+                    <Icon name="recherche" size={18} />
+                    {t.recherche.titre}
+                  </span>
+                  <span className="font-mono text-[13px] text-c-70 transition-transform duration-200 group-hover:translate-x-[3px]">→</span>
+                </Link>
+
                 {NAV_DRAWER.map((node) =>
                   !isGroup(node) ? (
                     <Link
