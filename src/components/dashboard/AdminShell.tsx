@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { ADMIN } from "@/content/admin";
 import type { AdminUser } from "@/lib/auth/guard";
-import { can, grantedPermissions, ROLE_LABEL } from "@/lib/auth/permissions";
-import { countUnreadGrievances } from "@/lib/mgp/query";
+import { grantedPermissions, ROLE_LABEL } from "@/lib/auth/permissions";
+import { compterNotifications } from "@/lib/notifications";
 import { parseSidebarCollapsed, SIDEBAR_COOKIE } from "@/lib/sidebar";
 import { AdminChrome } from "@/components/dashboard/AdminChrome";
 import { LogoutButton } from "@/components/dashboard/LogoutButton";
@@ -20,11 +20,11 @@ export async function AdminShell({ user, children }: { user: AdminUser; children
   const granted = grantedPermissions(user);
   const collapsed = parseSidebarCollapsed((await cookies()).get(SIDEBAR_COOKIE)?.value);
 
-  // Bulle des plaintes non lues : `null` pour un compte sans le module, qui ne
-  // voit alors ni bulle ni cloche. `catch` : la bulle n'est qu'une indication,
-  // une panne de base ne doit pas faire tomber la coquille entière, et la
-  // relecture suivante corrige le chiffre (cf. `useUnreadGrievances`).
-  const unreadGrievances = can(user, "mgp") ? await countUnreadGrievances().catch(() => 0) : null;
+  // Bulles de notification (plaintes, inscriptions) : `null` pour un module que
+  // le compte n'a pas, qui n'en voit alors ni la bulle ni la ligne dans la
+  // cloche. Calculées ici pour s'afficher dès le premier rendu, puis relues côté
+  // client (cf. `useNotifications`).
+  const notifications = await compterNotifications(user);
 
   // La barre du haut porte l'identité ; la déconnexion vit au pied de la barre
   // latérale, avec la navigation qu'elle referme.
@@ -43,7 +43,7 @@ export async function AdminShell({ user, children }: { user: AdminUser; children
     <AdminChrome
       granted={granted}
       initialCollapsed={collapsed}
-      initialUnreadGrievances={unreadGrievances}
+      initialNotifications={notifications}
       topbar={topbar}
       sidebarFooter={<LogoutButton />}
     >

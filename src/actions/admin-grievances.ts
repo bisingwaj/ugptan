@@ -267,16 +267,6 @@ export async function logGrievanceContactAction(
 /* --- Plaintes non lues ---------------------------------------------------- */
 
 /**
- * Valeur de la bulle, relue à intervalle par la coquille : un layout ne se
- * re-rend pas pendant la navigation, le chiffre calculé au chargement
- * resterait sinon figé (cf. `useUnreadGrievances`).
- */
-export async function countUnreadGrievancesAction(): Promise<number> {
-  await assertPermission("mgp");
-  return countUnreadGrievances();
-}
-
-/**
  * Marque un dossier comme lu à son ouverture. Appelée par un effet client
  * (`GrievanceReadMarker`) et non pendant le rendu serveur : un préchargement de
  * lien ne doit pas faire passer pour lu un dossier que personne n'a ouvert.

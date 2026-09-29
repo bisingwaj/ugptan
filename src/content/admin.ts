@@ -64,6 +64,7 @@ export const ADMIN = {
     collapse: "Replier la barre",
     expand: "Déplier la barre",
     notifications: "Notifications",
+    notificationsAucune: "Aucune notification",
   },
 
   errors: {
@@ -258,6 +259,12 @@ export const ADMIN = {
     colActions: "",
 
     desabonneLe: "Désabonné le",
+
+    nouveauMark: "Nouveau",
+    nouveauxNone: "Aucune nouvelle inscription",
+    nouveauxOne: "nouvelle inscription",
+    nouveauxMany: "nouvelles inscriptions",
+    nouveauxBandeau: "depuis la dernière consultation de la liste.",
 
     exportTitle: "Exporter",
     exportCsv: "Export CSV",

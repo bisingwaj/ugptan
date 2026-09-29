@@ -4,7 +4,8 @@ import { useCallback, useState, type ReactNode } from "react";
 import type { Permission } from "@/lib/auth/permissions";
 import { sidebarCookieValue } from "@/lib/sidebar";
 import { AdminSidebar } from "@/components/dashboard/AdminSidebar";
-import { GrievanceBell, useUnreadGrievances } from "@/components/dashboard/GrievanceUnread";
+import { NotificationBell, useNotifications } from "@/components/dashboard/Notifications";
+import { estSuivi, type Notifications } from "@/lib/notifications-model";
 
 /**
  * Coquille interactive de la console : c'est elle qui porte la grille `.adm`,
@@ -17,28 +18,28 @@ import { GrievanceBell, useUnreadGrievances } from "@/components/dashboard/Griev
  * `initialCollapsed` vient du serveur (cookie lu dans AdminShell) : la barre est
  * donc rendue d'emblée dans le bon état, sans repli visible après hydratation.
  *
- * Le compte de plaintes non lues vit ici pour la même raison : deux endroits
- * l'affichent (la bulle de la barre latérale, la cloche de la barre du haut),
- * et ils ne doivent jamais dire deux chiffres différents.
+ * Les comptes de notification vivent ici pour la même raison : deux endroits
+ * les affichent (les bulles de la barre latérale, la cloche de la barre du
+ * haut), et ils ne doivent jamais dire deux chiffres différents.
  */
 export function AdminChrome({
   granted,
   initialCollapsed,
-  initialUnreadGrievances,
+  initialNotifications,
   topbar,
   sidebarFooter,
   children,
 }: {
   granted: Permission[];
   initialCollapsed: boolean;
-  /** `null` : compte sans le module MGP, ni bulle ni cloche. */
-  initialUnreadGrievances: number | null;
+  /** Comptes par module ; `null` pour un module que le compte n'a pas. */
+  initialNotifications: Notifications;
   topbar: ReactNode;
   sidebarFooter: ReactNode;
   children: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed);
-  const unreadGrievances = useUnreadGrievances(initialUnreadGrievances);
+  const notifications = useNotifications(initialNotifications);
 
   const toggle = useCallback(() => {
     setCollapsed((previous) => {
@@ -57,12 +58,12 @@ export function AdminChrome({
         collapsed={collapsed}
         onToggle={toggle}
         footer={sidebarFooter}
-        unreadGrievances={unreadGrievances}
+        badges={notifications}
       />
       <div className="adm__main">
         <header className="adm__top">
           {topbar}
-          {unreadGrievances !== null && <GrievanceBell count={unreadGrievances} />}
+          {estSuivi(notifications) && <NotificationBell counts={notifications} />}
         </header>
         <main className="adm__body">{children}</main>
       </div>

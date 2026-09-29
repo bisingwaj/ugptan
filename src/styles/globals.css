@@ -1678,18 +1678,23 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
 /* ===========================================================================
    VIDÉOS & GALERIES
 
-   Une mosaïque, et non la grille cellulée du reste du site. La raison tient au
-   contenu : partout ailleurs, une cellule porte du TEXTE, et l'aligner sur une
-   trame régulière est ce qui rend la page lisible. Ici, la cellule porte une
-   IMAGE, dont le format est une donnée de la photographie et non un choix de
-   mise en page — imposer un carré à un panoramique de chantier reviendrait à le
-   recadrer sans que personne l'ait décidé. Chaque vignette garde donc son ratio
-   natif (`aspect-ratio`, relevé au dépôt), et la mosaïque les assemble en
-   colonnes de largeur égale.
+   Une trame RÉGULIÈRE : toutes les vignettes (photos, vidéos, couvertures
+   d'albums) partagent le même cadre, `--gal-ratio`, et la même largeur de
+   colonne, `--gal-colonne`.
+
+   Les vignettes ont d'abord gardé le ratio natif de leur image. Dans une grille,
+   une rangée prend la hauteur de sa vignette la plus haute : un portrait voisin
+   de deux paysages laissait sous eux des blancs de hauteur variable, et la
+   cellule « mise en avant » sur deux colonnes creusait des trous dans la trame.
+   La page se lisait comme un désordre, pas comme une galerie.
+
+   Le cadre commun recadre donc la VIGNETTE (`object-fit: cover`, cf. Photo),
+   jamais la photographie : la visionneuse l'affiche entière (`contain`). Le
+   4/3 est un compromis entre le paysage des photos de chantier et le 16/9 des
+   vidéos, et c'était déjà le format des couvertures d'albums.
 
    Les filets 1px du design system restent le liant : même `gap`, même fond
-   `--c-20`, même bordure que `.celled` ou `.doc-grille`. Ce qui change est la
-   hauteur des cellules, pas la trame.
+   `--c-20`, même bordure que `.celled` ou `.doc-grille`.
 
    La légende est POSÉE SUR l'image, sous un dégradé sombre, plutôt que sous
    elle : la retirer du flux garde la mosaïque serrée, et un titre sur fond
@@ -1704,9 +1709,12 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
    sont des repères de navigation, qu'on lit avant de cliquer, et non la légende
    d'une photographie qu'on regarde déjà.
 
-   Le format de couverture est FIXE (4/3), contrairement aux cellules de la
-   mosaïque qui gardent leur ratio natif. Ici, l'alignement prime : on compare
-   des reportages, on ne contemple pas des images. */
+   La couverture prend le cadre commun (`--gal-ratio`), comme les vignettes de
+   la mosaïque en dessous : albums et images se lisent sur la même trame. */
+
+/* Cadre et largeur de colonne communs aux albums et à la mosaïque. Posés sur
+   les deux grilles, et non sur `:root`, pour ne rien exposer au reste du site. */
+.gal-albums__grille, .gal-grille { --gal-ratio: 4 / 3; --gal-colonne: 280px; }
 
 .gal-albums { margin-bottom: clamp(44px, 6vw, 76px); }
 .gal-albums__tete {
@@ -1718,7 +1726,7 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
 }
 
 .gal-albums__grille {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--gal-colonne), 1fr));
   gap: 1px; background: var(--c-20); border: 1px solid var(--c-20);
   margin: 0; padding: 0; list-style: none;
 }
@@ -1727,7 +1735,7 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
 .gal-album__lien:focus-visible { outline: 2px solid var(--ac); outline-offset: -3px; }
 
 .gal-album__visuel {
-  position: relative; display: block; aspect-ratio: 4 / 3;
+  position: relative; display: block; aspect-ratio: var(--gal-ratio);
   background: var(--c-10); overflow: hidden; isolation: isolate;
 }
 .gal-album__visuel img { transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -1764,18 +1772,19 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
 .gal-toutes { margin-bottom: 22px; }
 
 .gal-grille {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--gal-colonne), 1fr));
   gap: 1px; background: var(--c-20); border: 1px solid var(--c-20);
   margin: 0; padding: 0; list-style: none;
 }
 
+/* Toutes les cellules ont la même taille, mise en avant comprise : un contenu
+   « à la une » se distingue par son RANG (il passe en tête, cf.
+   lib/galerie/query.ts), plus par une double largeur qui trouait la trame. */
 .gal-cell { background: #fff; min-width: 0; }
-/* Mise en avant : deux colonnes. La cellule ne change pas de rang — l'ordre
-   reste celui décidé en console —, elle change de PLACE occupée. */
-.gal-cell--large { grid-column: span 2; }
 
 .gal-cell__btn {
   position: relative; display: block; width: 100%; overflow: hidden;
+  aspect-ratio: var(--gal-ratio);
   background: var(--c-10); border: 0; padding: 0; text-align: left; cursor: pointer;
   isolation: isolate;
 }
@@ -1891,8 +1900,6 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
 
 @media (max-width: 760px) {
   .gal-grille, .gal-albums__grille { grid-template-columns: 1fr; }
-  /* Une seule colonne : la mise en avant n'a plus de largeur à doubler. */
-  .gal-cell--large { grid-column: span 1; }
   .gal-vue__image, .gal-vue__lecteur { height: 52vh; }
   .gal-vue__pied { grid-template-columns: 1fr; }
   /* Le rappel clavier ne s'adresse qu'à ceux qui en ont un. */

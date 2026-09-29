@@ -230,7 +230,9 @@ export async function confirmByToken(rawToken: string): Promise<{ code: TokenCod
 
     await db().newsletterSubscriber.update({
       where: { id: abonne.id },
-      data: { status: "ACTIVE", subscribedAt: new Date(), unsubscribedAt: null },
+      // `readAt` remis à zéro : une réinscription est une inscription, que la
+      // bulle de la console doit signaler comme la première.
+      data: { status: "ACTIVE", subscribedAt: new Date(), unsubscribedAt: null, readAt: null },
     });
 
     return { code: "done" };

@@ -283,6 +283,33 @@
     box-shadow: 0 0 0 2px var(--c-black);
   }
   .adm-bell:hover .adm-bulle { box-shadow: 0 0 0 2px var(--c-90); }
+  .adm-bell[aria-expanded="true"] { @apply bg-c-90 text-white border-c-80; }
+  .adm-bell[aria-expanded="true"] .adm-bulle { box-shadow: 0 0 0 2px var(--c-90); }
+
+  /* Menu de la cloche : une ligne par module suivi. Même dessin que les autres
+     panneaux flottants de la console (cf. `.rte__palette`) : fond blanc, filet,
+     ombre légère, angles droits. Posé à l'aplomb du filet bas de la barre du
+     haut, aligné sur le bord droit de la cloche, et jamais plus large que
+     l'écran moins ses gouttières. */
+  .adm-bell-wrap { @apply relative flex flex-none; }
+  .adm-bell-menu {
+    position: absolute; top: calc(100% + 15px); right: -10px; z-index: 6;
+    width: min(300px, calc(100vw - 32px));
+    background: #fff; color: var(--c-black); border: 1px solid var(--c-20);
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.12);
+  }
+  .adm-bell-menu__titre {
+    @apply font-mono text-[10.5px] tracking-[0.08em] uppercase text-c-50 px-4 pt-3 pb-2;
+  }
+  .adm-bell-menu__liste { @apply list-none m-0 p-0 border-t border-c-20; }
+  .adm-bell-menu__item {
+    @apply flex min-h-11 items-center justify-between gap-3 px-4 py-2.5 text-[13.5px] border-b border-c-20;
+    transition: background 0.16s;
+  }
+  .adm-bell-menu__liste li:last-child .adm-bell-menu__item { @apply border-b-0; }
+  .adm-bell-menu__item:hover { @apply bg-c-10; }
+  .adm-bell-menu__item.is-vide { @apply text-c-60; }
+  .adm-bell-menu__fin { @apply flex flex-none items-center gap-2.5 text-c-50; }
   .adm__body { flex: 1; padding: clamp(24px, 3vw, 40px) clamp(20px, 3vw, 40px) 64px; }
   .adm__title { @apply font-semibold tracking-[-0.02em] text-[clamp(24px,2.6vw,32px)]; }
   .adm__lead { @apply mt-2.5 max-w-[68ch] text-[14.5px] leading-[1.55] text-c-70; }

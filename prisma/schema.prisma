@@ -580,10 +580,17 @@ model NewsletterSubscriber {
   /// Adresse d'origine de la soumission, conservée pour instruire un abus.
   ip String?
 
+  /// Moment où l'inscription a été vue dans la console ; `null` tant que
+  /// personne n'a ouvert la page Newsletter depuis. Alimente la bulle de
+  /// notification (cf. lib/newsletter/query.ts). État PARTAGÉ par l'équipe,
+  /// remis à `null` par une réinscription confirmée.
+  readAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([status, subscribedAt])
+  @@index([readAt])
 }
 
 /// ===========================================================================

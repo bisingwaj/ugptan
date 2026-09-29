@@ -26,6 +26,7 @@ const RAW_DIGIPROCURE_URL =
   process.env.NEXT_PUBLIC_DIGIPROCURE_URL ||
   process.env.NEXT_PUBLIC_BIDDERS_PORTAL_URL ||
   process.env.NEXT_PUBLIC_SUBMITTERS_ADMIN_LOGIN_URL ||
+
   "";
 
 /** Nom de la plateforme, tel qu'il s'affiche. Identique en français et en anglais. */

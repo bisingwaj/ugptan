@@ -9,8 +9,26 @@
  *
  * ⚠️ Module SERVEUR : il parle à Prisma.
  */
+import type { Prisma } from "@/generated/prisma/client";
+import { db } from "@/lib/db";
 import { LANGS, type Lang } from "@/lib/pick";
 import { estStatut, normalizeEmail, sourceLabel, STATUT_LABEL, type NewsletterStatut } from "./model";
+
+/**
+ * Inscription que personne n'a encore vue dans la console. État partagé par
+ * l'équipe (cf. `NewsletterSubscriber.readAt`). Une adresse inscrite puis
+ * désabonnée avant d'avoir été vue ne compte pas : il n'y a plus rien à signaler.
+ *
+ * Un seul filtre, le même pour la bulle et pour les lignes « Nouveau ».
+ */
+export const NOUVEAUX_WHERE = {
+  readAt: null,
+  status: "ACTIVE",
+} as const satisfies Prisma.NewsletterSubscriberWhereInput;
+
+/** Nombre de nouvelles inscriptions — la valeur de la bulle. */
+export const compterNouveauxAbonnes = (): Promise<number> =>
+  db().newsletterSubscriber.count({ where: NOUVEAUX_WHERE });
 
 /** Filtres tels qu'ils voyagent dans l'URL de la liste. */
 export type FiltresBruts = {

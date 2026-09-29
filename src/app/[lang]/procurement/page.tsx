@@ -5,6 +5,7 @@ import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { marchesMethodes, candidature } from "@/content/marches";
 import { chargerMarches } from "@/lib/digiprocure";
+import { DIGIPROCURE_URL } from "@/lib/external";
 import { NAV, route } from "@/lib/routes";
 import { Kicker } from "@/components/ui/Kicker";
 import { Icon, type IconName } from "@/components/ui/Icon";
@@ -68,10 +69,17 @@ export default async function MarchesPage(props: {
               <div style={{ fontWeight: 600, fontSize: "clamp(20px,2.4vw,30px)", letterSpacing: "-0.02em" }}>{t.marches.bidderTitle}</div>
               <p style={{ margin: "9px 0 0", fontSize: 14.5, color: "var(--c-30)", lineHeight: 1.55 }}>{t.marches.bidderLead}</p>
             </div>
-            {/* ⚠️ Menait au formulaire de contact, ce qui promettait un
-                échange humain là où le parcours est en libre-service. Il mène
-                désormais à la page qui l'explique et ouvre l'inscription. */}
-            <Link href={route(lang, NAV.soumissionnaires)} className="btn btn--primary" style={{ whiteSpace: "nowrap", padding: "16px 26px" }}>{t.marches.bidderCta} →</Link>
+            {/* Mène à l'inscription sur DigiProcure : le texte à côté dit que
+                c'est elle qui ouvre le dossier et les additifs, le bouton y va
+                donc directement. Même adresse que « Créer un compte » sur la
+                page Soumissionnaires.
+                ⚠️ Sans adresse configurée (`DIGIPROCURE_URL` à `null`), repli
+                sur cette page, qui annonce l'ouverture : jamais de lien mort. */}
+            {DIGIPROCURE_URL ? (
+              <a href={`${DIGIPROCURE_URL}`} className="btn btn--primary" style={{ whiteSpace: "nowrap", padding: "16px 26px" }}>{t.marches.bidderCta} →</a>
+            ) : (
+              <Link href={route(lang, NAV.soumissionnaires)} className="btn btn--primary" style={{ whiteSpace: "nowrap", padding: "16px 26px" }}>{t.marches.bidderCta} →</Link>
+            )}
           </Reveal>
 
           <RevealGroup className="grid-4" style={{ marginTop: 1 }} gap={0.045}>

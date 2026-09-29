@@ -1,13 +1,11 @@
 /**
  * Vidéos & galeries : le bandeau d'albums, puis la mosaïque.
  *
- * La grille réelle mêle des cellules simples et des cellules doubles
- * (`.gal-cell--large`). Le squelette reprend cette alternance : une mosaïque
- * régulière annoncerait une mise en page qui n'arrive jamais.
+ * La grille réelle est régulière : toutes ses cellules partagent le même cadre
+ * (`--gal-ratio`, cf. globals.css). Le squelette la reproduit telle quelle, pour
+ * annoncer la mise en page qui arrive et non une autre.
  */
 import { SqEcran, SqPageHero, SqBloc } from "@/components/ui/Squelette";
-
-const LARGES = new Set([0, 5]);
 
 export default function Loading() {
   return (
@@ -22,8 +20,8 @@ export default function Loading() {
           </div>
           <ul className="gal-grille" style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {Array.from({ length: 8 }, (_, i) => (
-              <li key={i} className={LARGES.has(i) ? "gal-cell gal-cell--large" : "gal-cell"}>
-                <SqBloc surface rang={i} hauteur="100%" style={{ aspectRatio: LARGES.has(i) ? "16 / 9" : "4 / 3" }} />
+              <li key={i} className="gal-cell">
+                <SqBloc surface rang={i} hauteur="100%" style={{ aspectRatio: "var(--gal-ratio)" }} />
               </li>
             ))}
           </ul>

@@ -13,9 +13,13 @@ import {
   sourceLabel,
   type NewsletterStatut,
 } from "@/lib/newsletter/model";
-import { CHAMPS_LISTE, filtreActif, lireFiltres, whereAbonnes } from "@/lib/newsletter/query";
+import {
+  CHAMPS_LISTE, compterNouveauxAbonnes, filtreActif, lireFiltres, whereAbonnes,
+} from "@/lib/newsletter/query";
+import { resumeNotification } from "@/lib/notifications-model";
 import { ExportButton } from "@/components/dashboard/ExportButton";
 import { NewsletterActions } from "@/components/dashboard/NewsletterActions";
+import { NewsletterSeenMarker } from "@/components/dashboard/NewsletterUnread";
 import { PendingLink } from "@/components/ui/PendingLink";
 
 export const metadata: Metadata = { title: ADMIN.newsletter.title };
@@ -55,13 +59,18 @@ export default async function NewsletterAdminPage(props: { searchParams: Promise
   const filtres = lireFiltres(params);
   const where = whereAbonnes(filtres);
 
-  const depuis = new Date(Date.now() - FENETRE_JOURS * 24 * 60 * 60 * 1000);
+  // Instant de lecture de la liste : il borne ce qui sera marqué comme vu (cf.
+  // `NewsletterSeenMarker`), une inscription arrivée depuis reste signalée.
+  const now = new Date();
+  const depuis = new Date(now.getTime() - FENETRE_JOURS * 24 * 60 * 60 * 1000);
 
-  const [total, abonnes, actifs, desabonnes, recents, sources] = await Promise.all([
+  const [total, abonnes, actifs, desabonnes, recents, sources, nouveaux] = await Promise.all([
     db().newsletterSubscriber.count({ where }),
     db().newsletterSubscriber.findMany({
       where,
-      select: CHAMPS_LISTE,
+      // `readAt` ici seulement, et non dans `CHAMPS_LISTE` : ce dernier est
+      // partagé avec l'export, où l'état de lecture de la console n'a rien à faire.
+      select: { ...CHAMPS_LISTE, readAt: true },
       // Les dernières inscriptions d'abord : c'est ce qu'on vient vérifier.
       orderBy: { subscribedAt: "desc" },
       skip: (page - 1) * PAR_PAGE,
@@ -74,6 +83,7 @@ export default async function NewsletterAdminPage(props: { searchParams: Promise
     db().newsletterSubscriber.count({ where: { status: "UNSUBSCRIBED" } }),
     db().newsletterSubscriber.count({ where: { status: "ACTIVE", subscribedAt: { gte: depuis } } }),
     db().newsletterSubscriber.groupBy({ by: ["source"], _count: { source: true } }),
+    compterNouveauxAbonnes(),
   ]);
 
   const pages = Math.max(1, Math.ceil(total / PAR_PAGE));
@@ -169,6 +179,17 @@ export default async function NewsletterAdminPage(props: { searchParams: Promise
 
       <p className="adm-hint" style={{ marginTop: 12, maxWidth: 780 }}>{t.exportAide}</p>
 
+      {/* Nouvelles inscriptions : signalées pendant cette visite, puis marquées
+          comme vues à l'ouverture de la page, ce qui éteint la bulle. */}
+      {nouveaux > 0 && (
+        <>
+          <div className="adm-ok" role="status" style={{ marginTop: 18 }}>
+            {resumeNotification("newsletter", nouveaux)} {t.nouveauxBandeau}
+          </div>
+          <NewsletterSeenMarker before={now.toISOString()} />
+        </>
+      )}
+
       {abonnes.length === 0 ? (
         <div className="adm-list" style={{ marginTop: 18 }}>
           <div className="adm-list__row">{filtre ? t.emptyFiltered : t.empty}</div>
@@ -190,10 +211,19 @@ export default async function NewsletterAdminPage(props: { searchParams: Promise
               {abonnes.map((abonne) => {
                 const statut = abonne.status as NewsletterStatut;
                 const actif = statut === "ACTIVE";
+                // Même règle que `NOUVEAUX_WHERE` : une adresse désabonnée
+                // n'est plus une nouveauté à signaler.
+                const nouveau = actif && abonne.readAt === null;
 
                 return (
-                  <tr key={abonne.id}>
+                  <tr key={abonne.id} className={nouveau ? "is-unread" : undefined}>
                     <td>
+                      {nouveau && (
+                        <>
+                          <span className="adm-unread-dot" aria-hidden />
+                          <span className="sr-only">{t.nouveauMark} : </span>
+                        </>
+                      )}
                       {/* `mailto:` plutôt qu'un lien vers une fiche : le module
                           n'a pas de vue de détail, une adresse n'ayant rien de
                           plus à montrer que sa ligne. */}

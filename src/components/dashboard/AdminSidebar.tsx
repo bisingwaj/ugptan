@@ -7,7 +7,8 @@ import { ADMIN, ADMIN_NAV_SECTIONS } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import type { Permission } from "@/lib/auth/permissions";
 import { AdminIcon } from "@/components/dashboard/AdminIcon";
-import { UnreadBubble, unreadSummary } from "@/components/dashboard/GrievanceUnread";
+import { UnreadBubble } from "@/components/dashboard/Notifications";
+import { estCleNotification, resumeNotification, type Notifications } from "@/lib/notifications-model";
 import { Marque } from "@/components/chrome/Marque";
 
 /** Chevron de la bascule. Dessiné ici : c'est de la chrome, pas un module. */
@@ -48,15 +49,15 @@ export function AdminSidebar({
   collapsed,
   onToggle,
   footer,
-  unreadGrievances,
+  badges,
 }: {
   granted: Permission[];
   collapsed: boolean;
   onToggle: () => void;
   /** Actions de pied de barre — la déconnexion, servie du serveur. */
   footer?: ReactNode;
-  /** Plaintes non lues, portées en bulle sur le module MGP. `null` : pas de module. */
-  unreadGrievances: number | null;
+  /** Comptes portés en bulle sur les modules qui en ont (cf. lib/notifications-model.ts). */
+  badges: Notifications;
 }) {
   const pathname = usePathname();
   const allowed = new Set<string>(granted);
@@ -88,9 +89,10 @@ export function AdminSidebar({
             <div className="adm__nav-label" aria-hidden>{section.label}</div>
 
             {section.items.map((item) => {
-              // Seul le module MGP porte une bulle : c'est le seul où quelque
-              // chose arrive de l'extérieur sans que la console l'ait demandé.
-              const unread = item.key === "mgp" && unreadGrievances ? unreadGrievances : 0;
+              // Une bulle sur les seuls modules où quelque chose arrive du site
+              // public sans que la console l'ait demandé : plaintes, inscriptions.
+              const cle = estCleNotification(item.key) ? item.key : null;
+              const unread = cle ? badges[cle] ?? 0 : 0;
 
               const content = (
                 <>
@@ -98,7 +100,7 @@ export function AdminSidebar({
                   <span className="adm__nav-text">{item.label}</span>
                   {/* Le nombre en toutes lettres pour les lecteurs d'écran : la
                       bulle est muette, et le libellé seul ne dit rien de neuf. */}
-                  {unread > 0 && <span className="sr-only">, {unreadSummary(unread)}</span>}
+                  {cle && unread > 0 && <span className="sr-only">, {resumeNotification(cle, unread)}</span>}
                   <UnreadBubble count={unread} />
                 </>
               );
@@ -123,7 +125,7 @@ export function AdminSidebar({
                   key={item.key}
                   href={href}
                   // Seule infobulle disponible une fois la barre repliée.
-                  title={unread > 0 ? `${item.label} · ${unreadSummary(unread)}` : item.label}
+                  title={cle && unread > 0 ? `${item.label} · ${resumeNotification(cle, unread)}` : item.label}
                   className={`adm__nav-item${active ? " is-active" : ""}`}
                   aria-current={active ? "page" : undefined}
                 >

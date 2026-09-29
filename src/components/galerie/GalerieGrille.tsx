@@ -31,16 +31,6 @@ import type { GalerieVue } from "@/lib/galerie/query";
 import { Photo } from "@/components/ui/Photo";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
-/**
- * Ratio de repli quand les dimensions n'ont pas été relevées.
- *
- * Le format paysage plutôt que le carré : c'est celui de l'immense majorité des
- * photographies de chantier et de toutes les vignettes de vidéo, et une cellule
- * carrée au milieu d'une mosaïque paysage se remarque plus qu'un paysage au
- * milieu de carrés.
- */
-const RATIO_DEFAUT = 3 / 2;
-
 export function GalerieGrille({
   items,
   lang,
@@ -148,18 +138,18 @@ export function GalerieGrille({
       {/* `RevealGroup` REMPLACE la grille et `RevealItem` la cellule : aucun
           conteneur intermédiaire, conformément au contrat du composant. Une
           galerie est une LISTE — d'où `ul` / `li` plutôt que des `div`, pour que
-          la navigation au lecteur d'écran en annonce le nombre. */}
+          la navigation au lecteur d'écran en annonce le nombre.
+
+          Toutes les cellules partagent le même cadre (`--gal-ratio`, cf.
+          globals.css) : ni ratio propre à l'image, ni double largeur pour la
+          mise en avant. Les deux faisaient des rangées de hauteurs inégales et
+          des trous dans la trame. L'image entière reste dans la visionneuse. */}
       <RevealGroup as="ul" className="gal-grille" gap={0.035}>
         {items.map((item, position) => (
-          <RevealItem
-            as="li"
-            key={item.id}
-            className={item.featured ? "gal-cell gal-cell--large" : "gal-cell"}
-          >
+          <RevealItem as="li" key={item.id} className="gal-cell">
             <button
               type="button"
               className="gal-cell__btn"
-              style={{ aspectRatio: String(item.visuel.ratio ?? RATIO_DEFAUT) }}
               onClick={() => ouvrir(position)}
               aria-label={`${item.type === "VIDEO" ? t.openVideo : t.openPhoto} : ${item.titre}`}
             >

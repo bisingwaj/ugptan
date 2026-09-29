@@ -22,6 +22,7 @@ import { revalidatePath } from "next/cache";
 import { ADMIN_NEWSLETTER } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { assertPermission } from "@/lib/auth/guard";
+import { NOUVEAUX_WHERE, compterNouveauxAbonnes } from "@/lib/newsletter/query";
 import { ADMIN } from "@/content/admin";
 
 export type NewsletterFormState = { error: string | null; ok: string | null };
@@ -45,7 +46,9 @@ export async function setSubscriberStatusAction(
       data: actif
         ? // Réabonnement : la date d'inscription repart à zéro, faute de quoi
           // la liste prétendrait que l'adresse n'a jamais quitté la diffusion.
-          { status: "ACTIVE", subscribedAt: new Date(), unsubscribedAt: null }
+          // Vue d'office : c'est un agent qui l'inscrit, la bulle n'a pas à
+          // lui signaler son propre geste.
+          { status: "ACTIVE", subscribedAt: new Date(), unsubscribedAt: null, readAt: new Date() }
         : { status: "UNSUBSCRIBED", unsubscribedAt: new Date() },
     });
   } catch (error) {
@@ -82,4 +85,33 @@ export async function deleteSubscriberAction(
 
   revalidatePath(ADMIN_NEWSLETTER);
   return { error: null, ok: t.supprimeOk };
+}
+
+/**
+ * Marque comme vues les inscriptions affichées par la page Newsletter.
+ *
+ * Appelée à l'ouverture de la page par un effet client (`NewsletterSeenMarker`)
+ * et non pendant son rendu serveur : le préchargement d'un lien vers la page ne
+ * doit rien marquer.
+ *
+ * Bornée aux inscriptions antérieures au chargement (`before`) : une adresse
+ * arrivée depuis n'était pas à l'écran, elle reste signalée. Une date illisible
+ * ne marque rien.
+ *
+ * Pas de `revalidatePath`, délibérément : la page ouverte garde ses lignes
+ * « Nouveau » le temps de la visite — c'est ce qui permet de les repérer. La
+ * suivante relit la base, la page étant rendue à chaque requête.
+ */
+export async function markSubscribersSeenAction(before: string): Promise<number> {
+  await assertPermission("newsletter");
+
+  const borne = new Date(typeof before === "string" ? before : "");
+  if (!Number.isNaN(borne.getTime())) {
+    await db().newsletterSubscriber.updateMany({
+      where: { ...NOUVEAUX_WHERE, subscribedAt: { lte: borne } },
+      data: { readAt: new Date() },
+    });
+  }
+
+  return compterNouveauxAbonnes();
 }
