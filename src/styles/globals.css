@@ -1107,6 +1107,12 @@ a.footer-legal__link:hover { color: #fff; border-bottom-color: var(--ac-light); 
   cursor: pointer; transition: background 0.2s, border-color 0.2s;
 }
 .avis__btn:hover { background: var(--acd); border-color: var(--acd); }
+/* Refus : deuxieme action, jamais grisee. Le contour suffit a la mettre au
+   second rang ; au survol elle bascule sur une surface pleine et claire, pour
+   qu'on voie qu'on l'a bien saisie avant de quitter le site. */
+.avis__btn--refus { background: transparent; color: var(--c-30); border-color: var(--c-70); transition: background 0.2s, border-color 0.2s, color 0.2s; }
+.avis__btn--refus:hover { background: #fff; color: var(--c-black); border-color: #fff; }
+.avis__aide { margin: 14px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--c-50); }
 .avis__liens { display: flex; flex-wrap: wrap; gap: 16px; }
 .avis__lien { font-size: 12.5px; color: var(--c-40); border-bottom: 1px solid var(--c-70); transition: color 0.2s, border-color 0.2s; }
 a.avis__lien:hover { color: #fff; border-bottom-color: var(--ac-light); }
@@ -1891,6 +1897,183 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
   .gal-vue__pied { grid-template-columns: 1fr; }
   /* Le rappel clavier ne s'adresse qu'à ceux qui en ont un. */
   .gal-vue__aide { display: none; }
+}
+
+/* ===========================================================================
+   SITE FERMÉ — écran de maintenance
+   Substitué à toute page publique quand la console ferme le site. Surface noire
+   pleine page : le visiteur doit voir en un coup d'œil qu'il n'est pas sur une
+   page ordinaire du site, avant même d'avoir lu le titre.
+=========================================================================== */
+.mnt {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  background: var(--c-black);
+  color: var(--c-30);
+  padding: clamp(28px, 6vw, 72px) max(24px, var(--sa-r)) calc(clamp(28px, 6vw, 72px) + var(--sa-b)) max(24px, var(--sa-l));
+}
+.mnt__cadre { width: min(680px, 100%); margin: 0 auto; }
+.mnt__tete { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-bottom: clamp(36px, 7vw, 64px); }
+.mnt__logo { height: 38px; width: auto; }
+.mnt__langues { display: flex; gap: 14px; font-size: 12.5px; }
+.mnt__langue { color: var(--c-50); transition: color 0.2s; }
+.mnt__langue--active { color: #fff; }
+a.mnt__langue:hover { color: #fff; }
+
+.mnt__kicker { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ac-light); }
+.mnt__titre { margin: 14px 0 0; font-size: clamp(29px, 5.2vw, 46px); font-weight: 600; line-height: 1.08; letter-spacing: -0.02em; color: #fff; }
+.mnt__corps { margin: 18px 0 0; max-width: 58ch; font-size: clamp(15px, 1.5vw, 16.5px); line-height: 1.65; }
+
+/* L'échéance porte la barre d'accent : c'est l'information que l'on revient
+   chercher, et la seule qui change d'une fermeture à l'autre. */
+.mnt__echeance { display: block; margin: 26px 0 0; padding: 12px 0 12px 16px; border-left: 3px solid var(--ac); font-size: 16px; color: #fff; }
+.mnt__echeance-label { margin-bottom: 2px; }
+
+.mnt__bloc { margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--c-80); }
+.mnt__note { margin: 10px 0 0; max-width: 62ch; font-size: 13.5px; line-height: 1.6; color: var(--c-40); }
+.mnt__contact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 14px 0 0; font-size: 13px; }
+.mnt__contact a { color: var(--c-30); border-bottom: 1px solid var(--c-70); transition: color 0.2s, border-color 0.2s; }
+.mnt__contact a:hover { color: #fff; border-bottom-color: var(--ac-light); }
+.mnt__contact span { color: var(--c-70); }
+
+.mnt__acces { margin-top: 16px; }
+.mnt__saisie { display: flex; flex-wrap: wrap; gap: 12px; }
+/* Chiffres espacés : un code se relit caractère par caractère, et l'écart rend
+   visible qu'il en manque un avant même de compter. */
+.mnt__champ {
+  flex: 0 1 200px; padding: 12px 16px;
+  font-size: 18px; letter-spacing: 0.3em;
+  background: transparent; color: #fff; border: 1px solid var(--c-70);
+}
+.mnt__champ::placeholder { color: var(--c-70); }
+.mnt__champ:focus-visible { outline: 2px solid var(--ac-light); outline-offset: 2px; border-color: var(--ac-light); }
+.mnt__btn {
+  padding: 12px 22px; font-size: 14px; font-weight: 500;
+  background: var(--ac); color: #fff; border: 1px solid var(--ac);
+  cursor: pointer; transition: background 0.2s, border-color 0.2s;
+}
+.mnt__btn:hover:not(:disabled) { background: var(--acd); border-color: var(--acd); }
+.mnt__btn:disabled { opacity: 0.55; cursor: default; }
+/* `--red` est calibré pour les fonds clairs de la console : sur le noir, il
+   tombe sous le seuil de lisibilité. Rouge clair de la même famille Carbon. */
+.mnt__erreur { margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: #ff8389; }
+
+@media (max-width: 560px) {
+  .mnt__logo { height: 32px; }
+  /* Le champ et le bouton passent pleine largeur : la saisie d'un code au
+     pouce ne doit pas se faire dans une boîte de 200px collée à un bouton. */
+  .mnt__champ, .mnt__btn { flex: none; width: 100%; }
+  .mnt__btn { min-height: 48px; }
+}
+
+
+/* ===========================================================================
+   RECHERCHE GLOBALE  (/[lang]/search)
+
+   Une seule page interroge les six fonds du site. Sa mise en forme doit donc
+   faire une chose qu'aucune page de section n'a à faire : rendre COMPARABLES
+   des fiches de natures différentes. D'où des lignes uniformes plutôt que les
+   cartes illustrées des sections — une vignette ferait passer le fonds le plus
+   imagé pour le plus pertinent (cf. components/recherche/LigneResultat.tsx).
+
+   Les gris de texte sont pris à --c-60 et --c-70, jamais à --c-50 : à 11-13 px
+   sur fond blanc, ce dernier tombe à 3,3:1, sous le seuil AA de 4,5:1.
+=========================================================================== */
+
+/* --- En-tête ----------------------------------------------------------------
+   La page n'a pas de `.page-hero` (cf. le commentaire de sa page) : le titre
+   tient sur une ligne, au-dessus du champ, et le rembourrage haut est celui
+   d'une section ordinaire et non d'un héros. Le titre reste un <h1> — le retirer
+   pour gagner de la hauteur laisserait la page sans en-tête de niveau 1. */
+.rec-page { padding: clamp(34px, 4vw, 52px) max(var(--pad-x), var(--sa-r)) clamp(64px, 8vw, 110px) max(var(--pad-x), var(--sa-l)); }
+.rec-titre {
+  margin-bottom: clamp(20px, 2.4vw, 28px);
+  font-weight: 600; font-size: clamp(26px, 3.2vw, 40px);
+  line-height: 1.08; letter-spacing: -0.025em; max-width: 20ch;
+}
+
+/* --- Barre de recherche -----------------------------------------------------
+   Plus haute et plus large que le champ des pages de section : ici, c'est la
+   seule action de la page, et le champ doit se voir depuis le haut de l'écran. */
+.rec-form { display: flex; flex-wrap: wrap; gap: 10px; }
+.rec-form__champ {
+  flex: 1 1 320px; min-width: 0;
+  border: 1px solid var(--c-30); background: #fff; color: var(--c-black);
+  padding: 14px 18px; font-size: 16px; font-family: inherit;
+}
+.rec-form__champ::placeholder { color: var(--c-60); }
+.rec-form__champ:focus { outline: 2px solid var(--ac); outline-offset: -1px; border-color: var(--ac); }
+
+/* --- Page ouverte sans requête ---------------------------------------------- */
+.rec-invite { margin: 22px 0 0; max-width: 68ch; font-size: 15.5px; line-height: 1.65; color: var(--c-70); }
+.rec-portes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 26px; }
+.rec-portes__label {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--c-60); margin-right: 4px;
+}
+
+/* --- Décompte ---------------------------------------------------------------- */
+.rec-compte {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 26px 0 0; padding-bottom: 14px; border-bottom: 1px solid var(--c-20);
+  font-size: 12.5px; color: var(--c-60);
+}
+
+/* --- Groupe par fonds --------------------------------------------------------
+   L'intertitre porte le décompte du fonds : le visiteur sait ce qu'il regarde
+   ET ce qu'il ne regarde pas encore, avant d'avoir fait défiler. */
+.rec-groupe { margin-top: clamp(38px, 5vw, 56px); }
+.rec-groupe__tete {
+  display: flex; align-items: baseline; gap: 14px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--c-black);
+}
+.rec-groupe__titre {
+  margin: 0; font-size: clamp(17px, 1.9vw, 21px); font-weight: 600; letter-spacing: -0.02em;
+}
+.rec-groupe__compte { font-size: 12px; color: var(--c-60); }
+.rec-groupe__tout {
+  display: inline-flex; align-items: center; gap: 9px; margin-top: 18px;
+  font-size: 14px; font-weight: 600; color: var(--ac);
+}
+.rec-groupe__tout:hover { color: var(--acd); }
+.rec-groupe__tout:focus-visible { outline: 2px solid var(--ac); outline-offset: 3px; }
+
+/* --- Lignes de résultat -------------------------------------------------------
+   Une vraie <ul> de liens : c'est ce que lit un lecteur d'écran et ce
+   qu'explore un robot. Le filet vit sur la ligne, pas sur la liste, pour que le
+   survol puisse le colorer sans décaler la mise en page. */
+.rec-liste { margin: 0; padding: 0; list-style: none; }
+.rec-item {
+  display: grid; gap: 7px; padding: 20px 0 22px;
+  border-bottom: 1px solid var(--c-20);
+  border-left: 2px solid transparent; padding-left: 0;
+  transition: border-left-color 0.18s, padding-left 0.18s, background 0.18s;
+}
+.rec-item:hover { border-left-color: var(--ac); padding-left: 14px; background: var(--c-10); }
+.rec-item:focus-visible { outline: 2px solid var(--ac); outline-offset: -2px; }
+
+.rec-item__haut { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.rec-item__type {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ac);
+}
+.rec-item__meta { font-size: 11px; letter-spacing: 0.04em; color: var(--c-60); }
+.rec-item__titre {
+  font-size: clamp(16px, 1.7vw, 18.5px); font-weight: 600; line-height: 1.35;
+  letter-spacing: -0.01em; color: var(--c-black); max-width: 60ch;
+}
+.rec-item:hover .rec-item__titre { color: var(--ac); }
+.rec-item__extrait { max-width: 78ch; font-size: 14.5px; line-height: 1.6; color: var(--c-70); }
+.rec-item__date { font-size: 11.5px; color: var(--c-60); }
+
+@media (max-width: 560px) {
+  /* Le champ et son bouton passent pleine largeur : chercher au pouce ne doit
+     pas se faire dans une boîte serrée contre un bouton. */
+  .rec-form__champ { flex: none; width: 100%; }
+  .rec-form .btn { width: 100%; justify-content: center; min-height: 48px; }
+  /* Le décalage au survol ne veut rien dire au tactile, et rognerait la ligne. */
+  .rec-item:hover { padding-left: 0; background: transparent; }
 }
 
 } /* fin @layer components */

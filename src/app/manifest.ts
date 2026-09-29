@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "UGPTN — Unité de Gestion du Projet de Transformation Numérique",
     short_name: "UGPTN",
     description:
-      "Portail institutionnel de l'UGPTN — Projet de Transformation Numérique de la RDC (PTN-RDC · P180495).",
+      "Portail institutionnel de l'UGPTN — Projet de Transformation Numérique de la RDC (PTN-RDC · P180495/CCD1198).",
     start_url: "/fr",
     scope: "/",
     display: "standalone",

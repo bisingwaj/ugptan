@@ -509,14 +509,29 @@ const ordreAlbums = [
   { publishedAt: { sort: "desc" as const, nulls: "last" as const } },
 ];
 
-/** Albums publiés et non vides, du plus mis en avant au plus ancien. */
+/**
+ * Albums publiés et non vides, du plus mis en avant au plus ancien.
+ *
+ * `recherche` sert la recherche globale du site (cf. lib/recherche/query.ts),
+ * qui interroge les albums au même titre que les cinq autres fonds. Elle passe
+ * par `clauseRecherche`, la même que la grille des visuels : un album se trouve
+ * donc sur son titre, sa description et son lieu, comme les images qu'il tient.
+ *
+ * ⚠️ La clause s'ajoute EN CLÉ PROPRE (`OR`) à côté de `albumServi` (`AND`), et
+ * non fusionnée dedans : ce sont deux clés distinctes de la même condition, que
+ * Prisma combine en « et ». Écrites toutes deux sous `AND`, la seconde
+ * écraserait la première et la liste servirait des albums vides.
+ */
 export async function listerAlbums(
   lang: Lang,
-  options: { limite?: number; rubrique?: string | null } = {},
+  options: { limite?: number; rubrique?: string | null; recherche?: string | null } = {},
 ): Promise<AlbumVue[]> {
+  const q = options.recherche?.trim();
+
   const where = {
     ...albumServi,
     ...(options.rubrique ? { category: { slug: options.rubrique } } : {}),
+    ...(q ? clauseRecherche(q) : {}),
   };
 
   const lignes = await lecture(

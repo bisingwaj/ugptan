@@ -14,7 +14,7 @@ export const meta: Meta = {
   projet: "PTN-RDC",
   projetLong:
     "Projet de Transformation Numérique de la République Démocratique du Congo",
-  code: "P180495",
+  code: "P180495/CCD1198",
   tutelle: "MPTN",
   tutelleLong: "Ministère des Postes, Télécommunications et Numérique",
   bailleurs: "IDA (Banque mondiale) · AFD",

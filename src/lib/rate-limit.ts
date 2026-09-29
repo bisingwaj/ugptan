@@ -56,13 +56,59 @@ export function rateLimit(key: string, limit: number, windowMs: number): RateLim
 /**
  * Adresse d'origine de la requête, telle que la voit l'hébergeur.
  *
- * Ces en-têtes sont posés par le proxy de la plateforme et non par le client :
- * derrière Vercel ou Netlify, ils sont fiables. En développement, aucun proxy ne
- * les pose et tout le monde partage la clé « local » — ce qui est sans
- * conséquence, personne d'autre n'y accédant.
+ * ─── L'ordre de lecture est une décision de sécurité ─────────────────────────
+ *
+ * Cette fonction produit la CLÉ de la limitation de débit. Une clé que le
+ * client choisit, c'est une limitation qu'il annule : il suffit de faire varier
+ * un en-tête à chaque requête pour obtenir un compteur neuf à chaque fois. Ce
+ * qui tomberait alors : la protection du dépôt de plaintes contre l'inondation,
+ * celle des inscriptions, et surtout le plafond de six essais qui rend
+ * impraticable la force brute sur le code de maintenance à six chiffres.
+ *
+ * La version précédente lisait `x-forwarded-for` EN PREMIER et en prenait
+ * l'entrée la plus à GAUCHE. Or `x-forwarded-for` est une liste à laquelle
+ * chaque relais AJOUTE : la valeur de gauche est celle que le client a
+ * annoncée, et les relais qui la normalisent le font chacun à leur façon. Bâtir
+ * un contrôle de sécurité sur elle, c'est le bâtir sur une valeur d'origine
+ * inconnue.
+ *
+ * On interroge donc d'abord les en-têtes que la PLATEFORME pose elle-même et
+ * qu'un client ne peut pas usurper — ils sont réécrits à l'entrée, quoi que la
+ * requête ait apporté :
+ *
+ *   · `x-vercel-forwarded-for`      — Vercel ;
+ *   · `x-nf-client-connection-ip`   — Netlify ;
+ *   · `cf-connecting-ip`            — Cloudflare, si un jour il s'intercale ;
+ *   · `x-real-ip`                   — proxys classiques (nginx, Traefik).
+ *
+ * `x-forwarded-for` ne sert qu'en DERNIER RECOURS, et l'on en prend alors
+ * l'entrée la plus à DROITE : celle du relais le plus proche de nous, donc la
+ * seule que le client n'a pas pu écrire.
+ *
+ * En développement, aucun proxy ne pose rien et tout le monde partage la clé
+ * « local » : sans conséquence, personne d'autre n'y accédant.
  */
+const ENTETES_PLATEFORME = [
+  "x-vercel-forwarded-for",
+  "x-nf-client-connection-ip",
+  "cf-connecting-ip",
+  "x-real-ip",
+] as const;
+
 export function requestIp(headers: Headers): string {
-  const forwarded = headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
-  return headers.get("x-real-ip") ?? headers.get("x-nf-client-connection-ip") ?? "local";
+  for (const nom of ENTETES_PLATEFORME) {
+    const valeur = headers.get(nom)?.trim();
+    if (valeur) return valeur;
+  }
+
+  /* Dernier recours. L'entrée la plus à DROITE, et non la plus à gauche : la
+     chaîne se lit « client, relais 1, relais 2 », et seule la dernière a été
+     écrite par un relais et non par l'appelant. */
+  const chaine = headers.get("x-forwarded-for");
+  if (chaine) {
+    const maillons = chaine.split(",").map((m) => m.trim()).filter(Boolean);
+    if (maillons.length > 0) return maillons[maillons.length - 1];
+  }
+
+  return "local";
 }

@@ -61,6 +61,27 @@ export const formatArticleDate = (date: Date, lang: "fr" | "en"): string =>
   dateArticle[lang].format(date);
 
 /**
+ * Date ET heure dans la langue de lecture, pour une échéance annoncée au public.
+ *
+ * L'heure compte ici, contrairement à la date d'un communiqué : une réouverture
+ * annoncée « le 26 août » laisse le lecteur revenir dix fois dans la journée.
+ * Le fuseau reste celui de Kinshasa, seul repère commun aux lecteurs du site.
+ */
+const dateHeure: Record<"fr" | "en", Intl.DateTimeFormat> = {
+  fr: new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric", month: "long", year: "numeric",
+    hour: "2-digit", minute: "2-digit", timeZone: "Africa/Kinshasa",
+  }),
+  en: new Intl.DateTimeFormat("en-GB", {
+    day: "numeric", month: "long", year: "numeric",
+    hour: "2-digit", minute: "2-digit", timeZone: "Africa/Kinshasa",
+  }),
+};
+
+export const formatDateHeure = (date: Date, lang: "fr" | "en"): string =>
+  dateHeure[lang].format(date);
+
+/**
  * Année de publication, au fuseau de Kinshasa.
  *
  * Même exigence que ci-dessus, pour la raison inverse : `getFullYear()` lit le

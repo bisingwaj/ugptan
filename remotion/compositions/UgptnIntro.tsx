@@ -34,7 +34,7 @@ export const UgptnIntro = () => {
           une connexion à la fois.
         </div>
         <div style={{ color: "#78a9ff", fontFamily: "'IBM Plex Mono', monospace", fontSize: unit * 0.022, letterSpacing: "0.1em", marginTop: unit * 0.04, opacity: subO, textTransform: "uppercase" }}>
-          UGPTN · PTN-RDC · P180495
+          UGPTN · PTN-RDC · P180495/CCD1198
         </div>
       </div>
     </AbsoluteFill>

@@ -6,6 +6,8 @@ import { ADMIN_BASE, ADMIN_LOGIN, ADMIN_SET_PASSWORD, NEXT_PARAM } from "@/lib/a
    liens saisis en console avant le renommage. Ce module n'a aucune dépendance
    d'exécution, il peut donc être lu depuis la middleware. */
 import { cheminActuel } from "@/lib/routes";
+import { COOKIE_ACCES } from "@/lib/reglages/code";
+import { etatPourProxy } from "@/lib/reglages/edge";
 
 const locales = ["fr", "en"];
 const defaultLocale = "fr";
@@ -59,6 +61,32 @@ export async function proxy(req: NextRequest) {
     return redirectTo(req, ADMIN_LOGIN, `${pathname}${req.nextUrl.search}`);
   }
 
+  /* --- Pages internes servies depuis le segment public ---------------------
+   *
+   * Le plan de tournage (`/<langue>/media`) n'est pas une page du site : c'est
+   * un document de travail des équipes de production. Sa page porte déjà sa
+   * garde — elle appelle `getCurrentUser()` et lève `notFound()` sans session,
+   * et c'est elle qui fait autorité.
+   *
+   * ⚠️ Cette garde-là protège le CONTENU, pas le STATUT. Mesuré sur un serveur
+   * de production : sans session, le corps servi est bien l'écran d'introuvable
+   * — aucune trace du plan — mais la réponse part en **200**, car la coquille et
+   * les métadonnées sont diffusées avant que la garde n'ait fini d'interroger la
+   * session. L'adresse répondait donc « rien à voir ici » avec le statut d'une
+   * page qui existe, et son titre annonçait « Plan médias ».
+   *
+   * Bloquer ici corrige les deux : le proxy s'exécute AVANT tout rendu, il n'y a
+   * donc rien à diffuser, et le 404 est franc.
+   *
+   * Contrôle OPTIMISTE, comme pour la console (voir plus haut) : on regarde si
+   * un cookie de session EXISTE, sans le valider. Il ne fait que bloquer les
+   * visiteurs anonymes ; c'est la page qui vérifie réellement. Un cookie périmé
+   * passe ici et se fait refuser là.
+   */
+  if (/^\/(?:fr|en)\/media\/?$/.test(pathname) && !getSessionCookie(req)) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   // --- Site public ---------------------------------------------------------
   /* Deux corrections possibles, traitées ensemble pour n'imposer qu'un seul
      aller-retour : le préfixe de langue absent, et l'ancien chemin français. */
@@ -67,8 +95,9 @@ export async function proxy(req: NextRequest) {
   const actuel = cheminActuel(reste);
   const ancien = actuel !== reste;
 
-  // Adresse déjà correcte dans les deux dimensions : rien à faire.
-  if (locale && !ancien) return;
+  /* Adresse déjà correcte dans les deux dimensions : il ne reste qu'à vérifier
+     que le site est ouvert. */
+  if (locale && !ancien) return fermeture(req, locale);
 
   const url = req.nextUrl.clone();
   url.pathname = `/${locale ?? defaultLocale}${actuel}`;
@@ -77,6 +106,48 @@ export async function proxy(req: NextRequest) {
      langue reste un 307 — la langue servie peut changer, l'adresse sans
      préfixe n'est pas périmée pour autant. */
   return NextResponse.redirect(url, ancien ? 308 : 307);
+}
+
+/**
+ * Site fermé au public : substitution de l'écran de maintenance.
+ *
+ * ⚠️ POURQUOI ICI, ET NON DANS LE LAYOUT. La première version décidait au
+ * rendu. Elle marchait sur les pages rendues à la demande et ÉCHOUAIT sur les
+ * cent pages prérendues, pour deux raisons qui se cumulaient : leur HTML est
+ * figé à la construction, où l'état lu peut être faux ; et leur régénération
+ * s'exécute hors requête, où lire un cookie est interdit, si bien qu'elle
+ * échouait en silence et que Vercel continuait de servir la page ouverte.
+ * Constaté en production le 27 août 2026 : `/fr/news` fermait, `/fr` non.
+ *
+ * Le proxy, lui, s'exécute avant tout cache et sur chaque requête. C'est le
+ * seul endroit d'où une page prérendue peut être retirée au public.
+ *
+ * RÉÉCRITURE et non redirection : l'adresse demandée reste affichée, donc la
+ * personne qui saisit le code retombe sur la page qu'elle visait. Le chemin
+ * d'origine est passé à l'écran, qui le rend au formulaire.
+ */
+async function fermeture(req: NextRequest, locale: string) {
+  const etat = await etatPourProxy(req.nextUrl.origin);
+  if (!etat.ferme) return;
+
+  /* Comparaison simple : l'empreinte est un condensé de 64 caractères, jamais
+     dérivable du code, et une attaque par mesure de temps à travers le réseau
+     n'a pas de sens à cette échelle. La signature, elle, est faite côté serveur
+     (cf. lib/reglages/maintenance.ts). */
+  const jeton = req.cookies.get(COOKIE_ACCES)?.value;
+  if (jeton && etat.empreinte && jeton === etat.empreinte) return;
+
+  const url = req.nextUrl.clone();
+  url.pathname = `/maintenance/${locale}`;
+  url.search = "";
+  url.searchParams.set("depuis", `${req.nextUrl.pathname}${req.nextUrl.search}`);
+
+  /* ⚠️ PAS de statut 503 ici. Une réécriture assortie d'un 5xx est interceptée
+     par la plateforme, qui remplace la page par son propre écran « deployment
+     unavailable » : essayé le 27 août 2026, le site entier a servi cette page.
+     La réponse reste donc un 200, et c'est le `noindex` de l'écran de
+     maintenance qui tient les moteurs à l'écart. */
+  return NextResponse.rewrite(url);
 }
 
 function redirectTo(req: NextRequest, pathname: string, next?: string) {

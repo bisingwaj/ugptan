@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { asLang } from "@/lib/params";
+import { getCurrentUser } from "@/lib/auth/guard";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { videoSlots, statusLabel, statusColor, type Ratio } from "@/content/videos";
@@ -7,6 +9,23 @@ import { Kicker } from "@/components/ui/Kicker";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+
+/**
+ * Rendu à la demande, obligatoirement.
+ *
+ * ⚠️ Sans cette ligne, la garde ci-dessous ne protège RIEN, et le symptôme est
+ * trompeur. Le layout déclare `generateStaticParams` et `dynamicParams = false` :
+ * cette page est donc pré-calculée à la compilation, où aucune requête n'existe
+ * et où `getCurrentUser()` rend forcément `null`. Le `notFound()` est alors figé
+ * dans le rendu, que Next sert ensuite tel quel — mesuré : `x-nextjs-prerender: 1`,
+ * `x-nextjs-cache: HIT`, statut **200**, corps mêlant le titre de la page et le
+ * contenu de l'écran d'introuvable. La porte paraissait fermée dans le code et
+ * restait ouverte sur le réseau.
+ *
+ * `force-dynamic` fait évaluer la session à chaque requête : 404 pour un
+ * visiteur, la page pour un compte de l'Unité.
+ */
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -18,7 +37,26 @@ const ratioBox: Record<Ratio, { w: number; h: number }> = {
   "16:9": { w: 16, h: 9 }, "9:16": { w: 9, h: 16 }, "1:1": { w: 1, h: 1 },
 };
 
+/**
+ * Document de travail INTERNE, servi depuis le segment public.
+ *
+ * Cette page n'est pas une page du site : c'est le plan de tournage, à l'usage
+ * des équipes de production. Elle nomme les emplacements prévus, leur état
+ * d'avancement, et explique l'outil de repérage `?slots=1`. Le `noindex` de son
+ * `generateMetadata` la retire des moteurs — il ne la retire pas du web, et
+ * quiconque connaissait ou devinait l'adresse la lisait.
+ *
+ * Elle exige donc une session de la console. Sans compte, elle n'existe pas :
+ * `notFound()` plutôt qu'une redirection vers la connexion, pour ne pas
+ * confirmer à un visiteur de passage qu'il y a quelque chose à cette adresse.
+ *
+ * Aucune permission particulière n'est demandée au-delà de la session : le plan
+ * de tournage n'est pas un module de la console, et tout compte de l'Unité a
+ * légitimement à le consulter.
+ */
 export default async function MediasPage(props: { params: Promise<{ lang: string }> }) {
+  if (!(await getCurrentUser())) notFound();
+
   const params = await props.params;
   const lang = asLang(params.lang);
   const en = lang === "en";

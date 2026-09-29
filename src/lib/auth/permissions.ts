@@ -59,8 +59,13 @@ export type Permission = (typeof PERMISSIONS)[number];
  * Modules réservés au rôle ADMIN, qu'aucune permission individuelle ne peut
  * ouvrir. La gestion des comptes en fait partie : c'est l'exigence même de
  * l'authentification privée — seul un administrateur crée des accès.
+ *
+ * Les réglages l'ont rejointe en même temps que le mode maintenance : la seule
+ * commande de la console qui retire le site entier au public n'a pas à être
+ * accordable au cas par cas. Le module n'avait aucun écran jusque-là, donc
+ * personne ne perd un droit qu'il exerçait.
  */
-const ADMIN_ONLY: readonly Permission[] = ["utilisateurs"];
+const ADMIN_ONLY: readonly Permission[] = ["utilisateurs", "reglages"];
 
 /**
  * Socle de chaque rôle. `"*"` vaut « tous les modules ».

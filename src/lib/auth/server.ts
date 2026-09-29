@@ -155,6 +155,29 @@ function createAuth() {
       },
     },
 
+    /* Attributs du cookie de session, posés EXPLICITEMENT.
+     *
+     * Better Auth les déduit sinon de `baseURL` : un `BETTER_AUTH_URL` mal
+     * renseigné en production — laissé en `http://localhost`, oublié après une
+     * bascule de domaine — suffirait à faire tomber l'indicateur `Secure`, et le
+     * cookie de session partirait en clair sur le premier lien `http`. La
+     * déduction est correcte ; c'est la valeur dont elle dépend qui ne mérite
+     * pas cette confiance.
+     *
+     * `sameSite: "lax"` et non `"strict"` : la console se rejoint par un lien
+     * reçu par courriel — définition de mot de passe, réinitialisation —, et
+     * `strict` refuserait d'envoyer le cookie sur cette première navigation.
+     * `lax` couvre la falsification de requête inter-sites, qui passe par des
+     * envois POST, et ceux-là restent bloqués. */
+    advanced: {
+      useSecureCookies: process.env.NODE_ENV === "production",
+      defaultCookieAttributes: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+      },
+    },
+
     session: {
       expiresIn: SESSION_EXPIRES_IN,
       /* Cache de session en cookie volontairement laissé DÉSACTIVÉ : chaque

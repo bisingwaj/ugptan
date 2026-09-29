@@ -2,7 +2,7 @@
 
 Refonte **Next.js (App Router)** de la direction visuelle « Carbon » du site institutionnel de
 l'**UGPTN** — Unité de Gestion du Projet de Transformation Numérique de la RDC
-(**PTN-RDC · P180495**, 510 M USD, cofinancement IDA / Banque mondiale + AFD, 26 provinces,
+(**PTN-RDC · P180495/CCD1198**, 510 M USD, cofinancement IDA / Banque mondiale + AFD, 26 provinces,
 horizon 2029).
 
 > **Source de vérité** : Manuel d'Exécution du Projet (MEP) du 23 juin 2025.

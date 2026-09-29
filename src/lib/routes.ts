@@ -7,7 +7,7 @@ export type NavKey =
   | "accueil" | "projet" | "composantes" | "ugptn" | "gouvernance" | "marches" | "transparence"
   | "soumissionnaires"
   | "actualites" | "resultats" | "evenements" | "galerie" | "contact" | "mgp"
-  | "mgpSuivi" | "confidentialite" | "conditions";
+  | "mgpSuivi" | "recherche" | "confidentialite" | "conditions";
 
 export type NavItem = { slug: string; key: NavKey };
 
@@ -38,6 +38,13 @@ export const NAV: Record<NavKey, string> = {
   resultats: "/results", evenements: "/events",
   galerie: "/gallery",
   contact: "/contact", mgp: "/grievances", mgpSuivi: "/grievances/track",
+  /* Recherche globale. Elle ne figure dans aucun groupe de la barre : sa porte
+     est l'icône de l'en-tête et une entrée du tiroir, pas une septième entrée
+     dans une barre qui en loge déjà six à 1120px. Elle reste dans NAV — donc
+     dans ALL_PATHS et le sitemap — parce que la page NUE (sans requête) est une
+     page comme une autre ; ce sont ses RÉSULTATS que le moteur ne doit pas
+     indexer, et c'est la page elle-même qui le dit (cf. son generateMetadata). */
+  recherche: "/search",
   confidentialite: "/privacy", conditions: "/terms",
 };
 

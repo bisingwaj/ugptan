@@ -33,6 +33,7 @@ import {
 } from "@/lib/mgp/model";
 import { uniqueReference } from "@/lib/mgp/reference";
 import { rateLimit, requestIp } from "@/lib/rate-limit";
+import { ecrituresSuspendues } from "@/lib/reglages/maintenance";
 
 /* --- Dépôt ---------------------------------------------------------------- */
 
@@ -74,6 +75,20 @@ const asLangCode = (value: unknown): Lang =>
 export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResult> {
   const lang = asLangCode(draft?.lang);
   const t = (fr: string, en: string) => (lang === "en" ? en : fr);
+
+  /* Site fermé : le dossier ne s'ouvre pas. Le formulaire n'est plus affiché,
+     mais un onglet resté ouvert avant la fermeture poste encore ici, et une
+     plainte déposée au milieu d'une migration se perdrait sans que personne ne
+     le sache. Le refus dit où revenir. */
+  if (await ecrituresSuspendues()) {
+    return {
+      ok: false,
+      error: t(
+        "Le portail est momentanément fermé pour intervention technique. Votre plainte n'a pas été enregistrée : reprenez le dépôt à la réouverture, ou écrivez à info@ugptn.cd.",
+        "The portal is temporarily closed for technical work. Your grievance has not been recorded: please file it again once the site reopens, or write to info@ugptn.cd.",
+      ),
+    };
+  }
 
   const limit = rateLimit(`mgp:submit:${requestIp(await headers())}`, SUBMIT_LIMIT, SUBMIT_WINDOW_MS);
   if (!limit.allowed) {

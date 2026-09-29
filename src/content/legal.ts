@@ -43,8 +43,8 @@ export const confidentialite: LegalDoc = {
         {
           k: "p",
           texte: {
-            fr: "L'Unité de Gestion du Projet de Transformation Numérique (UGPTN), unité d'exécution du Projet de Transformation Numérique de la République Démocratique du Congo (PTN-RDC, P180495) placée sous la tutelle du Ministère des Postes, Télécommunications et Numérique, détermine les finalités et les moyens des traitements opérés sur ce site. Elle en répond en qualité de responsable du traitement.",
-            en: "The Digital Transformation Project Management Unit (UGPTN), the implementing unit of the Democratic Republic of the Congo Digital Transformation Project (PTN-RDC, P180495) under the authority of the Ministry of Posts, Telecommunications and Digital Affairs, determines the purposes and means of the processing carried out on this site. It is accountable for that processing as data controller.",
+            fr: "L'Unité de Gestion du Projet de Transformation Numérique (UGPTN), unité d'exécution du Projet de Transformation Numérique de la République Démocratique du Congo (PTN-RDC, P180495/CCD1198) placée sous la tutelle du Ministère des Postes, Télécommunications et Numérique, détermine les finalités et les moyens des traitements opérés sur ce site. Elle en répond en qualité de responsable du traitement.",
+            en: "The Digital Transformation Project Management Unit (UGPTN), the implementing unit of the Democratic Republic of the Congo Digital Transformation Project (PTN-RDC, P180495/CCD1198) under the authority of the Ministry of Posts, Telecommunications and Digital Affairs, determines the purposes and means of the processing carried out on this site. It is accountable for that processing as data controller.",
           },
         },
         {
@@ -547,8 +547,8 @@ export const conditions: LegalDoc = {
             {
               t: { fr: "Financement du projet", en: "Project financing" },
               d: {
-                fr: "Association internationale de développement (Groupe de la Banque mondiale) et Agence française de développement — projet P180495.",
-                en: "International Development Association (World Bank Group) and Agence française de développement — project P180495.",
+                fr: "Association internationale de développement (Groupe de la Banque mondiale) et Agence française de développement — projet P180495/CCD1198.",
+                en: "International Development Association (World Bank Group) and Agence française de développement — project P180495/CCD1198.",
               },
             },
           ],
@@ -816,14 +816,25 @@ export const legalDocs = { confidentialite, conditions };
 export const avisNavigation = {
   kicker: { fr: "Avis d'utilisation", en: "Usage notice" },
   titre: { fr: "Avant de poursuivre votre navigation", en: "Before you continue" },
+  /* La formule est celle de l'article « Objet et acceptation » des conditions
+     d'utilisation, reprise mot pour mot : un avis qui annonce autre chose que
+     ce que dit le texte qu'il fait accepter n'a aucune valeur. */
   corps: {
-    fr: "Ce site est un service de communication au public en ligne édité par l'UGPTN, unité d'exécution d'un projet de l'État congolais. En y accédant, vous vous placez sous l'empire du Code du numérique de la République Démocratique du Congo — Ordonnance-loi n° 23/010 du 13 mars 2023 — et vous acceptez les conditions d'utilisation du site.",
-    en: "This site is an online public communication service published by the UGPTN, the implementing unit of a project of the Congolese State. By accessing it, you come under the Digital Code of the Democratic Republic of the Congo — Ordinance-Law No. 23/010 of 13 March 2023 — and you accept the site's terms of use.",
+    fr: "Ce site est édité par l'UGPTN, unité d'exécution du Projet de Transformation Numérique de la République Démocratique du Congo. Il est régi par le droit congolais, notamment par l'Ordonnance-loi n° 23/010 du 13 mars 2023 portant Code du numérique. L'accès au site et l'usage de ses services valent acceptation pleine et sans réserve des conditions d'utilisation.",
+    en: "This site is published by the UGPTN, the implementing unit of the Democratic Republic of the Congo Digital Transformation Project. It is governed by Congolese law, in particular by Ordinance-Law No. 23/010 of 13 March 2023 enacting the Digital Code. Accessing the site and using its services constitute full and unreserved acceptance of the terms of use.",
   },
   precision: {
-    fr: "Aucun traceur publicitaire, aucune mesure d'audience. Les données que vous confiez à une plainte, à une candidature ou à une demande d'information sont traitées selon la politique de confidentialité.",
-    en: "No advertising trackers, no audience measurement. Data you provide with a grievance, an application or an information request is processed in accordance with the privacy policy.",
+    fr: "Aucun traceur publicitaire n'est déposé sur votre terminal et aucune mesure d'audience n'est effectuée. Les données transmises au moyen d'une plainte, d'une candidature ou d'une demande d'information sont traitées aux fins et selon les modalités énoncées par la politique de confidentialité.",
+    en: "No advertising tracker is placed on your device and no audience measurement is carried out. Data submitted through a grievance, an application or an information request is processed for the purposes and in the manner set out in the privacy policy.",
   },
-  accepter: { fr: "J'ai lu et je poursuis", en: "I have read this and will continue" },
+  accepter: { fr: "J'accepte et je poursuis", en: "I accept and continue" },
+  refuser: { fr: "Refuser et quitter le site", en: "Decline and leave the site" },
+  /* Le refus n'est pas une impasse : les conditions d'utilisation prévoient
+     elles-mêmes la voie de repli, et la rappeler ici évite qu'un usager qui
+     refuse perde l'accès à l'information publique du projet. */
+  refuserAide: {
+    fr: "Le refus vous fait quitter le site et n'y conserve aucune trace de votre passage. Les documents publics du projet restent communicables sur demande écrite adressée au siège de l'Unité.",
+    en: "Declining takes you off the site and keeps no record of your visit. The project's public documents remain available on written request addressed to the Unit's offices.",
+  },
   fermer: { fr: "Fermer l'avis", en: "Dismiss notice" },
 };

@@ -62,7 +62,7 @@ export default function OpengraphImage() {
         )}
         <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
           <div style={{ width: 22, height: 60, background: "#0f62fe" }} />
-          <div style={{ fontSize: 32, letterSpacing: 2, color: "#c6c6c6" }}>PTN-RDC · P180495</div>
+          <div style={{ fontSize: 32, letterSpacing: 2, color: "#c6c6c6" }}>PTN-RDC · P180495/CCD1198</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 150, fontWeight: 700, letterSpacing: -2, lineHeight: 1 }}>UGPTN</div>
