@@ -1745,6 +1745,17 @@ export const ADMIN_REGLAGES = {
 
   enregistrer: "Enregistrer les réglages",
   enregistrement: "Enregistrement",
+
+  /* --- Pages désactivées individuellement ------------------------------ */
+  pagesTitre: "Pages du site",
+  pagesAide: "Coupez une page à elle seule, sans fermer le reste du site. Le public y voit « Page en construction » ; la navigation et le pied de page restent affichés.",
+  pageActive: "En ligne",
+  pageDesactivee: "En construction",
+  pageDesactiver: "Désactiver",
+  pageDesactiverEnCours: "Désactivation",
+  pageReactiver: "Réactiver",
+  pageReactiverEnCours: "Réactivation",
+  pageDepuis: "Depuis le",
 };
 
 export type AdminNavItem = {

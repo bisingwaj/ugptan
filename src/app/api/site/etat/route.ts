@@ -12,10 +12,28 @@
  * qui refuse.
  */
 import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { describeError } from "@/lib/errors";
 import { etatMaintenance, laissezPasser } from "@/lib/reglages/maintenance";
 
 /** Jamais de cache : le proxy tient le sien, avec sa propre péremption. */
 export const dynamic = "force-dynamic";
+
+/**
+ * Pages coupées individuellement. Lue à part de `etatMaintenance()` : une
+ * panne ici ne doit pas priver la fermeture générale de sa réponse, et
+ * inversement — d'où le repli propre (liste vide, donc aucune page coupée)
+ * plutôt qu'une exception qui ferait échouer toute la route.
+ */
+async function pagesFermees(): Promise<string[]> {
+  try {
+    const lignes = await db().pageEtat.findMany({ select: { cle: true } });
+    return lignes.map((ligne) => ligne.cle);
+  } catch (error) {
+    console.warn(`[pages] état illisible, pages laissées actives. ${describeError(error)}`);
+    return [];
+  }
+}
 
 export async function GET(requete: Request): Promise<NextResponse> {
   const attendue = process.env.BETTER_AUTH_SECRET;
@@ -23,12 +41,13 @@ export async function GET(requete: Request): Promise<NextResponse> {
     return new NextResponse(null, { status: 404 });
   }
 
-  const etat = await etatMaintenance();
+  const [etat, pages] = await Promise.all([etatMaintenance(), pagesFermees()]);
 
   return NextResponse.json(
     {
       ferme: etat.ferme,
       empreinte: etat.ferme && etat.code ? laissezPasser(etat.code) : null,
+      pagesFermees: pages,
     },
     { headers: { "cache-control": "no-store" } },
   );

@@ -5,7 +5,7 @@ import { ADMIN_BASE, ADMIN_LOGIN, ADMIN_SET_PASSWORD, NEXT_PARAM } from "@/lib/a
    publics dont ils dérivent : le rendu s'en sert aussi, pour rattraper les
    liens saisis en console avant le renommage. Ce module n'a aucune dépendance
    d'exécution, il peut donc être lu depuis la middleware. */
-import { cheminActuel } from "@/lib/routes";
+import { cheminActuel, navKeyPourChemin } from "@/lib/routes";
 import { COOKIE_ACCES } from "@/lib/reglages/code";
 import { etatPourProxy } from "@/lib/reglages/edge";
 
@@ -96,8 +96,8 @@ export async function proxy(req: NextRequest) {
   const ancien = actuel !== reste;
 
   /* Adresse déjà correcte dans les deux dimensions : il ne reste qu'à vérifier
-     que le site est ouvert. */
-  if (locale && !ancien) return fermeture(req, locale);
+     que le site — puis la page elle-même — est ouvert. */
+  if (locale && !ancien) return fermeture(req, locale, actuel);
 
   const url = req.nextUrl.clone();
   url.pathname = `/${locale ?? defaultLocale}${actuel}`;
@@ -109,7 +109,8 @@ export async function proxy(req: NextRequest) {
 }
 
 /**
- * Site fermé au public : substitution de l'écran de maintenance.
+ * Site fermé au public, ou page coupée individuellement : substitution de
+ * l'écran qui convient.
  *
  * ⚠️ POURQUOI ICI, ET NON DANS LE LAYOUT. La première version décidait au
  * rendu. Elle marchait sur les pages rendues à la demande et ÉCHOUAIT sur les
@@ -122,32 +123,47 @@ export async function proxy(req: NextRequest) {
  * Le proxy, lui, s'exécute avant tout cache et sur chaque requête. C'est le
  * seul endroit d'où une page prérendue peut être retirée au public.
  *
- * RÉÉCRITURE et non redirection : l'adresse demandée reste affichée, donc la
- * personne qui saisit le code retombe sur la page qu'elle visait. Le chemin
- * d'origine est passé à l'écran, qui le rend au formulaire.
+ * RÉÉCRITURE et non redirection dans les deux cas : l'adresse demandée reste
+ * affichée. Pour la fermeture générale, la personne qui saisit le code retombe
+ * sur la page qu'elle visait, dont le chemin est passé à l'écran. Pour une
+ * page coupée, `/construction` vit DANS le segment `[lang]` — l'en-tête et le
+ * pied de page restent donc en place, seul le contenu change ; rien à
+ * transmettre, le message y est générique.
  */
-async function fermeture(req: NextRequest, locale: string) {
+async function fermeture(req: NextRequest, locale: string, chemin: string) {
   const etat = await etatPourProxy(req.nextUrl.origin);
-  if (!etat.ferme) return;
 
-  /* Comparaison simple : l'empreinte est un condensé de 64 caractères, jamais
-     dérivable du code, et une attaque par mesure de temps à travers le réseau
-     n'a pas de sens à cette échelle. La signature, elle, est faite côté serveur
-     (cf. lib/reglages/maintenance.ts). */
-  const jeton = req.cookies.get(COOKIE_ACCES)?.value;
-  if (jeton && etat.empreinte && jeton === etat.empreinte) return;
+  if (etat.ferme) {
+    /* Comparaison simple : l'empreinte est un condensé de 64 caractères,
+       jamais dérivable du code, et une attaque par mesure de temps à travers
+       le réseau n'a pas de sens à cette échelle. La signature, elle, est
+       faite côté serveur (cf. lib/reglages/maintenance.ts). */
+    const jeton = req.cookies.get(COOKIE_ACCES)?.value;
+    if (!(jeton && etat.empreinte && jeton === etat.empreinte)) {
+      const url = req.nextUrl.clone();
+      url.pathname = `/maintenance/${locale}`;
+      url.search = "";
+      url.searchParams.set("depuis", `${req.nextUrl.pathname}${req.nextUrl.search}`);
 
-  const url = req.nextUrl.clone();
-  url.pathname = `/maintenance/${locale}`;
-  url.search = "";
-  url.searchParams.set("depuis", `${req.nextUrl.pathname}${req.nextUrl.search}`);
+      /* ⚠️ PAS de statut 503 ici. Une réécriture assortie d'un 5xx est
+         interceptée par la plateforme, qui remplace la page par son propre
+         écran « deployment unavailable » : essayé le 27 août 2026, le site
+         entier a servi cette page. La réponse reste donc un 200, et c'est le
+         `noindex` de l'écran de maintenance qui tient les moteurs à l'écart. */
+      return NextResponse.rewrite(url);
+    }
+  }
 
-  /* ⚠️ PAS de statut 503 ici. Une réécriture assortie d'un 5xx est interceptée
-     par la plateforme, qui remplace la page par son propre écran « deployment
-     unavailable » : essayé le 27 août 2026, le site entier a servi cette page.
-     La réponse reste donc un 200, et c'est le `noindex` de l'écran de
-     maintenance qui tient les moteurs à l'écart. */
-  return NextResponse.rewrite(url);
+  /* Site ouvert (ou laissez-passer valide) : reste à vérifier que LA PAGE
+     demandée n'est pas coupée à elle seule. Couper une section coupe aussi
+     ses sous-pages, d'où le préfixe testé par `navKeyPourChemin`. */
+  const cle = navKeyPourChemin(chemin);
+  if (cle && etat.pagesFermees.includes(cle)) {
+    const url = req.nextUrl.clone();
+    url.pathname = `/${locale}/construction`;
+    url.search = "";
+    return NextResponse.rewrite(url);
+  }
 }
 
 function redirectTo(req: NextRequest, pathname: string, next?: string) {

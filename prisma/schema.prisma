@@ -2457,3 +2457,21 @@ model Reglages {
   /// supprimer un compte ne doit pas effacer la trace du réglage.
   updatedBy String?
 }
+
+/// Pages publiques coupées individuellement, indépendamment de la fermeture
+/// générale du site (`Reglages.maintenance`, ci-dessus).
+///
+/// Une ligne = une page COUPÉE ; son absence vaut page active. Même convention
+/// que `Reglages` : plutôt qu'une table pré-remplie pour un état qui est déjà
+/// le défaut, seul l'écart s'écrit. Ça évite aussi toute migration le jour où
+/// une page de plus devient désactivable — la liste éligible vit dans le code
+/// (cf. `PAGES_DESACTIVABLES`, src/lib/routes.ts), pas dans le schéma.
+model PageEtat {
+  /// Clé de navigation (`NavKey` — cf. src/lib/routes.ts), ex. "actualites".
+  cle String @id
+
+  updatedAt DateTime @updatedAt
+  /// Adresse du compte qui a coupé la page. Chaîne et non relation, pour la
+  /// même raison que `Reglages.updatedBy`.
+  updatedBy String?
+}

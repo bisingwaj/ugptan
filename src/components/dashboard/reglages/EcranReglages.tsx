@@ -20,14 +20,15 @@ import { ADMIN_REGLAGES } from "@/content/admin";
 import { dict } from "@/content/i18n";
 import { formatDateTime, toDateTimeLocal } from "@/lib/format";
 import { codeAleatoire } from "@/lib/reglages/code";
-import type { ReglagesSaisie } from "@/lib/reglages/edition";
+import type { PageSaisie, ReglagesSaisie } from "@/lib/reglages/edition";
 import type { Lang } from "@/lib/pick";
+import { LignePage } from "@/components/dashboard/reglages/LignePage";
 
 const LANG_LABEL: Record<Lang, string> = { fr: "Français", en: "English" };
 
 const etatInitial: ReglagesFormState = { error: null, ok: null };
 
-export function EcranReglages({ reglages }: { reglages: ReglagesSaisie }) {
+export function EcranReglages({ reglages, pages }: { reglages: ReglagesSaisie; pages: PageSaisie[] }) {
   const t = ADMIN_REGLAGES;
   const idBase = useId();
 
@@ -219,6 +220,22 @@ export function EcranReglages({ reglages }: { reglages: ReglagesSaisie }) {
           </div>
         </div>
       </form>
+
+      {/* --- Pages désactivées individuellement --------------------------- */}
+      <section className="adm-items" style={{ marginTop: 24 }}>
+        <div className="adm-items__tete">
+          <div style={{ minWidth: 0 }}>
+            <h2 className="adm__section-title" style={{ margin: 0 }}>{t.pagesTitre}</h2>
+            <p className="adm-hint" style={{ marginTop: 4 }}>{t.pagesAide}</p>
+          </div>
+        </div>
+
+        <div className="adm-items__liste">
+          {pages.map((page) => (
+            <LignePage key={page.cle} page={page} />
+          ))}
+        </div>
+      </section>
     </>
   );
 }

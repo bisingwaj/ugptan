@@ -22,9 +22,11 @@ export type EtatProxy = {
   ferme: boolean;
   /** Valeur exacte que le cookie de laissez-passer doit présenter. */
   empreinte: string | null;
+  /** Clés de navigation (`NavKey`) des pages coupées individuellement. */
+  pagesFermees: string[];
 };
 
-const OUVERT: EtatProxy = { ferme: false, empreinte: null };
+const OUVERT: EtatProxy = { ferme: false, empreinte: null, pagesFermees: [] };
 
 const PEREMPTION_MS = 15_000;
 

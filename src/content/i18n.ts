@@ -1476,6 +1476,22 @@ export function dict(lang: Lang) {
         "Code checking is unavailable on this deployment. Please notify the site administrator.",
       ),
     },
+
+    /* Écran substitué au CONTENU d'une page coupée individuellement depuis la
+       console (module « Réglages ») — cf. lib/routes.ts (PAGES_DESACTIVABLES)
+       et src/proxy.ts. À la différence de `maintenance`, l'en-tête et le pied
+       de page restent affichés : seule cette page-là est concernée, pas le
+       site. Message générique, non personnalisable page par page — le besoin
+       ne s'est pas présenté, et une console qui le demanderait pourrait
+       reprendre le principe du message de `maintenance`. */
+    construction: {
+      kicker: t("Page en construction", "Page under construction"),
+      titre: t("Cette page est en cours de préparation", "This page is being prepared"),
+      corps: t(
+        "Le contenu de cette page n'est pas encore accessible. Il le redeviendra prochainement — le reste du site, lui, reste consultable normalement.",
+        "This page's content isn't available yet. It will be back shortly — the rest of the site remains open as usual.",
+      ),
+    },
   };
 }
 

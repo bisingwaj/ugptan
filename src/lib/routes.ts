@@ -286,3 +286,33 @@ export const NAV_FOOTER: NavGroup[] = [
   { ...G_TRANSPARENCE, children: [...G_MARCHES.children, ...G_TRANSPARENCE.children] },
   G_ACTUS,
 ];
+
+/**
+ * Pages qu'un administrateur peut couper individuellement depuis la console
+ * (module « Réglages »), indépendamment de la fermeture générale du site.
+ *
+ * Les feuilles de `NAV_TREE` — donc PAS l'accueil, absente de cet arbre : la
+ * couper laisserait le site sans porte d'entrée. Une section coupée entraîne
+ * ses sous-pages avec elle (cf. `navKeyPourChemin`) : couper « Actualités »
+ * coupe aussi chaque article, pas seulement la liste.
+ *
+ * Définie ici et non dérivée à l'affichage : c'est la même liste qui sert à la
+ * console (quoi proposer) et au proxy (quoi faire respecter), et les deux
+ * doivent rester rigoureusement identiques.
+ */
+export const PAGES_DESACTIVABLES: NavItem[] = navLeaves(NAV_TREE);
+
+/**
+ * La page désactivable dont relève `chemin` (sans préfixe de langue), si elle
+ * ou une de ses sous-pages est demandée. `null` si `chemin` ne tombe sous
+ * aucune d'elles.
+ *
+ * Lue par `src/proxy.ts` : aucune dépendance au-delà de ce module, requis pour
+ * tourner sur le moteur périphérique (cf. l'en-tête de lib/reglages/edge.ts).
+ */
+export function navKeyPourChemin(chemin: string): NavKey | null {
+  for (const { slug, key } of PAGES_DESACTIVABLES) {
+    if (slug && (chemin === slug || chemin.startsWith(`${slug}/`))) return key;
+  }
+  return null;
+}

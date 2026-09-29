@@ -7,7 +7,10 @@
  * est traduite en valeurs par défaut.
  */
 import { db } from "@/lib/db";
+import { dict } from "@/content/i18n";
 import { lectureConsole } from "@/lib/lecture";
+import { PAGES_DESACTIVABLES } from "@/lib/routes";
+import type { NavKey } from "@/lib/routes";
 import { REGLAGES_ID } from "@/lib/reglages/maintenance";
 
 export type ReglagesSaisie = {
@@ -47,4 +50,39 @@ export function chargerReglages(): Promise<ReglagesSaisie> {
       majPar: ligne.updatedBy,
     };
   }, "réglages du site");
+}
+
+/** Une page désactivable, et son état actuel. */
+export type PageSaisie = {
+  cle: NavKey;
+  /** Libellé français — l'unique langue de la console. */
+  label: string;
+  active: boolean;
+  majLe: Date | null;
+  majPar: string | null;
+};
+
+/**
+ * L'état des pages désactivables, dans l'ordre de `PAGES_DESACTIVABLES`.
+ *
+ * Comme `chargerReglages`, l'absence de ligne se traduit en valeur par
+ * défaut (page active) plutôt que d'être créée à la volée.
+ */
+export function chargerPages(): Promise<PageSaisie[]> {
+  return lectureConsole(async () => {
+    const lignes = await db().pageEtat.findMany();
+    const fermees = new Map(lignes.map((ligne) => [ligne.cle, ligne]));
+    const labels = dict("fr").nav;
+
+    return PAGES_DESACTIVABLES.map(({ key }) => {
+      const ligne = fermees.get(key);
+      return {
+        cle: key,
+        label: labels[key],
+        active: !ligne,
+        majLe: ligne?.updatedAt ?? null,
+        majPar: ligne?.updatedBy ?? null,
+      };
+    });
+  }, "pages publiques");
 }

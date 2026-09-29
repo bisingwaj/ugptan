@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ADMIN_REGLAGES } from "@/content/admin";
 import { requirePermission } from "@/lib/auth/guard";
-import { chargerReglages } from "@/lib/reglages/edition";
+import { chargerPages, chargerReglages } from "@/lib/reglages/edition";
 import { EcranReglages } from "@/components/dashboard/reglages/EcranReglages";
 
 export const metadata: Metadata = { title: ADMIN_REGLAGES.title };
@@ -17,7 +17,7 @@ export default async function ReglagesAdminPage() {
   // rendue et sérialisée.
   await requirePermission("reglages");
 
-  const reglages = await chargerReglages();
+  const [reglages, pages] = await Promise.all([chargerReglages(), chargerPages()]);
 
-  return <EcranReglages reglages={reglages} />;
+  return <EcranReglages reglages={reglages} pages={pages} />;
 }

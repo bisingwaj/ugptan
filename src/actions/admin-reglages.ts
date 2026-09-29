@@ -26,7 +26,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { assertPermission } from "@/lib/auth/guard";
 import { fromDateTimeLocal } from "@/lib/format";
-import { patronRoute } from "@/lib/routes";
+import { PAGES_DESACTIVABLES, patronRoute } from "@/lib/routes";
+import type { NavKey } from "@/lib/routes";
 import { CODE_MOTIF } from "@/lib/reglages/code";
 import { REGLAGES_ID } from "@/lib/reglages/maintenance";
 
@@ -139,5 +140,51 @@ export async function basculerMaintenanceAction(
     ok: fermer
       ? "Le site public est fermé. Seul le code d'accès y donne encore entrée."
       : "Le site public est rouvert.",
+  };
+}
+
+/* --- Pages désactivées individuellement -------------------------------- */
+
+const CLES_DESACTIVABLES = new Set<NavKey>(PAGES_DESACTIVABLES.map((page) => page.key));
+
+/**
+ * Coupe ou rétablit UNE page publique, indépendamment de la fermeture
+ * générale ci-dessus.
+ *
+ * ⚠️ Une ligne = une page coupée (cf. le schéma) : rétablir SUPPRIME la ligne
+ * plutôt que d'y écrire `active: true`, pour rester fidèle à la convention
+ * « l'absence vaut page active » sur laquelle lit `chargerPages`.
+ */
+export async function basculerPageAction(
+  _precedent: ReglagesFormState,
+  form: FormData,
+): Promise<ReglagesFormState> {
+  const admin = await assertPermission("reglages");
+
+  const cle = texte(form, "cle");
+  if (!CLES_DESACTIVABLES.has(cle as NavKey)) {
+    return { error: "Page inconnue.", ok: null };
+  }
+
+  const desactiver = texte(form, "desactiver") === "1";
+
+  if (desactiver) {
+    await db().pageEtat.upsert({
+      where: { cle },
+      create: { cle, updatedBy: admin.email },
+      update: { updatedBy: admin.email },
+    });
+  } else {
+    await db().pageEtat.deleteMany({ where: { cle } });
+  }
+
+  // Une publication a pu paraître pendant que la page était coupée : le
+  // rétablissement doit la montrer tout de suite, pas à la prochaine
+  // expiration de cache.
+  revaliderSitePublic();
+
+  return {
+    error: null,
+    ok: desactiver ? "Page désactivée : le public y voit désormais « en construction »." : "Page réactivée.",
   };
 }
