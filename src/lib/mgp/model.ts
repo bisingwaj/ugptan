@@ -198,6 +198,15 @@ export const dueDateFrom = (submittedAt: Date): Date =>
 export const daysUntil = (date: Date, now: number = Date.now()): number =>
   Math.ceil((date.getTime() - now) / DAY_MS);
 
+/* --- Plaintes non lues ---------------------------------------------------- */
+
+/** Au-delà, la bulle affiche « 99+ » : trois chiffres ne tiennent pas sur l'icône du rail. */
+export const UNREAD_CAP = 99;
+
+/** Texte de la bulle de notification. */
+export const unreadLabel = (count: number): string =>
+  count > UNREAD_CAP ? `${UNREAD_CAP}+` : String(Math.max(0, count));
+
 /* --- Numéro de référence -------------------------------------------------- */
 
 /**

@@ -31,6 +31,7 @@ import {
   GrievanceMessageForm,
   GrievanceNoteForm,
 } from "@/components/dashboard/GrievanceForms";
+import { GrievanceReadMarker } from "@/components/dashboard/GrievanceUnread";
 
 export const metadata: Metadata = { title: ADMIN.grievances.caseTitle };
 
@@ -75,6 +76,7 @@ export default async function PlaintePage({ params }: { params: Promise<{ id: st
       submittedAt: true,
       dueAt: true,
       closedAt: true,
+      readAt: true,
       attachments: { select: { id: true, name: true, sizeKb: true } },
       events: {
         select: {
@@ -109,6 +111,9 @@ export default async function PlaintePage({ params }: { params: Promise<{ id: st
 
   return (
     <>
+      {/* Première ouverture : le dossier sort du compte des non lues. */}
+      {grievance.readAt === null && <GrievanceReadMarker id={grievance.id} />}
+
       <Link href={ADMIN_GRIEVANCES} className="adm-back">← {t.back}</Link>
 
       <h1 className="adm__title mono" style={{ marginTop: 14 }}>{grievance.reference}</h1>

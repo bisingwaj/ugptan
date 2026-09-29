@@ -63,6 +63,7 @@ export const ADMIN = {
     console: "Console",
     collapse: "Replier la barre",
     expand: "Déplier la barre",
+    notifications: "Notifications",
   },
 
   errors: {
@@ -144,6 +145,7 @@ export const ADMIN = {
     back: "Retour aux plaintes",
 
     filterAll: "Tous",
+    filterUnread: "Non lues",
     filterOpen: "En cours",
     filterUnassigned: "Non affectés",
     filterOverdue: "Hors délai",
@@ -164,6 +166,13 @@ export const ADMIN = {
     overdue: "Hors délai",
     dueIn: "j restants",
     lateBy: "j de retard",
+
+    unreadMark: "Non lue",
+    unreadNone: "Aucune plainte non lue",
+    unreadOne: "plainte non lue",
+    unreadMany: "plaintes non lues",
+    markAllRead: "Tout marquer comme lu",
+    markingAllRead: "Marquage…",
 
     kpiTotal: "Dossiers",
     kpiNew: "Nouvelles",

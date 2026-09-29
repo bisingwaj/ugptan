@@ -248,12 +248,21 @@ model Grievance {
   closedAt    DateTime?
   updatedAt   DateTime  @updatedAt
 
+  /// Première ouverture du dossier dans la console ; `null` tant que personne
+  /// ne l'a lu. Alimente la bulle de notification (cf. lib/mgp/query.ts).
+  ///
+  /// État PARTAGÉ par l'équipe : un dossier ouvert par un agent l'est pour tous,
+  /// la file de traitement étant commune. Ce n'est pas un acte de traitement,
+  /// d'où l'absence d'événement au journal (cf. actions/admin-grievances.ts).
+  readAt      DateTime?
+
   attachments GrievanceAttachment[]
   events      GrievanceEvent[]
 
   @@index([status, submittedAt])
   @@index([stage])
   @@index([assigneeId])
+  @@index([readAt])
 }
 
 /// Pièce annoncée par le plaignant à l'étape 3.

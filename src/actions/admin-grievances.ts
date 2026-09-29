@@ -17,6 +17,11 @@
  *   · NOTE    — interne, jamais publiée ;
  *   · MESSAGE — adressé au plaignant, visible dans le suivi public.
  * Le champ `isPublic` d'un événement n'est jamais posé ailleurs qu'ici.
+ *
+ * Seule exception au second invariant : le marquage « lu » (`readAt`). C'est
+ * l'état de lecture de la console, qui alimente la bulle de notification, et
+ * non une décision sur le dossier. Journaliser chaque ouverture noierait
+ * l'historique sous des lignes qui n'apprennent rien sur le traitement.
  */
 import { revalidatePath } from "next/cache";
 import { ADMIN_GRIEVANCES, adminPath } from "@/lib/admin";
@@ -33,6 +38,7 @@ import {
   type GrievanceStage,
   type GrievanceStatus,
 } from "@/lib/mgp/model";
+import { UNREAD_WHERE, countUnreadGrievances } from "@/lib/mgp/query";
 
 export type GrievanceActionState = { error: string | null; ok: string | null };
 
@@ -256,4 +262,61 @@ export async function logGrievanceContactAction(
 
   refresh(id);
   return { error: null, ok: "Contact journalisé." };
+}
+
+/* --- Plaintes non lues ---------------------------------------------------- */
+
+/**
+ * Valeur de la bulle, relue à intervalle par la coquille : un layout ne se
+ * re-rend pas pendant la navigation, le chiffre calculé au chargement
+ * resterait sinon figé (cf. `useUnreadGrievances`).
+ */
+export async function countUnreadGrievancesAction(): Promise<number> {
+  await assertPermission("mgp");
+  return countUnreadGrievances();
+}
+
+/**
+ * Marque un dossier comme lu à son ouverture. Appelée par un effet client
+ * (`GrievanceReadMarker`) et non pendant le rendu serveur : un préchargement de
+ * lien ne doit pas faire passer pour lu un dossier que personne n'a ouvert.
+ *
+ * Idempotente : `readAt: null` dans le filtre garde la date de la PREMIÈRE
+ * lecture, que deux agents ouvrent le dossier ensemble ou que l'effet soit
+ * rejoué. Renvoie le nouveau compte, pour que la bulle baisse sans attendre.
+ */
+export async function markGrievanceReadAction(id: string): Promise<number> {
+  await assertPermission("mgp");
+
+  if (typeof id === "string" && id) {
+    const { count } = await db().grievance.updateMany({
+      where: { id, ...UNREAD_WHERE },
+      data: { readAt: new Date() },
+    });
+    if (count > 0) revalidatePath(ADMIN_GRIEVANCES);
+  }
+
+  return countUnreadGrievances();
+}
+
+/**
+ * « Tout marquer comme lu », depuis la liste.
+ *
+ * Borné aux plaintes reçues AVANT le chargement de la liste (`before`) : une
+ * plainte arrivée entre-temps n'était pas sous les yeux de l'agent, elle doit
+ * rester signalée. Une date absente ou illisible ne marque rien.
+ */
+export async function markAllGrievancesReadAction(formData: FormData): Promise<number> {
+  await assertPermission("mgp");
+
+  const before = new Date(String(formData.get("before") ?? ""));
+  if (!Number.isNaN(before.getTime())) {
+    const { count } = await db().grievance.updateMany({
+      where: { ...UNREAD_WHERE, submittedAt: { lte: before } },
+      data: { readAt: new Date() },
+    });
+    if (count > 0) revalidatePath(ADMIN_GRIEVANCES);
+  }
+
+  return countUnreadGrievances();
 }

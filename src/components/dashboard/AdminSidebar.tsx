@@ -7,6 +7,7 @@ import { ADMIN, ADMIN_NAV_SECTIONS } from "@/content/admin";
 import { adminPath } from "@/lib/admin";
 import type { Permission } from "@/lib/auth/permissions";
 import { AdminIcon } from "@/components/dashboard/AdminIcon";
+import { UnreadBubble, unreadSummary } from "@/components/dashboard/GrievanceUnread";
 import { Marque } from "@/components/chrome/Marque";
 
 /** Chevron de la bascule. Dessiné ici : c'est de la chrome, pas un module. */
@@ -47,12 +48,15 @@ export function AdminSidebar({
   collapsed,
   onToggle,
   footer,
+  unreadGrievances,
 }: {
   granted: Permission[];
   collapsed: boolean;
   onToggle: () => void;
   /** Actions de pied de barre — la déconnexion, servie du serveur. */
   footer?: ReactNode;
+  /** Plaintes non lues, portées en bulle sur le module MGP. `null` : pas de module. */
+  unreadGrievances: number | null;
 }) {
   const pathname = usePathname();
   const allowed = new Set<string>(granted);
@@ -84,10 +88,18 @@ export function AdminSidebar({
             <div className="adm__nav-label" aria-hidden>{section.label}</div>
 
             {section.items.map((item) => {
+              // Seul le module MGP porte une bulle : c'est le seul où quelque
+              // chose arrive de l'extérieur sans que la console l'ait demandé.
+              const unread = item.key === "mgp" && unreadGrievances ? unreadGrievances : 0;
+
               const content = (
                 <>
                   <span className="adm__nav-ico"><AdminIcon name={item.key} /></span>
                   <span className="adm__nav-text">{item.label}</span>
+                  {/* Le nombre en toutes lettres pour les lecteurs d'écran : la
+                      bulle est muette, et le libellé seul ne dit rien de neuf. */}
+                  {unread > 0 && <span className="sr-only">, {unreadSummary(unread)}</span>}
+                  <UnreadBubble count={unread} />
                 </>
               );
 
@@ -111,7 +123,7 @@ export function AdminSidebar({
                   key={item.key}
                   href={href}
                   // Seule infobulle disponible une fois la barre repliée.
-                  title={item.label}
+                  title={unread > 0 ? `${item.label} · ${unreadSummary(unread)}` : item.label}
                   className={`adm__nav-item${active ? " is-active" : ""}`}
                   aria-current={active ? "page" : undefined}
                 >

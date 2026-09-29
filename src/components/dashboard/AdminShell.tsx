@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { ADMIN } from "@/content/admin";
 import type { AdminUser } from "@/lib/auth/guard";
-import { grantedPermissions, ROLE_LABEL } from "@/lib/auth/permissions";
+import { can, grantedPermissions, ROLE_LABEL } from "@/lib/auth/permissions";
+import { countUnreadGrievances } from "@/lib/mgp/query";
 import { parseSidebarCollapsed, SIDEBAR_COOKIE } from "@/lib/sidebar";
 import { AdminChrome } from "@/components/dashboard/AdminChrome";
 import { LogoutButton } from "@/components/dashboard/LogoutButton";
@@ -18,6 +19,12 @@ export async function AdminShell({ user, children }: { user: AdminUser; children
   // Calculé côté serveur : la règle d'autorisation ne descend jamais au client.
   const granted = grantedPermissions(user);
   const collapsed = parseSidebarCollapsed((await cookies()).get(SIDEBAR_COOKIE)?.value);
+
+  // Bulle des plaintes non lues : `null` pour un compte sans le module, qui ne
+  // voit alors ni bulle ni cloche. `catch` : la bulle n'est qu'une indication,
+  // une panne de base ne doit pas faire tomber la coquille entière, et la
+  // relecture suivante corrige le chiffre (cf. `useUnreadGrievances`).
+  const unreadGrievances = can(user, "mgp") ? await countUnreadGrievances().catch(() => 0) : null;
 
   // La barre du haut porte l'identité ; la déconnexion vit au pied de la barre
   // latérale, avec la navigation qu'elle referme.
@@ -36,6 +43,7 @@ export async function AdminShell({ user, children }: { user: AdminUser; children
     <AdminChrome
       granted={granted}
       initialCollapsed={collapsed}
+      initialUnreadGrievances={unreadGrievances}
       topbar={topbar}
       sidebarFooter={<LogoutButton />}
     >

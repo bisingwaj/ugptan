@@ -14,7 +14,9 @@ import {
   type GrievanceStage,
   type GrievanceStatus,
 } from "@/lib/mgp/model";
+import { UNREAD_WHERE } from "@/lib/mgp/query";
 import { AnonymityBadge, DeadlineCell, StatusBadge } from "@/components/dashboard/GrievanceBadges";
+import { MarkAllGrievancesRead } from "@/components/dashboard/GrievanceUnread";
 import { PendingLink } from "@/components/ui/PendingLink";
 
 export const metadata: Metadata = { title: ADMIN.grievances.title };
@@ -22,10 +24,12 @@ export const metadata: Metadata = { title: ADMIN.grievances.title };
 /** Statuts qui laissent le dossier ouvert — base des compteurs et des filtres. */
 const OPEN_STATUSES = GRIEVANCE_STATUSES.filter(isOpenStatus);
 
-type FilterKey = "tous" | "nouvelles" | "en-cours" | "non-affectes" | "hors-delai";
+type FilterKey = "tous" | "non-lues" | "nouvelles" | "en-cours" | "non-affectes" | "hors-delai";
 
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "tous", label: ADMIN.grievances.filterAll },
+  // Juste après « Tous » : c'est là que mène la cloche de la barre du haut.
+  { key: "non-lues", label: ADMIN.grievances.filterUnread },
   { key: "nouvelles", label: ADMIN.grievances.kpiNew },
   { key: "en-cours", label: ADMIN.grievances.filterOpen },
   { key: "non-affectes", label: ADMIN.grievances.filterUnassigned },
@@ -39,6 +43,8 @@ const FILTERS: { key: FilterKey; label: string }[] = [
  */
 function whereFor(filter: FilterKey, now: Date) {
   switch (filter) {
+    case "non-lues":
+      return UNREAD_WHERE;
     case "nouvelles":
       return { status: "NOUVELLE" as const };
     case "en-cours":
@@ -65,7 +71,7 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
   const filter = asFilter(f);
   const now = new Date();
 
-  const [grievances, total, nouvelles, ouvertes, horsDelai] = await Promise.all([
+  const [grievances, total, nouvelles, ouvertes, horsDelai, nonLues] = await Promise.all([
     db().grievance.findMany({
       where: whereFor(filter, now),
       select: {
@@ -78,6 +84,7 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
         submittedAt: true,
         dueAt: true,
         closedAt: true,
+        readAt: true,
         assignee: { select: { name: true, email: true } },
       },
       // Les plus récentes d'abord : c'est l'ordre dans lequel on prend un poste.
@@ -88,6 +95,7 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
     db().grievance.count({ where: { status: "NOUVELLE" } }),
     db().grievance.count({ where: { status: { in: OPEN_STATUSES } } }),
     db().grievance.count({ where: { dueAt: { lt: now }, status: { in: OPEN_STATUSES } } }),
+    db().grievance.count({ where: UNREAD_WHERE }),
   ]);
 
   const kpis = [
@@ -115,21 +123,26 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
 
       <div className="adm__section-title">{t.listTitle}</div>
 
-      <nav className="adm-filters" aria-label={t.filterLabel}>
-        {FILTERS.map((item) => {
-          const active = item.key === filter;
-          return (
-            <PendingLink
-              key={item.key}
-              href={item.key === "tous" ? ADMIN_GRIEVANCES : `${ADMIN_GRIEVANCES}?f=${item.key}`}
-              className={`adm-filter${active ? " is-active" : ""}`}
-              aria-current={active ? "page" : undefined}
-            >
-              {item.label}
-            </PendingLink>
-          );
-        })}
-      </nav>
+      <div className="adm-filters-row">
+        <nav className="adm-filters" aria-label={t.filterLabel}>
+          {FILTERS.map((item) => {
+            const active = item.key === filter;
+            return (
+              <PendingLink
+                key={item.key}
+                href={item.key === "tous" ? ADMIN_GRIEVANCES : `${ADMIN_GRIEVANCES}?f=${item.key}`}
+                className={`adm-filter${active ? " is-active" : ""}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {item.label}
+              </PendingLink>
+            );
+          })}
+        </nav>
+        {/* `now` : l'instant où cette liste a été lue. Une plainte arrivée depuis
+            n'était pas sous les yeux de l'agent et ne sera pas marquée. */}
+        {nonLues > 0 && <MarkAllGrievancesRead before={now.toISOString()} />}
+      </div>
 
       {grievances.length === 0 ? (
         <div className="adm-list">
@@ -152,9 +165,16 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
             <tbody>
               {grievances.map((g) => {
                 const status = g.status as GrievanceStatus;
+                const unread = g.readAt === null;
                 return (
-                  <tr key={g.id}>
+                  <tr key={g.id} className={unread ? "is-unread" : undefined}>
                     <td>
+                      {unread && (
+                        <>
+                          <span className="adm-unread-dot" aria-hidden />
+                          <span className="sr-only">{t.unreadMark} : </span>
+                        </>
+                      )}
                       <Link href={adminPath(`/grievances/${g.id}`)} className="adm-link mono">
                         {g.reference}
                       </Link>
