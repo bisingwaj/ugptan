@@ -22,6 +22,7 @@ import {
   SMTP_USER,
   emailConfigured,
 } from "./config";
+import { LOGO_CID, logoAttachment } from "./logo";
 
 export type SendResult =
   | { ok: true; id: string | null }
@@ -124,6 +125,11 @@ export async function sendEmail(mail: Mail): Promise<SendResult> {
       subject: mail.subject,
       html: mail.html,
       text: mail.text,
+      /* Le logo du bandeau est embarqué dans le message (cf. email/logo.ts).
+         Joint dès que le HTML le référence, donc à tout message composé par
+         `renderEmail` : aucun gabarit n'a à y penser. Un `cid:` sans pièce
+         correspondante laisserait un cadre vide. */
+      ...(mail.html.includes(`cid:${LOGO_CID}`) ? { attachments: [logoAttachment()] } : {}),
       ...(EMAIL_REPLY_TO ? { replyTo: EMAIL_REPLY_TO } : {}),
       ...(mail.listUnsubscribe
         ? {

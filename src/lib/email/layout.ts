@@ -23,7 +23,7 @@
  */
 
 import { contact } from "@/content/carbon";
-import { SITE_URL } from "@/lib/site";
+import { LOGO_CID, LOGO_HEIGHT, LOGO_WIDTH } from "./logo";
 
 /** Siège de l'Unité, sur une ligne, tel qu'il figure au pied des messages. */
 const ADRESSE_POSTALE = `${contact.adresse}, ${contact.quartier}`;
@@ -209,24 +209,20 @@ export const featureList = (items: { title: string; text: string }[]): string =>
 /**
  * Marque de l'UGPTN, en tête du bandeau noir.
  *
- * ─── Pourquoi une image, alors qu'un e-mail ne peut pas compter dessus ──────
+ * L'image est EMBARQUÉE dans le message et référencée par `cid:` (cf.
+ * email/logo.ts, et `sendEmail` qui joint le fichier). Elle pointait autrefois
+ * vers le site, dont le domaine ne servait pas le fichier : aucun destinataire
+ * ne voyait le logo. Embarquée, elle s'affiche sans dépendre du site ni du
+ * déblocage des images distantes.
  *
- * La plupart des clients bloquent les images distantes tant que le
- * destinataire ne les autorise pas. Le bandeau portait donc jusqu'ici un carré
- * dessiné en tableaux, qui s'affichait toujours mais ne ressemblait à aucun
- * logo de la charte.
+ * L'attribut `alt` porte toujours « UGPTN » en blanc, à la taille et à la
+ * graisse du mot-symbole : un client qui refuserait malgré tout l'image
+ * afficherait le sigle en toutes lettres, à sa place et dans la bonne couleur.
  *
- * Le compromis retenu ne pariait pas sur le déblocage : l'attribut `alt` porte
- * « UGPTN » en blanc, à la taille et à la graisse du mot-symbole. Images
- * bloquées, le bandeau affiche donc le sigle en toutes lettres, à sa place et
- * dans la bonne couleur ; images autorisées, il affiche le logo. Aucun des deux
- * états n'est un accident.
- *
- * L'URL est ABSOLUE et pointe vers le site : un e-mail quitte l'application,
- * plus aucun chemin relatif n'y a de sens. C'est la version à encre blanche,
- * le bandeau étant noir.
+ * Largeur ET hauteur fixes : Outlook ignore `height:auto` et étirerait l'image
+ * à sa taille réelle, le double de sa taille d'affichage.
  */
-const mark = `<img src="${SITE_URL}/marque/ugptn-blanc.png" width="132" height="78" alt="UGPTN" style="display:block;width:132px;height:auto;border:0;outline:none;text-decoration:none;font-family:${FONT_SANS};font-size:19px;font-weight:700;color:${PALETTE.white};">`;
+const mark = `<img src="cid:${LOGO_CID}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="UGPTN" style="display:block;width:${LOGO_WIDTH}px;height:${LOGO_HEIGHT}px;border:0;outline:none;text-decoration:none;font-family:${FONT_SANS};font-size:19px;font-weight:700;color:${PALETTE.white};">`;
 
 export type EmailDocument = {
   /** Ligne d'aperçu affichée après l'objet dans la liste des messages. */

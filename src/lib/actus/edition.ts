@@ -62,7 +62,7 @@ export async function chargerReferentiels(): Promise<Referentiels> {
 const traductionVide = (): TraductionSaisie => ({
   title: "", slug: "", excerpt: "", content: "",
   seoTitle: "", seoDescription: "", coverAlt: "", authorRole: "",
-  existe: false, complete: false, majLe: null,
+  existe: false, complete: false, majLe: null, version: "",
 });
 
 const traductionsVides = (): Record<Lang, TraductionSaisie> =>
@@ -132,6 +132,9 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
       existe: true,
       complete: tr.title.trim().length > 0 && !isEmptyHtml(tr.contentHtml),
       majLe: formatDateTime(tr.updatedAt),
+      // À la milliseconde, et non la date formatée : deux écritures dans la
+      // même minute doivent donner deux versions distinctes.
+      version: tr.updatedAt.toISOString(),
     };
   }
 

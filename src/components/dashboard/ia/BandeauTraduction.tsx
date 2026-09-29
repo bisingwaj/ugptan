@@ -125,7 +125,8 @@ export function BandeauTraduction({
       <div className="adm-ia adm-ia--attente">
         <p className="adm-ia__texte">
           <strong className="adm-ia__titre">Cette version n&apos;existe pas encore</strong>
-          L&apos;assistance peut la composer à partir du {LANGUE[sourcePossible]}. Vous obtiendrez
+          L&apos;assistance peut la composer à partir de la version en {LANGUE[sourcePossible]}{" "}
+          <strong>enregistrée</strong> : enregistrez d&apos;abord vos dernières modifications. Vous obtiendrez
           une première version à relire, pas un texte définitif. Comptez de dix à soixante secondes.
         </p>
 

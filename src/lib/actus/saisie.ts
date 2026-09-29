@@ -31,6 +31,13 @@ export type TraductionSaisie = {
   complete: boolean;
   /** Dernière modification de cette langue, déjà formatée. */
   majLe: string | null;
+  /**
+   * Jeton de la version en base : l'instant exact de la dernière écriture, ""
+   * tant que la langue n'existe pas. Sert de `key` aux champs du formulaire
+   * (cf. ArticleTraduction) : une écriture faite SANS le formulaire, par la
+   * traduction assistée, doit remplacer ce qu'il affiche.
+   */
+  version: string;
 };
 
 /** La fiche, indépendante de toute langue. */

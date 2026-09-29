@@ -78,7 +78,15 @@ export function ArticleTraduction({
         <input type="hidden" name="articleId" value={articleId} />
         <input type="hidden" name="locale" value={lang} />
 
-        <TraductionChamps lang={lang} valeurs={valeurs} assets={assets} />
+        {/* `key` sur la version en base : les champs ne lisent leurs valeurs
+            qu'au montage (`defaultValue`, état du titre et du slug, éditeur du
+            corps). Quand la traduction assistée écrit cette langue, la page se
+            rafraîchit mais le formulaire reste monté : sans remontage, le titre
+            et le corps restaient vides à l'écran, et un « Enregistrer » les
+            aurait réécrits vides par-dessus la traduction.
+            Sur les champs et non sur ce composant, qui porte le message de
+            résultat de l'enregistrement : il doit survivre au rafraîchissement. */}
+        <TraductionChamps key={valeurs.version} lang={lang} valeurs={valeurs} assets={assets} />
 
         <div className="adm-edit__actions">
           <button type="submit" className="btn btn--primary" disabled={enCours}>
