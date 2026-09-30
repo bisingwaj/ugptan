@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { m, useScroll, useTransform, useSpring } from "framer-motion";
 import type { CSSProperties } from "react";
 import { usePrefersReducedMotion } from "@/components/motion/useReducedMotion";
@@ -55,13 +56,27 @@ export function HeroVideo({ src, srcWebm, poster }: { src: string; srcWebm?: str
 
   return (
     <div ref={wrapRef} style={{ position: "absolute", inset: 0, overflow: "hidden" }} aria-hidden>
-      {/* Poster : première peinture instantanée (toujours présent, sous la vidéo). */}
+      {/* Poster : c'est le CANDIDAT LCP du site. Servi par next/image en
+          `priority` → précharge automatique (fetchpriority high) + variantes
+          responsives AVIF/WebP dimensionnées par écran, là où l'ancien
+          `background-image: url()` n'était pas découvrable par le préchargeur et
+          livrait la pleine résolution même sur mobile. Toujours présent sous la
+          vidéo pour une première peinture immédiate. */}
       {poster && (
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `url("${poster}")`, backgroundSize: "cover", backgroundPosition: "center" }} />
+        <Image
+          src={poster}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: "cover", objectPosition: "center" }}
+        />
       )}
       {load && (
-        // eslint-disable-next-line jsx-a11y/media-has-caption
-        <m.video ref={videoRef} poster={poster} autoPlay muted loop playsInline preload="auto" style={videoStyle}>
+        // `preload="none"` : la vidéo est décorative et le poster couvre déjà
+        // l'écran ; on ne dispute plus au LCP le téléchargement du MP4. L'autoplay
+        // muet déclenche de toute façon le streaming progressif (MP4 faststart).
+        <m.video ref={videoRef} poster={poster} autoPlay muted loop playsInline preload="none" style={videoStyle}>
           {srcWebm && <source src={srcWebm} type="video/webm" />}
           <source src={src} type="video/mp4" />
         </m.video>

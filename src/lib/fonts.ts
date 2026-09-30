@@ -33,6 +33,12 @@ export const plexMono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
   display: "swap",
   variable: "--font-plex-mono",
+  // `preload: false` : le mono ne sert que des libellés secondaires (kickers,
+  // notes, méta) — jamais le candidat LCP. Retirer ses 3 fichiers de la file de
+  // préchargement rend le chemin critique à l'image du héros et au titre.
+  // `display:swap` + métriques de repli ajustées évitent tout décalage à la
+  // bascule. La Sans, elle, garde son préchargement (elle porte le titre).
+  preload: false,
 });
 
 /** À poser sur `<html>` : c'est là que `tokens.css` lit les deux variables. */

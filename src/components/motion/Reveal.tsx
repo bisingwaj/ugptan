@@ -26,6 +26,7 @@ export function Reveal({
   as = "div",
   className,
   style,
+  eager = false,
 }: {
   children: ReactNode;
   variant?: Variant;
@@ -33,6 +34,14 @@ export function Reveal({
   as?: keyof typeof TAGS;
   className?: string;
   style?: CSSProperties;
+  /**
+   * Contenu AU-DESSUS de la ligne de flottaison (titre du héros) : rendu visible
+   * immédiatement, sans passer par l'état `hidden`. Sinon le HTML SSR porte
+   * `opacity:0` et l'élément — souvent le candidat LCP — n'apparaît qu'une fois
+   * framer-motion hydraté, ce qui dégrade le LCP sur mobile lent. L'animation
+   * d'entrée n'a de sens que pour ce qu'on découvre en défilant.
+   */
+  eager?: boolean;
 }) {
   const reduce = usePrefersReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
@@ -42,7 +51,7 @@ export function Reveal({
   const inView = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
   const Tag = TAGS[as] as typeof m.div;
 
-  if (reduce) {
+  if (reduce || eager) {
     const Static = as;
     return (
       <Static className={className} style={style}>

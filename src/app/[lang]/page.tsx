@@ -15,6 +15,7 @@ import { membresEquipe } from "@/lib/equipe/query";
 import { galleryProvinces, partners } from "@/content/carbon";
 import { media } from "@/content/media";
 import { NAV, route } from "@/lib/routes";
+import { SITE_URL } from "@/lib/site";
 import { Kicker } from "@/components/ui/Kicker";
 import { Counter } from "@/components/ui/Counter";
 import { Photo } from "@/components/ui/Photo";
@@ -50,16 +51,52 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
     organesPublies(lang),
   ]);
 
+  // Données structurées : identifie l'organisation et le site pour les moteurs
+  // (rich results, encart de connaissance) et déclare l'action de recherche.
+  const donneesStructurees = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "GovernmentOrganization",
+        "@id": `${SITE_URL}/#organization`,
+        name: "UGPTN",
+        legalName: meta.uniteLong,
+        url: SITE_URL,
+        logo: `${SITE_URL}/icon.png`,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: "UGPTN",
+        inLanguage: lang === "en" ? "en" : "fr",
+        publisher: { "@id": `${SITE_URL}/#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/${lang}/search?q={search_term_string}` },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(donneesStructurees) }}
+      />
       {/* ===== HERO ===== */}
       <section data-hero style={{ position: "relative", borderBottom: "1px solid #1f2430", overflow: "hidden", background: "#0b0f1a", color: "#fff", minHeight: "calc(100svh - 64px)", display: "flex", flexDirection: "column" }}>
         <HeroVideo src={media.heroFilm} poster={media.img.hero} />
         <div className="hero-grid" style={{ position: "relative", flex: 1, width: "100%", maxWidth: "var(--maxw)", margin: "0 auto", padding: "clamp(40px,6vw,88px) var(--pad-x) 0", display: "grid", gridTemplateColumns: "1.35fr .9fr", gap: "clamp(32px,5vw,72px)", alignItems: "end", alignContent: "end" }}>
           <div style={{ paddingBottom: "clamp(48px,7vw,96px)" }}>
-            <Reveal variant="fade"><Kicker light>{t.home.heroKicker}</Kicker></Reveal>
-            <Reveal variant="mask"><h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(32px,6.2vw,82px)", lineHeight: 1.04, letterSpacing: "-0.03em", color: "#fff" }}>{t.home.heroTitle}</h1></Reveal>
-            <Reveal variant="up" delay={0.1}><p style={{ margin: "28px 0 0", maxWidth: 560, fontSize: "clamp(16px,1.5vw,19px)", lineHeight: 1.6, color: "#c6c6c6" }}>{t.home.heroLead}</p></Reveal>
+            {/* `eager` : le bloc de texte du héros est au-dessus de la ligne de
+                flottaison (le titre est le candidat LCP). Rendu visible dès le
+                SSR, il ne dépend pas de l'hydratation de framer-motion. */}
+            <Reveal variant="fade" eager><Kicker light>{t.home.heroKicker}</Kicker></Reveal>
+            <Reveal variant="mask" eager><h1 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(32px,6.2vw,82px)", lineHeight: 1.04, letterSpacing: "-0.03em", color: "#fff" }}>{t.home.heroTitle}</h1></Reveal>
+            <Reveal variant="up" delay={0.1} eager><p style={{ margin: "28px 0 0", maxWidth: 560, fontSize: "clamp(16px,1.5vw,19px)", lineHeight: 1.6, color: "#c6c6c6" }}>{t.home.heroLead}</p></Reveal>
             <Reveal variant="up" delay={0.18} className="stack-sm" style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 38 }}>
               <Link href={route(lang, NAV.projet)} className="btn btn--primary">{t.cta.discover}<span className="arrow">→</span></Link>
               <VideoButton id={media.heroFilm} className="btn backdrop-blur-[4px] max-[760px]:backdrop-blur-none" style={{ paddingLeft: 15, background: "rgba(255,255,255,.1)", border: "1px solid rgba(255,255,255,.28)", color: "#fff" }} dataSlot="Film du projet (lecture avec son)" dataRatio="16:9">
@@ -287,7 +324,10 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           <RevealGroup gap={0.05} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(216px,1fr))" }}>
             {galleryProvinces.map((g) => (
               <RevealItem key={g.nom} className="duo" style={{ aspectRatio: "4/3" }}>
-                <Photo src={media.img[g.img]} alt={g.nom} />
+                {/* sizes ajusté à la grille `minmax(216px,1fr)` : 1 colonne
+                    sous 480px, 2 entre 480 et 760px, ~300px au-delà — évite de
+                    télécharger une image pleine largeur pour une case d'un tiers. */}
+                <Photo src={media.img[g.img]} alt={g.nom} sizes="(max-width: 480px) 100vw, (max-width: 760px) 50vw, 300px" />
                 <div style={{ position: "absolute", left: 14, right: 14, bottom: 13, fontSize: 14, fontWeight: 600, color: "#fff", lineHeight: 1.25 }}>{g.nom}</div>
               </RevealItem>
             ))}

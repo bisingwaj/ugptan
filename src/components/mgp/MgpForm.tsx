@@ -180,9 +180,12 @@ export function MgpForm({ lang }: { lang: Lang }) {
               {named ? t.namedBadge : t.anonymousBadge}
             </p>
 
-            <input value={contact.email} maxLength={LIMITS.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} placeholder={t.email} type="email" autoComplete="email" className="field" style={{ marginBottom: 10 }} />
-            <input value={contact.tel} maxLength={LIMITS.phone} onChange={(e) => setContact({ ...contact, tel: e.target.value })} placeholder={t.phone} type="tel" autoComplete="tel" className="field" style={{ marginBottom: 10 }} />
-            <input value={contact.prov} maxLength={LIMITS.province} onChange={(e) => setContact({ ...contact, prov: e.target.value })} placeholder={t.province} className="field" />
+            {/* aria-label : ces trois champs n'ont pas de label visible (design
+                compact) — le placeholder disparaît à la saisie et n'est pas un
+                nom accessible fiable. */}
+            <input value={contact.email} maxLength={LIMITS.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} placeholder={t.email} aria-label={t.email} type="email" autoComplete="email" className="field" style={{ marginBottom: 10 }} />
+            <input value={contact.tel} maxLength={LIMITS.phone} onChange={(e) => setContact({ ...contact, tel: e.target.value })} placeholder={t.phone} aria-label={t.phone} type="tel" autoComplete="tel" className="field" style={{ marginBottom: 10 }} />
+            <input value={contact.prov} maxLength={LIMITS.province} onChange={(e) => setContact({ ...contact, prov: e.target.value })} placeholder={t.province} aria-label={t.province} className="field" />
           </>
         )}
         {step === 5 && (

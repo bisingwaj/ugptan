@@ -102,13 +102,20 @@ export default async function LangLayout(props: { children: React.ReactNode; par
         </noscript>
       </head>
       <body suppressHydrationWarning>
+        {/* Lien d'évitement : premier élément focalisable de la page, invisible
+            jusqu'au focus clavier (cf. `.skip-link` dans globals.css). Sans lui,
+            un utilisateur au clavier retraverse l'en-tête et le méga-menu à
+            chaque page avant d'atteindre le contenu. */}
+        <a href="#contenu" className="skip-link">
+          {lang === "en" ? "Skip to content" : "Aller au contenu"}
+        </a>
         <MotionProvider>
           <NavigationProgress />
           <SmoothScroll />
           <Cursor />
           <VideoProvider lang={lang}>
             <Header lang={lang} />
-            <main>{children}</main>
+            <main id="contenu">{children}</main>
             <Newsletter lang={lang} />
             <Footer lang={lang} />
             <AvisNavigation lang={lang} />

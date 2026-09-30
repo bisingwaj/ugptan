@@ -25,7 +25,7 @@
  * Chargé UNIQUEMENT côté client (cf. ProvinceMap.tsx, qui l'importe en
  * `dynamic(..., { ssr:false })`) : WebGL n'existe pas côté serveur.
  */
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html, PerspectiveCamera, OrbitControls } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
@@ -168,7 +168,7 @@ function ProvinceBlock({
   );
 }
 
-function Scene({ lang, reduceMotion }: { lang: Lang; reduceMotion: boolean }) {
+function Scene({ lang, reduceMotion, coarse }: { lang: Lang; reduceMotion: boolean; coarse: boolean }) {
   const t = dict(lang);
   const geometries = useMemo(() => provinceGeometries(), []);
   const prioSet = useMemo(() => new Set(provincesPrio.map((p) => p.nom)), []);
@@ -266,6 +266,11 @@ function Scene({ lang, reduceMotion }: { lang: Lang; reduceMotion: boolean }) {
           l'horizontale — de quoi l'incliner légèrement à la souris, jamais de
           quoi en voir la tranche ou le dos. */}
       <OrbitControls
+        /* Rotation par la souris uniquement. Au tactile (appareil hybride qui
+           aurait passé le filtre matériel de ProvinceMap), la laisser active
+           ferait pivoter la carte sur un balayage vertical au lieu de laisser
+           défiler la page — un piège de scroll en plein milieu de l'accueil. */
+        enableRotate={!coarse}
         enablePan={false}
         enableZoom={false}
         autoRotate={false}
@@ -290,10 +295,17 @@ function Scene({ lang, reduceMotion }: { lang: Lang; reduceMotion: boolean }) {
 export function ProvinceMap3D({ lang }: { lang: Lang }) {
   const reduceMotion = Boolean(usePrefersReducedMotion());
   const [dragging, setDragging] = useState(false);
+  const [coarse, setCoarse] = useState(false);
+
+  useEffect(() => {
+    setCoarse(matchMedia("(pointer: coarse)").matches);
+  }, []);
 
   return (
     <div
-      style={{ position: "relative", width: "100%", height: "100%", cursor: dragging ? "grabbing" : "grab" }}
+      // `touch-action: pan-y` : le défilement vertical reste au navigateur même
+      // au-dessus du canvas (cf. `enableRotate` désactivé au tactile dans Scene).
+      style={{ position: "relative", width: "100%", height: "100%", touchAction: "pan-y", cursor: dragging ? "grabbing" : "grab" }}
       onPointerDown={() => setDragging(true)}
       onPointerUp={() => setDragging(false)}
       onPointerLeave={() => setDragging(false)}
@@ -302,7 +314,7 @@ export function ProvinceMap3D({ lang }: { lang: Lang }) {
         {/* De face, reculée pour cadrer le pays entier avec marge — le
             cadrage qu'avait la carte plate, avant Three.js. */}
         <PerspectiveCamera makeDefault position={[0, 0.3, 13]} fov={30} />
-        <Scene lang={lang} reduceMotion={reduceMotion} />
+        <Scene lang={lang} reduceMotion={reduceMotion} coarse={coarse} />
       </Canvas>
     </div>
   );

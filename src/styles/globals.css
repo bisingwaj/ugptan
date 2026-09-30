@@ -62,6 +62,39 @@
   :focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
 }
 
+/* Accessibilité — masquage visuel sans retrait de l'arbre d'accessibilité, et
+   lien d'évitement. `.sr-only` : lu par les lecteurs d'écran, invisible à l'œil.
+   `.skip-link` : hors écran jusqu'au focus clavier, où il descend en évidence
+   en haut à gauche (cf. le premier enfant du <body>, app/[lang]/layout.tsx). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  transform: translateY(-140%);
+  padding: 10px 16px;
+  background: var(--ac);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 2px;
+  transition: transform 0.15s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 /* Contrats de la librairie Lenis et verrou de défilement : hors couche, donc
    au-dessus de tout utilitaire. Ces règles pilotent le document, pas un
    composant, et ne doivent jamais être arbitrées par une classe du JSX.
@@ -105,7 +138,7 @@ html.scroll-locked body {
 
 /* Page hero (inner pages) */
 .page-hero { padding: clamp(54px, 7vw, 92px) max(var(--pad-x), var(--sa-r)) clamp(38px, 4vw, 56px) max(var(--pad-x), var(--sa-l)); border-bottom: 1px solid var(--c-20); }
-.page-hero__crumb { font-family: var(--font-mono); font-size: 12px; color: var(--c-50); letter-spacing: 0.05em; margin-bottom: 22px; }
+.page-hero__crumb { font-family: var(--font-mono); font-size: 12px; color: var(--c-60); letter-spacing: 0.05em; margin-bottom: 22px; } /* --c-60 (5:1) et non --c-50 (3.3:1) : fil d'Ariane sur fond clair, seuil AA. */
 
 /* Fil d'Ariane sémantique (composant FilAriane). Le reset du site remet marges
    et rembourrages à zéro mais NE retire PAS `list-style` : sans la règle
@@ -493,8 +526,8 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 }
 .field:focus { border-color: var(--ac); outline: 2px solid var(--ac-line); outline-offset: -1px; }
 .field--dark { background: var(--c-90); border-color: var(--c-80); color: #fff; }
-.field--dark:focus { border-color: var(--ac-light); outline: none; }
-.label-mono { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--c-50); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
+.field--dark:focus-visible { border-color: var(--ac-light); outline: 2px solid var(--ac-light); outline-offset: 2px; } /* focus visible sur fond sombre : le seul changement de bordure 1px ne suffit pas (a11y). */
+.label-mono { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--c-60); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; } /* --c-60 (5:1) : libellé de champ sur fond clair, seuil AA. */
 
 /* Chiffres prospectifs : marqueur d'ordre de grandeur + mention de prudence.
    Les valeurs du cadre de résultats sont des ambitions, pas des engagements. */
@@ -546,7 +579,7 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .comp-hero__cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
 
 /* Encart chiffres du héros */
-.comp-hero__figures { border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(10, 15, 26, 0.55); backdrop-filter: blur(8px); }
+.comp-hero__figures { border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(10, 15, 26, 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .comp-hero__figures-head { display: flex; justify-content: space-between; gap: 12px; padding: 13px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); font-size: 10px; letter-spacing: 0.11em; text-transform: uppercase; color: #97a1b3; }
 .comp-hero__figure { padding: 15px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
 .comp-hero__figure:last-child { border-bottom: none; }
@@ -558,7 +591,7 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .comp-hero__v { font-size: 16px; font-weight: 600; color: #fff; margin-top: 5px; }
 
 /* ------------------------------------------- BARRE COLLANTE (onglets) ----- */
-.comp-subnav { position: sticky; top: calc(64px + var(--sa-t)); z-index: 40; background: rgba(255, 255, 255, 0.97); border-bottom: 1px solid var(--c-20); backdrop-filter: blur(8px); }
+.comp-subnav { position: sticky; top: calc(64px + var(--sa-t)); z-index: 40; background: rgba(255, 255, 255, 0.97); border-bottom: 1px solid var(--c-20); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .comp-subnav__inner { max-width: var(--maxw); margin: 0 auto; padding-inline: max(var(--pad-x), var(--sa-l)) max(var(--pad-x), var(--sa-r)); display: flex; align-items: stretch; justify-content: space-between; gap: 20px; }
 .comp-subnav__tabs { display: flex; align-items: stretch; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
 .comp-subnav__tabs::-webkit-scrollbar { display: none; }
@@ -853,7 +886,7 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
 
   /* Index des projets : bande d'ancres collante sous la barre d'onglets,
      titres conservés (une liste de numéros seuls n'aide pas à choisir). */
-  .projets-index { position: sticky; top: calc(64px + var(--sa-t) + 51px); z-index: 30; flex-direction: row; overflow-x: auto; scrollbar-width: none; background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(8px); border-bottom: 1px solid var(--c-20); margin-bottom: 4px; }
+  .projets-index { position: sticky; top: calc(64px + var(--sa-t) + 51px); z-index: 30; flex-direction: row; overflow-x: auto; scrollbar-width: none; background: rgba(255, 255, 255, 0.97); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-bottom: 1px solid var(--c-20); margin-bottom: 4px; }
   .projets-index::-webkit-scrollbar { display: none; }
   .projet-link { grid-template-columns: auto auto; gap: 8px; align-items: center; padding: 11px 14px; border-bottom: none; border-left: none; border-right: 1px solid var(--c-20); border-bottom: 2px solid transparent; white-space: nowrap; background: transparent; }
   .projet-link__t { display: block; max-width: 168px; overflow: hidden; text-overflow: ellipsis; font-size: 12.5px; }
@@ -876,7 +909,7 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
   .comp-hero__cta.stack-sm { flex-direction: row !important; flex-wrap: wrap; }
   .comp-hero__cta.stack-sm > .btn { width: auto !important; flex: 1 1 46%; justify-content: center; padding-inline: 14px; font-size: 14px; }
   .comp-hero__cta.stack-sm > .btn:last-child { flex-basis: 100%; }
-  .comp-hero__figures { margin-top: 26px; background: rgba(10, 15, 26, 0.85); backdrop-filter: none; }
+  .comp-hero__figures { margin-top: 26px; background: rgba(10, 15, 26, 0.85); -webkit-backdrop-filter: none; backdrop-filter: none; }
   .comp-hero__figures-head { padding: 11px 14px; }
   .comp-hero__figure { padding: 13px 14px; }
   .comp-hero__figure--big .stat__num { font-size: 32px; }
@@ -1819,6 +1852,7 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
   position: absolute; top: 14px; left: 14px; z-index: 2;
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 12px; background: rgba(22, 22, 22, 0.72); color: #fff;
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
 .gal-cell__play em { font-style: normal; font-size: 11px; letter-spacing: 0.04em; }

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { media, ytEmbed } from "@/content/media";
 import { pick, type Lang } from "@/lib/pick";
 
@@ -17,7 +17,13 @@ const isFileSrc = (s: string) => s.startsWith("/") || s.startsWith("blob:") || /
 export function VideoProvider({ lang, children }: { lang: Lang; children: ReactNode }) {
   const [src, setSrc] = useState<string | null>(null);
   const [meta, setMeta] = useState<VideoMeta | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const fermerRef = useRef<HTMLButtonElement>(null);
+  /** Élément à re-focaliser à la fermeture (celui qui a ouvert la lightbox). */
+  const restaurer = useRef<HTMLElement | null>(null);
+
   const open = useCallback<OpenVideo>((value, m) => {
+    restaurer.current = (document.activeElement as HTMLElement) ?? null;
     setSrc(value || media.videoYt);
     setMeta(m ?? null);
   }, []);
@@ -26,11 +32,33 @@ export function VideoProvider({ lang, children }: { lang: Lang; children: ReactN
     setMeta(null);
   }, []);
 
+  // Modale : Échap ferme, le focus entre à l'ouverture et y reste piégé, puis
+  // revient au déclencheur à la fermeture (aligné sur les autres modales).
   useEffect(() => {
     if (!src) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    fermerRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { close(); return; }
+      if (e.key !== "Tab") return;
+      const cibles = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, a[href], iframe, video, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!cibles || cibles.length === 0) return;
+      const premier = cibles[0];
+      const dernier = cibles[cibles.length - 1];
+      if (e.shiftKey && document.activeElement === premier) {
+        e.preventDefault();
+        dernier.focus();
+      } else if (!e.shiftKey && document.activeElement === dernier) {
+        e.preventDefault();
+        premier.focus();
+      }
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      restaurer.current?.focus?.();
+    };
   }, [src, close]);
 
   const file = src ? isFileSrc(src) : false;
@@ -43,17 +71,16 @@ export function VideoProvider({ lang, children }: { lang: Lang; children: ReactN
       {children}
       {src && (
         <div className="scrim scrim--center backdrop-blur-[8px] max-[760px]:backdrop-blur-none" style={{ background: "rgba(22,22,22,0.86)" }} onClick={close}>
-          <div className="modal" data-lenis-prevent style={{ width: "100%", maxWidth: 1080 }} onClick={(e) => e.stopPropagation()}>
+          <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={titre} className="modal" data-lenis-prevent style={{ width: "100%", maxWidth: 1080 }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginBottom: 14 }}>
               <div>
                 <div style={{ fontWeight: 600, fontSize: "clamp(16px,2vw,22px)", color: "#fff" }}>{titre}</div>
                 <div className="mono" style={{ fontSize: 11, letterSpacing: "0.06em", color: "#a8a8a8", marginTop: 6, textTransform: "uppercase" }}>{source}</div>
               </div>
-              <button onClick={close} aria-label="Fermer" style={{ width: 46, height: 46, flex: "0 0 auto", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontSize: 17, background: "rgba(255,255,255,0.08)" }}>✕</button>
+              <button ref={fermerRef} onClick={close} aria-label={lang === "en" ? "Close" : "Fermer"} style={{ width: 46, height: 46, flex: "0 0 auto", border: "1px solid rgba(255,255,255,0.3)", color: "#fff", fontSize: 17, background: "rgba(255,255,255,0.08)" }}>✕</button>
             </div>
             <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", boxShadow: "0 40px 90px rgba(0,0,0,0.5)", background: "#000" }}>
               {file ? (
-                // eslint-disable-next-line jsx-a11y/media-has-caption
                 <video src={src!} controls autoPlay playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", background: "#000" }} />
               ) : (
                 <iframe

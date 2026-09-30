@@ -6,10 +6,12 @@ export function DRCMapSvg({
   onHover,
   onClick,
   ...props
-}: React.SVGProps<SVGSVGElement> & {
+}: Omit<React.SVGProps<SVGSVGElement>, "onClick"> & {
   hovered: string | null;
   clicked: string | null;
   onHover: (name: string | null) => void;
+  // `onClick` reçoit le NOM de la province, pas l'événement — d'où l'Omit
+  // ci-dessus, qui écarte le `onClick` (MouseEventHandler) de `SVGProps`.
   onClick: (name: string) => void;
 }) {
   return (

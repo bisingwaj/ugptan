@@ -146,7 +146,7 @@ export function MgpTracker({ lang, initialRef = "" }: { lang: Lang; initialRef?:
 
           {/* Messages adressés au plaignant */}
           <div style={{ marginTop: 22, paddingTop: 18, borderTop: "1px solid var(--c-80)" }}>
-            <div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)", marginBottom: 12 }}>{t.trackUpdates}</div>
+            <div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-40)", marginBottom: 12 }}>{t.trackUpdates}</div>
             {result.updates.length === 0 ? (
               <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: "var(--c-50)" }}>{t.trackNoUpdates}</p>
             ) : (
@@ -164,7 +164,7 @@ export function MgpTracker({ lang, initialRef = "" }: { lang: Lang; initialRef?:
       )}
 
       <div style={{ marginTop: 22, paddingTop: 20, borderTop: "1px solid var(--c-80)" }}>
-        <div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)", marginBottom: 12 }}>{t.pipelineTitle}</div>
+        <div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-40)", marginBottom: 12 }}>{t.pipelineTitle}</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {stages.map((s) => (
             <span key={s} className="mono" style={{ fontSize: 11, color: "var(--c-40)" }}>{s} <span style={{ color: "var(--ac-light)", marginLeft: 6 }}>›</span></span>
@@ -179,7 +179,7 @@ export function MgpTracker({ lang, initialRef = "" }: { lang: Lang; initialRef?:
 function Field({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
     <div>
-      <div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)" }}>{label}</div>
+      <div className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-40)" }}>{label}</div>
       <div style={{ marginTop: 5, fontSize: strong ? 15 : 13, fontWeight: strong ? 600 : 400, color: "#fff" }}>{value}</div>
     </div>
   );

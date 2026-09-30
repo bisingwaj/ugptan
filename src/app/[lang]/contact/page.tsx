@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { asLang } from "@/lib/params";
+import { NAV, route } from "@/lib/routes";
 import { dict } from "@/content/i18n";
 import { contact } from "@/content/carbon";
 import { Kicker } from "@/components/ui/Kicker";
@@ -85,7 +87,7 @@ export default async function ContactPage(props: { params: Promise<{ lang: strin
                 <div style={{ fontSize: 20, fontWeight: 600 }}>{c.generalTitle}</div>
                 <div style={{ fontSize: 13.5, color: "var(--c-40)", marginTop: 6, maxWidth: 380, lineHeight: 1.5 }}>{c.generalDesc}</div>
               </div>
-              <button className="btn btn--primary btn--sm">{t.cta.report}<span className="arrow">→</span></button>
+              <Link href={route(lang, NAV.mgp)} className="btn btn--primary btn--sm">{t.cta.report}<span className="arrow">→</span></Link>
             </RevealItem>
             <RevealItem style={{ background: "var(--c-10)", padding: "34px clamp(20px,3vw,36px)", borderLeft: "3px solid var(--c-50)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 15 }}>🔒</span><div style={{ fontSize: 16, fontWeight: 600 }}>{c.easLabel}</div></div>
