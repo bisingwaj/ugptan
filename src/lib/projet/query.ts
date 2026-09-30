@@ -38,6 +38,7 @@ import type { Lang } from "@/lib/pick";
 import { pick } from "@/lib/pick";
 import { composantes as composantesSeed, compColors, odp as odpSeed, intermediaires as interSeed } from "@/content/data";
 import { composantesDetail } from "@/content/composantes-detail";
+import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
 import type { ComposanteDetail } from "@/content/types";
 import {
   blocTraduit, composanteTraduite, indicateurTraduit,
@@ -532,6 +533,18 @@ function seedIndicateurs(famille: IndicateurFamille, lang: Lang): IndicateurVue[
  * la même chose sans que personne l'ait décidé.
  */
 export async function composantesPubliques(lang: Lang): Promise<ComposanteVue[]> {
+  // Requête la plus lourde du site (toutes les composantes, toutes traductions,
+  // tous les blocs) et la plus RÉPÉTÉE : /components, chaque /components/[code]
+  // via `composantePublique`, /project et /search la rejouaient à l'identique.
+  // TTL long (socle) : une composante change quelques fois par an.
+  return cacheJson(
+    `projet:composantes:${lang}`,
+    { tags: [TAG.projet], ttl: TTL.socle },
+    () => composantesPubliquesImpl(lang),
+  );
+}
+
+async function composantesPubliquesImpl(lang: Lang): Promise<ComposanteVue[]> {
   const lignesBase = await lecture(
     () => db().composante.findMany({
       where: { status: "PUBLISHED" },
@@ -596,6 +609,22 @@ export async function indicateurs(
   lang: Lang,
   codes?: readonly string[],
 ): Promise<IndicateurVue[]> {
+  // On met en cache la famille ENTIÈRE (sans le filtre `codes`) : la même liste
+  // sert l'accueil, « Résultats » et les pages de composante, qui n'en gardent
+  // qu'un sous-ensemble. Filtrer hors cache maximise la réutilisation.
+  const liste = await cacheJson(
+    `projet:indicateurs:${famille}:${lang}`,
+    { tags: [TAG.projet], ttl: TTL.socle },
+    () => indicateursImpl(famille, lang),
+  );
+  if (!codes) return liste;
+  return liste.filter((item) => item.code !== null && codes.includes(item.code));
+}
+
+async function indicateursImpl(
+  famille: IndicateurFamille,
+  lang: Lang,
+): Promise<IndicateurVue[]> {
   const lignesBase = await lecture(
     () => db().indicateur.findMany({
       where: { famille, status: "PUBLISHED" },
@@ -628,8 +657,7 @@ export async function indicateurs(
         })
         .filter((item): item is IndicateurVue => item !== null);
 
-  if (!codes) return liste;
-  return liste.filter((item) => item.code !== null && codes.includes(item.code));
+  return liste;
 }
 
 /* -------------------------------------------------------------------------- */

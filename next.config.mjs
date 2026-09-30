@@ -140,6 +140,21 @@ const nextConfig = {
     "cloudinary",
   ],
   experimental: {
+    /* Tree-shaking ciblé des paquets d'animation et de 3D. framer-motion est
+       monté GLOBALEMENT par le layout public (MotionProvider, Cursor, Header,
+       AvisNavigation) : il pèse donc sur chaque page, y compris celles sans
+       données. `optimizePackageImports` transforme les imports de barrique en
+       imports directs, ne gardant dans le bundle que les symboles réellement
+       utilisés. Les paquets @react-three/* et lenis n'entrent que sur l'accueil
+       et la page contact, mais bénéficient du même élagage. Effet nul sur le
+       comportement, seulement sur la taille livrée. */
+    optimizePackageImports: [
+      "framer-motion",
+      "lenis",
+      "@react-three/fiber",
+      "@react-three/drei",
+      "@react-three/postprocessing",
+    ],
     serverActions: {
       // La console téléverse visuels et documents par server action, et la
       // limite par défaut (1 Mo) refuserait une photographie ordinaire. Les

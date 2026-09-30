@@ -18,7 +18,9 @@
  * détaillé de lib/impact/cache.ts).
  */
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { NAV, patronRoute } from "@/lib/routes";
+import { invaliderTags, TAG } from "@/lib/cache/redis";
 
 export function revaliderProjet(): void {
   revalidatePath(patronRoute(NAV.accueil), "page");
@@ -28,4 +30,7 @@ export function revaliderProjet(): void {
   revalidatePath(patronRoute(`${NAV.composantes}/[code]`), "page");
   revalidatePath(patronRoute(NAV.resultats), "page");
   revalidatePath(patronRoute(NAV.marches), "page");
+  // Vide les entrées Redis du module (composantes + indicateurs) — cf.
+  // lib/actus/cache.ts pour le `after`.
+  after(() => invaliderTags([TAG.projet]));
 }

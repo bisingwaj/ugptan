@@ -12,7 +12,9 @@
  * n'existe plus — la panne aurait été silencieuse.
  */
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { NAV, patronRoute } from "@/lib/routes";
+import { invaliderTags, TAG } from "@/lib/cache/redis";
 
 export function revaliderDocuments(): void {
   revalidatePath(patronRoute(NAV.transparence), "page");
@@ -21,4 +23,6 @@ export function revaliderDocuments(): void {
   // coup, ce qui évite de savoir laquelle vient de changer.
   revalidatePath(patronRoute(`${NAV.transparence}/[slug]`), "page");
   revalidatePath("/sitemap.xml");
+  // Vide les entrées Redis du module (cf. lib/actus/cache.ts pour le `after`).
+  after(() => invaliderTags([TAG.docs]));
 }

@@ -22,11 +22,15 @@
  * de `lib/impact/cache.ts`, qui vaut mot pour mot ici.
  */
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { NAV, patronRoute } from "@/lib/routes";
+import { invaliderTags, TAG } from "@/lib/cache/redis";
 
 export function revaliderEquipe(): void {
   revalidatePath(patronRoute(NAV.accueil), "page");
   revalidatePath(patronRoute(NAV.ugptn), "page");
   revalidatePath(patronRoute(NAV.gouvernance), "page");
   revalidatePath(patronRoute(`${NAV.composantes}/[code]`), "page");
+  // Vide les entrées Redis du module (cf. lib/actus/cache.ts pour le `after`).
+  after(() => invaliderTags([TAG.equipe]));
 }

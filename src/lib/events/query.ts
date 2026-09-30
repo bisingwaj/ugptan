@@ -23,6 +23,7 @@ import { lecteur } from "@/lib/lecture";
 import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
 import { describeError } from "@/lib/errors";
+import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
 import { anneeEvenement, intervalleDates, isoEvenement, plageHoraire } from "@/lib/events/dates";
 import {
   estAVenir, finEffective, phaseEvenement,
@@ -315,6 +316,19 @@ export async function listerEvenements(options: ListeEvtOptions): Promise<{
   passes: EvtVue[];
   total: number;
 }> {
+  const q = options.recherche?.trim() ?? "";
+  return cacheJson(
+    `events:liste:${JSON.stringify([options.lang, options.categorie ?? "", q, options.comp ?? "", options.limite ?? 0])}`,
+    { tags: [TAG.events], ttl: TTL.liste },
+    () => listerEvenementsImpl(options),
+  );
+}
+
+async function listerEvenementsImpl(options: ListeEvtOptions): Promise<{
+  aVenir: EvtVue[];
+  passes: EvtVue[];
+  total: number;
+}> {
   const { lang, categorie, recherche, comp } = options;
   const now = new Date();
 
@@ -372,6 +386,14 @@ export async function listerEvenements(options: ListeEvtOptions): Promise<{
  * est ensuite appliqué sur les seules lignes retenues.
  */
 export async function prochainsEvenements(lang: Lang, limite = 3, comp?: string): Promise<EvtVue[]> {
+  return cacheJson(
+    `events:prochains:${lang}:${limite}:${comp ?? ""}`,
+    { tags: [TAG.events], ttl: TTL.liste },
+    () => prochainsEvenementsImpl(lang, limite, comp),
+  );
+}
+
+async function prochainsEvenementsImpl(lang: Lang, limite: number, comp?: string): Promise<EvtVue[]> {
   const now = new Date();
   // Marge d'un jour en arrière : un événement de plusieurs jours commencé hier
   // est encore « en cours », et doit rester proposé.
@@ -401,6 +423,16 @@ export async function prochainsEvenements(lang: Lang, limite = 3, comp?: string)
 
 /** Catégories réellement peuplées dans la langue active, pour les filtres. */
 export async function listerCategoriesEvt(
+  lang: Lang,
+): Promise<(EvtCategorie & { total: number })[]> {
+  return cacheJson(
+    `events:categories:${lang}`,
+    { tags: [TAG.events], ttl: TTL.liste },
+    () => listerCategoriesEvtImpl(lang),
+  );
+}
+
+async function listerCategoriesEvtImpl(
   lang: Lang,
 ): Promise<(EvtCategorie & { total: number })[]> {
   const rows = await lecture(

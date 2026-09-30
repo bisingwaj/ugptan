@@ -21,6 +21,7 @@ import type { Lang } from "@/lib/pick";
 import { lecteur } from "@/lib/lecture";
 import { type ArticleStatut } from "@/lib/actus/statut";
 import { describeError } from "@/lib/errors";
+import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
 
 /** Longueur d'un résumé déduit du corps, faute de résumé saisi. */
 const EXTRAIT_AUTO = 190;
@@ -254,6 +255,23 @@ export async function listerActualites(options: ListeOptions): Promise<ListeActu
   const { lang, categorie, tag, recherche, comp } = options;
   const parPage = options.parPage ?? PAR_PAGE;
   const page = Math.max(1, options.page ?? 1);
+  const q = recherche?.trim() ?? "";
+
+  // La clé décrit exactement la liste demandée : langue, filtres, page. Deux
+  // visites au même filtre partagent l'entrée ; changer un filtre en crée une
+  // autre, que le TTL récupérera. `enLigne()` dépend de l'heure, mais à la
+  // minute près sur des dates de publication : le grain du TTL le couvre.
+  return cacheJson(
+    `actus:liste:${JSON.stringify([lang, categorie ?? "", tag ?? "", q, comp ?? "", page, parPage])}`,
+    { tags: [TAG.actus], ttl: TTL.liste },
+    () => listerActualitesImpl({ lang, categorie, tag, recherche, comp, page, parPage }),
+  );
+}
+
+async function listerActualitesImpl(
+  options: ListeOptions & { page: number; parPage: number },
+): Promise<ListeActus> {
+  const { lang, categorie, tag, recherche, comp, page, parPage } = options;
 
   const where = {
     ...enLigne(),
@@ -350,6 +368,21 @@ export async function filChronologique(options: {
   recherche?: string | null;
   limite?: number;
 }): Promise<JalonActu[]> {
+  const q = options.recherche?.trim() ?? "";
+  return cacheJson(
+    `actus:fil:${JSON.stringify([options.lang, options.categorie ?? "", options.tag ?? "", q, options.limite ?? FIL_MAX])}`,
+    { tags: [TAG.actus], ttl: TTL.liste },
+    () => filChronologiqueImpl(options),
+  );
+}
+
+async function filChronologiqueImpl(options: {
+  lang: Lang;
+  categorie?: string | null;
+  tag?: string | null;
+  recherche?: string | null;
+  limite?: number;
+}): Promise<JalonActu[]> {
   const { lang, categorie, tag, recherche } = options;
 
   const where = {
@@ -396,6 +429,14 @@ export async function filChronologique(options: {
 
 /** Derniers articles — accueil, bloc d'une page composante, articles liés. */
 export async function derniersArticles(lang: Lang, limite = 4, comp?: string): Promise<ActuVue[]> {
+  return cacheJson(
+    `actus:derniers:${lang}:${limite}:${comp ?? ""}`,
+    { tags: [TAG.actus], ttl: TTL.liste },
+    () => derniersArticlesImpl(lang, limite, comp),
+  );
+}
+
+async function derniersArticlesImpl(lang: Lang, limite: number, comp?: string): Promise<ActuVue[]> {
   const rows = await lecture(
     () => db().article.findMany({
       where: {
@@ -416,6 +457,16 @@ export async function derniersArticles(lang: Lang, limite = 4, comp?: string): P
 
 /** Catégories réellement peuplées dans la langue active, pour les filtres. */
 export async function listerCategories(
+  lang: Lang,
+): Promise<(ActuCategorie & { total: number })[]> {
+  return cacheJson(
+    `actus:categories:${lang}`,
+    { tags: [TAG.actus], ttl: TTL.liste },
+    () => listerCategoriesImpl(lang),
+  );
+}
+
+async function listerCategoriesImpl(
   lang: Lang,
 ): Promise<(ActuCategorie & { total: number })[]> {
   const rows = await lecture(

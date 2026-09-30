@@ -27,6 +27,7 @@ import { formatArticleDate } from "@/lib/format";
 import { estOptimisable } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
 import { ratioVisuel } from "@/lib/galerie/fichier";
+import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
 import {
   dureeISO, dureeLisible, sourceVideo, typeMediaLabel,
   type GalerieTri, type GalerieTypeMedia, type SourceVideo,
@@ -317,6 +318,14 @@ export type FiltresGalerie = {
  * PostgreSQL fait mieux.
  */
 export async function listerGalerie(filtres: FiltresGalerie): Promise<GalerieVue[]> {
+  return cacheJson(
+    `galerie:liste:${JSON.stringify([filtres.lang, filtres.rubrique ?? "", filtres.type ?? "", filtres.recherche?.trim() ?? "", filtres.tri ?? "", filtres.limite ?? 0, filtres.album ?? ""])}`,
+    { tags: [TAG.galerie], ttl: TTL.liste },
+    () => listerGalerieImpl(filtres),
+  );
+}
+
+async function listerGalerieImpl(filtres: FiltresGalerie): Promise<GalerieVue[]> {
   const q = filtres.recherche?.trim();
 
   const where = {
@@ -526,6 +535,17 @@ export async function listerAlbums(
   lang: Lang,
   options: { limite?: number; rubrique?: string | null; recherche?: string | null } = {},
 ): Promise<AlbumVue[]> {
+  return cacheJson(
+    `galerie:albums:${JSON.stringify([lang, options.limite ?? 0, options.rubrique ?? "", options.recherche?.trim() ?? ""])}`,
+    { tags: [TAG.galerie], ttl: TTL.liste },
+    () => listerAlbumsImpl(lang, options),
+  );
+}
+
+async function listerAlbumsImpl(
+  lang: Lang,
+  options: { limite?: number; rubrique?: string | null; recherche?: string | null } = {},
+): Promise<AlbumVue[]> {
   const q = options.recherche?.trim();
 
   const where = {
@@ -556,6 +576,14 @@ export async function listerAlbums(
  * vide, que les moteurs indexeraient.
  */
 export async function getAlbum(lang: Lang, slug: string): Promise<AlbumVue | null> {
+  return cacheJson(
+    `galerie:album:${lang}:${slug}`,
+    { tags: [TAG.galerie], ttl: TTL.liste },
+    () => getAlbumImpl(lang, slug),
+  );
+}
+
+async function getAlbumImpl(lang: Lang, slug: string): Promise<AlbumVue | null> {
   const ligne = await lecture(
     () => db().galerieAlbum.findFirst({ where: { slug, ...albumServi }, select: albumSelect }),
     null as LigneAlbum | null,
@@ -591,6 +619,14 @@ export async function urlsAlbums(): Promise<{ slug: string; updatedAt: Date }[]>
  * décompte accompagne le libellé, pour annoncer ce qui attend.
  */
 export async function listerRubriquesGalerie(lang: Lang): Promise<GalerieRubrique[]> {
+  return cacheJson(
+    `galerie:rubriques:${lang}`,
+    { tags: [TAG.galerie], ttl: TTL.liste },
+    () => listerRubriquesGalerieImpl(lang),
+  );
+}
+
+async function listerRubriquesGalerieImpl(lang: Lang): Promise<GalerieRubrique[]> {
   const rubriques = await lecture(
     () => db().galerieCategory.findMany({
       where: { items: { some: servi } },
@@ -621,6 +657,16 @@ export async function listerRubriquesGalerie(lang: Lang): Promise<GalerieRubriqu
  * dès qu'on est sur « Photos », et deviendrait incliquable.
  */
 export async function compterParType(
+  filtres: Pick<FiltresGalerie, "rubrique" | "recherche">,
+): Promise<Record<GalerieTypeMedia, number>> {
+  return cacheJson(
+    `galerie:compte:${JSON.stringify([filtres.rubrique ?? "", filtres.recherche?.trim() ?? ""])}`,
+    { tags: [TAG.galerie], ttl: TTL.liste },
+    () => compterParTypeImpl(filtres),
+  );
+}
+
+async function compterParTypeImpl(
   filtres: Pick<FiltresGalerie, "rubrique" | "recherche">,
 ): Promise<Record<GalerieTypeMedia, number>> {
   const q = filtres.recherche?.trim();

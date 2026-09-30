@@ -8,12 +8,21 @@
  * JS de la page d'accueil du poids de three.js avant que la carte ne soit
  * réellement affichée.
  *
+ * ⚠️ Le chunk three.js (~150–250 Ko compressés, à lui seul le plus gros poste
+ * JS de l'accueil) n'est demandé que lorsque la carte APPROCHE du viewport, via
+ * un IntersectionObserver — et non au montage de la page. La carte vit tout en
+ * bas de l'accueil : sans ce garde, three.js se téléchargeait dès l'ouverture,
+ * en concurrence avec le reste de la page, pour un contenu que beaucoup de
+ * visiteurs ne font jamais défiler jusqu'à lui. `rootMargin` l'amorce 300 px
+ * avant l'entrée à l'écran, pour qu'il soit prêt au moment où on l'atteint.
+ *
  * ⚠️ Pas de carte ni de fond sombre ici : la relief flotte directement sur le
  * blanc de la page, comme un objet posé devant soi plutôt qu'encadré dans une
  * vitrine. Une ombre douce (`::after`, cf. le halo radial ci-dessous) le pose
  * sur la page au lieu de le laisser léviter sans repère.
  */
 import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 
@@ -26,8 +35,34 @@ export function ProvinceMap({ lang }: { lang: Lang }) {
   const t = dict(lang);
   const pays = lang === "en" ? "DRC" : "RDC";
 
+  const cadre = useRef<HTMLDivElement>(null);
+  const [proche, setProche] = useState(false);
+
+  useEffect(() => {
+    if (proche) return;
+    const cible = cadre.current;
+    // Sans IntersectionObserver (navigateur ancien, environnement de test), on
+    // charge tout de suite : mieux vaut le comportement d'avant que rien.
+    if (!cible || typeof IntersectionObserver === "undefined") {
+      setProche(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entrees) => {
+        if (entrees.some((e) => e.isIntersecting)) {
+          setProche(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+    obs.observe(cible);
+    return () => obs.disconnect();
+  }, [proche]);
+
   return (
     <div
+      ref={cadre}
       data-testid="province-map"
       style={{
         position: "relative",
@@ -88,7 +123,7 @@ export function ProvinceMap({ lang }: { lang: Lang }) {
       </div>
 
       <div style={{ position: "relative", width: "100%", height: "100%", zIndex: 10 }}>
-        <ProvinceMap3D lang={lang} />
+        {proche && <ProvinceMap3D lang={lang} />}
       </div>
     </div>
   );

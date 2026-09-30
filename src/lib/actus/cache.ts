@@ -16,7 +16,9 @@
  * n'invalidait plus rien, sans le dire (cf. `patronRoute` dans lib/routes.ts).
  */
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { NAV, patronRoute } from "@/lib/routes";
+import { invaliderTags, TAG } from "@/lib/cache/redis";
 
 export function revaliderActualites(): void {
   revalidatePath(patronRoute(NAV.actualites), "page");
@@ -26,4 +28,9 @@ export function revaliderActualites(): void {
   revalidatePath(patronRoute(NAV.accueil), "page");
   revalidatePath(patronRoute(`${NAV.composantes}/[code]`), "page");
   revalidatePath("/sitemap.xml");
+  /* Vide les entrées Redis du module (cf. lib/cache/redis.ts). `after` diffère
+     l'appel APRÈS la réponse de la server action, sans la ralentir, tout en le
+     garantissant côté plateforme — contrairement à un `void` fire-and-forget
+     que l'instance serverless pourrait figer avant la fin. */
+  after(() => invaliderTags([TAG.actus]));
 }

@@ -7,7 +7,9 @@
  * plutôt qu'écrit en toutes lettres (cf. `patronRoute` dans lib/routes.ts).
  */
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { NAV, patronRoute } from "@/lib/routes";
+import { invaliderTags, TAG } from "@/lib/cache/redis";
 
 export function revaliderGalerie(): void {
   revalidatePath(patronRoute(NAV.galerie), "page");
@@ -19,4 +21,6 @@ export function revaliderGalerie(): void {
      un reportage qui garde une photo qu'on vient d'en retirer. */
   revalidatePath(patronRoute(`${NAV.galerie}/[slug]`), "page");
   revalidatePath("/sitemap.xml");
+  // Vide les entrées Redis du module (cf. lib/actus/cache.ts pour le `after`).
+  after(() => invaliderTags([TAG.galerie]));
 }

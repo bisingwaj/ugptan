@@ -22,6 +22,7 @@ import { pick } from "@/lib/pick";
 import { gouvActivites as activitesSeed } from "@/content/carbon";
 import { organesOrigine } from "@/lib/gouvernance/origine";
 import { activiteTraduite, organeTraduit } from "@/lib/gouvernance/statut";
+import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
 
 const lecture = lecteur("gouvernance");
 
@@ -80,6 +81,14 @@ const lignes = (valeurs: readonly string[] | null | undefined): string[] =>
  * anglaise, et les deux versions du site ne diraient plus la même chose.
  */
 export async function organesPublies(lang: Lang): Promise<OrganeVue[]> {
+  return cacheJson(
+    `gouvernance:organes:${lang}`,
+    { tags: [TAG.gouvernance], ttl: TTL.socle },
+    () => organesPubliesImpl(lang),
+  );
+}
+
+async function organesPubliesImpl(lang: Lang): Promise<OrganeVue[]> {
   const lignesBase = await lecture(
     () => db().organe.findMany({
       where: { status: "PUBLISHED" },
@@ -124,6 +133,14 @@ export async function organesPublies(lang: Lang): Promise<OrganeVue[]> {
 
 /** Décisions publiées, résolues dans une langue, de la plus récente à la plus ancienne. */
 export async function activitesPubliees(lang: Lang): Promise<ActiviteVue[]> {
+  return cacheJson(
+    `gouvernance:activites:${lang}`,
+    { tags: [TAG.gouvernance], ttl: TTL.socle },
+    () => activitesPublieesImpl(lang),
+  );
+}
+
+async function activitesPublieesImpl(lang: Lang): Promise<ActiviteVue[]> {
   const lignesBase = await lecture(
     () => db().gouvActivite.findMany({
       where: { status: "PUBLISHED" },

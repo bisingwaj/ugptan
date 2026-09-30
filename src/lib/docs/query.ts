@@ -22,6 +22,7 @@ import { formatArticleDate } from "@/lib/format";
 import { readingMinutes } from "@/lib/html/sanitize";
 import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import { NAV } from "@/lib/routes";
+import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
 import type { Lang } from "@/lib/pick";
 import {
   apercuPossible, formatLisible, ligneTechnique, poidsLisible, urlTelechargement,
@@ -374,6 +375,14 @@ export type FiltresDoc = {
  * PostgreSQL fait mieux.
  */
 export async function listerDocuments(filtres: FiltresDoc): Promise<DocVue[]> {
+  return cacheJson(
+    `docs:liste:${JSON.stringify([filtres.lang, filtres.categorie ?? "", filtres.type ?? "", filtres.recherche?.trim() ?? "", filtres.tri ?? "", filtres.limite ?? 0])}`,
+    { tags: [TAG.docs], ttl: TTL.liste },
+    () => listerDocumentsImpl(filtres),
+  );
+}
+
+async function listerDocumentsImpl(filtres: FiltresDoc): Promise<DocVue[]> {
   const q = filtres.recherche?.trim();
 
   // ⚠️ La recherche entre par `AND` et non à plat : sa clause est un `OR`, et
@@ -409,6 +418,14 @@ export async function listerDocuments(filtres: FiltresDoc): Promise<DocVue[]> {
  * catégorie. Le décompte accompagne le libellé, pour annoncer ce qui attend.
  */
 export async function listerCategoriesDoc(lang: Lang): Promise<DocCategorie[]> {
+  return cacheJson(
+    `docs:categories:${lang}`,
+    { tags: [TAG.docs], ttl: TTL.liste },
+    () => listerCategoriesDocImpl(lang),
+  );
+}
+
+async function listerCategoriesDocImpl(lang: Lang): Promise<DocCategorie[]> {
   const categories = await lecture(
     () => db().documentCategory.findMany({
       where: { documents: { some: servi } },
@@ -437,6 +454,16 @@ export async function listerCategoriesDoc(lang: Lang): Promise<DocCategorie[]> {
  * aucun n'est publié offre un filtre qui ne peut que décevoir.
  */
 export async function listerTypesDoc(
+  lang: Lang,
+): Promise<{ type: DocType; nom: string; total: number }[]> {
+  return cacheJson(
+    `docs:types:${lang}`,
+    { tags: [TAG.docs], ttl: TTL.liste },
+    () => listerTypesDocImpl(lang),
+  );
+}
+
+async function listerTypesDocImpl(
   lang: Lang,
 ): Promise<{ type: DocType; nom: string; total: number }[]> {
   const groupes = await lecture(

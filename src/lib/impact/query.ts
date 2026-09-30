@@ -29,6 +29,7 @@ import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import { formatArticleDate } from "@/lib/format";
 import type { Lang } from "@/lib/pick";
 import { lienPublic } from "@/lib/routes";
+import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
 import {
   impactSeed, seedItems, seedPourEmplacement,
   type ImpactSeedItem, type ImpactSeedSection,
@@ -350,6 +351,20 @@ function resoudreSeedSection(section: ImpactSeedSection, lang: Lang): ImpactSect
  * chose sans que personne l'ait décidé.
  */
 export async function sectionsImpact(
+  emplacement: ImpactEmplacement,
+  lang: Lang,
+): Promise<ImpactSectionVue[]> {
+  // Appelée jusqu'à 7 fois par rendu sur /ugptn et /project (un emplacement par
+  // section) : autant d'allers-retours Neon distincts, désormais servis depuis
+  // Redis. Clé par emplacement + langue, tag impact, TTL long.
+  return cacheJson(
+    `impact:sections:${emplacement}:${lang}`,
+    { tags: [TAG.impact], ttl: TTL.socle },
+    () => sectionsImpactImpl(emplacement, lang),
+  );
+}
+
+async function sectionsImpactImpl(
   emplacement: ImpactEmplacement,
   lang: Lang,
 ): Promise<ImpactSectionVue[]> {

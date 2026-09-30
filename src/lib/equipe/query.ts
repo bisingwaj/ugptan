@@ -25,6 +25,7 @@
  */
 import { db } from "@/lib/db";
 import { lecteur } from "@/lib/lecture";
+import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
 import { estOptimisable, mediaSrc, type MediaRef } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
 import {
@@ -215,6 +216,14 @@ function versMembreSeed(membre: EquipeSeedMembre, lang: Lang): MembreEquipe {
  * saisie ne le rendraient, d'où la colonne `position` plutôt qu'un tri calculé.
  */
 export async function membresEquipe(lang: Lang): Promise<MembreEquipe[]> {
+  return cacheJson(
+    `equipe:membres:${lang}`,
+    { tags: [TAG.equipe], ttl: TTL.socle },
+    () => membresEquipeImpl(lang),
+  );
+}
+
+async function membresEquipeImpl(lang: Lang): Promise<MembreEquipe[]> {
   const lignes = await lecture(
     () => db().teamMember.findMany({
       where: { status: "PUBLISHED" },
@@ -242,6 +251,14 @@ export async function membresEquipe(lang: Lang): Promise<MembreEquipe[]> {
  * donnerait à penser qu'il s'agit de deux listes différentes.
  */
 export async function membresEnAvant(lang: Lang): Promise<MembreEquipe[]> {
+  return cacheJson(
+    `equipe:enavant:${lang}`,
+    { tags: [TAG.equipe], ttl: TTL.socle },
+    () => membresEnAvantImpl(lang),
+  );
+}
+
+async function membresEnAvantImpl(lang: Lang): Promise<MembreEquipe[]> {
   const lignes = await lecture(
     () => db().teamMember.findMany({
       where: { status: "PUBLISHED", featured: true },
@@ -280,6 +297,14 @@ export async function membresEnAvant(lang: Lang): Promise<MembreEquipe[]> {
  * la section, exactement comme elle le faisait sans profil renseigné.
  */
 export async function membreComposante(code: string, lang: Lang): Promise<MembreEquipe | null> {
+  return cacheJson(
+    `equipe:composante:${code}:${lang}`,
+    { tags: [TAG.equipe], ttl: TTL.socle },
+    () => membreComposanteImpl(code, lang),
+  );
+}
+
+async function membreComposanteImpl(code: string, lang: Lang): Promise<MembreEquipe | null> {
   const ligne = await lecture(
     () => db().teamMember.findFirst({
       where: { status: "PUBLISHED", composante: code },

@@ -8,7 +8,9 @@
  * (cf. `patronRoute` dans lib/routes.ts).
  */
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { NAV, patronRoute } from "@/lib/routes";
+import { invaliderTags, TAG } from "@/lib/cache/redis";
 
 export function revaliderEvenements(): void {
   revalidatePath(patronRoute(NAV.evenements), "page");
@@ -16,4 +18,6 @@ export function revaliderEvenements(): void {
   // L'accueil affiche les prochaines rencontres.
   revalidatePath(patronRoute(NAV.accueil), "page");
   revalidatePath("/sitemap.xml");
+  // Vide les entrées Redis du module (cf. lib/actus/cache.ts pour le `after`).
+  after(() => invaliderTags([TAG.events]));
 }

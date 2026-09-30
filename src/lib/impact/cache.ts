@@ -22,11 +22,15 @@
  * ces invalidations ; en développement, la question ne se pose pas.
  */
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { NAV, patronRoute } from "@/lib/routes";
+import { invaliderTags, TAG } from "@/lib/cache/redis";
 
 export function revaliderImpact(): void {
   revalidatePath(patronRoute(NAV.accueil), "page");
   revalidatePath(patronRoute(NAV.resultats), "page");
   revalidatePath(patronRoute(NAV.projet), "page");
   revalidatePath(patronRoute(NAV.ugptn), "page");
+  // Vide les entrées Redis du module (cf. lib/actus/cache.ts pour le `after`).
+  after(() => invaliderTags([TAG.impact]));
 }
