@@ -122,6 +122,16 @@ html.scroll-locked body {
    Typography helpers
 =========================================================================== */
 .mono { font-family: var(--font-mono); }
+
+/* Carte des provinces (ProvinceMap3D) : l'étiquette au survol vit dans un
+   <Html> de @react-three/drei, dont le conteneur externe (celui que
+   `wrapperClass` cible) répond aux événements par défaut — même si le <div>
+   qu'on lui passe en enfant porte `pointer-events: none`. Sans cette classe,
+   dès que l'étiquette flotte sous le curseur, elle vole le survol au canvas :
+   la province retombe, l'étiquette disparaît, le curseur retrouve le canvas,
+   la province se relève, l'étiquette revient — clignotement en boucle tant
+   qu'on ne bouge pas la souris. */
+.map-etiquette-hors-clic { pointer-events: none; }
 .h2 { font-weight: 600; font-size: clamp(28px, 4vw, 46px); letter-spacing: -0.02em; line-height: 1.05; }
 .h2--sm { font-size: clamp(26px, 3.4vw, 42px); letter-spacing: -0.025em; line-height: 1.06; }
 .lead { font-size: clamp(16px, 1.6vw, 19px); line-height: 1.62; color: var(--c-70); }

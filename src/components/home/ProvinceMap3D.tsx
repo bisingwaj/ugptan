@@ -221,7 +221,21 @@ function Scene({ lang, reduceMotion }: { lang: Lang; reduceMotion: boolean }) {
         {active && (
           // X/Y directement — aucune rotation à compenser ici, la carte est
           // dans le plan de la caméra. Z place l'étiquette devant le relief.
-          <Html position={[active.cx, active.cy + 0.32, activeDepth + HOVER_POP + 0.05]} center>
+          //
+          // ⚠️ `wrapperClass`, pas la prop `pointerEvents` : cette dernière ne
+          // s'applique qu'en mode `transform` de <Html> (cf. son code source),
+          // qu'on n'utilise pas ici. `wrapperClass` cible en revanche le vrai
+          // conteneur externe que drei pose dans le DOM — celui qui, laissé à
+          // son défaut, vole le survol au canvas dès que l'étiquette flotte
+          // sous le curseur (cf. .map-etiquette-hors-clic, globals.css) : la
+          // province retombe, l'étiquette disparaît, la souris retrouve le
+          // canvas, la province se relève, l'étiquette revient — clignotement
+          // en boucle tant qu'on ne bouge pas la souris.
+          <Html
+            position={[active.cx, active.cy + 0.32, activeDepth + HOVER_POP + 0.05]}
+            center
+            wrapperClass="map-etiquette-hors-clic"
+          >
             <div
               className="mono"
               data-testid="map-tooltip"
@@ -232,7 +246,6 @@ function Scene({ lang, reduceMotion }: { lang: Lang; reduceMotion: boolean }) {
                 padding: "8px 14px",
                 whiteSpace: "nowrap",
                 letterSpacing: "0.04em",
-                pointerEvents: "none",
                 boxShadow: "0 8px 20px rgba(0,0,0,0.35)",
               }}
             >
