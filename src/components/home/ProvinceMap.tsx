@@ -1,165 +1,128 @@
 "use client";
 
 /**
- * Carte des 26 provinces (10 prioritaires) — coquille : cadre, libellé de
- * coin, et point d'entrée vers la carte, en DEUX rendus selon l'appareil.
+ * Carte des 26 provinces (10 prioritaires) — un SVG à plat, le même sur tous
+ * les appareils.
  *
- * ─── Pourquoi deux rendus ────────────────────────────────────────────────────
- * La scène Three.js (relief + postprocessing Bloom) est superbe sur un poste de
- * travail, mais sur un téléphone c'est un canvas WebGL qui rend 60 fps en
- * continu — pic thermique, jank, INP dégradé — et ses `OrbitControls`
- * PIÈGENT le défilement vertical au tactile (un balayage fait pivoter la carte
- * au lieu de faire défiler la page). Sur mobile / appareil modeste, on rend donc
- * le SVG statique des provinces (`DRCMapSvg`), au coût quasi nul : three.js n'y
- * est jamais téléchargé.
- *
- *   · `capable === true`  → scène 3D, chargée en `dynamic(ssr:false)` et différée
- *     jusqu'à l'approche du viewport (IntersectionObserver, `rootMargin` 300 px).
- *   · `capable === false` → SVG immédiat, léger, interactif au tap.
- *   · `capable === null`  → indéterminé (rendu serveur et première frame) : on
- *     n'affiche rien plutôt que de faire clignoter un rendu qu'on remplacerait.
- *
- * Le critère « capable » exige un pointeur FIN (donc pas un téléphone) et un
- * minimum de mémoire/cœurs. Un canvas WebGL n'existe de toute façon pas côté
- * serveur, d'où `ssr:false` conservé sur la scène.
+ * Remplace l'ancienne scène Three.js (relief, bloom, balancement) et son repli
+ * SVG mobile : la 3D chargeait three.js, piégeait le défilement au tactile et
+ * se lisait mal ; deux rendus différents donnaient deux cartes différentes.
+ * Ici : aplats francs (accent pour les prioritaires, gris très clair pour les
+ * autres), frontières blanches, entrée en fondu d'ouest en est au premier
+ * passage dans le viewport, province soulevée + nom au survol ou au tap.
  *
  * ⚠️ Le conteneur est `aria-hidden` : la carte est décorative, l'information
  * qu'elle porte (26 provinces / 10 prioritaires + légende) figure en toutes
  * lettres dans le texte adjacent (cf. page d'accueil et page contact).
  *
- * ⚠️ Pas de fond sombre ici : la relief flotte directement sur le blanc de la
- * page. Une ombre douce (halo radial ci-dessous) l'ancre sans dessiner de cadre.
+ * Le conteneur a exactement le ratio du viewBox : un point (cx, cy) du SVG se
+ * place donc en pourcentage dans le conteneur, ce qui positionne l'étiquette
+ * HTML sans aucun calcul de mise à l'échelle.
  */
-import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
-import { DRCMapSvg } from "./DRCMapSvg";
+import { provincesPrio } from "@/content/data";
+import { provincePaths, MAP_VIEWBOX } from "./mapData";
 
-const ProvinceMap3D = dynamic(
-  () => import("./ProvinceMap3D").then((m) => m.ProvinceMap3D),
-  { ssr: false, loading: () => null },
-);
-
-/** L'appareil peut-il rendre la 3D sans nuire à l'expérience ? */
-function estCapable(): boolean {
-  if (typeof window === "undefined" || typeof matchMedia === "undefined") return false;
-  // Pointeur fin ET survol : écarte les téléphones et tablettes tactiles, où la
-  // 3D piège le scroll et coûte cher.
-  if (!matchMedia("(hover: hover) and (pointer: fine)").matches) return false;
-  const nav = navigator as Navigator & { deviceMemory?: number };
-  const memoire = nav.deviceMemory ?? 8; // absente sur Safari → on suppose correct
-  const coeurs = nav.hardwareConcurrency ?? 8;
-  return memoire >= 4 && coeurs >= 4;
-}
+const [, , VB_W, VB_H] = MAP_VIEWBOX.split(" ").map(Number);
+const PRIO = new Set(provincesPrio.map((p) => p.nom));
+const STAGGER_MS = 28;
 
 export function ProvinceMap({ lang }: { lang: Lang }) {
   const t = dict(lang);
-  const pays = lang === "en" ? "DRC" : "RDC";
-
   const cadre = useRef<HTMLDivElement>(null);
-  // null = indéterminé (SSR + première frame), avant que le client ne tranche.
-  const [capable, setCapable] = useState<boolean | null>(null);
-  const [proche, setProche] = useState(false);
-
-  // État d'interaction du SVG (survol souris, tap tactile) — inoffensif si la 3D
-  // est choisie, ce fil ne sert alors jamais.
+  const [visible, setVisible] = useState(false);
   const [survol, setSurvol] = useState<string | null>(null);
   const [actif, setActif] = useState<string | null>(null);
+  const courant = actif ?? survol;
+
+  // Ordre d'apparition : d'ouest en est, comme un balayage.
+  const provinces = useMemo(
+    () =>
+      Object.entries(provincePaths)
+        .map(([nom, p]) => ({ nom, ...p, prio: PRIO.has(nom) }))
+        .sort((a, b) => a.cx - b.cx),
+    [],
+  );
 
   useEffect(() => {
-    setCapable(estCapable());
-  }, []);
-
-  useEffect(() => {
-    if (capable !== true || proche) return;
     const cible = cadre.current;
     if (!cible || typeof IntersectionObserver === "undefined") {
-      setProche(true);
+      setVisible(true);
       return;
     }
     const obs = new IntersectionObserver(
       (entrees) => {
         if (entrees.some((e) => e.isIntersecting)) {
-          setProche(true);
+          setVisible(true);
           obs.disconnect();
         }
       },
-      { rootMargin: "300px" },
+      { threshold: 0.2 },
     );
     obs.observe(cible);
     return () => obs.disconnect();
-  }, [capable, proche]);
+  }, []);
+
+  const enAvant = courant ? provinces.find((p) => p.nom === courant) : undefined;
+  const kin = provincePaths.Kinshasa;
 
   return (
     <div
       ref={cadre}
       data-testid="province-map"
       aria-hidden
-      style={{ position: "relative", aspectRatio: "1.32 / 1" }}
+      className={`carte-rdc${visible ? " is-visible" : ""}`}
+      style={{ position: "relative", width: "100%", maxWidth: 620, margin: "0 auto", aspectRatio: `${VB_W} / ${VB_H}` }}
     >
-      {/* Ombre au sol : dégradé radial très doux, qui pose la pièce sur la page. */}
-      <div
-        style={{
-          position: "absolute",
-          left: "50%",
-          bottom: "6%",
-          transform: "translateX(-50%)",
-          width: "72%",
-          height: "18%",
-          background: "radial-gradient(ellipse at center, rgba(15,20,30,0.16) 0%, rgba(15,20,30,0) 72%)",
-          filter: "blur(2px)",
-          zIndex: 0,
-        }}
-      />
-
-      <div
-        className="mono"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          fontSize: 11,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          color: "var(--c-50)",
-          zIndex: 30,
-          pointerEvents: "none",
-        }}
+      <svg
+        viewBox={MAP_VIEWBOX}
+        style={{ display: "block", width: "100%", height: "100%", overflow: "visible", touchAction: "pan-y" }}
+        onMouseLeave={() => setSurvol(null)}
       >
-        {t.words.provinces}
-      </div>
+        <g stroke="#fff" strokeWidth={1.6} strokeLinejoin="round">
+          {provinces.map((p, i) => (
+            <path
+              key={p.nom}
+              d={p.path}
+              className={`carte-rdc__prov${p.prio ? " is-prio" : ""}${p.nom === courant ? " is-on" : ""}`}
+              style={{ animationDelay: `${i * STAGGER_MS}ms` }}
+              onMouseEnter={() => setSurvol(p.nom)}
+              onClick={() => setActif((c) => (c === p.nom ? null : p.nom))}
+            />
+          ))}
+        </g>
 
-      <div
-        className="mono"
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          fontSize: 15,
-          fontWeight: 600,
-          letterSpacing: "0.06em",
-          color: "var(--c-black)",
-          zIndex: 30,
-          pointerEvents: "none",
-        }}
-      >
-        {pays}
-      </div>
-
-      <div style={{ position: "relative", width: "100%", height: "100%", zIndex: 10 }}>
-        {capable === false && (
-          // Repli mobile / appareil modeste : SVG statique, léger, au tap.
-          <DRCMapSvg
-            hovered={survol}
-            clicked={actif}
-            onHover={setSurvol}
-            onClick={setActif}
-            style={{ width: "100%", height: "100%", touchAction: "pan-y" }}
+        {/* Province active redessinée par-dessus : soulevée, ombre douce. */}
+        {enAvant && (
+          <path
+            d={enAvant.path}
+            className={`carte-rdc__lift${enAvant.prio ? " is-prio" : ""}`}
+            stroke="#fff"
+            strokeWidth={2.4}
+            strokeLinejoin="round"
+            pointerEvents="none"
           />
         )}
-        {capable === true && proche && <ProvinceMap3D lang={lang} />}
-      </div>
+
+        {/* Repère de la capitale. */}
+        <g className="carte-rdc__kin" pointerEvents="none">
+          <circle cx={kin.cx} cy={kin.cy} r={14} fill="var(--ac)" opacity={0.18} />
+          <circle cx={kin.cx} cy={kin.cy} r={6} fill="#fff" stroke="var(--acd)" strokeWidth={3} />
+        </g>
+      </svg>
+
+      {enAvant && (
+        <div
+          className="mono carte-rdc__tip"
+          data-testid="map-tooltip"
+          style={{ left: `${(enAvant.cx / VB_W) * 100}%`, top: `${(enAvant.cy / VB_H) * 100}%` }}
+        >
+          {enAvant.nom}
+          {enAvant.prio && <span className="carte-rdc__tip-prio">{t.words.prio}</span>}
+        </div>
+      )}
     </div>
   );
 }

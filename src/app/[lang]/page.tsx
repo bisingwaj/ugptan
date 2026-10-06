@@ -217,14 +217,6 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 11, height: 11, border: "1px solid var(--c-50)", background: "#fff" }} /><span style={{ color: "var(--c-80)" }}>{t.lbl.autres}</span></div>
             </div>
           </Reveal>
-          {/* Pas de <Reveal> ici, à dessein : la carte porte déjà sa propre
-              entrée animée (les provinces qui sortent de terre), et le
-              canvas Three.js est chargé par un dynamic(ssr:false) — quand
-              `prefers-reduced-motion` bascule Reveal de son rendu SSR (animé)
-              à son rendu client (statique), le changement de type de nœud
-              force un démontage/remontage qui laissait le canvas vide,
-              constaté à l'écran pour tout visiteur ayant cette préférence
-              active dès le premier chargement. */}
           <ProvinceMap lang={lang} />
         </div>
       </section>
