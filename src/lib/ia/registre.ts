@@ -3,7 +3,7 @@ import "server-only";
 /**
  * Ce qui se traduit, dans chaque module.
  *
- * Onze tables de traduction, onze formes différentes. Plutôt que de disperser
+ * Treize tables de traduction, treize formes différentes. Plutôt que de disperser
  * la connaissance de ces formes dans autant de services, tout est déclaré ici :
  * les champs, leur NATURE (une phrase courte ne se traduit pas comme un corps
  * HTML), les consignes particulières, et les deux accès à la base.
@@ -35,6 +35,7 @@ import { revaliderImpact } from "@/lib/impact/cache";
 import { revaliderEquipe } from "@/lib/equipe/cache";
 import { revaliderProjet } from "@/lib/projet/cache";
 import { revaliderGouvernance } from "@/lib/gouvernance/cache";
+import { revaliderProvinces } from "@/lib/provinces/cache";
 
 /**
  * Nature d'un champ. Elle décide de la consigne donnée au modèle et du
@@ -534,6 +535,75 @@ const ENTITES: Entite[] = [
     existe: async (id) => Boolean(await db().gouvActivite.findUnique({ where: { id }, select: { id: true } })),
     intitule: (source) => String(source.titre || source.dateLabel || "Décision sans titre"),
     revalider: revaliderGouvernance,
+  },
+
+  {
+    cle: "provinceFiche",
+    libelle: "Fiche de province",
+    permission: "projet",
+    ecran: adminPath("/project/provinces"),
+    contexte:
+      "La fiche de référence d'une province de la République démocratique du Congo, sur la page que lui consacre le site du Projet : quelques phrases neutres de présentation.",
+    obligatoires: [],
+    champs: [
+      {
+        nom: "description",
+        nature: "bloc",
+        quoi: "Présentation de la province en une ou deux phrases : géographie, économie.",
+        consigne:
+          "Les noms de provinces, de villes, de cours d'eau et de lacs restent dans leur graphie congolaise " +
+          "(« Kasaï », « Équateur », « lac Kivu » → « Lake Kivu » : seul le mot commun se traduit).",
+      },
+      {
+        nom: "administration",
+        nature: "texte",
+        quoi: "Statut administratif particulier, affiché en pastille (« État de siège depuis mai 2021 »).",
+      },
+    ],
+    lire: (id, locale) =>
+      db().provinceFicheTranslation.findUnique({ where: { ficheId_locale: { ficheId: id, locale } } }),
+    ecrire: async (id, locale, valeurs) => {
+      await db().provinceFicheTranslation.upsert({
+        where: { ficheId_locale: { ficheId: id, locale } },
+        create: { ficheId: id, locale, ...valeurs } as never,
+        update: valeurs,
+      });
+    },
+    existe: async (id) => Boolean(await db().provinceFiche.findUnique({ where: { id }, select: { id: true } })),
+    intitule: (source) => String(source.description || "Fiche de province").slice(0, 80),
+    revalider: revaliderProvinces,
+  },
+
+  {
+    cle: "provinceProjet",
+    libelle: "Projet en province",
+    permission: "projet",
+    ecran: adminPath("/project/provinces"),
+    contexte:
+      "Un projet conduit, prévu ou achevé par le Projet de transformation numérique dans une ou plusieurs provinces de la RDC, affiché sur les pages province.",
+    obligatoires: ["titre"],
+    champs: [
+      { nom: "titre", nature: "texte", quoi: "Intitulé du projet." },
+      { nom: "resume", nature: "bloc", quoi: "Ce que le projet change concrètement, en une ou deux phrases." },
+      {
+        nom: "lieu",
+        nature: "texte",
+        quoi: "Localisation lisible (« Goma, Bukavu »).",
+        consigne: "Les noms de lieux restent tels quels ; seuls les mots communs qui les entourent se traduisent.",
+      },
+    ],
+    lire: (id, locale) =>
+      db().provinceProjetTranslation.findUnique({ where: { projetId_locale: { projetId: id, locale } } }),
+    ecrire: async (id, locale, valeurs) => {
+      await db().provinceProjetTranslation.upsert({
+        where: { projetId_locale: { projetId: id, locale } },
+        create: { projetId: id, locale, ...valeurs } as never,
+        update: valeurs,
+      });
+    },
+    existe: async (id) => Boolean(await db().provinceProjet.findUnique({ where: { id }, select: { id: true } })),
+    intitule: (source) => String(source.titre || "Projet sans titre"),
+    revalider: revaliderProvinces,
   },
 ];
 

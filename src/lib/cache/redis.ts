@@ -70,6 +70,7 @@ export const TAG = {
   impact: "impact",
   gouvernance: "gouvernance",
   equipe: "equipe",
+  provinces: "provinces",
 } as const;
 
 export type Tag = (typeof TAG)[keyof typeof TAG];

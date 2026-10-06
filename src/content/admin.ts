@@ -1255,17 +1255,18 @@ export const ADMIN_IMPACT = {
 /* ===========================================================================
    Module « Le projet » — composantes et cadre de résultats
 
-   ⚠️ Ce module a TROIS écrans, qui reprennent un à un les trois entrées du menu
-   « Le projet » du site public. Le vocabulaire ci-dessous est celui des deux
-   écrans propres au module ; le troisième — la page du Projet, bloc par bloc —
-   partage le moteur de sections et donc `ADMIN_IMPACT`.
+   ⚠️ Ce module a QUATRE écrans, qui reprennent un à un les quatre entrées du
+   menu « Le projet » du site public. Le vocabulaire ci-dessous est celui des
+   écrans Composantes et Résultats ; la page du Projet, bloc par bloc, partage
+   le moteur de sections et donc `ADMIN_IMPACT` ; l'écran Provinces a le sien
+   (`ADMIN_PROVINCES`).
    =========================================================================== */
 
 /**
- * Les trois écrans du module, dans l'ordre du menu public.
+ * Les quatre écrans du module, dans l'ordre du menu public.
  *
  * ⚠️ Les LIBELLÉS sont ceux du sous-menu « Le Projet » du site, au mot près :
- * « Vue d'ensemble », « Composantes », « Résultats » (cf. `navSub` et `nav`
+ * « Vue d'ensemble », « Composantes », « Résultats », « Provinces » (cf. `navSub` et `nav`
  * dans src/content/i18n.ts). Ce n'est pas une coquetterie. Un éditeur à qui on
  * demande de corriger la page des composantes la cherche sous le nom qu'elle
  * porte sur le site ; l'appeler autrement en console — « Les composantes »,
@@ -1301,6 +1302,12 @@ export const ADMIN_PROJET_ONGLETS = [
     label: "Résultats",
     public: "/results",
     hint: "Ce qui s'affiche sur la page « Résultats » du site : les indicateurs d'objectif et les indicateurs intermédiaires. Les mêmes indicateurs coiffent l'accueil, la vue d'ensemble et les pages de composante.",
+  },
+  {
+    slug: "/provinces",
+    label: "Provinces",
+    public: "/project/provinces",
+    hint: "Ce qui s'affiche sur les vingt-six pages province du site : la fiche de référence de chaque province (chiffres, gouverneur, sources) et les projets qui y sont conduits, prévus ou achevés.",
   },
 ] as const;
 
@@ -1392,9 +1399,100 @@ export const ADMIN_GOUVERNANCE = {
   voirSite: "Voir sur le site",
 } as const;
 
+export const ADMIN_PROVINCES = {
+  title: "Provinces",
+  lead: "Ce qui s'affiche sur les vingt-six pages province du site : la fiche de référence de chaque province, puis les projets localisés. Chiffres, gouverneurs et sources viennent de documents publics : ils se vérifient et se datent, ils ne se rédigent pas.",
+
+  /* --- Fiches --------------------------------------------------------------- */
+  fichesTitle: "Les fiches des provinces",
+  fichesLead:
+    "Une fiche par province, rangées par ordre alphabétique. Les chiffres et l'administration se lisent dans toutes les langues ; seuls la présentation et le statut administratif particulier se traduisent.",
+  ficheVide: "Aucune fiche pour le moment. Elles sont reprises du contenu d'origine à l'ouverture de l'écran.",
+  fichePrio: "Prioritaire",
+  blocChiffres: "Chiffres de référence",
+  blocChiffresAide: "Laissez vide ce qui n'est pas sourcé : une ligne absente vaut mieux qu'un chiffre douteux.",
+  blocAdministration: "Administration",
+  blocAdministrationAide:
+    "Les gouverneurs changent : intérims, suspensions, nouvelles investitures. Vérifiez le nom à chaque mise à jour et datez-le d'après la source qui l'atteste. La page affiche « Attesté au » suivi de cette date.",
+  blocListes: "Villes, langues et sources",
+
+  champChefLieu: "Chef-lieu",
+  champSuperficie: "Superficie (km²)",
+  champPopulation: "Population",
+  champPopulationAide: "En chiffres, sans séparateur obligatoire. Affichée comme une estimation.",
+  champPopulationAnnee: "Année de l'estimation",
+  champPopulationSource: "Source de la population",
+  champPopulationSourceAide: "Nom court, affiché en pied de page (« INS, projections 2024 »).",
+  champTerritoires: "Territoires",
+  champCommunes: "Communes",
+  champCommunesAide: "Pour Kinshasa, qui n'a pas de territoires. Vide ailleurs.",
+  champGouverneur: "Gouverneur",
+  champViceGouverneur: "Vice-gouverneur",
+  champGouverneurDate: "Attesté au",
+  champGouverneurDateAide: "La date de la source, pas celle de l'investiture.",
+  champGouverneurSource: "Source du gouverneur",
+  champGouverneurSourceAide: "Le document ou le média qui atteste le nom (adresse ou titre).",
+  champVilles: "Villes",
+  champVillesAide: "Une ville à statut de ville par ligne, dans l'ordre d'affichage.",
+  champLangues: "Langues",
+  champLanguesAide: "Une langue par ligne.",
+  champSources: "Sources",
+  champSourcesAide: "Une adresse complète (https://…) par ligne. La page en affiche le domaine.",
+  ficheMaj: "Fiche modifiée le",
+  aSourcer: "Gouverneur non daté",
+  voirPage: "Voir la page",
+
+  /* --- Projets -------------------------------------------------------------- */
+  projetsTitle: "Les projets dans les provinces",
+  projetsLead:
+    "Ce que le Projet conduit, a conduit ou prévoit, province par province. Un projet sans province cochée est national : il paraît sur les vingt-six pages, après les projets propres à chacune.",
+  projetAjouter: "Ajouter un projet",
+  projetVide: "Aucun projet pour le moment.",
+  projetSupprimer: "Supprimer le projet",
+  projetSupprimerConfirm:
+    "Supprimer ce projet et toutes ses traductions ? Il disparaîtra de toutes les pages province.",
+  champAvancement: "Avancement",
+  champComposante: "Composante",
+  champComposanteAucune: "Aucune",
+  champComposanteAide: "Le projet s'affiche avec le code et l'intitulé de la composante, et y renvoie.",
+  champDebut: "Début",
+  champFin: "Fin",
+  champDatesAide: "Facultatives. Servent au suivi en console.",
+  champOdd: "Objectifs de développement durable",
+  champOddAide: "Les ODD auxquels le projet contribue. Ils alimentent la section « ODD visés » des pages province.",
+  champProvinces: "Provinces concernées",
+  champProvincesAide: "Aucune case cochée : projet national, affiché sur les vingt-six pages.",
+  national: "National",
+  provincesPlus: (n: number) => `+${n}`,
+
+  /* --- Commun --------------------------------------------------------------- */
+  reglages: "Réglages",
+  position: "Rang",
+  monter: "Monter",
+  descendre: "Descendre",
+  sansTitre: "(sans intitulé)",
+  publier: "Publier",
+  depublier: "Retirer du site",
+
+  tradPresente: "traduit",
+  tradIncomplete: "incomplet",
+  tradManquante: "à traduire",
+  langueRedaction: "Langue de rédaction",
+  tradNouvelle: (langue: string) =>
+    `Cette version ${langue} n'existe pas encore. Renseignez-la puis enregistrez-la : elle ne touchera à aucune autre langue.`,
+  enregistrerLangue: (langue: string) => `Enregistrer la version ${langue}`,
+  supprimerTraduction: "Supprimer cette traduction",
+  supprimerTraductionConfirm:
+    "Supprimer cette version linguistique ? Les autres langues ne sont pas touchées.",
+  majLe: "Modifié le",
+
+  enregistrer: "Enregistrer",
+  enregistrement: "Enregistrement…",
+} as const;
+
 export const ADMIN_PROJET = {
   title: "Le Projet",
-  lead: "Les trois pages du menu « Le Projet » du site. Chacune a son écran, sous son nom et dans son ordre : Vue d'ensemble, Composantes, Résultats.",
+  lead: "Les quatre pages du menu « Le Projet » du site. Chacune a son écran, sous son nom et dans son ordre : Vue d'ensemble, Composantes, Résultats, Provinces.",
 
   /* --- Composantes : liste -------------------------------------------------- */
   composantesTitle: "Composantes",
@@ -1865,8 +1963,8 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
           label: onglet.label,
         })),
       },
-      /* Trois écrans sous une seule permission : le module reprend, un à un et
-         sous leur nom, les trois entrées du menu « Le Projet » du site public. */
+      /* Quatre écrans sous une seule permission : le module reprend, un à un et
+         sous leur nom, les quatre entrées du menu « Le Projet » du site public. */
       {
         key: "projet",
         label: "Le Projet",

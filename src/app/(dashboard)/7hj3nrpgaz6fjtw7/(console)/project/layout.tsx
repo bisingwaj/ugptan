@@ -2,7 +2,7 @@ import { ADMIN_PROJET, ADMIN_PROJET_ONGLETS } from "@/content/admin";
 import { ModuleSubNav } from "@/components/dashboard/ModuleSubNav";
 
 /**
- * Coquille du module « Le Projet » : ses trois écrans en sous-barre, au-dessus
+ * Coquille du module « Le Projet » : ses quatre écrans en sous-barre, au-dessus
  * de tout ce que le module affiche.
  *
  * Elle enveloppe aussi les pages de détail — la fiche d'une section, celle

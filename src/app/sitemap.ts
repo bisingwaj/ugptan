@@ -7,6 +7,7 @@ import { urlsEvenements } from "@/lib/events/query";
 import { urlsDocuments } from "@/lib/docs/query";
 import { urlsAlbums } from "@/lib/galerie/query";
 import { slugsComposantes } from "@/lib/projet/query";
+import { CHEMIN_PROVINCES, slugsProvinces } from "@/lib/provinces/chemins";
 
 /**
  * Servi sur /sitemap.xml — toutes les pages localisées (FR + EN), plus une
@@ -58,6 +59,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
+  /* Une page par province et par langue — table figée, aucune lecture. */
+  const pagesProvinces = slugsProvinces().flatMap((slug) =>
+    LOCALES.map((locale) => ({
+      url: `${SITE_URL}/${locale}${CHEMIN_PROVINCES}/${slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+  );
+
   const articles = lignesArticles.map((article) => ({
     url: `${SITE_URL}/${article.locale}${NAV.actualites}/${article.slug}`,
     lastModified: article.updatedAt,
@@ -104,5 +115,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  return [...pages, ...composantes, ...articles, ...evenements, ...documents, ...albums];
+  return [...pages, ...composantes, ...pagesProvinces, ...articles, ...evenements, ...documents, ...albums];
 }

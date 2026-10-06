@@ -4,7 +4,7 @@ import type { Lang } from "./pick";
 export const route = (lang: Lang, slug = "") => `/${lang}${slug}`;
 
 export type NavKey =
-  | "accueil" | "projet" | "composantes" | "ugptn" | "gouvernance" | "marches" | "transparence"
+  | "accueil" | "projet" | "composantes" | "provinces" | "ugptn" | "gouvernance" | "marches" | "transparence"
   | "soumissionnaires"
   | "actualites" | "resultats" | "evenements" | "galerie" | "contact" | "mgp"
   | "mgpSuivi" | "recherche" | "confidentialite" | "conditions";
@@ -28,6 +28,11 @@ export type NavItem = { slug: string; key: NavKey };
  */
 export const NAV: Record<NavKey, string> = {
   accueil: "", projet: "/project", composantes: "/components", ugptn: "/ugptn",
+  /* Sous « /project » et non à la racine : couper la page « Vue d'ensemble »
+     en console coupe aussi l'index et les vingt-six pages province
+     (cf. `navKeysPourChemin`). Les pages de détail sont ajoutées au sitemap
+     par app/sitemap.ts (cf. lib/provinces/chemins.ts). */
+  provinces: "/project/provinces",
   gouvernance: "/governance",
   marches: "/procurement",
   /* La porte des entreprises candidates. Elle explique le parcours et renvoie
@@ -209,6 +214,7 @@ const G_PROJET: NavGroup = {
     { slug: NAV.projet, key: "projet" },
     { slug: NAV.composantes, key: "composantes" },
     { slug: NAV.resultats, key: "resultats" },
+    { slug: NAV.provinces, key: "provinces" },
   ],
 };
 
@@ -293,7 +299,7 @@ export const NAV_FOOTER: NavGroup[] = [
  *
  * Les feuilles de `NAV_TREE` — donc PAS l'accueil, absente de cet arbre : la
  * couper laisserait le site sans porte d'entrée. Une section coupée entraîne
- * ses sous-pages avec elle (cf. `navKeyPourChemin`) : couper « Actualités »
+ * ses sous-pages avec elle (cf. `navKeysPourChemin`) : couper « Actualités »
  * coupe aussi chaque article, pas seulement la liste.
  *
  * Définie ici et non dérivée à l'affichage : c'est la même liste qui sert à la
@@ -303,16 +309,20 @@ export const NAV_FOOTER: NavGroup[] = [
 export const PAGES_DESACTIVABLES: NavItem[] = navLeaves(NAV_TREE);
 
 /**
- * La page désactivable dont relève `chemin` (sans préfixe de langue), si elle
- * ou une de ses sous-pages est demandée. `null` si `chemin` ne tombe sous
- * aucune d'elles.
+ * TOUTES les pages désactivables dont relève `chemin` (sans préfixe de
+ * langue), dans l'ordre de `PAGES_DESACTIVABLES`. Vide si aucune.
+ *
+ * Une liste et non une seule clé depuis qu'une page désactivable en contient
+ * une autre : « Provinces » (`/project/provinces`) vit sous « Vue d'ensemble »
+ * (`/project`). S'arrêter à la première correspondance rendait la coupure de
+ * « Provinces » seule sans effet. Le proxy teste donc chacune : couper la page
+ * mère coupe toujours ses sous-pages, couper la fille ne coupe qu'elle.
  *
  * Lue par `src/proxy.ts` : aucune dépendance au-delà de ce module, requis pour
  * tourner sur le moteur périphérique (cf. l'en-tête de lib/reglages/edge.ts).
  */
-export function navKeyPourChemin(chemin: string): NavKey | null {
-  for (const { slug, key } of PAGES_DESACTIVABLES) {
-    if (slug && (chemin === slug || chemin.startsWith(`${slug}/`))) return key;
-  }
-  return null;
+export function navKeysPourChemin(chemin: string): NavKey[] {
+  return PAGES_DESACTIVABLES
+    .filter(({ slug }) => slug && (chemin === slug || chemin.startsWith(`${slug}/`)))
+    .map(({ key }) => key);
 }

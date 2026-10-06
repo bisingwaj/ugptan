@@ -15,6 +15,7 @@ export function dict(lang: Lang) {
       accueil: t("Accueil", "Home"),
       projet: t("Le Projet", "The Project"),
       composantes: t("Composantes", "Components"),
+      provinces: t("Provinces", "Provinces"),
       ugptn: t("L'UGPTN", "The UGPTN"),
       gouvernance: t("Gouvernance", "Governance"),
       marches: t("Marchés", "Tenders"),
@@ -58,6 +59,10 @@ export function dict(lang: Lang) {
       resultats: t(
         "Indicateurs d'objectif et intermédiaires, suivis province par province.",
         "Objective and intermediate indicators, tracked province by province.",
+      ),
+      provinces: t(
+        "Les 26 provinces couvertes, l'ordre de priorité et les projets dans chacune.",
+        "The 26 provinces covered, the priority order and the projects in each.",
       ),
       ugptn: t(
         "Mandat, principes directeurs et organisation en cinq pôles.",
@@ -1013,6 +1018,102 @@ export function dict(lang: Lang) {
     },
 
     /* --- Résultats -------------------------------------------------------- */
+    /* Page province (app/[lang]/project/provinces/[province]). Aucun chiffre
+       propre à une province ici : le projet n'en publie pas encore. Le texte
+       s'en tient au statut (prioritaire ou non) et au cadre national. */
+    province: {
+      prio: t("Province prioritaire", "Priority province"),
+      autre: t("Couverture nationale", "National coverage"),
+      leadPrio: t(
+        "Province retenue parmi les dix du Cadre de Partenariat-Pays : le déploiement du projet y est traité en priorité.",
+        "One of the ten provinces identified in the Country Partnership Framework: the project's rollout is treated as a priority here.",
+      ),
+      leadAutre: t(
+        "Province couverte par le projet au titre de sa portée nationale, après les dix provinces prioritaires du Cadre de Partenariat-Pays.",
+        "Covered by the project under its national scope, after the ten priority provinces of the Country Partnership Framework.",
+      ),
+      statutLabel: t("Statut dans le projet", "Status in the project"),
+      statutPrio: t(
+        "Le projet couvre les 26 provinces, mais pas au même rythme. Cette province fait partie des dix retenues dans le Cadre de Partenariat-Pays, où le déploiement du projet est engagé en premier.",
+        "The project covers all 26 provinces, but not at the same pace. This province is one of the ten identified in the Country Partnership Framework, where the project's rollout begins first.",
+      ),
+      statutAutre: t(
+        "Le projet couvre les 26 provinces, mais pas au même rythme. Cette province n'est pas parmi les dix prioritaires : elle bénéficie des investissements nationaux du projet, dont le déploiement suit l'ordre publié, puis les zones que le marché ne dessert pas spontanément.",
+        "The project covers all 26 provinces, but not at the same pace. This province is not among the ten priority provinces: it benefits from the project's national investments, rolled out in the published order, then in the areas the market does not serve on its own.",
+      ),
+      statutSuivi: t(
+        "L'avancement est suivi province par province dans le cadre de résultats du projet.",
+        "Progress is tracked province by province in the project's results framework.",
+      ),
+      compLabel: t("Ce que le projet y apporte", "What the project brings"),
+      compLead: t(
+        "Les composantes du projet sont nationales. Chacune s'applique à la province selon l'ordre de déploiement ci-dessus.",
+        "The project's components are national. Each applies to the province according to the rollout order above.",
+      ),
+      toutesLabel: t("Les 26 provinces", "All 26 provinces"),
+      ficheLabel: t("La province en bref", "The province at a glance"),
+      chefLieu: t("Chef-lieu", "Capital"),
+      population: t("Population", "Population"),
+      populationEst: t("estimation", "estimate"),
+      superficie: t("Superficie", "Area"),
+      densite: t("Densité", "Density"),
+      habKm2: t("hab./km²", "inhab./km²"),
+      territoires: t("Territoires", "Territories"),
+      communes: t("Communes", "Communes"),
+      villes: t("Villes", "Cities"),
+      langues: t("Langues", "Languages"),
+      villesLangues: t("Villes et langues", "Cities and languages"),
+      adminLabel: t("Administration", "Administration"),
+      gouverneur: t("Gouverneur", "Governor"),
+      viceGouverneur: t("Vice-gouverneur", "Vice-governor"),
+      gouverneurAu: t("Attesté au", "Confirmed as of"),
+      source: t("source", "source"),
+      gouverneurInconnu: t("Information en cours de vérification.", "Information being verified."),
+      projetsLabel: t("Les projets dans la province", "Projects in the province"),
+      projetsLead: t(
+        "Ce que le projet conduit, a conduit ou prévoit ici. Les projets nationaux couvrent les 26 provinces ; leur déploiement suit l'ordre de priorité.",
+        "What the project is running, has completed or plans here. National projects cover all 26 provinces; their rollout follows the priority order.",
+      ),
+      avEnCours: t("En cours", "Ongoing"),
+      avPrevu: t("Prévus", "Planned"),
+      avAcheve: t("Achevés", "Completed"),
+      portee: t("National", "National"),
+      porteeLocale: t("Dans la province", "In the province"),
+      voirPlus: t("Voir les {n} autres projets", "Show {n} more projects"),
+      aucunProjet: t("Aucun projet dans cette catégorie pour l'instant.", "No project in this category yet."),
+      oddLabel: t("Objectifs de développement durable visés", "Sustainable Development Goals targeted"),
+      oddLead: t(
+        "Les ODD des Nations unies auxquels contribuent les projets conduits dans la province.",
+        "The UN Sustainable Development Goals the projects in the province contribute to.",
+      ),
+      oddProjets: t("projet(s)", "project(s)"),
+      sourcesLabel: t("Sources", "Sources"),
+      sourcesNote: t(
+        "Données de référence publiques, non produites par le projet. Population et superficie : estimations de l'INS, à lire comme des ordres de grandeur.",
+        "Public reference data, not produced by the project. Population and area: INS estimates, to be read as orders of magnitude.",
+      ),
+      ctaTitre: t("Une question sur votre province ?", "A question about your province?"),
+      ctaLead: t(
+        "Une préoccupation liée aux activités du projet près de chez vous peut être signalée, de façon confidentielle si vous le souhaitez.",
+        "A concern about project activities near you can be reported, confidentially if you wish.",
+      ),
+      metaDesc: t(
+        "Couverture du Projet de Transformation Numérique dans la province : statut, composantes et déploiement.",
+        "Digital Transformation Project coverage in the province: status, components and rollout.",
+      ),
+      /* Index des provinces (app/[lang]/project/provinces). */
+      indexTitre: t("Le projet dans les 26 provinces", "The project in all 26 provinces"),
+      indexMetaDesc: t(
+        "Les 26 provinces de la RDC couvertes par le Projet de Transformation Numérique : provinces prioritaires, fiches de référence et projets dans chacune.",
+        "The 26 DRC provinces covered by the Digital Transformation Project: priority provinces, reference profiles and projects in each.",
+      ),
+      prioLabel: t("Les dix provinces prioritaires", "The ten priority provinces"),
+      autresLabel: t("Les autres provinces", "The other provinces"),
+      carteAide: t(
+        "Cliquez sur une province pour ouvrir sa page.",
+        "Click a province to open its page.",
+      ),
+    },
     resultats: {
       heroTitle: t("Ce que nous mesurons, comment, et ce que la mesure ne dit pas.", "What we measure, how, and what measurement does not say."),
       heroLead: t(

@@ -5,7 +5,7 @@ import { ADMIN_BASE, ADMIN_LOGIN, ADMIN_SET_PASSWORD, NEXT_PARAM } from "@/lib/a
    publics dont ils dérivent : le rendu s'en sert aussi, pour rattraper les
    liens saisis en console avant le renommage. Ce module n'a aucune dépendance
    d'exécution, il peut donc être lu depuis la middleware. */
-import { cheminActuel, navKeyPourChemin } from "@/lib/routes";
+import { cheminActuel, navKeysPourChemin } from "@/lib/routes";
 import { COOKIE_ACCES } from "@/lib/reglages/code";
 import { etatPourProxy } from "@/lib/reglages/edge";
 
@@ -156,9 +156,10 @@ async function fermeture(req: NextRequest, locale: string, chemin: string) {
 
   /* Site ouvert (ou laissez-passer valide) : reste à vérifier que LA PAGE
      demandée n'est pas coupée à elle seule. Couper une section coupe aussi
-     ses sous-pages, d'où le préfixe testé par `navKeyPourChemin`. */
-  const cle = navKeyPourChemin(chemin);
-  if (cle && etat.pagesFermees.includes(cle)) {
+     ses sous-pages, d'où le préfixe testé par `navKeysPourChemin` ; et une
+     page désactivable peut en contenir une autre (« Provinces » sous « Vue
+     d'ensemble »), d'où le test de chacune. */
+  if (navKeysPourChemin(chemin).some((cle) => etat.pagesFermees.includes(cle))) {
     const url = req.nextUrl.clone();
     url.pathname = `/${locale}/construction`;
     url.search = "";

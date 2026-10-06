@@ -2475,3 +2475,139 @@ model PageEtat {
   /// même raison que `Reglages.updatedBy`.
   updatedBy String?
 }
+
+/// ===========================================================================
+/// Provinces — fiche de chaque province et projets localisés
+/// ===========================================================================
+///
+/// Sert les pages `/[lang]/project/provinces/[province]`. Deux tables, deux
+/// natures de contenu :
+///   · `ProvinceFiche` : données de référence PUBLIQUES (chef-lieu, superficie,
+///     population, gouverneur…). Ce ne sont pas des données du projet : chacune
+///     porte sa source et sa date, affichées sur la page. Le gouverneur change —
+///     d'où un champ daté, plutôt qu'une vérité supposée stable.
+///   · `ProvinceProjet` : ce que le projet fait, a fait ou prévoit dans une ou
+///     plusieurs provinces. Une liste `provinces` VIDE vaut projet national,
+///     affiché sur les 26 pages.
+///
+/// La province elle-même n'est pas une table : la liste est figée (26 entrées,
+/// cf. src/content/data.ts) et son slug dérive du nom (cf. src/lib/provinces/chemins.ts).
+/// La fiche s'y rattache par ce slug.
+/// ===========================================================================
+
+enum ProvinceStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// Où en est un projet sur le terrain. Distinct de `ProvinceStatus`, qui dit
+/// seulement si la ligne est publiée.
+enum ProjetAvancement {
+  PREVU
+  EN_COURS
+  ACHEVE
+}
+
+/// Fiche de référence d'une province.
+model ProvinceFiche {
+  id String @id @default(cuid())
+
+  /// Slug de la province (« nord-kivu »), unique : une fiche par province.
+  slug   String         @unique
+  status ProvinceStatus @default(DRAFT)
+
+  chefLieu        String?
+  superficieKm2   Int?
+  population      Int?
+  populationAnnee Int?
+  /// Nom court de la source (« INS, projections 2024 »).
+  populationSource String?
+  territoires     Int?
+  /// Kinshasa n'a pas de territoires mais 24 communes : champ propre, plutôt
+  /// qu'un « 0 territoire » trompeur.
+  communes        Int?
+  /// Villes à statut de ville, dans l'ordre d'affichage.
+  villes          String[] @default([])
+  gouverneur      String?
+  viceGouverneur  String?
+  /// Date de la source qui atteste le gouverneur — affichée « au … ».
+  gouverneurDate  DateTime?
+  gouverneurSource String?
+  langues         String[] @default([])
+  /// Adresses des sources, affichées en pied de fiche.
+  sources         String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ProvinceFicheTranslation[]
+
+  @@index([status])
+}
+
+/// Version d'une fiche dans une langue : seul le texte libre se traduit.
+model ProvinceFicheTranslation {
+  id      String        @id @default(cuid())
+  ficheId String
+  fiche   ProvinceFiche @relation(fields: [ficheId], references: [id], onDelete: Cascade)
+  locale  String
+
+  /// Une ou deux phrases neutres : géographie, économie.
+  description    String?
+  /// Statut administratif particulier (« État de siège depuis mai 2021 »).
+  administration String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ficheId, locale])
+  @@index([locale])
+}
+
+/// Un projet rattaché à une ou plusieurs provinces (ou à toutes).
+model ProvinceProjet {
+  id String @id @default(cuid())
+
+  /// Identifiant stable, jamais affiché — ancrage de l'amorçage
+  /// (cf. src/lib/provinces/bootstrap.ts).
+  key        String           @unique
+  status     ProvinceStatus   @default(DRAFT)
+  avancement ProjetAvancement @default(PREVU)
+  position   Int              @default(0)
+
+  /// Code de la composante (« C1 »). Chaîne et non relation : la composante
+  /// peut être renommée ou absente de la base sans casser la ligne.
+  composante String?
+  /// Objectifs de développement durable visés, 1 à 17.
+  odd        Int[]    @default([])
+  /// Slugs des provinces concernées. Vide : projet national.
+  provinces  String[] @default([])
+  debut      DateTime?
+  fin        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations ProvinceProjetTranslation[]
+
+  @@index([status, position])
+}
+
+/// Version d'un projet dans une langue.
+model ProvinceProjetTranslation {
+  id       String         @id @default(cuid())
+  projetId String
+  projet   ProvinceProjet @relation(fields: [projetId], references: [id], onDelete: Cascade)
+  locale   String
+
+  titre  String?
+  resume String?
+  /// Localisation lisible (« Goma, Bukavu »). Vide : rien n'est affiché.
+  lieu   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projetId, locale])
+  @@index([locale])
+}

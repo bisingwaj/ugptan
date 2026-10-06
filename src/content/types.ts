@@ -276,3 +276,43 @@ export type ComposanteDetail = {
   odp?: string[];            // indicateurs ODP rattachés
   img: ImgKey;               // visuel du héros
 };
+
+/* ---------------------------------------------------------------------------
+   Provinces — fiche de référence et projets localisés (module « Provinces »)
+--------------------------------------------------------------------------- */
+
+/** Fiche d'une province telle qu'amorcée (cf. content/provinces-fiches.ts). */
+export type ProvinceFicheSeed = {
+  slug: string;
+  chefLieu: string | null;
+  superficieKm2: number | null;
+  population: number | null;
+  populationAnnee: number | null;
+  populationSource: string | null;
+  territoires: number | null;
+  communes: number | null;
+  villes: string[];
+  gouverneur: string | null;
+  viceGouverneur: string | null;
+  /** AAAA-MM-JJ : date de la source qui atteste le gouverneur. */
+  gouverneurDate: string | null;
+  gouverneurSource: string | null;
+  langues: string[];
+  sources: string[];
+  description: Bilingual;
+  administration: Bilingual | null;
+};
+
+export type Avancement = "PREVU" | "EN_COURS" | "ACHEVE";
+
+/** Projet localisé tel qu'amorcé (cf. content/provinces-projets.ts). */
+export type ProvinceProjetSeed = {
+  key: string;
+  composante: string;
+  avancement: Avancement;
+  odd: number[];
+  /** Slugs ; vide = projet national. */
+  provinces: string[];
+  titre: Bilingual;
+  resume: Bilingual;
+};

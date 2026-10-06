@@ -156,6 +156,72 @@ html.scroll-locked body {
 =========================================================================== */
 .mono { font-family: var(--font-mono); }
 
+/* Page province (app/[lang]/project/provinces/[province]) */
+.prov-badge { display: inline-flex; align-items: center; padding: 7px 12px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; background: var(--c-10); color: var(--c-80); }
+.prov-badge[data-prio] { background: var(--ac); color: #fff; }
+.prov-badge--alerte { text-transform: none; letter-spacing: .02em; background: #fff8e1; color: #6b4e00; border-left: 3px solid #f1c21b; }
+.prov-chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; margin: 26px 0 0; background: var(--c-20); border: 1px solid var(--c-20); }
+.prov-chiffre { background: #fff; padding: 22px; }
+.prov-chiffre dt { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--c-60); }
+.prov-chiffre dd { margin: 10px 0 0; font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; letter-spacing: -.01em; color: var(--c-black); }
+.prov-chiffre__note { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; letter-spacing: 0; color: var(--c-60); }
+.prov-infos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-top: 44px; }
+.prov-h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+.prov-lignes { margin: 0; }
+.prov-lignes > div { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid var(--c-20); }
+.prov-lignes > div:last-child { border-bottom: 1px solid var(--c-20); }
+.prov-lignes dt { font-size: 13.5px; color: var(--c-60); }
+.prov-lignes dd { margin: 0; font-size: 15px; line-height: 1.5; color: var(--c-black); font-weight: 500; }
+.prov-lignes__note { display: block; margin-top: 3px; font-size: 12.5px; font-weight: 400; color: var(--c-60); }
+.prov-lignes__note a { color: var(--ac); }
+@media (max-width: 520px) { .prov-lignes > div { grid-template-columns: 1fr; gap: 4px; } }
+.prov-compteurs { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 8px; }
+.prov-compteur { display: inline-flex; align-items: baseline; gap: 10px; padding: 12px 18px; border: 1px solid var(--c-20); color: var(--c-80); text-decoration: none; font-size: 14px; transition: border-color .2s, background .2s; }
+.prov-compteur:hover { border-color: var(--ac); background: var(--ac-pale); }
+.prov-compteur__n { font-size: 26px; font-weight: 600; color: var(--c-black); }
+.prov-compteur[data-av="EN_COURS"] .prov-compteur__n { color: var(--ac); }
+.prov-compteur[data-av="ACHEVE"] .prov-compteur__n { color: #198038; }
+.prov-groupe { margin-top: 40px; scroll-margin-top: 90px; }
+.prov-point { width: 10px; height: 10px; border-radius: 50%; background: var(--c-40); flex: none; }
+.prov-point[data-av="EN_COURS"] { background: var(--ac); box-shadow: 0 0 0 4px var(--ac-pale); }
+.prov-point[data-av="ACHEVE"] { background: #198038; }
+.prov-projets { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.prov-projet { display: flex; flex-direction: column; gap: 10px; padding: 20px 22px 22px; background: #fff; border: 1px solid var(--c-20); border-top: 3px solid var(--c-30); transition: box-shadow .2s, transform .2s; }
+.prov-projet:hover { box-shadow: 0 10px 28px rgba(15,25,45,.08); transform: translateY(-2px); }
+.prov-projet__haut { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; letter-spacing: .06em; color: var(--c-60); }
+.prov-projet__haut a { color: var(--c-80); text-decoration: none; font-weight: 600; }
+.prov-projet__haut a:hover { color: var(--ac); }
+.prov-projet__portee { padding: 3px 8px; background: var(--c-10); font-size: 11px; text-transform: uppercase; }
+.prov-projet__portee[data-local] { background: var(--ac-pale); color: var(--acd); }
+.prov-projet h3 { margin: 0; font-size: 16.5px; font-weight: 600; line-height: 1.35; color: var(--c-black); }
+.prov-projet p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--c-70); }
+.prov-projet__lieu { font-size: 12.5px !important; color: var(--c-60) !important; }
+.prov-projet__odd { list-style: none; display: flex; flex-wrap: wrap; gap: 5px; margin: auto 0 0; padding: 8px 0 0; }
+.prov-projet__odd li { min-width: 26px; height: 26px; padding: 0 6px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; cursor: help; }
+.prov-plus { margin-top: 16px; }
+.prov-plus > summary { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border: 1px solid var(--c-30); font-size: 13px; color: var(--c-80); cursor: pointer; list-style: none; transition: border-color .2s, color .2s; }
+.prov-plus > summary::-webkit-details-marker { display: none; }
+.prov-plus > summary::after { content: "+"; font-size: 16px; line-height: 1; }
+.prov-plus > summary:hover { border-color: var(--ac); color: var(--ac); }
+.prov-plus[open] > summary { margin-bottom: 16px; }
+.prov-plus[open] > summary::after { content: "−"; }
+.prov-odd { list-style: none; padding: 0; margin: 28px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.prov-odd li { position: relative; display: flex; flex-direction: column; gap: 8px; min-height: 150px; padding: 16px; color: #fff; transition: transform .2s; }
+.prov-odd li:hover { transform: translateY(-3px); }
+.prov-odd__n { font-size: 34px; font-weight: 700; line-height: 1; }
+.prov-odd__t { font-size: 13.5px; font-weight: 600; line-height: 1.3; text-transform: uppercase; letter-spacing: .02em; }
+.prov-odd__c { margin-top: auto; font-size: 11.5px; opacity: .9; }
+.prov-liste { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 4px 24px; }
+.prov-liste a { display: flex; align-items: center; gap: 10px; padding: 9px 0; font-size: 14.5px; color: var(--c-70); text-decoration: none; border-bottom: 1px solid var(--c-20); transition: color .2s; }
+.prov-liste a:hover { color: var(--ac); }
+.prov-liste a[aria-current] { color: var(--c-black); font-weight: 600; }
+.prov-liste a > span { width: 9px; height: 9px; flex: none; background: var(--c-30); }
+.prov-liste a > span[data-prio] { background: var(--ac); }
+.prov-sources { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--c-20); font-size: 12.5px; color: var(--c-60); }
+.prov-sources h2 { margin: 0 0 8px; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--c-70); }
+.prov-sources p { margin: 0 0 8px; max-width: 760px; line-height: 1.55; }
+.prov-sources ul { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 0; margin: 0; }
+.prov-sources a { color: var(--c-70); }
 /* Carte des provinces (components/home/ProvinceMap.tsx) */
 .carte-rdc__prov { fill: #e8ebf0; cursor: pointer; transition: fill .25s ease; opacity: 0; transform-box: fill-box; transform-origin: center; }
 .carte-rdc__prov.is-prio { fill: var(--ac); }
@@ -167,6 +233,8 @@ html.scroll-locked body {
 .carte-rdc__kin { opacity: 0; transition: opacity .5s ease .9s; }
 .carte-rdc.is-visible .carte-rdc__kin { opacity: 1; }
 .carte-rdc__tip { position: absolute; transform: translate(-50%, calc(-100% - 14px)); background: var(--c-black); color: #fff; font-size: 12px; padding: 7px 12px; white-space: nowrap; letter-spacing: .04em; pointer-events: none; box-shadow: 0 8px 20px rgba(0,0,0,.18); animation: carte-rdc-tip .18s ease-out both; z-index: 5; }
+.carte-rdc__tip.is-droite { transform: translate(calc(-100% + 24px), calc(-100% - 14px)); animation: none; }
+.carte-rdc__tip.is-gauche { transform: translate(-24px, calc(-100% - 14px)); animation: none; }
 .carte-rdc__tip-prio { display: block; margin-top: 2px; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ac-light); }
 @keyframes carte-rdc-in { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
 @keyframes carte-rdc-lift { from { transform: none; filter: none; } }
