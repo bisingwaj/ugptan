@@ -14,7 +14,7 @@ import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import type { ComposanteVue } from "@/lib/projet/query";
 import { compRoute } from "@/lib/routes";
-import { compColor, onCompDe } from "@/lib/comp";
+import { compColor, compTexteDe, onCompDe } from "@/lib/comp";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function CompChaine({ composantes, lang }: { composantes: ComposanteVue[]; lang: Lang }) {
@@ -55,7 +55,7 @@ export function CompChaine({ composantes, lang }: { composantes: ComposanteVue[]
               return (
                 <li key={lien.id}>
                   <Link href={compRoute(lang, cible!.slug)} className="chaine__lien">
-                    <span className="mono chaine__vers" style={{ color: couleur }}>{cible!.code}</span>
+                    <span className="mono chaine__vers" style={{ color: compTexteDe(couleur) }}>{cible!.code}</span>
                     <span className="chaine__quoi">{lien.texte}</span>
                     <span className="chaine__go" aria-hidden>→</span>
                   </Link>

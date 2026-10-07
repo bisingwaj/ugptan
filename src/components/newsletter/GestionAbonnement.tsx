@@ -138,7 +138,7 @@ export function ActionAbonnement({
 
   return (
     <div style={{ border: "1px solid var(--c-20)", background: "#fff", padding: "clamp(22px,2.8vw,32px)" }}>
-      <div className="mono" style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--c-50)" }}>
+      <div className="mono" style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--c-60)" }}>
         {t.unsubFor}
       </div>
       <div className="mono" style={{ marginTop: 8, fontSize: 16, fontWeight: 600, color: "var(--c-black)", wordBreak: "break-all" }}>

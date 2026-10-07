@@ -132,7 +132,8 @@ export function Newsletter({ lang }: { lang: Lang }) {
                   {t.erreurs[etat.code]}
                 </p>
               ) : (
-                <p className="mt-3.5 font-mono text-[11px] text-c-60">{t.privacy}</p>
+                /* --c-50 sur le noir du bandeau : 5,4:1 (--c-60 : 3,6:1). */
+                <p className="mt-3.5 font-mono text-[11px] text-c-50">{t.privacy}</p>
               )}
             </>
           ) : (

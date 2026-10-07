@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { onCompDe } from "@/lib/comp";
 import Link from "next/link";
 import { asLang } from "@/lib/params";
 import { dict } from "@/content/i18n";
@@ -104,7 +105,9 @@ export default async function GouvernancePage(props: { params: Promise<{ lang: s
             <Kicker>{g.compLabel}</Kicker>
             <h2 className="h2--sm" style={{ margin: "0 0 40px" }}>{g.compTitle}</h2>
           </Reveal>
-          <RevealGroup className="cols2" gap={0.06} style={{ gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+          {/* `alignItems: stretch` : les deux fiches prennent la hauteur de la plus
+              longue, au lieu de laisser un aplat sous la plus courte. */}
+          <RevealGroup className="cols2 celled-flow" gap={0.06} style={{ alignItems: "stretch" }}>
             {composes.map((organe) => (
               <RevealItem key={organe.id} style={{ background: "#fff", padding: "34px clamp(20px,3vw,38px)" }}>
                 <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
@@ -140,12 +143,12 @@ export default async function GouvernancePage(props: { params: Promise<{ lang: s
             <h2 className="h2--sm" style={{ margin: "0 0 14px" }}>{g.actTitle}</h2>
             <p style={{ margin: "0 0 44px", fontSize: 16, lineHeight: 1.6, color: "var(--c-40)", maxWidth: 680 }}>{g.actLead}</p>
           </Reveal>
-          <RevealGroup gap={0.04} style={{ display: "flex", flexDirection: "column", gap: 1, background: "var(--c-80)", border: "1px solid var(--c-80)" }}>
+          <RevealGroup gap={0.04} className="celled-flow celled--dark" style={{ display: "flex", flexDirection: "column" }}>
             {activites.map((a) => (
               <RevealItem key={a.id} className="gov-act" style={{ background: "var(--c-black)", padding: "24px clamp(20px,2.4vw,30px)", display: "grid", gridTemplateColumns: "150px 1fr", gap: "clamp(14px,2vw,32px)", alignItems: "start", borderLeft: `3px solid ${a.color}` }}>
                 <div>
                   <div className="mono" style={{ fontSize: 12, color: "var(--c-50)" }}>{a.dateLabel}</div>
-                  <span className="mono" style={{ display: "inline-block", marginTop: 10, fontSize: 10.5, fontWeight: 600, color: "#fff", background: a.color, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{a.org}</span>
+                  <span className="mono" style={{ display: "inline-block", marginTop: 10, fontSize: 10.5, fontWeight: 600, color: onCompDe(a.color), background: a.color, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{a.org}</span>
                 </div>
                 <div>
                   <div style={{ fontSize: 17, fontWeight: 600, color: "#fff", lineHeight: 1.35 }}>{a.titre}</div>

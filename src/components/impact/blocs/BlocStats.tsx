@@ -5,9 +5,14 @@
    grille, grand nombre en `stat__num`, unité en mono accentuée, phrase poussée
    en bas de cellule par `margin: auto 0 0`.
 
+   Les filets sont tracés par les cellules (`--filet`, cf. « Celled grid »
+   dans globals.css), plus par le fond du conteneur : le liseré de mise en
+   avant reprend donc le filet dans sa liste d'ombres.
+
    ⚠️ RevealGroup REMPLACE l'élément grille et RevealItem la cellule : aucun
    conteneur intermédiaire, sinon le `gap:1px; background` qui dessine les
    filets saute (cf. components/motion/RevealGroup.tsx). */
+import type { CSSProperties } from "react";
 import type { ImpactItemVue } from "@/lib/impact/query";
 import type { ImpactTheme } from "@/lib/impact/statut";
 import { themeSombre } from "@/lib/impact/statut";
@@ -30,7 +35,7 @@ export function BlocStats({
     <RevealGroup
       className="grid-4 celled--top"
       gap={0.06}
-      style={{ background: "var(--c-black)", borderColor: "var(--c-black)" }}
+      style={{ "--filet": "var(--c-black)" } as CSSProperties}
     >
       {items.map((item) => (
         <RevealItem
@@ -47,7 +52,7 @@ export function BlocStats({
             ...(sombre ? { background: "var(--c-black)", color: "#fff" } : {}),
             // Mise en avant : un liseré d'accent au bord haut de la cellule,
             // sans changement de place dans la grille.
-            ...(item.featured ? { boxShadow: `inset 0 3px 0 ${item.color ?? "var(--ac)"}` } : {}),
+            ...(item.featured ? { boxShadow: `0 0 0 1px var(--filet), inset 0 3px 0 ${item.color ?? "var(--ac)"}` } : {}),
           }}
         >
           <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,52px)" }}>

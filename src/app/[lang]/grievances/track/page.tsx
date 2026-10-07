@@ -51,8 +51,9 @@ export default async function MgpSuiviPage(props: { params: Promise<{ lang: stri
 
       <section style={{ padding: "clamp(48px,6vw,84px) var(--pad-x) clamp(64px,8vw,110px)" }}>
         <div className="section__inner">
-          <div className="cols2" style={{ gridTemplateColumns: "1.05fr .95fr", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", alignItems: "stretch" }}>
-            <MgpTracker lang={lang} initialRef={initialRef} />
+          {/* Filets portés par les panneaux (`.celled-flow`, cf. globals.css). */}
+          <div className="cols2 celled-flow" style={{ gridTemplateColumns: "1.05fr .95fr", alignItems: "stretch" }}>
+            <MgpTrackerUrl lang={lang} />
 
             <div style={{ background: "#fff", padding: "clamp(26px,3vw,38px)" }}>
               <Kicker>{t.pipelineTitle}</Kicker>
@@ -74,7 +75,7 @@ export default async function MgpSuiviPage(props: { params: Promise<{ lang: stri
                 })}
               </RevealGroup>
 
-              <p className="mono" style={{ margin: "22px 0 0", fontSize: 11.5, lineHeight: 1.6, color: "var(--c-50)" }}>{t.slaBadge}</p>
+              <p className="mono" style={{ margin: "22px 0 0", fontSize: 11.5, lineHeight: 1.6, color: "var(--c-60)" }}>{t.slaBadge}</p>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 22 }}>
                 <Link href={route(lang, NAV.mgp)} className="btn btn--outline btn--sm">

@@ -30,6 +30,7 @@ import type { DocVue } from "@/lib/docs/query";
 import { dict } from "@/content/i18n";
 import type { Lang } from "@/lib/pick";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { grillePleine } from "@/lib/grille";
 import { usePiegeFocus } from "@/components/ui/usePiegeFocus";
 
 export function RessourcesListe({
@@ -75,14 +76,17 @@ export function RessourcesListe({
   const fiche = useRef<HTMLDivElement>(null);
   const boutonFermer = useRef<HTMLButtonElement>(null);
   usePiegeFocus(fiche, ouvert !== null, { fermer, initial: boutonFermer });
+  const pleine = grillePleine(documents.length, 3, 2);
 
   return (
     <>
       {/* `RevealGroup` REMPLACE la grille et `RevealItem` la cellule : aucun
           conteneur intermédiaire, conformément au contrat du composant. Une
           liste de documents est une LISTE — d'où `ul` / `li` plutôt que des
-          `div`, pour que la navigation au lecteur d'écran en annonce le nombre. */}
-      <RevealGroup as="ul" className="doc-grille" gap={0.04}>
+          `div`, pour que la navigation au lecteur d'écran en annonce le nombre.
+          Trois colonnes au plus, ramenées à un diviseur du nombre de documents
+          en pleine largeur (cf. lib/grille.ts). */}
+      <RevealGroup as="ul" className={`doc-grille ${pleine.className ?? ""}`} style={pleine.style} gap={0.04}>
         {documents.map((document) => (
           <RevealItem as="li" key={document.id} className="doc-card">
             <div className="doc-card__top">

@@ -37,19 +37,19 @@ export default async function ContactPage(props: { params: Promise<{ lang: strin
       {/* Coordonnées */}
       <section style={{ padding: "clamp(48px,6vw,80px) var(--pad-x) 0" }}>
         <div className="section__inner">
-          <RevealGroup gap={0.04} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+          <RevealGroup gap={0.04} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))" }}>
             <RevealItem className="cell" style={{ padding: "30px 28px" }}>
-              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)" }}>{c.lblAddress}</div>
+              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)" }}>{c.lblAddress}</div>
               <div style={{ fontSize: 16, fontWeight: 600, marginTop: 14, lineHeight: 1.4 }}>{contact.adresse}</div>
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{contact.quartier}</div>
             </RevealItem>
             <RevealItem className="cell" style={{ padding: "30px 28px" }}>
-              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)" }}>{c.lblPhone}</div>
+              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)" }}>{c.lblPhone}</div>
               <a href={`tel:${contact.tel.replace(/\s/g, "")}`} className="mono" style={{ display: "block", fontSize: 21, fontWeight: 600, marginTop: 14 }}>{contact.tel}</a>
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.phoneNote}</div>
             </RevealItem>
             <RevealItem className="cell" style={{ padding: "30px 28px" }}>
-              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)" }}>E-mail</div>
+              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)" }}>E-mail</div>
               <a href={`mailto:${contact.email}`} style={{ display: "block", fontSize: 18, fontWeight: 600, marginTop: 14, color: "var(--ac)", wordBreak: "break-all" }}>{contact.email}</a>
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.emailNote}</div>
             </RevealItem>
@@ -100,7 +100,11 @@ export default async function ContactPage(props: { params: Promise<{ lang: strin
               </RevealItem>
             ))}
           </RevealGroup>
-          <RevealGroup className="cols2" gap={0.04} style={{ marginTop: 1, gridTemplateColumns: "1.2fr .8fr", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", borderTop: "none" }}>
+          {/* Accolé à la grille des modes : sans filet haut propre (`paddingTop: 0`),
+              l'ombre de ses cellules se superpose au filet bas de la grille du
+              dessus — un seul trait. `alignItems: stretch` : les deux pavés ont
+              la même hauteur, au lieu de laisser un aplat sous le plus court. */}
+          <RevealGroup className="cols2 celled-flow" gap={0.04} style={{ gridTemplateColumns: "1.2fr .8fr", paddingTop: 0, alignItems: "stretch" }}>
             <RevealItem style={{ background: "var(--c-black)", color: "#fff", padding: "34px clamp(20px,3vw,36px)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 20 }}>
               <div>
                 <div style={{ fontSize: 20, fontWeight: 600 }}>{c.generalTitle}</div>

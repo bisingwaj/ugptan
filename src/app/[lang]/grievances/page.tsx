@@ -58,8 +58,11 @@ export default async function MgpPage(props: { params: Promise<{ lang: string }>
           </RevealGroup>
 
           {/* Form + Tracker — un fondu du BLOC, jamais des champs un à un : le
-              formulaire reste lisible et utilisable dès les premiers instants. */}
-          <Reveal variant="fade" className="cols2" style={{ gridTemplateColumns: "1.1fr .9fr", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+              formulaire reste lisible et utilisable dès les premiers instants.
+              `.celled-flow` : filets portés par les deux panneaux, et
+              `stretch` : le suivi prend la hauteur du formulaire, au lieu de
+              laisser sous lui l'aplat gris de l'ancien fond de conteneur. */}
+          <Reveal variant="fade" className="cols2 celled-flow" style={{ gridTemplateColumns: "1.1fr .9fr", alignItems: "stretch" }}>
             <MgpForm lang={lang} />
             <MgpTracker lang={lang} />
           </Reveal>

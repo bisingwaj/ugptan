@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { asLang } from "@/lib/params";
@@ -16,6 +17,7 @@ import { membresEquipe } from "@/lib/equipe/query";
 import { galleryProvinces, partners } from "@/content/carbon";
 import { media } from "@/content/media";
 import { NAV, route } from "@/lib/routes";
+import { grillePleine } from "@/lib/grille";
 import { SITE_URL } from "@/lib/site";
 import { Kicker } from "@/components/ui/Kicker";
 import { Photo } from "@/components/ui/Photo";
@@ -63,6 +65,11 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
     composantesPubliques(lang),
     organesPublies(lang),
   ]);
+  // Colonnes qui remplissent les grilles de vignettes et de logos (cf. lib/grille.ts).
+  const grilleGalerie = grillePleine(galleryProvinces.length, 5, 3);
+  // Logos : jusqu'à neuf par rangée (≈ 140 px par case à 1440 px, assez pour
+  // un logotype de 46 px de haut), trois au moins.
+  const grilleLogos = grillePleine(partners.length, 9, 3);
 
   // Données structurées : identifie l'organisation et le site pour les moteurs
   // (rich results, encart de connaissance) et déclare l'action de recherche.
@@ -347,8 +354,11 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           <Reveal delay={0.1}>
             <p style={{ margin: "0 0 40px", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 680 }}>{t.home.galleryLead}</p>
           </Reveal>
-          {/* Vignettes photo : fondu + léger zoom arrière, en cascade. */}
-          <RevealGroup gap={0.06} delayChildren={0.1} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(216px,1fr))" }}>
+          {/* Vignettes photo : fondu + léger zoom arrière, en cascade.
+              Cinq colonnes au plus en pleine largeur ; `grillePleine` en
+              retient un diviseur du nombre de vignettes (8 → 4 × 2) pour ne
+              pas laisser trois cases seules sous une rangée pleine. */}
+          <RevealGroup gap={0.06} delayChildren={0.1} className={`celled-flow ${grilleGalerie.className ?? ""}`} style={{ gridTemplateColumns: "repeat(auto-fill,minmax(216px,1fr))", ...grilleGalerie.style }}>
             {galleryProvinces.map((g) => (
               <RevealItem key={g.nom} zoom className="duo" style={{ aspectRatio: "4/3" }}>
                 {/* sizes ajusté à la grille `minmax(216px,1fr)` : 1 colonne
@@ -369,7 +379,11 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             <Reveal><Kicker>{t.home.partenairesLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 14 }}>{t.home.partenairesTitle}</h2></Reveal>
             <Reveal delay={0.1}><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.partenairesLead}</p></Reveal>
           </div>
-          <RevealGroup gap={0.04} delayChildren={0.1} className="logos-grid">
+          {/* Le pas automatique de 180 px donne sept colonnes en pleine
+              largeur : neuf partenaires y laissaient deux logos seuls sous une
+              rangée pleine. `grillePleine` retient un nombre de colonnes qui
+              tombe juste — 9 → une rangée de neuf, 10 → 5 × 2, 12 → 6 × 2. */}
+          <RevealGroup gap={0.04} delayChildren={0.1} className={`logos-grid ${grilleLogos.className ?? ""}`} style={grilleLogos.style}>
             {partners.map((p) => (
               <RevealItem key={p.name} className="logo-cell">
                 {p.logo ? (
@@ -427,7 +441,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
 
           {/* Trois étapes, numérotées : le parcours se lit d'un coup d'œil, et
               son nombre fini est ce qui décide quelqu'un à le commencer. */}
-          <RevealGroup className="grid-3" gap={0.06} delayChildren={0.1} style={{ background: "var(--ac-line)", borderColor: "var(--ac-line)" }}>
+          <RevealGroup className="grid-3" gap={0.06} delayChildren={0.1} style={{ "--filet": "var(--ac-line)" } as CSSProperties}>
             {t.home.repondreEtapes.map((e) => (
               <RevealItem key={e.n} style={{ background: "#fff", padding: "26px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
                 <div className="mono" style={{ fontSize: 11, color: "var(--ac)" }}>{e.n}</div>

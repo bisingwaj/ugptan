@@ -6,9 +6,10 @@
  * copies affichaient la même liste, et une correction sur l'une ne remontait
  * pas sur l'autre. Elles sont réunies ici.
  *
- * Les deux écarts de dessin subsistants sont paramétrés, parce qu'ils sont
- * voulus : l'accueil pose sa grille avec `.celled-flow` (filets portés par les
- * cellules), la page « L'Unité » avec une grille bordée d'un pixel. Le reste —
+ * Les deux pages posent désormais la même grille `.celled-flow` (filets
+ * portés par les cellules) : la grille bordée de « L'Unité » montrait une case
+ * grise en fin de rangée incomplète. Seule la taille des intitulés diffère
+ * encore, et elle est paramétrée. Le reste —
  * carré du portrait, pastille d'initiales, numéro en incrustation, filet sous
  * le nom — est identique et ne se règle plus qu'à un endroit.
  */
@@ -26,7 +27,9 @@ type Props = {
   membres: MembreEquipe[];
   /**
    * `accueil` : filets portés par les cellules (`.celled-flow`).
-   * `unite`   : grille bordée, fond gris entre les cellules.
+   * `unite`   : idem (l'ancien fond gris du conteneur laissait des cases
+   *             grises en fin de rangée) ; la variante ne règle plus que la
+   *             taille des intitulés.
    */
   variante?: "accueil" | "unite";
 };
@@ -37,14 +40,12 @@ const CONTENEUR: Record<"accueil" | "unite", { className?: string; style: CSSPro
     className: "celled-flow",
     style: { gridTemplateColumns: "repeat(auto-fill,minmax(212px,1fr))" },
   },
+  // Même mécanisme que l'accueil depuis que le fond gris du conteneur
+  // laissait, en fin de rangée incomplète, une case grise que l'accueil
+  // n'avait pas (11 membres sur 6 colonnes).
   unite: {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill,minmax(212px,1fr))",
-      gap: 1,
-      background: "var(--c-20)",
-      border: "1px solid var(--c-20)",
-    },
+    className: "celled-flow",
+    style: { gridTemplateColumns: "repeat(auto-fill,minmax(212px,1fr))" },
   },
 };
 

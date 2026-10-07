@@ -235,7 +235,7 @@ export function Header({ lang }: { lang: Lang }) {
                     const inner = (
                       <span className="flex w-full items-center justify-between gap-3 px-[14px] py-[11px] text-[13.5px]">
                         {lg.label}
-                        <span className="font-mono text-[11px] uppercase text-c-50">{lg.code}</span>
+                        <span className="font-mono text-[11px] uppercase text-c-60">{lg.code}</span>
                       </span>
                     );
                     return active ? (
@@ -392,7 +392,8 @@ export function Header({ lang }: { lang: Lang }) {
                     </Link>
                   ) : (
                     <section key={node.key} aria-label={t.nav[node.labelKey]} className="border-b border-[#232323]">
-                      <div className="px-(--pad-x) pt-[18px] pb-[6px] font-mono text-[11px] uppercase tracking-[0.12em] text-c-60">
+                      {/* --c-50 sur le noir du tiroir : 5,4:1 (--c-60 n'y faisait que 3,6:1). */}
+                      <div className="px-(--pad-x) pt-[18px] pb-[6px] font-mono text-[11px] uppercase tracking-[0.12em] text-c-50">
                         {t.nav[node.labelKey]}
                       </div>
                       {node.children.map((child) => (

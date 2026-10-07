@@ -146,7 +146,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
           return (
             <div key={i} style={{ display: "contents" }}>
               {i > 0 && <div style={{ flex: 1, height: 2, minWidth: 10, background: done ? "var(--c-black)" : active ? "var(--ac)" : "var(--c-20)" }} />}
-              <div className="mono" style={{ width: 34, height: 34, flex: "0 0 auto", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, background: active ? "var(--ac)" : done ? "var(--c-black)" : "#fff", color: active || done ? "#fff" : "var(--c-50)", border: `1.5px solid ${active ? "var(--ac)" : done ? "var(--c-black)" : "var(--c-30)"}` }}>{done ? "✓" : n}</div>
+              <div className="mono" style={{ width: 34, height: 34, flex: "0 0 auto", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, background: active ? "var(--ac)" : done ? "var(--c-black)" : "#fff", color: active || done ? "#fff" : "var(--c-60)", border: `1.5px solid ${active ? "var(--ac)" : done ? "var(--c-black)" : "var(--c-30)"}` }}>{done ? "✓" : n}</div>
             </div>
           );
         })}
@@ -187,7 +187,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", background: "var(--c-10)", border: "1px solid var(--c-20)" }}>
                     <span style={{ fontSize: 15 }}>📄</span>
                     <span style={{ flex: 1, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
-                    <span className="mono" style={{ fontSize: 11, color: "var(--c-50)" }}>{f.size} Ko</span>
+                    <span className="mono" style={{ fontSize: 11, color: "var(--c-60)" }}>{f.size} Ko</span>
                     <button type="button" onClick={() => setFiles((fs) => fs.filter((_, idx) => idx !== i))} style={{ color: "var(--red)", fontSize: 14 }}>✕</button>
                   </div>
                 ))}
@@ -226,7 +226,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
             <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 14 }}>{t.reviewSubmit}</label>
             <div style={{ border: "1px solid var(--c-20)" }}>
               <Row k={t.category} v={catLabel} />
-              <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--c-20)" }}><div style={{ fontSize: 12.5, color: "var(--c-50)", marginBottom: 6 }}>{t.description}</div><div style={{ fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{msg}</div></div>
+              <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--c-20)" }}><div style={{ fontSize: 12.5, color: "var(--c-60)", marginBottom: 6 }}>{t.description}</div><div style={{ fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{msg}</div></div>
               <Row k={t.attachments} v={String(files.length)} />
               <Row k={t.identity} v={named ? contact.fullName.trim() : t.anonymous} />
               <Row k={t.contact} v={reachable || t.notProvided} last />
@@ -258,7 +258,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
           </BoutonAction>
         )}
       </div>
-      <p style={{ margin: "14px 0 0", fontSize: 11.5, color: "var(--c-50)", lineHeight: 1.5 }}>{t.formFootnote}</p>
+      <p style={{ margin: "14px 0 0", fontSize: 11.5, color: "var(--c-60)", lineHeight: 1.5 }}>{t.formFootnote}</p>
     </div>
   );
 }
@@ -266,7 +266,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
 function Row({ k, v, last }: { k: string; v: string; last?: boolean }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", gap: 12, padding: "14px 16px", borderBottom: last ? "none" : "1px solid var(--c-20)" }}>
-      <span style={{ fontSize: 12.5, color: "var(--c-50)" }}>{k}</span>
+      <span style={{ fontSize: 12.5, color: "var(--c-60)" }}>{k}</span>
       <span style={{ fontSize: 13, fontWeight: 600, textAlign: "right" }}>{v}</span>
     </div>
   );

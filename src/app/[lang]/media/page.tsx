@@ -76,7 +76,7 @@ export default async function MediasPage(props: { params: Promise<{ lang: string
           <Reveal>
             <Kicker>{en ? "Video slots" : "Emplacements vidéo"}</Kicker>
           </Reveal>
-          <RevealGroup gap={0.06} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", marginTop: 16 }}>
+          <RevealGroup gap={0.06} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", marginTop: 16 }}>
             {videoSlots.map((s) => {
               const sc = statusColor(s.status);
               const rb = ratioBox[s.ratio];
@@ -88,7 +88,7 @@ export default async function MediasPage(props: { params: Promise<{ lang: string
                     <span className="mono" style={{ position: "absolute", top: 8, left: 8, fontSize: 10.5, color: sc, background: "#fff", padding: "2px 6px", border: `1px solid ${sc}` }}>{s.ratio}</span>
                   </div>
                   <div style={{ marginTop: 18, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                    <span className="mono" style={{ fontSize: 11, color: "var(--c-50)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{pick(s.page, lang)}</span>
+                    <span className="mono" style={{ fontSize: 11, color: "var(--c-60)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{pick(s.page, lang)}</span>
                     <span className="mono" style={{ fontSize: 10.5, fontWeight: 600, color: "#fff", background: sc, padding: "3px 9px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{pick(statusLabel(s.status), lang)}</span>
                   </div>
                   <h3 style={{ margin: "10px 0 0", fontSize: 16, fontWeight: 600, lineHeight: 1.35 }}>{pick(s.zone, lang)}</h3>

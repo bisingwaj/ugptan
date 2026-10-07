@@ -7,6 +7,7 @@ import { dict } from "@/content/i18n";
 import { provinces } from "@/content/data";
 import { ODD, oddParNumero } from "@/content/odd";
 import { pick } from "@/lib/pick";
+import { onCompDe } from "@/lib/comp";
 import { NAV, route, compRoute } from "@/lib/routes";
 import { CHEMIN_PROVINCES, provinceParSlug, provinceRoute, slugProvince, slugsProvinces } from "@/lib/provinces/chemins";
 import { ficheProvince, projetsProvince, type ProjetVue } from "@/lib/provinces/query";
@@ -274,7 +275,7 @@ export default async function ProvincePage(props: Props) {
                 <Reveal>
                   <h2 className="prov-h3">
                     <span className="prov-point" data-av={g.av} aria-hidden />
-                    {libelleAvancement[g.av]} <span style={{ color: "var(--c-50)", fontWeight: 400 }}>({g.items.length})</span>
+                    {libelleAvancement[g.av]} <span style={{ color: "var(--c-60)", fontWeight: 400 }}>({g.items.length})</span>
                   </h2>
                 </Reveal>
                 {/* Cartes en fondu seul : `.prov-projet:hover` translate, et un
@@ -317,7 +318,10 @@ export default async function ProvincePage(props: Props) {
                 le transform inline d'un zoom framer neutraliserait ce survol. */}
             <RevealGroup as="ul" className="prov-odd" gap={0.06}>
               {oddVises.map((o) => (
-                <RevealItem as="li" fade key={o.n} style={{ background: o.couleur }}>
+                /* Encre ou blanc selon la luminance de la couleur ODD (`onCompDe`) :
+                   le blanc imposé tombait sous 4,5:1 sur les teintes claires
+                   (ODD 9 orange, 2,9:1 ; ODD 7 jaune, 1,9:1). */
+                <RevealItem as="li" fade key={o.n} style={{ background: o.couleur, color: onCompDe(o.couleur) }}>
                   <span className="prov-odd__n">{o.n}</span>
                   <span className="prov-odd__t">{pick(o.titre, lang)}</span>
                   <span className="mono prov-odd__c">{comptesOdd.get(o.n)} {pr.oddProjets}</span>
@@ -408,7 +412,7 @@ function CarteProjet({
           {projet.odd.map((n) => {
             const o = oddParNumero(n);
             return o ? (
-              <li key={n} style={{ background: o.couleur }} title={`ODD ${n} · ${pick(o.titre, lang)}`}>
+              <li key={n} style={{ background: o.couleur, color: onCompDe(o.couleur) }} title={`ODD ${n} · ${pick(o.titre, lang)}`}>
                 {n}
               </li>
             ) : null;

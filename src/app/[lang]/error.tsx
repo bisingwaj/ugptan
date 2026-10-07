@@ -43,7 +43,7 @@ export default function SiteError({
         <p className="lead mt-5">{t.corps}</p>
         {/* Le condensé relie cet écran à la ligne du journal serveur. */}
         {error.digest && (
-          <p className="mt-6 font-mono text-[11px] text-c-50">
+          <p className="mt-6 font-mono text-[11px] text-c-60">
             {t.reference} : {error.digest}
           </p>
         )}

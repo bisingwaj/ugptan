@@ -9,6 +9,7 @@ import { compColors, compImg } from "@/content/data";
 import type { Marche, MarcheStatut } from "@/content/types";
 import { media } from "@/content/media";
 import { computeCountdown } from "@/lib/format";
+import { compTexteDe, onCompDe } from "@/lib/comp";
 import { NAV, route } from "@/lib/routes";
 import { Photo } from "@/components/ui/Photo";
 import { useVideo } from "@/components/video/VideoProvider";
@@ -40,9 +41,11 @@ function formaterDate(iso: string, lang: Lang, avecHeure = false): string {
 
 const STATUTS: Record<MarcheStatut, { fr: string; en: string; c: string }> = {
   ouvert: { fr: "Ouvert", en: "Open", c: "#198038" },
-  cloture: { fr: "Clôturé", en: "Closed", c: "#8d8d8d" },
+  // #6f6f6f (--c-60) et non #8d8d8d : le statut s'écrit en texte de 11 px,
+  // où le gris clair ne faisait que 3,3:1 sur blanc (5:1 désormais).
+  cloture: { fr: "Clôturé", en: "Closed", c: "#6f6f6f" },
   attribue: { fr: "Attribué", en: "Awarded", c: "#0f62fe" },
-  infructueux: { fr: "Infructueux", en: "Unsuccessful", c: "#8d8d8d" },
+  infructueux: { fr: "Infructueux", en: "Unsuccessful", c: "#6f6f6f" },
   annule: { fr: "Annulé", en: "Cancelled", c: "#da1e28" },
 };
 
@@ -116,7 +119,7 @@ export function MarchesClient({
   if (marches.length === 0) {
     return (
       <div style={{ border: "1px solid var(--c-20)", background: "var(--c-10)", padding: "clamp(40px,6vw,72px) clamp(20px,4vw,40px)", textAlign: "center" }}>
-        <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--c-50)" }}>
+        <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--c-60)" }}>
           {dict(lang).nav.marches}
         </div>
         <p style={{ margin: "14px auto 0", fontSize: "clamp(17px,2.2vw,22px)", fontWeight: 600, letterSpacing: "-0.01em", maxWidth: "26ch" }}>
@@ -136,10 +139,10 @@ export function MarchesClient({
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
         <div style={{ position: "relative", flex: 1, minWidth: 260, maxWidth: 540 }}>
-          <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--c-50)", fontSize: 15 }}>⌕</span>
+          <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--c-60)", fontSize: 15 }}>⌕</span>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.search} className="field" style={{ paddingLeft: 40 }} />
         </div>
-        <div className="mono" style={{ fontSize: 12, color: "var(--c-50)", whiteSpace: "nowrap" }}>
+        <div className="mono" style={{ fontSize: 12, color: "var(--c-60)", whiteSpace: "nowrap" }}>
           <strong style={{ color: "var(--green)" }}>{ouverts}</strong> {t.open} · <strong style={{ color: "var(--c-black)" }}>{marches.length}</strong> {t.results}
         </div>
       </div>
@@ -172,14 +175,14 @@ export function MarchesClient({
                 </div>
                 <h3 style={{ margin: "14px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.35, flex: 1 }}>{pick(m.objet, lang)}</h3>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: 16 }}>
-                  <span className="mono" style={{ fontSize: 11, color: "#fff", background: cc, padding: "5px 9px" }}>{m.type}</span>
+                  <span className="mono" style={{ fontSize: 11, color: onCompDe(cc), background: cc, padding: "5px 9px" }}>{m.type}</span>
                   <span className="mono" style={{ fontSize: 11, color: "var(--c-70)", background: "var(--c-10)", padding: "5px 9px" }}>{m.comp}</span>
                   <span className="mono" style={{ fontSize: 11, color: "var(--c-70)", background: "var(--c-10)", padding: "5px 9px" }}>{pick(m.budget, lang)}</span>
                   {m.addenda.length > 0 && <span className="mono" style={{ fontSize: 11, color: "#8a3800", background: "#fff3e0", padding: "5px 9px" }}>+{m.addenda.length} addendum</span>}
                 </div>
                 {showCd && (
                   <div style={{ marginTop: 16 }}>
-                    <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 600, color: cd!.urgent ? "var(--red)" : cc, background: cd!.urgent ? "#fff1f1" : "var(--c-10)", padding: "7px 11px" }}>⏳ {cd!.d}j {cd!.hh}:{cd!.mm}:{cd!.ss}</span>
+                    <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 600, color: cd!.urgent ? "var(--red)" : compTexteDe(cc), background: cd!.urgent ? "#fff1f1" : "var(--c-10)", padding: "7px 11px" }}>⏳ {cd!.d}j {cd!.hh}:{cd!.mm}:{cd!.ss}</span>
                   </div>
                 )}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--c-20)" }}>
@@ -202,6 +205,9 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
   const t = dict(lang).marches;
   const w = dict(lang).words;
   const cc = compColors[m.comp] || "#0f62fe";
+  // Couleur de composante employée en TEXTE (intitulés de rubrique) : sa
+  // variante lisible, la sarcelle et le magenta tombant sinon à 3,3:1.
+  const ccTexte = compTexteDe(cc);
   const cd = now !== null ? computeCountdown(m.limiteISO, now) : null;
   const showCd = cd && m.statut === "ouvert";
   const st = STATUTS[m.statut];
@@ -235,7 +241,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
           </div>
           <div style={{ position: "relative", zIndex: 5, marginTop: "auto", padding: "32px clamp(20px,3vw,34px) clamp(18px,2.6vw,28px)" }}>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 9, marginBottom: 12 }}>
-              <span className="mono" style={{ fontSize: 11.5, fontWeight: 600, color: "#fff", background: cc, padding: "5px 11px" }}>{m.type}</span>
+              <span className="mono" style={{ fontSize: 11.5, fontWeight: 600, color: onCompDe(cc), background: cc, padding: "5px 11px" }}>{m.type}</span>
               <span className="mono" style={{ fontSize: 11, color: "#fff", border: "1px solid rgba(255,255,255,.4)", padding: "5px 10px" }}>{m.comp}</span>
               <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 11, fontWeight: 600, color: "#fff" }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: st.c }} />{statutLabel}</span>
             </div>
@@ -264,14 +270,18 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
             </div>
           )}
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", borderTop: `3px solid ${cc}`, marginBottom: 32 }}>
+          {/* Filets portés par les cellules (`.celled-flow`) ; le cadre reste
+              celui du conteneur (liseré de statut en tête), et `overflow:
+              hidden` rogne l'ombre des cellules du bord pour qu'elle ne
+              recouvre pas ce liseré. */}
+          <div className="celled-flow" style={{ gridTemplateColumns: "repeat(2,1fr)", padding: 0, border: "1px solid var(--c-20)", borderTop: `3px solid ${cc}`, overflow: "hidden", marginBottom: 32 }}>
             {[[t.published, formaterDate(m.publieISO, lang)], [t.deadline, formaterDate(m.limiteISO, lang, true)], [t.budget, pick(m.budget, lang)], [t.lots, String(m.lots)]].map(([k, v], i) => (
-              <div key={i} style={{ background: "#fff", padding: "15px 18px" }}><div className="mono" style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)", marginBottom: 6 }}>{k}</div><div style={{ fontSize: 14.5, fontWeight: 600 }}>{v}</div></div>
+              <div key={i} style={{ background: "#fff", padding: "15px 18px" }}><div className="mono" style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)", marginBottom: 6 }}>{k}</div><div style={{ fontSize: 14.5, fontWeight: 600 }}>{v}</div></div>
             ))}
-            <div style={{ gridColumn: "1 / -1", background: "#fff", padding: "15px 18px" }}><div className="mono" style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-50)", marginBottom: 6 }}>{t.place}</div><div style={{ fontSize: 14.5, fontWeight: 600 }}>{pick(m.lieu, lang)}</div></div>
+            <div style={{ gridColumn: "1 / -1", background: "#fff", padding: "15px 18px" }}><div className="mono" style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)", marginBottom: 6 }}>{t.place}</div><div style={{ fontSize: 14.5, fontWeight: 600 }}>{pick(m.lieu, lang)}</div></div>
           </div>
 
-          <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: cc, marginBottom: 12 }}>{t.summary}</div>
+          <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: ccTexte, marginBottom: 12 }}>{t.summary}</div>
           <p style={{ margin: "0 0 32px", fontSize: 15, lineHeight: 1.7, color: "var(--c-80)", whiteSpace: "pre-line" }}>{pick(m.resume, lang)}</p>
 
           {m.attributaire && (
@@ -283,7 +293,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
 
           {m.calendrier.length > 0 && (
             <>
-              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: cc, marginBottom: 18 }}>{t.scheduleTitle}</div>
+              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: ccTexte, marginBottom: 18 }}>{t.scheduleTitle}</div>
               <div style={{ marginBottom: 32 }}>
                 {m.calendrier.map((c, i) => {
                   /* Le franchissement se calcule ici, jamais côté serveur : une
@@ -299,8 +309,8 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
                         <span style={{ flex: 1, width: 2, background: "var(--c-20)", margin: "3px 0", minHeight: 16 }} />
                       </div>
                       <div style={{ paddingBottom: 20 }}>
-                        <div className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>{formaterDate(c.dateISO, lang, true)}</div>
-                        <div style={{ fontSize: 14.5, color: passe || cur ? "var(--c-black)" : "var(--c-50)", fontWeight: cur ? 600 : 400, marginTop: 3 }}>{lang === "en" ? c.en : c.fr}</div>
+                        <div className="mono" style={{ fontSize: 11.5, color: "var(--c-60)" }}>{formaterDate(c.dateISO, lang, true)}</div>
+                        <div style={{ fontSize: 14.5, color: passe || cur ? "var(--c-black)" : "var(--c-60)", fontWeight: cur ? 600 : 400, marginTop: 3 }}>{lang === "en" ? c.en : c.fr}</div>
                       </div>
                     </div>
                   );
@@ -332,14 +342,14 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
 
           {m.pieces.length > 0 && (
             <>
-              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: cc, marginBottom: 12 }}>{t.docsTitle}</div>
+              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: ccTexte, marginBottom: 12 }}>{t.docsTitle}</div>
               <p style={{ margin: "0 0 12px", fontSize: 12.5, lineHeight: 1.55, color: "var(--c-60)" }}>{t.docsSurPlateforme}</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", marginBottom: 32 }}>
+              <div className="celled-flow" style={{ display: "flex", flexDirection: "column", marginBottom: 32 }}>
                 {m.pieces.map((p, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", background: "#fff" }}>
                     <span style={{ width: 32, height: 32, flex: "0 0 auto", background: cc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>↓</span>
                     <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{pick(p.nom, lang)}</span>
-                    {p.taille && <span className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>{p.taille}</span>}
+                    {p.taille && <span className="mono" style={{ fontSize: 11.5, color: "var(--c-60)" }}>{p.taille}</span>}
                   </div>
                 ))}
               </div>
@@ -348,7 +358,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
 
           {pick(m.retrait, lang).trim() && (
             <>
-              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: cc, marginBottom: 12 }}>{t.retraitTitle}</div>
+              <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: ccTexte, marginBottom: 12 }}>{t.retraitTitle}</div>
               <p style={{ margin: "0 0 32px", fontSize: 14.5, lineHeight: 1.65, color: "var(--c-80)", whiteSpace: "pre-line" }}>{pick(m.retrait, lang)}</p>
             </>
           )}

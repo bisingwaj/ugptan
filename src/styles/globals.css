@@ -168,7 +168,7 @@ html.scroll-locked body {
 .prov-badge { display: inline-flex; align-items: center; padding: 7px 12px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; background: var(--c-10); color: var(--c-80); }
 .prov-badge[data-prio] { background: var(--ac); color: #fff; }
 .prov-badge--alerte { text-transform: none; letter-spacing: .02em; background: #fff8e1; color: #6b4e00; border-left: 3px solid #f1c21b; }
-.prov-chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; margin: 26px 0 0; background: var(--c-20); border: 1px solid var(--c-20); }
+.prov-chiffres { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; margin: 26px 0 0; padding: 1px; }
 .prov-chiffre { background: #fff; padding: 22px; }
 .prov-chiffre dt { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--c-60); }
 .prov-chiffre dd { margin: 10px 0 0; font-size: clamp(20px, 2.2vw, 26px); font-weight: 600; letter-spacing: -.01em; color: var(--c-black); }
@@ -343,13 +343,54 @@ html.scroll-locked body {
 
 /* ===========================================================================
    Celled grid (1px hairline cells, signature Carbon pattern)
+
+   ⚠️ LES FILETS SONT PORTÉS PAR LES CELLULES, JAMAIS PAR LE FOND DU CONTENEUR.
+   Le motif d'origine peignait le conteneur en gris (`background: --c-20`) et
+   laissait le `gap: 1px` le montrer entre les cellules. Tant que le nombre
+   d'éléments tombait juste, l'illusion tenait ; dès qu'une rangée restait
+   incomplète (10 logos sur 7 colonnes, 11 membres sur 4, 5 fiches sur 4…),
+   toute la fin de rangée apparaissait en aplat gris — des « cases vides » qui
+   donnaient au site un air inachevé, sur une quinzaine de grilles à la fois.
+
+   Désormais chaque enfant direct trace son filet par une ombre d'un pixel
+   (`0 0 0 1px`) qui remplit exactement le `gap` et, sur les bords, le
+   `padding: 1px` du conteneur (qui remplace son ancienne bordure : même
+   encombrement au pixel près). La zone non remplie reste transparente : elle
+   prend le fond de la section, et la grille se termine en escalier net.
+
+   · La couleur du filet est une variable, `--filet`, posée à spécificité nulle
+     (`:where`) : une variante (`.celled--dark`) ou un style en ligne
+     (`style={{ "--filet": … }}`) la remplace sans lutte de spécificité.
+   · L'ombre des enfants est elle aussi à spécificité nulle : la moindre classe
+     de cellule qui déclare sa propre ombre l'emporte. Les ombres de survol
+     (`.cell--fx`, `.cell--bloom`) reprennent donc le filet dans leur liste,
+     sans quoi la cellule perdrait son contour pendant le survol.
+   · Toute nouvelle grille à filets s'ajoute à la liste ci-dessous, plutôt que
+     de réécrire `background` + `gap` : c'est cette réécriture, répétée grille
+     par grille, qui avait propagé le défaut. Hors feuille, `.celled-flow` est
+     la classe générique à poser sur un conteneur de grille quelconque.
 =========================================================================== */
-.celled { display: grid; gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
-.celled--dark { background: var(--c-80); border-color: var(--c-80); }
-/* Spécificité accrue : sur grille sombre, les filets restent gris sombre
-   (sinon .grid-4/-3/-5 — définis plus bas — repassent en var(--c-20) clair). */
-.grid-3.celled--dark, .grid-4.celled--dark, .grid-5.celled--dark { background: var(--c-80); border-color: var(--c-80); }
+:where(.celled, .celled-flow, .grid-auto, .logos-grid, .grid-3, .grid-4, .grid-5,
+  .prov-chiffres, .unite-reperes, .poles, .glossaire__grille, .actu-nav,
+  .doc-grille, .gal-albums__grille, .gal-grille, .odp__grid) { --filet: var(--c-20); }
+:where(.celled, .celled-flow, .grid-auto, .logos-grid, .grid-3, .grid-4, .grid-5,
+  .prov-chiffres, .unite-reperes, .poles, .glossaire__grille, .actu-nav,
+  .doc-grille, .gal-albums__grille, .gal-grille, .odp__grid) > * { box-shadow: 0 0 0 1px var(--filet); }
+.celled { display: grid; gap: 1px; padding: 1px; }
+.celled--dark, .grid-auto--dark { --filet: var(--c-80); }
+/* `.celled--top` n'agit que sur `.celled` : sur `.grid-3`/`.grid-4`, définies
+   plus bas, leur `border: 0` l'emporte — comme leur ancienne bordure grise le
+   faisait déjà. On ne l'y réactive pas : le rendu actuel (filet d'un pixel en
+   tête) est celui que les pages ont toujours montré. */
 .celled--top { border-top: 2px solid var(--c-black); }
+/* Nombre de colonnes qui remplit la grille, calculé côté serveur sur le nombre
+   d'éléments (cf. lib/grille.ts). Réservé à la pleine largeur : en dessous, le
+   pas automatique de chaque grille reprend. `!important` parce que plusieurs
+   grilles déclarent leurs pistes en style en ligne (`gridTemplateColumns`),
+   qu'une règle de feuille ne pourrait pas sinon remplacer. */
+@media (min-width: 1200px) {
+  .grille-pleine { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)) !important; }
+}
 .cell { background: #fff; padding: 28px 24px; position: relative; overflow: hidden; isolation: isolate; }
 .celled--dark .cell { background: var(--c-black); }
 
@@ -380,7 +421,10 @@ html.scroll-locked body {
 .cell-fx path { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset var(--dur-3) var(--ease); transition-delay: calc(var(--d, 0) * 1ms); }
 
 /* État survol */
-.cell--fx:hover { transform: translateY(-3px); z-index: 3; box-shadow: 0 24px 48px -26px rgba(6, 10, 22, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+/* `0 0 0 1px var(--filet)` en tête : le filet de la grille, que l'ombre de
+   survol remplacerait sinon (cf. « Celled grid »). Hors grille, la variable
+   est absente et le repli transparent n'ajoute rien. */
+.cell--fx:hover { transform: translateY(-3px); z-index: 3; box-shadow: 0 0 0 1px var(--filet, transparent), 0 24px 48px -26px rgba(6, 10, 22, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
 .cell--fx:hover .cell-fx__surface, .cell--fx:hover .cell-fx__scrim { opacity: 1; }
 .cell--fx:hover .cell-fx path { stroke-dashoffset: 0; }
 .cell--fx:hover .cell-fx__drift { animation-play-state: running; }
@@ -390,7 +434,7 @@ html.scroll-locked body {
 .cell--light .cell-fx__scrim { background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 64%, rgba(255, 255, 255, 0.82) 100%); }
 .cell--light .cell-fx__glow { opacity: 0.4; }
 .cell--light .cell-fx__lines { opacity: 0.8; }
-.cell--light.cell--fx:hover { box-shadow: 0 18px 40px -22px rgba(22, 45, 99, 0.3), inset 0 0 0 1px rgba(20, 40, 90, 0.08); }
+.cell--light.cell--fx:hover { box-shadow: 0 0 0 1px var(--filet, transparent), 0 18px 40px -22px rgba(22, 45, 99, 0.3), inset 0 0 0 1px rgba(20, 40, 90, 0.08); }
 
 /* === Floraison de couleur du secteur, sur fond BLANC (cf. ui/CellBloom.tsx) ==
    Deux halos de la couleur (--sec) éclosent depuis des coins opposés + dérive. */
@@ -400,7 +444,7 @@ html.scroll-locked body {
 .cell-bloom__a, .cell-bloom__b { position: absolute; border-radius: 50%; filter: blur(34px); opacity: 0; background: radial-gradient(closest-side, var(--sec), transparent 72%); transition: opacity var(--dur-3) var(--ease), transform var(--dur-3) var(--ease); }
 .cell-bloom__a { width: 78%; height: 135%; left: -14%; top: -42%; transform: scale(0.55); transform-origin: top left; }
 .cell-bloom__b { width: 60%; height: 120%; right: -12%; bottom: -40%; transform: scale(0.45); transform-origin: bottom right; }
-.cell--bloom:hover { transform: translateY(-3px); z-index: 3; box-shadow: 0 20px 44px -24px rgba(20, 32, 66, 0.42); }
+.cell--bloom:hover { transform: translateY(-3px); z-index: 3; box-shadow: 0 0 0 1px var(--filet, transparent), 0 20px 44px -24px rgba(20, 32, 66, 0.42); }
 .cell--bloom:hover .cell-bloom__a { opacity: 0.2; transform: scale(1); animation: bloomFloatA 9s ease-in-out infinite alternate 0.5s; }
 .cell--bloom:hover .cell-bloom__b { opacity: 0.15; transform: scale(1); transition-delay: 0.08s; animation: bloomFloatB 11s ease-in-out infinite alternate 0.6s; }
 @keyframes bloomFloatA { from { translate: 0 0; } to { translate: 9px 11px; } }
@@ -448,11 +492,10 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
    pixels — assez pour déclencher un défilement horizontal sur toute la page.
    L'idiome borne la piste à la largeur disponible, sans requête média : la
    grille se réduit d'elle-même à une colonne quand la place manque. */
-.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(296px, 100%), 1fr)); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
-.grid-auto--dark { background: var(--c-80); border-color: var(--c-80); }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(296px, 100%), 1fr)); gap: 1px; padding: 1px; }
 
 /* Mur de logos partenaires — grille compacte, logos harmonisés (jamais 1 seul par ligne). */
-.logos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
+.logos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1px; padding: 1px; }
 .logo-cell { background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px 16px; min-height: 116px; transition: background var(--dur-2) var(--ease); }
 .logo-cell:hover { background: var(--c-10); }
 /* Cadre du logotype. Les bornes d'encombrement (80 % de large, 46 px de haut)
@@ -461,16 +504,17 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
    sait pas à quelle taille servir le fichier. Le rendu est le même : `contain`
    inscrit le logotype dans ces bornes sans jamais le déformer. */
 .logo-cell__mark { position: relative; display: block; width: 80%; height: 46px; }
-.logo-cell__kind { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-50); text-align: center; line-height: 1.3; }
+.logo-cell__kind { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-60); text-align: center; line-height: 1.3; }
 @media (max-width: 760px) {
   .logos-grid { grid-template-columns: repeat(3, 1fr); }
   .logo-cell { min-height: 82px; padding: 13px 8px; }
   .logo-cell__mark { width: 88%; height: 30px; }
   .logo-cell__kind { display: none; }
 }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
-.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
+/* `border: 0` : neutralise `.celled--top`, cf. la note du bloc « Celled grid ». */
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; padding: 1px; border: 0; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; padding: 1px; border: 0; }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; padding: 1px; border: 0; }
 @media (max-width: 1100px) { .grid-5 { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 680px) { .grid-5 { grid-template-columns: 1fr; } }
 
@@ -644,7 +688,12 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
   width: 100%; font-size: 14px; color: var(--c-black); background: #fff;
   border: 1px solid var(--c-20); padding: 13px 14px; outline: none;
 }
-.field:focus { border-color: var(--ac); outline: 2px solid var(--ac-line); outline-offset: -1px; }
+/* Focus : contour plein de l'accent, posé à l'intérieur (convention Carbon).
+   L'ancien anneau `--ac-line` (#d0e2ff) ne contrastait qu'à 1,3:1 avec le fond
+   blanc : seul le filet d'1 px passé au bleu signalait le champ actif, sous le
+   seuil de 3:1 des indicateurs de focus (WCAG 2.4.11 / 1.4.11). L'accent fait
+   5:1 sur blanc ; sur une page composante, `--ac` est déjà la variante lisible. */
+.field:focus { border-color: var(--ac); outline: 2px solid var(--ac); outline-offset: -2px; }
 .field--dark { background: var(--c-90); border-color: var(--c-80); color: #fff; }
 .field--dark:focus-visible { border-color: var(--ac-light); outline: 2px solid var(--ac-light); outline-offset: 2px; } /* focus visible sur fond sombre : le seul changement de bordure 1px ne suffit pas (a11y). */
 .label-mono { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--c-60); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; } /* --c-60 (5:1) : libellé de champ sur fond clair, seuil AA. */
@@ -724,7 +773,7 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .comp-tab--on .comp-tab__code { color: var(--tab); }
 .comp-subnav__anchors { display: flex; align-items: center; gap: 0; overflow-x: auto; scrollbar-width: none; }
 .comp-subnav__anchors::-webkit-scrollbar { display: none; }
-.comp-anchor { font-family: var(--font-mono); font-size: 11.5px; color: var(--c-50); padding: 8px 11px; white-space: nowrap; transition: color var(--dur-1) var(--ease); }
+.comp-anchor { font-family: var(--font-mono); font-size: 11.5px; color: var(--c-60); padding: 8px 11px; white-space: nowrap; transition: color var(--dur-1) var(--ease); }
 .comp-anchor:hover { color: var(--c-black); }
 .comp-anchor--on { color: var(--ac); }
 .comp-anchor--on::before { content: "● "; font-size: 7px; vertical-align: middle; }
@@ -734,9 +783,9 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .comp-chapeau { margin: 0 0 18px; font-size: 15.5px; line-height: 1.75; color: var(--c-80); max-width: 68ch; }
 .comp-chapeau--first { font-size: clamp(17px, 1.6vw, 20px); line-height: 1.6; color: var(--c-black); font-weight: 400; }
 .comp-aside { border: 1px solid var(--c-20); border-top: var(--comp-rail) solid var(--comp); background: #fff; padding: 22px 24px 24px; position: sticky; top: 140px; }
-.comp-aside__head { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-50); margin-bottom: 18px; }
+.comp-aside__head { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-60); margin-bottom: 18px; }
 .comp-aside__list { list-style: none; display: flex; flex-direction: column; gap: 17px; }
-.comp-aside__row { display: flex; justify-content: space-between; font-size: 11px; color: var(--c-50); }
+.comp-aside__row { display: flex; justify-content: space-between; font-size: 11px; color: var(--c-60); }
 .comp-aside__montant { color: var(--c-black); font-weight: 600; }
 .comp-aside__text { font-size: 13.5px; line-height: 1.45; color: var(--c-80); margin: 6px 0 9px; }
 .comp-aside__vide { font-size: 13.5px; line-height: 1.55; color: var(--c-60); }
@@ -773,7 +822,7 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .projets-split { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: clamp(26px, 3.6vw, 64px); align-items: start; }
 .projets-index { position: sticky; top: 140px; display: flex; flex-direction: column; border-top: var(--comp-rail) solid var(--comp); }
 .projet-link { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 11px 10px 11px 0; border-bottom: 1px solid var(--c-20); border-left: 2px solid transparent; transition: color var(--dur-1) var(--ease), background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), padding var(--dur-2) var(--ease); }
-.projet-link__n { font-size: 11px; color: var(--c-50); transition: color var(--dur-1) var(--ease); }
+.projet-link__n { font-size: 11px; color: var(--c-60); transition: color var(--dur-1) var(--ease); }
 .projet-link__t { font-size: 13.5px; line-height: 1.4; color: var(--c-70); transition: color var(--dur-1) var(--ease); }
 .projet-link:hover { background: var(--c-10); padding-left: 8px; }
 .projet-link:hover .projet-link__t { color: var(--c-black); }
@@ -809,7 +858,7 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
    rattachés d'une page de composante, qui l'écrivaient chacun de leur côté.
    `odp__grid` s'ajuste au nombre d'indicateurs — `grid-4` laisserait deux
    colonnes vides pour une composante qui n'en porte que deux. */
-.odp__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1px; margin-top: 24px; }
+.odp__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1px; padding: 1px; margin-top: 24px; }
 .odp__cell { display: flex; flex-direction: column; min-height: 214px; }
 .odp__code { font-size: 11.5px; color: var(--ac-light); letter-spacing: 0.08em; }
 .odp__val { margin-top: auto; font-size: clamp(30px, 4vw, 52px); letter-spacing: -0.03em; color: #fff; }
@@ -848,7 +897,7 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .comp-lies__h { margin: 0 0 10px; font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
 .comp-lies__list { display: flex; flex-direction: column; border-top: 1px solid var(--c-black); }
 .comp-lie { display: grid; grid-template-columns: minmax(0, 1fr) 22px; grid-template-areas: "meta go" "title title"; gap: 4px 10px; padding: 14px 0; border-bottom: 1px solid var(--c-20); transition: padding var(--dur-2) var(--ease), background var(--dur-1) var(--ease); }
-.comp-lie__meta { grid-area: meta; font-size: 11px; color: var(--c-50); }
+.comp-lie__meta { grid-area: meta; font-size: 11px; color: var(--c-60); }
 .comp-lie__t { grid-area: title; font-size: 14.5px; line-height: 1.45; color: var(--c-80); }
 .comp-lie__go { grid-area: go; font-size: 11.5px; color: var(--ac); text-align: right; }
 .comp-lie:hover { background: var(--ac-pale); padding-left: 10px; padding-right: 10px; }
@@ -883,13 +932,17 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .comp-card__titre { margin: 24px 0 0; font-size: clamp(18px, 1.9vw, 23px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; transition: color var(--dur-2) var(--ease); }
 .comp-card__desc { margin: 11px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--c-70); transition: color var(--dur-2) var(--ease); }
 .comp-card__foot { margin-top: auto; padding-top: 22px; }
-.comp-card__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 11px; font-size: 10.5px; color: var(--c-50); transition: color var(--dur-2) var(--ease); }
+.comp-card__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 11px; font-size: 10.5px; color: var(--c-60); transition: color var(--dur-2) var(--ease); }
 .comp-card__go { margin-left: auto; color: var(--ac); font-weight: 600; transition: color var(--dur-2) var(--ease); }
-.comp-card:hover { background: var(--comp); color: #fff; }
+/* `--ac` et non `--comp` : texte blanc sur l'aplat. `--ac` est la variante
+   lisible de la couleur (cf. `accentLisible`, lib/comp.ts) — identique pour le
+   bleu, le violet et le gris, foncée d'environ 20 % pour la sarcelle et le magenta,
+   sur lesquels le blanc tombait à 3,3:1. */
+.comp-card:hover { background: var(--ac); color: #fff; }
 .comp-card:hover .comp-card__titre, .comp-card:hover .comp-card__desc,
 .comp-card:hover .comp-card__montant, .comp-card:hover .comp-card__meta,
 .comp-card:hover .comp-card__go { color: #fff; }
-.comp-card:hover .comp-card__code { background: #fff !important; color: var(--comp) !important; }
+.comp-card:hover .comp-card__code { background: #fff !important; color: var(--ac) !important; }
 .comp-card:hover .bar { background: rgba(255, 255, 255, 0.28); }
 .comp-card:hover .bar__fill { background: #fff; }
 
@@ -907,7 +960,7 @@ html.cursor-custom, html.cursor-custom * { cursor: none !important; }
 .chaine__head { display: flex; align-items: center; gap: 12px; padding: 22px 0 16px; }
 .chaine__code { flex: 0 0 auto; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; padding: 5px 9px; }
 .chaine__titre { margin: 0; font-size: 16.5px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
-.chaine__k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-50); padding-bottom: 6px; border-bottom: 1px solid var(--c-20); }
+.chaine__k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-60); padding-bottom: 6px; border-bottom: 1px solid var(--c-20); }
 .chaine__liste { list-style: none; }
 .chaine__liste li + li { border-top: 1px solid var(--c-20); }
 .chaine__lien { display: grid; grid-template-columns: 30px minmax(0, 1fr) 16px; gap: 10px; align-items: baseline; padding: 15px 0; font-size: 13.5px; line-height: 1.5; color: var(--c-70); transition: color var(--dur-1) var(--ease), padding var(--dur-2) var(--ease); }
@@ -932,7 +985,7 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
 .organe__nom { font-size: 14.5px; color: var(--c-70); margin-top: 9px; line-height: 1.4; }
 .organe__attrs { margin-top: 22px; border-top: 1px solid var(--c-20); padding-top: 18px; display: flex; flex-direction: column; gap: 14px; }
 .organe--complet .organe__attrs { margin-top: 26px; }
-.organe__k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-50); }
+.organe__k { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-60); }
 .organe__v { font-size: 14.5px; margin-top: 4px; }
 .organe__lien { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 22px; font-size: 12.5px; color: var(--ac); transition: gap var(--dur-2) var(--ease); }
 .organe__lien:hover { gap: 12px; }
@@ -944,7 +997,10 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
 .unite-sub { margin: clamp(40px, 4.4vw, 68px) 0 26px; font-size: clamp(19px, 2vw, 24px); font-weight: 600; letter-spacing: -0.015em; }
 
 /* Repères de l'Unité — deux valeurs dérivées des données, une date d'arrêté. */
-.unite-reperes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--c-20); border: 1px solid var(--c-black); border-top-width: 2px; margin-bottom: clamp(34px, 3.6vw, 52px); }
+/* Cadre noir, filets gris : les ombres des cellules du bord déborderaient sur
+   le cadre ; `overflow: hidden` les rogne au bord intérieur de la bordure, qui
+   reste noire comme avant (cf. « Celled grid »). */
+.unite-reperes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; border: 1px solid var(--c-black); border-top-width: 2px; overflow: hidden; margin-bottom: clamp(34px, 3.6vw, 52px); }
 .unite-repere { padding: 24px 22px; }
 .unite-repere__v { font-weight: 600; font-size: clamp(28px, 3.4vw, 42px); line-height: 1; }
 .unite-repere__l { margin-top: 10px; font-size: 13px; line-height: 1.4; color: var(--c-70); }
@@ -952,12 +1008,12 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
 /* Pôles : une ligne par pôle, qui porte l'organigramme ET le dossier en cours.
    Les deux vivaient dans deux sections distinctes, avec des noms différents
    pour les mêmes cinq pôles. */
-.poles { display: flex; flex-direction: column; gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); }
+.poles { display: flex; flex-direction: column; gap: 1px; padding: 1px; }
 .pole-row { background: #fff; padding: 24px clamp(20px, 3vw, 32px); display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: clamp(16px, 3vw, 40px); align-items: start; }
 .pole-row__mission { margin: 14px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--c-70); }
 .pole-row__dossier { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--c-20); display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; line-height: 1.5; color: var(--c-80); }
 .pole-row__dossier .blink { width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; flex: 0 0 auto; }
-.pole-row__k { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-50); margin-bottom: 3px; }
+.pole-row__k { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--c-60); margin-bottom: 3px; }
 
 /* Glossaire replié. Le marqueur natif est masqué au profit d'un chevron, pour
    rester dans la grammaire du site (angles vifs, mono, filets). */
@@ -967,7 +1023,7 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
 .glossaire__sum::after { content: "+"; font-family: var(--font-mono); font-size: 22px; font-weight: 400; color: var(--ac); transition: transform var(--dur-2) var(--ease); }
 .glossaire[open] .glossaire__sum::after { transform: rotate(45deg); }
 .glossaire__lead { margin: 0 0 26px; max-width: 68ch; font-size: 15px; line-height: 1.6; color: var(--c-70); }
-.glossaire__grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; background: var(--c-20); border: 1px solid var(--c-20); margin-bottom: 30px; }
+.glossaire__grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; padding: 1px; margin-bottom: 30px; }
 .glossaire__item { background: #fff; padding: 18px 20px; display: flex; gap: 16px; align-items: baseline; }
 .glossaire__s { font-weight: 600; font-size: 14px; color: var(--ac); min-width: 68px; }
 .glossaire__d { font-size: 14px; line-height: 1.5; color: var(--c-80); }
@@ -977,7 +1033,9 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
    différents pour la même liste. Elle est ici, en un seul endroit — d'où la
    règle de repli à 860 px qui la battait à coups de `!important`. */
 .comp-row { display: grid; grid-template-columns: 88px minmax(0, 1fr) 34px; gap: clamp(14px, 2vw, 32px); align-items: baseline; padding: 26px 0; border-bottom: 1px solid var(--c-20); }
-.comp-row__code { font-weight: 600; font-size: 22px; color: var(--comp, var(--ac)); }
+/* `--comp-texte` : variante lisible de la couleur (lib/comp.ts) — 22 px en
+   demi-gras reste du texte courant au sens WCAG, donc 4,5:1. */
+.comp-row__code { font-weight: 600; font-size: 22px; color: var(--comp-texte, var(--comp, var(--ac))); }
 .comp-row__corps { display: flex; flex-direction: column; gap: 9px; }
 .comp-row__titre { font-size: clamp(18px, 1.9vw, 23px); font-weight: 600; letter-spacing: -0.01em; }
 .comp-row__desc { font-size: 14.5px; line-height: 1.55; color: var(--c-70); max-width: 62ch; }
@@ -1110,8 +1168,9 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
    au lieu du fond du conteneur : la fin de grille reste blanche quel que soit
    le nombre d'éléments, au lieu d'afficher des cases grises orphelines.
 =========================================================================== */
+/* Le filet des enfants est désormais commun à toutes les grilles à filets
+   (bloc « Celled grid ») ; `.celled-flow` en reste la classe générique. */
 .celled-flow { display: grid; gap: 1px; padding: 1px; }
-.celled-flow > * { box-shadow: 0 0 0 1px var(--c-20); }
 .celled-flow--top { border-top: 2px solid var(--c-black); }
 
 /* --- « La problématique » : l'exposé du problème avant la description ------ */
@@ -1352,7 +1411,7 @@ a.actu-card:hover h3 { color: var(--ac); }
 
 .actu-fil__annee {
   padding: 26px 0 8px 36px;
-  font-size: 12px; font-weight: 600; letter-spacing: 0.08em; color: var(--c-50);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em; color: var(--c-60);
 }
 /* Le premier millésime jouxte le chapeau : l'espace est déjà pris au-dessus. */
 .actu-fil__item:first-child .actu-fil__annee { padding-top: 0; }
@@ -1470,7 +1529,7 @@ a.actu-hero__crumb-lien:hover { color: #fff; border-bottom-color: #fff; }
 .actu-prose img { width: 100%; height: auto; }
 .actu-prose figure { margin-top: 34px; }
 .actu-prose figcaption {
-  margin-top: 10px; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.5; color: var(--c-50);
+  margin-top: 10px; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.5; color: var(--c-60);
 }
 .actu-prose .actu-embed { position: relative; aspect-ratio: 16 / 9; background: var(--c-black); }
 .actu-prose .actu-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
@@ -1484,7 +1543,7 @@ a.actu-hero__crumb-lien:hover { color: #fff; border-bottom-color: #fff; }
   background: var(--c-10); font-weight: 600; font-size: 12.5px;
   text-transform: uppercase; letter-spacing: 0.04em; color: var(--c-70);
 }
-.actu-prose caption { caption-side: bottom; padding-top: 10px; font-size: 12px; color: var(--c-50); }
+.actu-prose caption { caption-side: bottom; padding-top: 10px; font-size: 12px; color: var(--c-60); }
 
 .actu-prose .ta-left { text-align: left; }
 .actu-prose .ta-center { text-align: center; }
@@ -1499,7 +1558,7 @@ a.actu-hero__crumb-lien:hover { color: #fff; border-bottom-color: #fff; }
 }
 
 .actu-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 36px; padding-top: 26px; border-top: 1px solid var(--c-20); }
-.actu-tags__label { margin-right: 4px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-50); }
+.actu-tags__label { margin-right: 4px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-60); }
 .actu-tag { padding: 6px 12px; border: 1px solid var(--c-20); font-size: 12.5px; color: var(--c-70); transition: border-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
 a.actu-tag:hover { border-color: var(--ac); color: var(--ac); }
 
@@ -1507,7 +1566,7 @@ a.actu-tag:hover { border-color: var(--ac); color: var(--ac); }
   display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;
   margin-top: 28px; padding: 18px 0; border-top: 1px solid var(--c-20); border-bottom: 1px solid var(--c-20);
 }
-.actu-partage__label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-50); }
+.actu-partage__label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-60); }
 .actu-partage__liens { display: flex; flex-wrap: wrap; gap: 8px; }
 .actu-partage__lien {
   padding: 7px 13px; border: 1px solid var(--c-20); background: #fff; color: var(--c-70);
@@ -1517,9 +1576,9 @@ a.actu-tag:hover { border-color: var(--ac); color: var(--ac); }
 .actu-partage__copier { font-family: var(--font-mono); }
 
 /* --- Navigation entre articles ---------------------------------------------- */
-.actu-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 44px; background: var(--c-20); border: 1px solid var(--c-20); }
+.actu-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 44px; padding: 1px; }
 /* Y compris la cellule vide laissée quand il n'y a pas d'article de ce côté :
-   sans cette règle, le fond du conteneur apparaîtrait en gris. */
+   elle garde son filet et son fond blanc, la paire reste un bloc de deux. */
 .actu-nav > * { background: #fff; }
 .actu-nav__lien { display: flex; flex-direction: column; gap: 8px; padding: 20px 22px; transition: background var(--dur-1) var(--ease); }
 a.actu-nav__lien:hover { background: var(--c-10); }
@@ -1620,9 +1679,9 @@ a.actu-nav__lien:hover { background: var(--c-10); }
    Une liste de définitions, et non un tableau : ce sont des paires
    intitulé/valeur, ce que `<dl>` décrit exactement pour un lecteur d'écran. */
 .evt-pratique { margin: 34px 0 6px; border: 1px solid var(--c-20); background: var(--c-10); padding: clamp(20px, 2.6vw, 28px); }
-.evt-pratique__titre { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-50); margin-bottom: 18px; }
+.evt-pratique__titre { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-60); margin-bottom: 18px; }
 .evt-pratique__liste { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px 28px; margin: 0; }
-.evt-pratique dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-50); margin-bottom: 6px; }
+.evt-pratique dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-60); margin-bottom: 6px; }
 .evt-pratique dd { margin: 0; font-size: 15px; line-height: 1.55; color: var(--c-80); }
 .evt-pratique dd strong { font-weight: 600; color: var(--c-black); }
 .evt-pratique__lien { color: var(--ac); border-bottom: 1px solid var(--ac-line); }
@@ -1663,20 +1722,19 @@ a.actu-nav__lien:hover { background: var(--c-10); }
 .doc-filtres { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
 .doc-filtres__label {
   font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--c-50); margin-right: 4px;
+  color: var(--c-60); margin-right: 4px;
 }
 
 .doc-compte {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
   margin: 24px 0 18px; padding-bottom: 14px; border-bottom: 1px solid var(--c-20);
-  font-size: 12.5px; color: var(--c-50);
+  font-size: 12.5px; color: var(--c-60);
 }
 
 /* --- Grille ---------------------------------------------------------------- */
 .doc-grille {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 1px; background: var(--c-20); border: 1px solid var(--c-20);
-  margin: 0; padding: 0; list-style: none;
+  gap: 1px; margin: 0; padding: 1px; list-style: none;
 }
 .doc-card {
   display: flex; flex-direction: column; gap: 12px;
@@ -1693,7 +1751,7 @@ a.actu-nav__lien:hover { background: var(--c-10); }
 .doc-card__kicker {
   flex: 1; min-width: 0;
   font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
-  color: var(--c-50);
+  color: var(--c-60);
 }
 .doc-card__une {
   font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
@@ -1710,7 +1768,7 @@ a.actu-nav__lien:hover { background: var(--c-10); }
      description complète reste lisible dans le panneau de détail. */
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
 }
-.doc-card__meta { font-size: 11.5px; color: var(--c-50); }
+.doc-card__meta { font-size: 11.5px; color: var(--c-60); }
 .doc-card__auteur { font-size: 13px; color: var(--c-70); }
 .doc-card__pied {
   display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
@@ -1748,7 +1806,7 @@ a.actu-nav__lien:hover { background: var(--c-10); }
 }
 .doc-modal__row dt {
   font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--c-50); margin-bottom: 5px;
+  text-transform: uppercase; color: var(--c-60); margin-bottom: 5px;
 }
 .doc-modal__row dd { margin: 0; font-size: 14.5px; line-height: 1.5; color: var(--c-80); }
 .doc-modal__apercu { display: flex; flex-direction: column; gap: 10px; }
@@ -1760,7 +1818,7 @@ a.actu-nav__lien:hover { background: var(--c-10); }
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
   padding: 44px 24px; border: 1px dashed var(--c-20); background: var(--c-10);
 }
-.doc-modal__note { margin: 0; font-size: 12px; line-height: 1.6; color: var(--c-50); text-align: center; }
+.doc-modal__note { margin: 0; font-size: 12px; line-height: 1.6; color: var(--c-60); text-align: center; }
 .doc-modal__pied {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px;
   padding: 18px clamp(20px, 2.6vw, 28px); border-top: 1px solid var(--c-20); background: var(--c-10);
@@ -1809,7 +1867,7 @@ a.actu-nav__lien:hover { background: var(--c-10); }
 .doc-piece__tete { display: flex; align-items: flex-start; gap: 16px; min-width: min(260px, 100%); flex: 1; }
 .doc-piece__titre { font-size: 15px; font-weight: 600; color: var(--c-black); }
 .doc-piece__note { margin: 6px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--c-70); }
-.doc-piece__meta { margin: 8px 0 0; font-size: 11.5px; color: var(--c-50); }
+.doc-piece__meta { margin: 8px 0 0; font-size: 11.5px; color: var(--c-60); }
 .doc-piece__actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
 /* Publications liées, en fin de page. Une carte de texte, sans visuel : ces
@@ -1821,7 +1879,7 @@ a.actu-nav__lien:hover { background: var(--c-10); }
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--c-50);
+  color: var(--c-60);
 }
 .doc-lie__titre {
   display: block;
@@ -1833,7 +1891,7 @@ a.actu-nav__lien:hover { background: var(--c-10); }
   transition: color var(--dur-1) var(--ease);
 }
 a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
-.doc-lie__date { display: block; margin-top: 12px; font-size: 11.5px; color: var(--c-50); }
+.doc-lie__date { display: block; margin-top: 12px; font-size: 11.5px; color: var(--c-60); }
 
 @media (max-width: 760px) {
   .doc-grille { grid-template-columns: 1fr; }
@@ -1895,8 +1953,7 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
 
 .gal-albums__grille {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--gal-colonne), 1fr));
-  gap: 1px; background: var(--c-20); border: 1px solid var(--c-20);
-  margin: 0; padding: 0; list-style: none;
+  gap: 1px; margin: 0; padding: 1px; list-style: none;
 }
 .gal-album { background: #fff; min-width: 0; }
 .gal-album__lien { display: flex; flex-direction: column; height: 100%; }
@@ -1921,7 +1978,7 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
   border-top: 3px solid var(--ac);
 }
 .gal-album__kicker {
-  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-50);
+  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-60);
 }
 .gal-album__titre {
   font-size: 17px; font-weight: 600; line-height: 1.35; color: var(--c-black);
@@ -1941,8 +1998,7 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
 
 .gal-grille {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(var(--gal-colonne), 1fr));
-  gap: 1px; background: var(--c-20); border: 1px solid var(--c-20);
-  margin: 0; padding: 0; list-style: none;
+  gap: 1px; margin: 0; padding: 1px; list-style: none;
 }
 
 /* Toutes les cellules ont la même taille, mise en avant comprise : un contenu
@@ -2057,7 +2113,7 @@ a.doc-lie:hover .doc-lie__titre { color: var(--ac); }
 .gal-vue__defs { display: flex; flex-direction: column; gap: 12px; margin: 0; }
 .gal-vue__row dt {
   font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--c-50); margin-bottom: 4px;
+  text-transform: uppercase; color: var(--c-60); margin-bottom: 4px;
 }
 .gal-vue__row dd { margin: 0; font-size: 14px; line-height: 1.5; color: var(--c-80); }
 

@@ -12,15 +12,7 @@ export default function Loading() {
         <div className="section__inner">
           <SqBloc largeur={150} hauteur={12} style={{ marginBottom: 18 }} />
           <SqBloc largeur="min(400px, 66%)" hauteur={30} style={{ marginBottom: 40 }} />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(212px, 1fr))",
-              gap: 1,
-              background: "var(--c-20)",
-              border: "1px solid var(--c-20)",
-            }}
-          >
+          <div className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(212px, 1fr))" }}>
             {Array.from({ length: 8 }, (_, i) => (
               <div key={i} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
                 <SqBloc surface rang={i} hauteur="100%" style={{ aspectRatio: "1 / 1" }} />

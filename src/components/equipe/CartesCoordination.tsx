@@ -15,20 +15,22 @@ import { plafondRole } from "@/lib/equipe/affichage";
 import type { MembreEquipe } from "@/lib/equipe/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { Photo } from "@/components/ui/Photo";
+import { grillePleine } from "@/lib/grille";
+import { compTexteDe } from "@/lib/comp";
 
 export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
   if (membres.length === 0) return null;
+  const pleine = grillePleine(membres.length, 5, 3);
 
   return (
+    /* Filets portés par les cartes (`.celled-flow`). Quatre colonnes au pas
+       de 262 px laissaient, pour cinq fiches, une carte seule et trois cases
+       vides : `grillePleine` aligne les cinq sur une rangée en pleine largeur
+       (cf. lib/grille.ts). */
     <RevealGroup
       gap={0.06}
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill,minmax(262px,1fr))",
-        gap: 1,
-        background: "var(--c-20)",
-        border: "1px solid var(--c-20)",
-      }}
+      className={`celled-flow ${pleine.className ?? ""}`}
+      style={{ gridTemplateColumns: "repeat(auto-fill,minmax(262px,1fr))", ...pleine.style }}
     >
       {membres.map((membre) => {
         const photo = membre.portrait.src;
@@ -98,7 +100,10 @@ export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
                     marginTop: 10,
                     fontSize: 10.5,
                     fontWeight: 600,
-                    color: couleur,
+                    // Libellé de 10,5 px : variante lisible de la couleur (la
+                    // sarcelle brute ne faisait que 3,3:1) ; le cadre garde la
+                    // couleur d'origine, 3:1 suffit à un filet.
+                    color: compTexteDe(couleur),
                     border: `1px solid ${couleur}`,
                     padding: "3px 8px",
                   }}

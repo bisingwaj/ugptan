@@ -9,12 +9,16 @@
    de la page mais les éléments d'une même liste. */
 import type { ImpactItemVue } from "@/lib/impact/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { grillePleine } from "@/lib/grille";
 
 export function BlocPersonas({ items }: { items: ImpactItemVue[] }) {
+  // Colonnes ramenées à un diviseur du nombre d'éléments en pleine largeur
+  // (cf. lib/grille.ts) : pas de rangée finale bancale.
+  const pleine = grillePleine(items.length, 4, 2);
   return (
     <RevealGroup
-      className="celled-flow celled-flow--top"
-      style={{ gridTemplateColumns: "repeat(auto-fit,minmax(258px,1fr))" }}
+      className={`celled-flow celled-flow--top ${pleine.className ?? ""}`}
+      style={{ gridTemplateColumns: "repeat(auto-fit,minmax(258px,1fr))", ...pleine.style }}
       gap={0.04}
     >
       {items.map((item) => (

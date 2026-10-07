@@ -6,10 +6,14 @@
    descend d'un cran quand la section en poursuit une autre. */
 import type { ImpactItemVue } from "@/lib/impact/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { grillePleine } from "@/lib/grille";
 
 export function BlocEngagements({ items }: { items: ImpactItemVue[] }) {
+  // Colonnes ramenées à un diviseur du nombre d'éléments en pleine largeur
+  // (cf. lib/grille.ts) : pas de rangée finale bancale.
+  const pleine = grillePleine(items.length, 4, 2);
   return (
-    <RevealGroup className="grid-4" gap={0.04}>
+    <RevealGroup className={`grid-4 ${pleine.className ?? ""}`} style={pleine.style} gap={0.04}>
       {items.map((item) => (
         <RevealItem
           key={item.id}

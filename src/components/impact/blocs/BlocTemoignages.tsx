@@ -19,6 +19,8 @@ import { lienPublic } from "@/lib/routes";
 import { Photo } from "@/components/ui/Photo";
 import { useVideo } from "@/components/video/VideoProvider";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { grillePleine } from "@/lib/grille";
+import { compTexteDe } from "@/lib/comp";
 
 export function BlocTemoignages({
   items,
@@ -32,10 +34,15 @@ export function BlocTemoignages({
 }) {
   const openVideo = useVideo();
 
+  // Colonnes ramenées à un diviseur du nombre d'éléments en pleine largeur
+  // (cf. lib/grille.ts) : pas de rangée finale bancale.
+  const pleine = grillePleine(items.length, 4, 2);
   return (
-    <RevealGroup className="grid-auto" gap={0.04}>
+    <RevealGroup className={`grid-auto ${pleine.className ?? ""}`} style={pleine.style} gap={0.04}>
       {items.map((item) => {
         const accent = item.color ?? "var(--ac)";
+        // Variante lisible de l'accent pour le texte (cf. lib/comp.ts).
+        const texte = compTexteDe(accent);
         const visuel = (
           <>
             <Photo
@@ -73,7 +80,7 @@ export function BlocTemoignages({
               background: "#fff",
               display: "flex",
               flexDirection: "column",
-              ...(item.featured ? { boxShadow: `inset 0 3px 0 ${accent}` } : {}),
+              ...(item.featured ? { boxShadow: `0 0 0 1px var(--filet), inset 0 3px 0 ${accent}` } : {}),
             }}
           >
             {item.videoYt ? (
@@ -98,7 +105,7 @@ export function BlocTemoignages({
             <div style={{ padding: "22px clamp(18px,2vw,24px) 24px", display: "flex", flexDirection: "column", flex: 1 }}>
               {item.titre && <div style={{ fontSize: 16.5, fontWeight: 600 }}>{item.titre}</div>}
               {item.surtitre && (
-                <div className="mono" style={{ fontSize: 11.5, color: accent, marginTop: 5 }}>{item.surtitre}</div>
+                <div className="mono" style={{ fontSize: 11.5, color: texte, marginTop: 5 }}>{item.surtitre}</div>
               )}
               {item.texte && (
                 <p style={{ margin: "16px 0 0", fontSize: 14.5, lineHeight: 1.6, color: "var(--c-80)", flex: 1 }}>
@@ -109,7 +116,7 @@ export function BlocTemoignages({
                 <a
                   href={lienPublic(item.lienUrl, lang)}
                   className="mono"
-                  style={{ marginTop: 16, fontSize: 12, color: accent, display: "inline-flex", alignItems: "center", gap: 8 }}
+                  style={{ marginTop: 16, fontSize: 12, color: texte, display: "inline-flex", alignItems: "center", gap: 8 }}
                 >
                   {item.lienLabel} →
                 </a>

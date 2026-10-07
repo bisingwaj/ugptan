@@ -51,7 +51,7 @@ export function ActuCard({ actu, lang, priority = false }: { actu: ActuVue; lang
       </div>
 
       <div style={{ padding: "22px clamp(18px,2vw,24px) 24px", display: "flex", flexDirection: "column", flex: 1 }}>
-        <div className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>
+        <div className="mono" style={{ fontSize: 11.5, color: "var(--c-60)" }}>
           {actu.dateLabel}{actu.lieu ? ` · ${actu.lieu}` : ""}
         </div>
 

@@ -53,7 +53,9 @@ export function BlocCitation({ citation, note }: { citation: string | null; note
               flexWrap: "wrap",
               gap: "14px 32px",
               fontSize: 12.5,
-              color: "var(--ac-line)",
+              // Blanc et non `--ac-line` : sur l'aplat d'accent, le bleu pâle
+              // ne faisait que 3,8:1 à 12,5 px ; le blanc atteint 5:1.
+              color: "#ffffff",
             }}
           >
             {/* Un fragment et non un conteneur : les segments et leurs

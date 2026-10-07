@@ -12,14 +12,18 @@ import type { ImpactItemVue } from "@/lib/impact/query";
 import type { ImpactTheme } from "@/lib/impact/statut";
 import { themeSombre } from "@/lib/impact/statut";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { grillePleine } from "@/lib/grille";
 
 const rang = (index: number): string => String(index + 1).padStart(2, "0");
 
 export function BlocEtapes({ items, theme }: { items: ImpactItemVue[]; theme: ImpactTheme }) {
   const sombre = themeSombre(theme);
 
+  // Colonnes ramenées à un diviseur du nombre d'éléments en pleine largeur
+  // (cf. lib/grille.ts) : pas de rangée finale bancale.
+  const pleine = grillePleine(items.length, 5, 2);
   return (
-    <RevealGroup className={sombre ? "grid-5 celled--dark" : "grid-5"} gap={0.04}>
+    <RevealGroup className={`${sombre ? "grid-5 celled--dark" : "grid-5"} ${pleine.className ?? ""}`} style={pleine.style} gap={0.04}>
       {items.map((item, index) => (
         <RevealItem
           key={item.id}

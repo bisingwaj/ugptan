@@ -114,15 +114,9 @@ export function SqGrille({
   lignes?: number;
 }) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: colonnes,
-        gap: 1,
-        background: "var(--c-20)",
-        border: "1px solid var(--c-20)",
-      }}
-    >
+    /* `.celled-flow` : filets portés par les cartes, comme les grilles qu'il
+       préfigure — sans aplat gris en fin de rangée incomplète. */
+    <div className="celled-flow" style={{ gridTemplateColumns: colonnes }}>
       {Array.from({ length: cartes }, (_, i) => (
         <SqCarte key={i} rang={i} rapport={rapport} lignes={lignes} />
       ))}

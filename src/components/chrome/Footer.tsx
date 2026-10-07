@@ -12,7 +12,9 @@ import { Marque } from "@/components/chrome/Marque";
    de la feuille compilée, pas par l'ordre dans la chaîne de classes. */
 /* `.footer-link` ne porte aucun style sur desktop : elle sert de prise à la
    règle mobile qui donne à ces liens une hauteur tactile (cf. globals.css). */
-const colLabel = "mb-4 font-mono text-[11px] uppercase tracking-[0.1em] text-c-60";
+// Gris de texte du pied : --c-50 (5,4:1 sur --c-black) et non --c-60 (3,6:1,
+// sous le seuil AA du texte courant à 11 px).
+const colLabel = "mb-4 font-mono text-[11px] uppercase tracking-[0.1em] text-c-50";
 const colLink = "footer-link block py-[7px] text-[14px] text-c-30 transition-colors duration-200 hover:text-white";
 const colLinkAccent = "footer-link flex items-center gap-2 py-[7px] text-[14px] text-ac-light transition-colors duration-200 hover:text-white";
 
@@ -27,7 +29,7 @@ export function Footer({ lang }: { lang: Lang }) {
             <Marque variante="claire" hauteur={63} />
           </div>
           <p className="max-w-[300px] text-[13.5px] leading-[1.6] text-c-50">{meta.uniteLong}</p>
-          <p className="mt-4 font-mono text-[11.5px] leading-[1.7] text-c-60">{meta.tutelleLong}<br />{meta.bailleurs}</p>
+          <p className="mt-4 font-mono text-[11.5px] leading-[1.7] text-c-50">{meta.tutelleLong}<br />{meta.bailleurs}</p>
           <p className="mt-3 max-w-[320px] font-mono text-[11px] leading-[1.6] text-c-50">{t.foot.source}</p>
           <div className="mt-5 flex flex-col gap-[7px] text-[13px] leading-[1.5] text-c-30">
             <span>{contact.adresse}</span>
@@ -66,7 +68,7 @@ export function Footer({ lang }: { lang: Lang }) {
       </div>
 
       <div className="border-t border-c-80">
-        <div className="mx-auto flex max-w-(--maxw) flex-wrap justify-between gap-3 px-(--pad-x) py-[18px] font-mono text-[11px] text-c-60">
+        <div className="mx-auto flex max-w-(--maxw) flex-wrap justify-between gap-3 px-(--pad-x) py-[18px] font-mono text-[11px] text-c-50">
           <span>© {t.words.year} UGPTN · {meta.code} · {meta.ville}</span>
           <nav className="footer-legal" aria-label={t.foot.legalLabel}>
             {NAV_LEGAL.map((item) => (

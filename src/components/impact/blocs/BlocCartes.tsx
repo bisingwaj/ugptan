@@ -13,22 +13,35 @@ import type { ImpactItemVue } from "@/lib/impact/query";
 import { lienPublic } from "@/lib/routes";
 import { CellBloom } from "@/components/ui/CellBloom";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { grillePleine } from "@/lib/grille";
+import { compTexteDe } from "@/lib/comp";
 
 export function BlocCartes({ items, lang }: { items: ImpactItemVue[]; lang: Lang }) {
+  const pleine = grillePleine(items.length, 4, 2);
   return (
+    /* Filets portés par les cellules (`.celled-flow`) : la fin d'une rangée
+       incomplète prend le fond de la section au lieu d'un aplat gris. Le cadre
+       noir reste celui du conteneur ; `overflow: hidden` rogne l'ombre des
+       cellules du bord, qui sinon recouvrirait ce cadre de gris. Quatre
+       colonnes au plus en pleine largeur, ramenées à un diviseur du nombre de
+       cartes quand il existe (6 → 3 × 2, cf. lib/grille.ts). */
     <RevealGroup
       gap={0.04}
+      className={`celled-flow ${pleine.className ?? ""}`}
       style={{
-        display: "grid",
         gridTemplateColumns: "repeat(auto-fill,minmax(282px,1fr))",
-        gap: 1,
-        background: "var(--c-20)",
+        padding: 0,
         border: "1px solid var(--c-black)",
         borderTopWidth: 2,
+        overflow: "hidden",
+        ...pleine.style,
       }}
     >
       {items.map((item) => {
         const accent = item.color ?? "var(--ac)";
+        // L'accent en TEXTE prend sa variante lisible (4,5:1) ; filet et
+        // floraison gardent la couleur saisie (cf. lib/comp.ts).
+        const texte = compTexteDe(accent);
         return (
           <RevealItem
             fade
@@ -51,7 +64,7 @@ export function BlocCartes({ items, lang }: { items: ImpactItemVue[]; lang: Lang
                   fontWeight: 600,
                   textTransform: "uppercase",
                   letterSpacing: "0.05em",
-                  color: accent,
+                  color: texte,
                 }}
               >
                 {item.surtitre}
@@ -71,7 +84,7 @@ export function BlocCartes({ items, lang }: { items: ImpactItemVue[]; lang: Lang
               <a
                 href={lienPublic(item.lienUrl, lang)}
                 className="mono"
-                style={{ marginTop: 14, fontSize: 12, color: accent }}
+                style={{ marginTop: 14, fontSize: 12, color: texte }}
               >
                 {item.lienLabel} →
               </a>

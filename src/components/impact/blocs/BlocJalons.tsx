@@ -12,6 +12,7 @@ import type { ImpactItemVue } from "@/lib/impact/query";
 import { lienPublic } from "@/lib/routes";
 import { themeSombre, type ImpactTheme } from "@/lib/impact/statut";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { compTexteDe } from "@/lib/comp";
 
 /** Fond réel de la section, pour la bordure du carré de la frise. */
 const FOND: Record<ImpactTheme, string> = {
@@ -43,6 +44,10 @@ export function BlocJalons({
     >
       {items.map((item) => {
         const accent = item.color ?? "var(--ac)";
+        // Texte : variante lisible de l'accent sur fond clair (cf. lib/comp.ts).
+        // Sur fond sombre, foncer la couleur la rendrait moins lisible : elle
+        // reste telle que saisie.
+        const texte = sombre ? accent : compTexteDe(accent);
         return (
           <RevealItem key={item.id} style={{ position: "relative", padding: "0 0 30px 36px" }}>
             <span
@@ -60,7 +65,7 @@ export function BlocJalons({
               }}
             />
             {item.dateLabel && (
-              <div className="mono" style={{ fontSize: 13, color: accent, fontWeight: 500 }}>{item.dateLabel}</div>
+              <div className="mono" style={{ fontSize: 13, color: texte, fontWeight: 500 }}>{item.dateLabel}</div>
             )}
             {item.titre && (
               <div style={{ fontSize: 16, fontWeight: 600, marginTop: 5, maxWidth: 560, lineHeight: 1.35 }}>
@@ -84,7 +89,7 @@ export function BlocJalons({
               <a
                 href={lienPublic(item.lienUrl, lang)}
                 className="mono"
-                style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: accent }}
+                style={{ display: "inline-block", marginTop: 8, fontSize: 12, color: texte }}
               >
                 {item.lienLabel} →
               </a>

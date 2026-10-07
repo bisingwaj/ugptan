@@ -30,6 +30,8 @@ import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import type { EvtVue } from "@/lib/events/query";
 import { evenementRoute } from "@/lib/routes";
+import { compTexteDe, onCompDe } from "@/lib/comp";
+import { grillePleine } from "@/lib/grille";
 import { Photo } from "@/components/ui/Photo";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { InscriptionModal } from "@/components/events/InscriptionModal";
@@ -57,12 +59,14 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
   const action = (e: EvtVue) => {
     const style = {
       display: "inline-flex", alignItems: "center", gap: 7,
-      fontSize: 13, fontWeight: 600, color: e.accent, background: "none",
+      // Variante lisible de l'accent : un orange de catégorie (#ff832b) ne
+      // faisait que 2,5:1 en texte de 13 px sur blanc (cf. lib/comp.ts).
+      fontSize: 13, fontWeight: 600, color: compTexteDe(e.accent), background: "none",
     } as const;
 
     if (!e.aVenir) {
       return (
-        <span className="evt-card__action mono" style={{ fontSize: 11.5, color: "var(--c-50)", marginLeft: "auto" }}>
+        <span className="evt-card__action mono" style={{ fontSize: 11.5, color: "var(--c-60)", marginLeft: "auto" }}>
           {t.evt.past} ✓
         </span>
       );
@@ -102,21 +106,26 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
       <span className="mono evt-etat evt-etat--passe">{t.evt.past}</span>
     ) : null;
 
+  // Colonnes ramenées à un diviseur du nombre de cartes en pleine largeur
+  // (cf. lib/grille.ts) : pas de rangée finale bancale. Cinq au plus : cinq
+  // rencontres passées tiennent sur une rangée au lieu de quatre plus une.
+  const pleine = grillePleine(events.length, 5, 2);
+
   return (
     <>
-      <RevealGroup className="grid-auto" gap={0.04}>
+      <RevealGroup className={`grid-auto ${pleine.className ?? ""}`} style={pleine.style} gap={0.04}>
         {events.map((e) =>
           withImage ? (
             <RevealItem key={e.id} zoom className="evt-card" style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
               <div className="duo" style={{ aspectRatio: "16/9", ["--duo" as string]: e.accent }}>
                 <Photo src={e.visuel.src} alt={e.visuel.alt} unoptimized={e.visuel.unoptimized} />
                 {e.categorie && (
-                  <span className="mono" style={{ position: "absolute", top: 12, left: 12, fontSize: 11, fontWeight: 600, color: "#fff", background: e.accent, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{e.categorie.nom}</span>
+                  <span className="mono" style={{ position: "absolute", top: 12, left: 12, fontSize: 11, fontWeight: 600, color: onCompDe(e.accent), background: e.accent, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{e.categorie.nom}</span>
                 )}
                 <span style={{ position: "absolute", top: 12, right: 12 }}>{etat(e)}</span>
               </div>
               <div style={{ padding: "22px clamp(18px,2vw,24px) 24px", display: "flex", flexDirection: "column", flex: 1 }}>
-                <div className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>
+                <div className="mono" style={{ fontSize: 11.5, color: "var(--c-60)" }}>
                   {e.dateCourte}{e.lieu ? ` · ${e.lieu}` : ""}
                 </div>
                 <h3 style={{ margin: "12px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.32, flex: 1 }}>
@@ -137,9 +146,9 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
             <RevealItem key={e.id} className="evt-card" style={{ background: "#fff", padding: "24px clamp(20px,2.4vw,28px)", display: "flex", flexDirection: "column", borderTop: `3px solid ${e.accent}` }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 {e.categorie ? (
-                  <span className="mono" style={{ fontSize: 11, fontWeight: 600, color: "#fff", background: e.accent, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{e.categorie.nom}</span>
+                  <span className="mono" style={{ fontSize: 11, fontWeight: 600, color: onCompDe(e.accent), background: e.accent, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{e.categorie.nom}</span>
                 ) : <span />}
-                <span className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>{e.dateCourte}</span>
+                <span className="mono" style={{ fontSize: 11.5, color: "var(--c-60)" }}>{e.dateCourte}</span>
               </div>
               <h3 style={{ margin: "16px 0 0", fontSize: 16.5, fontWeight: 600, lineHeight: 1.32, flex: 1 }}>
                 <Link href={evenementRoute(lang, e.slug)} className="evt-card__lien">{e.title}</Link>
