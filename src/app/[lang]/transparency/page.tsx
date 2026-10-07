@@ -8,6 +8,7 @@ import { listerCategoriesDoc, listerDocuments, listerTypesDoc } from "@/lib/docs
 import { isDocTri, isDocType, type DocTri, type DocType } from "@/lib/docs/statut";
 import { PageHero } from "@/components/ui/PageHero";
 import { RessourcesListe } from "@/components/docs/RessourcesListe";
+import { Reveal } from "@/components/motion/Reveal";
 
 /**
  * Cinq minutes de cache.
@@ -227,7 +228,9 @@ export default async function RessourcesPage(props: {
             />
           )}
 
-          <p className="doc-mention">{r.disclaimer}</p>
+          <Reveal variant="fade">
+            <p className="doc-mention">{r.disclaimer}</p>
+          </Reveal>
         </div>
       </section>
 

@@ -53,11 +53,12 @@ export default async function MgpPage(props: { params: Promise<{ lang: string }>
             ))}
           </RevealGroup>
 
-          {/* Form + Tracker */}
-          <div className="cols2" style={{ gridTemplateColumns: "1.1fr .9fr", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+          {/* Form + Tracker — un fondu du BLOC, jamais des champs un à un : le
+              formulaire reste lisible et utilisable dès les premiers instants. */}
+          <Reveal variant="fade" className="cols2" style={{ gridTemplateColumns: "1.1fr .9fr", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
             <MgpForm lang={lang} />
             <MgpTracker lang={lang} />
-          </div>
+          </Reveal>
 
           {/* Le suivi a sa page dédiée : c'est elle que l'on garde en favori ou
               que l'on transmet à quelqu'un qui aide la personne à suivre son
@@ -89,7 +90,9 @@ export default async function MgpPage(props: { params: Promise<{ lang: string }>
               <h2 className="h2--sm" style={{ margin: "0 0 8px" }}>{t.faqTitle}</h2>
               <p style={{ margin: "0 0 30px", fontSize: 15, color: "var(--c-70)", maxWidth: 620 }}>{t.faqLead}</p>
             </Reveal>
-            <Accordion items={faq} />
+            <Reveal variant="fade" delay={0.1}>
+              <Accordion items={faq} />
+            </Reveal>
           </div>
         </div>
       </section>

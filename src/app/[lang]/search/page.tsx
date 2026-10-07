@@ -11,6 +11,7 @@ import {
   type TypeResultat,
 } from "@/lib/recherche/query";
 import { LigneResultat } from "@/components/recherche/LigneResultat";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 /**
  * Aucun cache de route.
@@ -236,16 +237,20 @@ export default async function RecherchePage(props: {
                       </span>
                     </div>
 
-                    <ul className="rec-liste">
+                    {/* Cascade des lignes : `RevealGroup` EST la <ul> et
+                        `RevealItem` le <li> (pas de wrapper). La translation
+                        porte sur le <li>, le décalage au survol sur le lien
+                        qu'il contient : les deux ne se gênent pas. */}
+                    <RevealGroup as="ul" className="rec-liste" gap={0.04}>
                       {groupe.items.map((item) => (
-                        <li key={item.cle}>
+                        <RevealItem as="li" key={item.cle}>
                           <LigneResultat
                             resultat={item}
                             etiquette={r.etiquettes[item.type]}
                           />
-                        </li>
+                        </RevealItem>
                       ))}
-                    </ul>
+                    </RevealGroup>
 
                     {groupe.lienPlus && (
                       <Link href={groupe.lienPlus} className="rec-groupe__tout">

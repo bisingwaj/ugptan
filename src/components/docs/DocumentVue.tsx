@@ -110,84 +110,88 @@ export function DocumentVue({
               Une liste de définitions, et non un tableau : ce sont des paires
               intitulé/valeur, ce que `<dl>` décrit exactement pour un lecteur
               d'écran. */}
-          <section className="evt-pratique" aria-label={t.labelReference}>
-            <div className="mono evt-pratique__titre">{t.labelReference}</div>
-            <dl className="evt-pratique__liste">
-              {document.reference && (
-                <div>
-                  <dt>{t.labelReference}</dt>
-                  <dd className="mono">{document.reference}</dd>
-                </div>
-              )}
-              {document.auteur && (
-                <div>
-                  <dt>{t.labelAuthor}</dt>
-                  <dd>{document.auteur}</dd>
-                </div>
-              )}
-              {document.categorie && (
-                <div>
-                  <dt>{t.labelCategory}</dt>
-                  <dd>{document.categorie.nom}</dd>
-                </div>
-              )}
-              {document.dateLabel && (
-                <div>
-                  <dt>{document.dateSource === "document" ? t.labelDocDate : t.labelPublished}</dt>
-                  <dd>{document.dateLabel}</dd>
-                </div>
-              )}
-              {document.comps.length > 0 && (
-                <div>
-                  <dt>{dict(lang).comp.titre}</dt>
-                  <dd>
-                    {document.comps.map((code, index) => (
-                      <span key={code}>
-                        {index > 0 && " · "}
-                        <Link href={compRoute(lang, code)} className="evt-pratique__lien mono">{code}</Link>
-                      </span>
-                    ))}
-                  </dd>
-                </div>
-              )}
-            </dl>
-          </section>
+          <Reveal>
+            <section className="evt-pratique" aria-label={t.labelReference}>
+              <div className="mono evt-pratique__titre">{t.labelReference}</div>
+              <dl className="evt-pratique__liste">
+                {document.reference && (
+                  <div>
+                    <dt>{t.labelReference}</dt>
+                    <dd className="mono">{document.reference}</dd>
+                  </div>
+                )}
+                {document.auteur && (
+                  <div>
+                    <dt>{t.labelAuthor}</dt>
+                    <dd>{document.auteur}</dd>
+                  </div>
+                )}
+                {document.categorie && (
+                  <div>
+                    <dt>{t.labelCategory}</dt>
+                    <dd>{document.categorie.nom}</dd>
+                  </div>
+                )}
+                {document.dateLabel && (
+                  <div>
+                    <dt>{document.dateSource === "document" ? t.labelDocDate : t.labelPublished}</dt>
+                    <dd>{document.dateLabel}</dd>
+                  </div>
+                )}
+                {document.comps.length > 0 && (
+                  <div>
+                    <dt>{dict(lang).comp.titre}</dt>
+                    <dd>
+                      {document.comps.map((code, index) => (
+                        <span key={code}>
+                          {index > 0 && " · "}
+                          <Link href={compRoute(lang, code)} className="evt-pratique__lien mono">{code}</Link>
+                        </span>
+                      ))}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </section>
+          </Reveal>
 
           {/* ===== Pièce jointe =====
               La version fichier de la publication, quand elle existe. Elle vient
               APRÈS le texte : c'est un complément, pas la porte d'entrée. */}
           {document.fichier && (
-            <section className="doc-piece" aria-label={t.attachment}>
-              <div className="doc-piece__tete">
-                <span className="doc-card__ext mono" aria-hidden="true">{document.fichier.format}</span>
-                <div style={{ minWidth: 0 }}>
-                  <div className="doc-piece__titre">{t.attachment}</div>
-                  <p className="doc-piece__note">{t.attachmentLead}</p>
-                  <p className="mono doc-piece__meta">{document.technique}</p>
+            <Reveal delay={0.05}>
+              <section className="doc-piece" aria-label={t.attachment}>
+                <div className="doc-piece__tete">
+                  <span className="doc-card__ext mono" aria-hidden="true">{document.fichier.format}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="doc-piece__titre">{t.attachment}</div>
+                    <p className="doc-piece__note">{t.attachmentLead}</p>
+                    <p className="mono doc-piece__meta">{document.technique}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="doc-piece__actions">
-                {/* Même règle que le panneau de la liste : « Ouvrir » suppose que
-                    le navigateur sache afficher le format. Sur une pièce jointe
-                    bureautique, il ne le sait pas, et le lien ne faisait que
-                    relancer un téléchargement sous un autre nom. */}
-                {document.fichier.apercu && (
-                  <a
-                    href={document.fichier.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn--outline btn--sm"
-                  >
-                    {t.open} ↗
+                <div className="doc-piece__actions">
+                  {/* Même règle que le panneau de la liste : « Ouvrir » suppose que
+                      le navigateur sache afficher le format. Sur une pièce jointe
+                      bureautique, il ne le sait pas, et le lien ne faisait que
+                      relancer un téléchargement sous un autre nom. */}
+                  {document.fichier.apercu && (
+                    <a
+                      href={document.fichier.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--outline btn--sm"
+                    >
+                      {t.open} ↗
+                    </a>
+                  )}
+                  {/* `download` seul ne suffit pas sur une origine tierce : c'est
+                      l'URL qui porte la demande (cf. lib/docs/fichier.ts). */}
+                  <a href={document.fichier.urlDl} className="btn btn--primary btn--sm" download>
+                    <span className="arrow">↓</span> {t.download}
                   </a>
-                )}
-                {/* `download` seul ne suffit pas sur une origine tierce : c'est
-                    l'URL qui porte la demande (cf. lib/docs/fichier.ts). */}
-                <a href={document.fichier.urlDl} className="btn btn--primary btn--sm" download>
-                  <span className="arrow">↓</span> {t.download}
-                </a>
-              </div>
-            </section>
+                </div>
+              </section>
+            </Reveal>
           )}
 
           <PartageArticle lang={lang} titre={document.titre} />

@@ -77,7 +77,9 @@ export function LegalDocument({ doc, lang }: { doc: LegalDoc; lang: Lang }) {
               </article>
             ))}
 
-            <div className="legal-fin">
+            {/* Seul le bloc de fin (renvoi + contact) apparaît au défilement :
+                le texte juridique lui-même reste statique. */}
+            <Reveal className="legal-fin">
               <div className="mono legal-fin__label">{t.legal.voirAussi}</div>
               <Link href={route(lang, NAV[autre])} className="legal-fin__link">
                 {t.nav[autre]} →
@@ -95,7 +97,7 @@ export function LegalDocument({ doc, lang }: { doc: LegalDoc; lang: Lang }) {
                   </Link>
                 </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>

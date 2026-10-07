@@ -10,6 +10,7 @@ import { ProvinceMap } from "@/components/home/ProvinceMap";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { Compteur } from "@/components/motion/Compteur";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
@@ -54,10 +55,12 @@ export default async function ContactPage(props: { params: Promise<{ lang: strin
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.numeroVertNote}</div>
             </RevealItem>
           </RevealGroup>
-          <div style={{ marginTop: 1, background: "var(--c-black)", color: "#fff", padding: "24px 28px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "14px 22px" }}>
+          {/* Bandeau des tutelles : il prolonge la grille des coordonnées, d'où un
+              simple fondu, légèrement après la cascade des cellules. */}
+          <Reveal variant="fade" delay={0.15} style={{ marginTop: 1, background: "var(--c-black)", color: "#fff", padding: "24px 28px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "14px 22px" }}>
             <span className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--ac-light)" }}>{c.lblTutelle}</span>
             {contact.tutelles.map((tu) => <span key={tu} style={{ fontSize: 14.5, fontWeight: 500 }}>{tu}</span>)}
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -100,9 +103,14 @@ export default async function ContactPage(props: { params: Promise<{ lang: strin
       {/* Map */}
       <section className="section">
         <div className="section__inner cols2 cols2--center" style={{ gridTemplateColumns: ".85fr 1.15fr" }}>
-          <Reveal>
+          {/* Colonne texte depuis la gauche ; la carte, à droite, a sa propre
+              apparition (tracé des provinces) et n'est donc pas enveloppée. */}
+          <Reveal variant="left">
             <Kicker>{c.focalLabel}</Kicker>
-            <h2 className="h2--sm">26 provinces.<br />10 {t.words.prio}.</h2>
+            <h2 className="h2--sm">
+              <Compteur valeur={26} locale={lang === "en" ? "en-GB" : "fr-FR"} /> provinces.<br />
+              <Compteur valeur={10} locale={lang === "en" ? "en-GB" : "fr-FR"} /> {t.words.prio}.
+            </h2>
             <p style={{ margin: "22px 0 0", fontSize: 15, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 420 }}>{t.home.couvertureLead}</p>
             <div style={{ marginTop: 30, display: "flex", flexDirection: "column", gap: 9, fontSize: 13 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 11, height: 11, background: "var(--ac)" }} /><span style={{ color: "var(--c-80)" }}>{t.lbl.prio} (CPF)</span></div>
