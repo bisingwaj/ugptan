@@ -27,6 +27,15 @@
  * Le conteneur a exactement le ratio du viewBox : un point (cx, cy) du SVG se
  * place donc en pourcentage dans le conteneur, ce qui positionne l'étiquette
  * HTML sans aucun calcul de mise à l'échelle.
+ *
+ * Poids : les tracés (mapData.ts) sont simplifiés topologiquement (≈ 25 Ko
+ * au lieu de ≈ 500 Ko, cf. l'en-tête de ce fichier). Le composant reste
+ * client d'un seul tenant, à dessein : rendre les <path> dans un composant
+ * serveur ne supprimerait pas le doublon, il le déplacerait. Le HTML
+ * porterait les tracés une fois dans le balisage et une seconde fois dans la
+ * charge RSC (flight) inline, renvoyée à chaque navigation client vers une
+ * autre fiche province. Ici, le second exemplaire vit dans un chunk JS mis en
+ * cache une fois pour les 55 pages qui affichent la carte.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
