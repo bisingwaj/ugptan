@@ -29,6 +29,12 @@ export default async function ProvincesAdminPage() {
     vuesDePlusieurs("provinceProjet", projets.map((projet) => projet.id)),
   ]);
 
+  // Au-delà d'un an, la source du gouverneur est signalée « à revérifier ».
+  // Calculée ici plutôt qu'au rendu client : une seule horloge, pas d'écart
+  // d'hydratation.
+  const limite = new Date();
+  limite.setUTCFullYear(limite.getUTCFullYear() - 1);
+
   return (
     <EcranProvinces
       fiches={fiches}
@@ -37,6 +43,7 @@ export default async function ProvincesAdminPage() {
       composantes={composantes}
       etatsIAFiches={etatsIAFiches}
       etatsIAProjets={etatsIAProjets}
+      dateLimite={limite.toISOString().slice(0, 10)}
     />
   );
 }

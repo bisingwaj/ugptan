@@ -65,7 +65,7 @@ export function ProjetCarte({
   const [etatReglages, actionReglages, reglagesEnCours] = useActionState(enregistrerProjetAction, etatInitial);
   const [etatBascule, bascule, basculeEnCours] = useActionState(basculerProjetAction, etatInitial);
   const [etatSuppression, suppression, suppressionEnCours] = useActionState(supprimerProjetAction, etatInitial);
-  const [, deplacer, deplacementEnCours] = useActionState(deplacerProjetAction, etatInitial);
+  const [etatDeplacement, deplacer, deplacementEnCours] = useActionState(deplacerProjetAction, etatInitial);
 
   const enLigne = projet.status === "PUBLISHED";
   const idSuppression = `suppr-projet-${projet.id}`;
@@ -152,6 +152,7 @@ export function ProjetCarte({
       </div>
 
       {etatBascule.error && <div className="auth-error" role="alert">{etatBascule.error}</div>}
+      {etatDeplacement.error && <div className="auth-error" role="alert">{etatDeplacement.error}</div>}
 
       <div className="adm-item__corps" hidden={!ouverte}>
         {etatSuppression.error && <div className="auth-error" role="alert">{etatSuppression.error}</div>}

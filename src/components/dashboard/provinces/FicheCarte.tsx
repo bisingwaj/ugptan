@@ -49,9 +49,12 @@ function Champ({
 
 export function FicheCarte({
   fiche,
+  aVerifier,
   etatsIA,
 }: {
   fiche: FicheSaisie;
+  /** Gouverneur sans date de source, ou daté de plus d'un an. */
+  aVerifier: boolean;
   etatsIA: Partial<Record<Lang, EtatVue>>;
 }) {
   const t = ADMIN_PROVINCES;
@@ -88,7 +91,11 @@ export function FicheCarte({
 
         <div className="adm-item__etats">
           {fiche.prio && <span className="adm-badge adm-badge--info">{t.fichePrio}</span>}
-          {!fiche.gouverneurDate && <span className="adm-badge adm-badge--warn">{t.aSourcer}</span>}
+          {aVerifier && (
+            <span className="adm-badge adm-badge--warn" title={fiche.gouverneurDate ? t.aReverifierAide : undefined}>
+              {fiche.gouverneurDate ? t.aReverifier : t.aSourcer}
+            </span>
+          )}
           <span className={`adm-badge adm-statut adm-statut--${enLigne ? "published" : "draft"}`}>
             {PROVINCE_STATUT_LABEL[fiche.status]}
           </span>
