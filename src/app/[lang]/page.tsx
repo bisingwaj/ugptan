@@ -17,7 +17,6 @@ import { media } from "@/content/media";
 import { NAV, route } from "@/lib/routes";
 import { SITE_URL } from "@/lib/site";
 import { Kicker } from "@/components/ui/Kicker";
-import { Counter } from "@/components/ui/Counter";
 import { Photo } from "@/components/ui/Photo";
 import { HeroVideo } from "@/components/home/HeroVideo";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
@@ -30,6 +29,7 @@ import { EventsGrid } from "@/components/events/EventsGrid";
 import { VideoButton } from "@/components/video/VideoButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { Compteur } from "@/components/motion/Compteur";
 import { cheminArticle } from "@/components/actus/ActuCard";
 
 /** Cache aligné sur les pages « Actualités » et « Événements » : l'accueil
@@ -41,6 +41,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
+  const locale = lang === "en" ? "en-GB" : "fr-FR";
   // Lectures indépendantes, menées de front : aucune ne conditionne l'autre, et
   // les enchaîner ajouterait autant d'allers-retours à la base pour rien.
   const [actualites, upcoming, equipe, composantes, organes] = await Promise.all([
@@ -104,15 +105,18 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
                 {t.video.watch}
               </VideoButton>
             </Reveal>
-            <div className="hero-links" style={{ display: "flex", flexWrap: "wrap", marginTop: 40, borderTop: "1px solid rgba(255,255,255,.14)" }}>
+            <Reveal variant="fade" delay={0.26} className="hero-links" style={{ display: "flex", flexWrap: "wrap", marginTop: 40, borderTop: "1px solid rgba(255,255,255,.14)" }}>
               {[[t.cta.docs, NAV.transparence], [t.cta.marches, NAV.marches], [t.cta.mgp, NAV.mgp]].map(([label, slug], i) => (
                 <Link key={i} href={route(lang, slug as string)} className="mono" style={{ display: "flex", alignItems: "center", gap: 9, padding: i === 0 ? "14px 22px 0 0" : "14px 22px 0", fontSize: 12.5, letterSpacing: "0.04em", color: "#c6c6c6", borderLeft: i ? "1px solid rgba(255,255,255,.14)" : "none" }}>
                   <span style={{ color: "var(--ac-light)" }}>↳</span>{label as string}
                 </Link>
               ))}
-            </div>
+            </Reveal>
           </div>
-          <div className="hero-figures backdrop-blur-[8px] max-[760px]:backdrop-blur-none" style={{ border: "1px solid rgba(255,255,255,.14)", background: "rgba(13,17,26,.55)", marginBottom: "clamp(48px,7vw,96px)", color: "#fff" }}>
+          {/* Panneau de chiffres : pas candidat LCP (c'est le titre), il peut donc
+              glisser depuis la droite. Il reste une `div`, dernier enfant de
+              `.hero-grid` (cf. `.hero-grid > div:last-child` en mobile). */}
+          <Reveal variant="right" delay={0.2} className="hero-figures backdrop-blur-[8px] max-[760px]:backdrop-blur-none" style={{ border: "1px solid rgba(255,255,255,.14)", background: "rgba(13,17,26,.55)", marginBottom: "clamp(48px,7vw,96px)", color: "#fff" }}>
             <div className="mono" style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,.12)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a8a8a8", display: "flex", justifyContent: "space-between" }}>
               <span>{t.sec.chiffres}</span><span style={{ color: "var(--ac-light)" }}>{meta.code}</span>
             </div>
@@ -123,11 +127,17 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
                   <div className="mono" style={{ fontSize: 10.5, color: "#8d8d8d", marginTop: 3, lineHeight: 1.35 }}>{pick(r.sub, lang)}</div>
                 </div>
                 <div style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                  <span className="stat__num" style={{ fontSize: /^\d+$/.test(r.v) ? "clamp(24px,2.4vw,32px)" : 15, color: "#fff", letterSpacing: /^\d+$/.test(r.v) ? "-0.02em" : "0.04em" }}>{r.v}</span>
+                  {/* Compteur pour les effectifs (« 26 », « 05 ») ; une année
+                      (« 2029 ») ou un sigle restent du texte. */}
+                  <span className="stat__num" style={{ fontSize: /^\d+$/.test(r.v) ? "clamp(24px,2.4vw,32px)" : 15, color: "#fff", letterSpacing: /^\d+$/.test(r.v) ? "-0.02em" : "0.04em" }}>
+                    {/^\d{1,3}$/.test(r.v)
+                      ? <Compteur valeur={Number(r.v)} locale={locale} options={{ minimumIntegerDigits: r.v.length }} />
+                      : r.v}
+                  </span>
                 </div>
               </div>
             ))}
-          </div>
+          </Reveal>
         </div>
         <div className="backdrop-blur-[4px] max-[760px]:backdrop-blur-none" style={{ position: "relative", borderTop: "1px solid #1f2430", background: "rgba(11,15,26,.6)", fontFamily: "var(--font-mono)", fontSize: 11.5, color: "#a8a8a8", overflow: "hidden" }}>
           <div className="hero-status" style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "11px var(--pad-x)", display: "flex", flexWrap: "wrap", gap: "8px 28px" }}>
@@ -141,10 +151,10 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
       {/* ===== INTRO / QUESTION ===== */}
       <section className="section">
         <div className="section__inner cols2" style={{ gridTemplateColumns: ".42fr 1fr", gap: "clamp(28px,5vw,72px)" }}>
-          <div className="mono" style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ac)" }}>[ 01 · {t.home.introKicker} ]</div>
-          <Reveal>
+          <Reveal variant="left" className="mono" style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ac)" }}>[ 01 · {t.home.introKicker} ]</Reveal>
+          <Reveal variant="right" delay={0.08}>
             <p style={{ margin: 0, fontSize: "clamp(22px,2.7vw,34px)", lineHeight: 1.4, letterSpacing: "-0.01em", fontWeight: 300 }}>{t.home.introLead}</p>
-            <Reveal variant="up" delay={0.1} style={{ marginTop: 36, padding: "28px 30px", borderLeft: "3px solid var(--ac)", background: "var(--c-10)" }}>
+            <Reveal variant="up" delay={0.22} style={{ marginTop: 36, padding: "28px 30px", borderLeft: "3px solid var(--ac)", background: "var(--c-10)" }}>
               <p style={{ margin: 0, fontSize: "clamp(17px,1.8vw,21px)", lineHeight: 1.5, color: "var(--c-80)", fontStyle: "italic" }}>« {pick(question, lang)} »</p>
             </Reveal>
           </Reveal>
@@ -157,23 +167,23 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           l'accueil disait tout et qu'il n'y avait plus de raison de cliquer. */}
       <section className="section">
         <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 48 }}>
-            <div>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 48 }}>
+            <Reveal>
               <Kicker n="02">{t.sec.composantes}</Kicker>
               <h2 className="h2">{t.home.composantesTitle}</h2>
-            </div>
-            <p className="mono" style={{ fontSize: 12, color: "var(--c-60)", textAlign: "right", maxWidth: 260, lineHeight: 1.6, margin: 0 }}>{t.home.composantesNote}</p>
-          </Reveal>
-          <RevealGroup style={{ borderTop: "1px solid var(--c-black)" }} gap={0.05}>
+            </Reveal>
+            <Reveal variant="fade" delay={0.12} style={{ maxWidth: 260 }}><p className="mono" style={{ fontSize: 12, color: "var(--c-60)", textAlign: "right", maxWidth: 260, lineHeight: 1.6, margin: 0 }}>{t.home.composantesNote}</p></Reveal>
+          </div>
+          <RevealGroup style={{ borderTop: "1px solid var(--c-black)" }} gap={0.05} delayChildren={0.12}>
             {composantes.map((comp) => (
               <RevealItem key={comp.id}>
                 <CompRow comp={comp} lang={lang} />
               </RevealItem>
             ))}
           </RevealGroup>
-          <div style={{ marginTop: 22, textAlign: "right" }}>
+          <Reveal variant="fade" style={{ marginTop: 22, textAlign: "right" }}>
             <Link href={route(lang, NAV.composantes)} className="mono" style={{ fontSize: 13, color: "var(--ac)", display: "inline-flex", alignItems: "center", gap: 8 }}>{t.comp.seeAll} →</Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -184,13 +194,15 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           jusqu'ici qu'un seul lien de tout le site. */}
       <section className="section section--dark">
         <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 50 }}>
-            <div style={{ maxWidth: 700 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 50 }}>
+            <Reveal style={{ maxWidth: 700 }}>
               <Kicker light n="03">{t.sec.resultats}</Kicker>
               <h2 className="h2" style={{ margin: 0 }}>{t.home.resultatsTitle}</h2>
-            </div>
-            <Link href={route(lang, NAV.resultats)} className="mono" style={{ fontSize: 13, color: "var(--ac-light)", display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>{t.cta.resultats} →</Link>
-          </Reveal>
+            </Reveal>
+            <Reveal variant="fade" delay={0.15}>
+              <Link href={route(lang, NAV.resultats)} className="mono" style={{ fontSize: 13, color: "var(--ac-light)", display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>{t.cta.resultats} →</Link>
+            </Reveal>
+          </div>
           <GrilleODP lang={lang} variante="apercu" />
         </div>
       </section>
@@ -204,20 +216,24 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
       {/* ===== COUVERTURE / CARTE ===== */}
       <section className="section">
         <div className="section__inner cols2 cols2--center" style={{ gridTemplateColumns: ".85fr 1.15fr" }}>
-          <Reveal>
+          <Reveal variant="left">
             <Kicker n="04">{t.sec.couverture}</Kicker>
             <h2 className="h2">26 provinces.<br />10 {t.words.prio}.</h2>
             <p style={{ margin: "22px 0 0", fontSize: 16, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 420 }}>{t.home.couvertureLead}</p>
             <div style={{ display: "flex", gap: 26, marginTop: 34 }}>
-              <div><div className="stat__num" style={{ fontSize: 40 }}><Counter to={26} /></div><div style={{ fontSize: 12.5, color: "var(--c-60)", marginTop: 4 }}>{t.words.provinces}</div></div>
-              <div style={{ borderLeft: "1px solid var(--c-20)", paddingLeft: 26 }}><div className="stat__num" style={{ fontSize: 40, color: "var(--ac)" }}><Counter to={10} /></div><div style={{ fontSize: 12.5, color: "var(--c-60)", marginTop: 4 }}>{t.lbl.prio}</div></div>
+              <div><div className="stat__num" style={{ fontSize: 40 }}><Compteur valeur={26} locale={locale} /></div><div style={{ fontSize: 12.5, color: "var(--c-60)", marginTop: 4 }}>{t.words.provinces}</div></div>
+              <div style={{ borderLeft: "1px solid var(--c-20)", paddingLeft: 26 }}><div className="stat__num" style={{ fontSize: 40, color: "var(--ac)" }}><Compteur valeur={10} locale={locale} /></div><div style={{ fontSize: 12.5, color: "var(--c-60)", marginTop: 4 }}>{t.lbl.prio}</div></div>
             </div>
             <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 9, fontSize: 13 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 11, height: 11, background: "var(--ac)" }} /><span style={{ color: "var(--c-80)" }}>{t.lbl.prio} (CPF)</span></div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 11, height: 11, border: "1px solid var(--c-50)", background: "#fff" }} /><span style={{ color: "var(--c-80)" }}>{t.lbl.autres}</span></div>
             </div>
           </Reveal>
-          <ProvinceMap lang={lang} />
+          {/* La carte garde sa propre entrée (tracé des provinces, `.is-visible`) ;
+              l'enveloppe ne fait que la poser en léger zoom, en écho à la colonne. */}
+          <Reveal variant="zoom" delay={0.1}>
+            <ProvinceMap lang={lang} />
+          </Reveal>
         </div>
       </section>
 
@@ -227,21 +243,25 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           retrouvait sinon à l'identique en suivant « en savoir plus ». */}
       <section className="section section--grey">
         <div className="section__inner">
-          <Reveal style={{ marginBottom: 48, maxWidth: 720 }}>
-            <Kicker n="05">{t.sec.gouvernance}</Kicker>
-            <h2 className="h2" style={{ margin: 0 }}>COPIL · CTP · UGPTN</h2>
-            <p style={{ margin: "18px 0 0", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.gouvLead}</p>
-          </Reveal>
-          <RevealGroup className="grid-3" gap={0.05}>
+          <div style={{ marginBottom: 48, maxWidth: 720 }}>
+            <Reveal>
+              <Kicker n="05">{t.sec.gouvernance}</Kicker>
+              <h2 className="h2" style={{ margin: 0 }}>COPIL · CTP · UGPTN</h2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p style={{ margin: "18px 0 0", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.gouvLead}</p>
+            </Reveal>
+          </div>
+          <RevealGroup className="grid-3" gap={0.07} delayChildren={0.15}>
             {organes.map((g) => (
               <RevealItem key={g.id} className="cell" style={{ padding: "30px 28px" }}>
                 <CarteOrgane organe={g} lang={lang} champs="court" />
               </RevealItem>
             ))}
           </RevealGroup>
-          <div style={{ marginTop: 18, textAlign: "right" }}>
+          <Reveal variant="fade" style={{ marginTop: 18, textAlign: "right" }}>
             <Link href={route(lang, NAV.gouvernance)} className="mono" style={{ fontSize: 13, color: "var(--ac)", display: "inline-flex", alignItems: "center", gap: 8 }}>{t.cta.more} →</Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -253,10 +273,10 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           console (cf. `polesSousRoles` dans content/data.ts). */}
       <section className="section">
         <div className="section__inner">
-          <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 46 }}>
-            <div><Kicker n="06">{t.sec.equipe}</Kicker><h2 className="h2">{poles.length} {t.words.poles}</h2></div>
-            <p style={{ maxWidth: 340, fontSize: 14.5, lineHeight: 1.55, color: "var(--c-60)", margin: 0 }}>{t.home.equipeLead}</p>
-          </Reveal>
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 46 }}>
+            <Reveal><Kicker n="06">{t.sec.equipe}</Kicker><h2 className="h2">{poles.length} {t.words.poles}</h2></Reveal>
+            <Reveal delay={0.12} style={{ maxWidth: 340 }}><p style={{ maxWidth: 340, fontSize: 14.5, lineHeight: 1.55, color: "var(--c-60)", margin: 0 }}>{t.home.equipeLead}</p></Reveal>
+          </div>
           {/* Grille administrée depuis la console (cf. src/lib/equipe/query.ts).
               Le même bloc sert la page « L'Unité », à l'habillage près. */}
           <GrilleEquipe membres={equipe} variante="accueil" />
@@ -267,7 +287,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
       <section className="section">
         <div className="section__inner">
           <Reveal><Kicker n="07">{t.sec.actus}</Kicker></Reveal>
-          <RevealGroup gap={0.045} style={{ borderTop: "1px solid var(--c-black)" }}>
+          <RevealGroup gap={0.06} delayChildren={0.1} style={{ borderTop: "1px solid var(--c-black)" }}>
             {actualites.map((a) => (
               <RevealItem key={a.id}>
                 <Link href={cheminArticle(lang, a.slug)} className="actu-row" style={{ display: "grid", gridTemplateColumns: "130px 150px 1fr 40px", gap: "clamp(12px,2vw,28px)", padding: "24px 0", borderBottom: "1px solid var(--c-20)", alignItems: "center" }}>
@@ -296,10 +316,10 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
       {upcoming.length > 0 && (
         <section className="section section--sm section--grey">
           <div className="section__inner">
-            <Reveal style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 36 }}>
-              <div style={{ maxWidth: 620 }}><Kicker>{t.home.evtLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 12 }}>{t.home.evtTitle}</h2><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.evtLead}</p></div>
-              <Link href={route(lang, NAV.evenements)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.home.evtUpcoming} →</Link>
-            </Reveal>
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 20, marginBottom: 36 }}>
+              <Reveal style={{ maxWidth: 620 }}><Kicker>{t.home.evtLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 12 }}>{t.home.evtTitle}</h2><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.evtLead}</p></Reveal>
+              <Reveal variant="fade" delay={0.15}><Link href={route(lang, NAV.evenements)} className="btn btn--outline" style={{ whiteSpace: "nowrap" }}>{t.home.evtUpcoming} →</Link></Reveal>
+            </div>
             <EventsGrid lang={lang} events={upcoming} />
           </div>
         </section>
@@ -311,11 +331,14 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           <Reveal>
             <Kicker>{t.home.galleryLabel}</Kicker>
             <h2 className="h2--sm" style={{ marginBottom: 14 }}>{t.home.galleryTitle}</h2>
+          </Reveal>
+          <Reveal delay={0.1}>
             <p style={{ margin: "0 0 40px", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 680 }}>{t.home.galleryLead}</p>
           </Reveal>
-          <RevealGroup gap={0.05} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(216px,1fr))" }}>
+          {/* Vignettes photo : fondu + léger zoom arrière, en cascade. */}
+          <RevealGroup gap={0.05} delayChildren={0.15} className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(216px,1fr))" }}>
             {galleryProvinces.map((g) => (
-              <RevealItem key={g.nom} className="duo" style={{ aspectRatio: "4/3" }}>
+              <RevealItem key={g.nom} zoom className="duo" style={{ aspectRatio: "4/3" }}>
                 {/* sizes ajusté à la grille `minmax(216px,1fr)` : 1 colonne
                     sous 480px, 2 entre 480 et 760px, ~300px au-delà — évite de
                     télécharger une image pleine largeur pour une case d'un tiers. */}
@@ -330,8 +353,11 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
       {/* ===== PARTENAIRES ===== */}
       <section className="section section--sm">
         <div className="section__inner">
-          <Reveal style={{ marginBottom: 40, maxWidth: 640 }}><Kicker>{t.home.partenairesLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 14 }}>{t.home.partenairesTitle}</h2><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.partenairesLead}</p></Reveal>
-          <RevealGroup gap={0.04} className="logos-grid">
+          <div style={{ marginBottom: 40, maxWidth: 640 }}>
+            <Reveal><Kicker>{t.home.partenairesLabel}</Kicker><h2 className="h2--sm" style={{ marginBottom: 14 }}>{t.home.partenairesTitle}</h2></Reveal>
+            <Reveal delay={0.1}><p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{t.home.partenairesLead}</p></Reveal>
+          </div>
+          <RevealGroup gap={0.04} delayChildren={0.12} className="logos-grid">
             {partners.map((p) => (
               <RevealItem key={p.name} className="logo-cell">
                 {p.logo ? (
@@ -382,14 +408,14 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           `/bidders` l'attend : les entreprises candidates. */}
       <section className="section section--pale">
         <div className="section__inner">
-          <Reveal className="cols2" style={{ alignItems: "end", marginBottom: 46 }}>
-            <div><Kicker n="08">{t.sec.repondre}</Kicker><h2 className="h2--sm">{t.home.repondreTitle}</h2></div>
-            <p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--c-80)", margin: 0, maxWidth: 460 }}>{t.home.repondreLead}</p>
-          </Reveal>
+          <div className="cols2" style={{ alignItems: "end", marginBottom: 46 }}>
+            <Reveal variant="left"><Kicker n="08">{t.sec.repondre}</Kicker><h2 className="h2--sm">{t.home.repondreTitle}</h2></Reveal>
+            <Reveal variant="right" delay={0.08}><p style={{ fontSize: 15, lineHeight: 1.6, color: "var(--c-80)", margin: 0, maxWidth: 460 }}>{t.home.repondreLead}</p></Reveal>
+          </div>
 
           {/* Trois étapes, numérotées : le parcours se lit d'un coup d'œil, et
               son nombre fini est ce qui décide quelqu'un à le commencer. */}
-          <RevealGroup className="grid-3" gap={0.045} style={{ background: "var(--ac-line)", borderColor: "var(--ac-line)" }}>
+          <RevealGroup className="grid-3" gap={0.08} delayChildren={0.12} style={{ background: "var(--ac-line)", borderColor: "var(--ac-line)" }}>
             {t.home.repondreEtapes.map((e) => (
               <RevealItem key={e.n} style={{ background: "#fff", padding: "26px 24px", display: "flex", flexDirection: "column", gap: 12 }}>
                 <div className="mono" style={{ fontSize: 11, color: "var(--ac)" }}>{e.n}</div>
@@ -399,7 +425,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
             ))}
           </RevealGroup>
 
-          <Reveal style={{ marginTop: 34, display: "flex", flexWrap: "wrap", gap: 14 }}>
+          <Reveal delay={0.1} style={{ marginTop: 34, display: "flex", flexWrap: "wrap", gap: 14 }}>
             <Link href={route(lang, NAV.soumissionnaires)} className="btn btn--primary">
               {t.home.repondreCta}<span className="arrow">→</span>
             </Link>
