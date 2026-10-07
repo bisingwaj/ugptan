@@ -982,6 +982,11 @@ a.chaine__lien:hover .chaine__go { color: var(--ac); transform: translateX(4px);
 .comp-row__titre { font-size: clamp(18px, 1.9vw, 23px); font-weight: 600; letter-spacing: -0.01em; }
 .comp-row__desc { font-size: 14.5px; line-height: 1.55; color: var(--c-70); max-width: 62ch; }
 .comp-row--link::before { background: var(--comp, var(--ac)); opacity: 0.09; }
+/* Le lavis du survol couvre toute la ligne : le contenu s'en écarte des deux
+   côtés en même temps qu'il se remplit, et revient à l'alignement au repos. */
+.comp-row--link { padding-inline: 0; transition: padding var(--dur-2) var(--ease); }
+.comp-row--link:hover,
+.comp-row--link:focus-visible { padding-inline: clamp(16px, 2vw, 28px); }
 .comp-row--link .comp-row__go { display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); color: var(--comp, var(--ac)); transition: transform var(--dur-2) var(--ease); }
 .comp-row--link:hover .comp-row__go { transform: translateX(6px); }
 .comp-row--link:hover .comp-row__titre { color: var(--comp, var(--ac)); }
