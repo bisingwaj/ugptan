@@ -49,7 +49,7 @@
 
 /* Les 12 % restants, franchis d'un coup à la réponse du serveur. */
 .btn--action[data-etat="fini"]::after {
-  animation: btn-progression-fin 0.26s ease-out forwards;
+  animation: btn-progression-fin var(--dur-2) var(--ease) forwards;
 }
 
 @keyframes btn-progression {
