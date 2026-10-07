@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { notFound } from "next/navigation";
 import { asLang, estLocale, LOCALES } from "@/lib/params";
 import { SITE_URL } from "@/lib/site";
+import { imageParDefaut } from "@/lib/seo";
 import { dict } from "@/content/i18n";
 import { meta } from "@/content/data";
 import { VideoProvider } from "@/components/video/VideoProvider";
@@ -34,8 +35,9 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
-  const title = `UGPTN — ${meta.projetLong}`;
+  const title = t.seo.titreSite;
   const description = t.home.heroLead;
+  const image = imageParDefaut(lang);
   return {
     metadataBase: new URL(SITE_URL),
     title: { default: title, template: "%s · UGPTN" },
@@ -43,9 +45,14 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     applicationName: "UGPTN",
     authors: [{ name: meta.uniteLong }],
     keywords: ["UGPTN", "PTN-RDC", "transformation numérique", "RDC", "Banque mondiale", "AFD", "P180495", "CCD1198"],
-    openGraph: { title, description, url: `/${lang}`, siteName: "UGPTN", locale: lang === "en" ? "en_US" : "fr_FR", type: "website" },
-    twitter: { card: "summary_large_image", title, description },
-    alternates: { canonical: `/${lang}`, languages: { fr: "/fr", en: "/en" } },
+    /* Volontairement SANS adresse : ni `alternates` (canonical, hreflang), ni
+       `openGraph.url`, ni titre de partage. Tout ce qui est posé ici est hérité
+       par une page qui ne déclare rien — et une page oubliée se déclarait alors
+       doublon de l'accueil. Chaque page déclare les siens par `metaPage`
+       (lib/seo.ts), l'accueil compris. Ne restent ici que les valeurs justes
+       pour TOUTE page : le site, la langue, l'image par défaut. */
+    openGraph: { siteName: "UGPTN", locale: lang === "en" ? "en_GB" : "fr_FR", type: "website", images: [image] },
+    twitter: { card: "summary_large_image", images: [image] },
     /* Pendant une fermeture, le moteur ne voit jamais cette page : le proxy
        répond 503 et sert l'écran de maintenance, lui-même en `noindex`. Rien à
        conditionner ici, et surtout rien à lire en base — cette valeur est figée

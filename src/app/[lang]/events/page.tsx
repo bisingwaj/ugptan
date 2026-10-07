@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { asLang } from "@/lib/params";
 import { dict } from "@/content/i18n";
-import { SITE_URL } from "@/lib/site";
 import { NAV, route } from "@/lib/routes";
 import { listerCategoriesEvt, listerEvenements } from "@/lib/events/query";
 import { EventsGrid } from "@/components/events/EventsGrid";
@@ -10,6 +9,7 @@ import { EvtFiltres } from "@/components/events/EvtFiltres";
 import { Kicker } from "@/components/ui/Kicker";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Deux minutes de cache, comme la page « Actualités ».
@@ -26,21 +26,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang);
-
-  return {
-    title: t.nav.evenements,
-    description: t.home.evtLead,
-    alternates: {
-      canonical: `/${lang}${NAV.evenements}`,
-      languages: { fr: `/fr${NAV.evenements}`, en: `/en${NAV.evenements}` },
-    },
-    openGraph: {
-      title: `${t.nav.evenements} · UGPTN`,
-      description: t.home.evtLead,
-      url: `${SITE_URL}/${lang}${NAV.evenements}`,
-      type: "website",
-    },
-  };
+  return metaPage({ lang, path: NAV.evenements, title: t.nav.evenements, description: t.home.evtLead });
 }
 
 type Recherche = { categorie?: string; q?: string };

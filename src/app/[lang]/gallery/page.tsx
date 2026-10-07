@@ -15,6 +15,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { AlbumsBandeau } from "@/components/galerie/AlbumsBandeau";
 import { GalerieGrille } from "@/components/galerie/GalerieGrille";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Cinq minutes de cache.
@@ -27,27 +28,11 @@ import { GalerieGrille } from "@/components/galerie/GalerieGrille";
  */
 export const revalidate = 300;
 
-export async function generateMetadata(props: {
-  params: Promise<{ lang: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const t = dict(lang).galerie;
-
-  return {
-    title: t.titre,
-    description: t.lead,
-    alternates: {
-      canonical: `/${lang}${NAV.galerie}`,
-      languages: { fr: `/fr${NAV.galerie}`, en: `/en${NAV.galerie}` },
-    },
-    openGraph: {
-      title: `${t.titre} · UGPTN`,
-      description: t.lead,
-      url: `${SITE_URL}/${lang}${NAV.galerie}`,
-      type: "website",
-    },
-  };
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.galerie, title: t.galerie.titre, description: t.galerie.lead });
 }
 
 type Recherche = { rubrique?: string; type?: string; q?: string; tri?: string; media?: string };

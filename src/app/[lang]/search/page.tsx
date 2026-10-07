@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { asLang } from "@/lib/params";
 import { dict } from "@/content/i18n";
-import { SITE_URL } from "@/lib/site";
 import { NAV, route } from "@/lib/routes";
 import {
   estTypeResultat,
@@ -12,6 +11,7 @@ import {
 } from "@/lib/recherche/query";
 import { LigneResultat } from "@/components/recherche/LigneResultat";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Aucun cache de route.
@@ -39,24 +39,14 @@ export async function generateMetadata(props: {
   const q = saisie.length >= MIN_CARACTERES ? saisie : "";
 
   return {
+    ...metaPage({ lang, path: NAV.recherche, title: r.titre, description: r.lead }),
     title: q ? `${r.titre} : ${q}` : r.titre,
-    description: r.lead,
-    alternates: {
-      canonical: `/${lang}${NAV.recherche}`,
-      languages: { fr: `/fr${NAV.recherche}`, en: `/en${NAV.recherche}` },
-    },
-    openGraph: {
-      title: `${r.titre} · UGPTN`,
-      description: r.lead,
-      url: `${SITE_URL}/${lang}${NAV.recherche}`,
-      type: "website",
-    },
     /* La page NUE est une page du site, indexable comme les autres. Une page de
        RÉSULTATS ne l'est pas : elle n'existe que pour la requête qui l'a
        produite, et laisser un moteur en indexer autant qu'il en existe remplit
        l'index d'adresses qui ne mènent qu'à des listes de liens. `follow` est
        maintenu dans les deux cas : les fiches trouvées, elles, doivent être
-       suivies. */
+       suivies. Le canonical, lui, désigne toujours la page nue. */
     robots: saisie
       ? { index: false, follow: true }
       : { index: true, follow: true },

@@ -13,6 +13,7 @@ import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
 import { GrilleODP } from "@/components/resultats/GrilleODP";
 import { ChiffreCle } from "@/components/impact/ChiffreCle";
+import { metaPage } from "@/lib/seo";
 
 /** Cache aligné sur l'accueil : la page est entièrement administrée — la grille
  *  ODP et les indicateurs intermédiaires depuis « Le projet », les dialogues
@@ -24,18 +25,9 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const params = await props.params;
   const lang = asLang(params.lang);
   const r = dict(lang).resultats;
-  const path = `/${lang}${NAV.resultats}`;
-  return {
-    /* Le titre d'onglet reprenait le libellé de menu (« Résultats ») pendant
-       que le H1 disait autre chose : deux noms pour une page. */
-    title: r.titre,
-    description: r.metaDesc,
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${NAV.resultats}`, en: `/en${NAV.resultats}` },
-    },
-    openGraph: { title: r.titre, description: r.metaDesc, url: path, type: "website" },
-  };
+  /* Le titre d'onglet reprenait le libellé de menu (« Résultats ») pendant
+     que le H1 disait autre chose : deux noms pour une page. */
+  return metaPage({ lang, path: NAV.resultats, title: r.titre, description: r.metaDesc });
 }
 
 export default async function ResultatsPage(props: { params: Promise<{ lang: string }> }) {

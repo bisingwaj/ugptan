@@ -9,6 +9,7 @@ import { isDocTri, isDocType, type DocTri, type DocType } from "@/lib/docs/statu
 import { PageHero } from "@/components/ui/PageHero";
 import { RessourcesListe } from "@/components/docs/RessourcesListe";
 import { Reveal } from "@/components/motion/Reveal";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Cinq minutes de cache.
@@ -24,22 +25,8 @@ export const revalidate = 300;
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const t = dict(lang).ressources;
-
-  return {
-    title: t.titre,
-    description: t.lead,
-    alternates: {
-      canonical: `/${lang}${NAV.transparence}`,
-      languages: { fr: `/fr${NAV.transparence}`, en: `/en${NAV.transparence}` },
-    },
-    openGraph: {
-      title: `${t.titre} · UGPTN`,
-      description: t.lead,
-      url: `${SITE_URL}/${lang}${NAV.transparence}`,
-      type: "website",
-    },
-  };
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.transparence, title: t.ressources.titre, description: t.ressources.lead });
 }
 
 type Recherche = { categorie?: string; type?: string; q?: string; tri?: string; doc?: string };

@@ -7,6 +7,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { FilAriane } from "@/components/ui/FilAriane";
 import { CtaFin } from "@/components/ui/CtaFin";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
+import { metaPage } from "@/lib/seo";
 
 /**
  * La page ne porte plus que sa chrome : le héros, le fil d'Ariane, les
@@ -31,18 +32,14 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const params = await props.params;
   const lang = asLang(params.lang);
   const u = dict(lang).ugptn;
-  const path = `/${lang}${NAV.ugptn}`;
-  return {
+  return metaPage({
+    lang,
+    path: NAV.ugptn,
     /* `absolute` parce que le gabarit du layout ajoute « · UGPTN » : sur cette
        page-ci, il produirait « L'UGPTN · UGPTN ». */
     title: { absolute: `${u.titre} — ${meta.uniteLong}` },
     description: u.metaDesc,
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${NAV.ugptn}`, en: `/en${NAV.ugptn}` },
-    },
-    openGraph: { title: u.titre, description: u.metaDesc, url: path, type: "website" },
-  };
+  });
 }
 
 export default async function UgptnPage(props: { params: Promise<{ lang: string }> }) {

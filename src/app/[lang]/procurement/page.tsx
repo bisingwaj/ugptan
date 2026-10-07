@@ -13,10 +13,13 @@ import { MarchesClient } from "@/components/marches/MarchesClient";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { metaPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
-  return { title: dict(asLang(params.lang)).nav.marches };
+  const lang = asLang(params.lang);
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.marches, title: t.nav.marches, description: t.marches.metaDesc });
 }
 
 /** Une icône par étape du parcours soumissionnaire (ordre de `candidature`). */

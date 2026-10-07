@@ -8,6 +8,7 @@ import { NAV } from "@/lib/routes";
 import { truncate } from "@/lib/html/sanitize";
 import { articlesLies, getArticle, voisins, type ActuVue } from "@/lib/actus/query";
 import { ArticleVue } from "@/components/actus/ArticleVue";
+import { metaPage } from "@/lib/seo";
 
 /** Même politique de cache que la liste (cf. ../page.tsx). */
 export const revalidate = 120;
@@ -33,44 +34,33 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
 
   if (!actu) return { title: dict(lang).nav.actualites, robots: { index: false, follow: true } };
 
-  const titre = actu.seoTitle?.trim() || actu.title;
-  const url = `${SITE_URL}/${actu.langue}${NAV.actualites}/${actu.slug}`;
   const image = actu.visuel.src
     ? actu.visuel.src.startsWith("http") ? actu.visuel.src : `${SITE_URL}${actu.visuel.src}`
     : undefined;
 
-  // `languages` ne liste que les langues RÉELLEMENT traduites : annoncer une
+  // `chemins` ne liste que les langues RÉELLEMENT traduites : annoncer une
   // alternative qui renverrait le même texte tromperait les moteurs autant que
-  // les lecteurs.
-  const languages = Object.fromEntries(
-    Object.entries(actu.slugs).map(([locale, slug]) => [locale, `/${locale}${NAV.actualites}/${slug}`]),
+  // les lecteurs. La langue est celle réellement servie, pas celle demandée.
+  const chemins = Object.fromEntries(
+    Object.entries(actu.slugs).map(([locale, slug]) => [locale, `${NAV.actualites}/${slug}`]),
   );
 
-  return {
-    title: titre,
+  return metaPage({
+    lang: actu.langue,
+    path: `${NAV.actualites}/${actu.slug}`,
+    chemins,
+    title: actu.seoTitle?.trim() || actu.title,
     description: description(actu),
     authors: actu.auteur ? [{ name: actu.auteur.nom }] : [{ name: meta.uniteLong }],
-    alternates: { canonical: `/${actu.langue}${NAV.actualites}/${actu.slug}`, languages },
-    openGraph: {
-      type: "article",
-      title: titre,
-      description: description(actu),
-      url,
-      siteName: "UGPTN",
-      locale: actu.langue === "en" ? "en_US" : "fr_FR",
+    type: "article",
+    article: {
       publishedTime: actu.dateISO,
       modifiedTime: actu.updatedISO,
       section: actu.categorie?.nom,
       tags: actu.tags.map((tag) => tag.nom),
-      images: image ? [{ url: image, alt: actu.visuel.alt }] : undefined,
     },
-    twitter: {
-      card: "summary_large_image",
-      title: titre,
-      description: description(actu),
-      images: image ? [image] : undefined,
-    },
-  };
+    images: image ? [{ url: image, alt: actu.visuel.alt }] : undefined,
+  });
 }
 
 export default async function ArticlePage(props: Params) {

@@ -12,6 +12,7 @@ import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Index des provinces : la carte, puis les vingt-six pages province, les dix
@@ -27,17 +28,8 @@ export const revalidate = 120;
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const pr = dict(lang).province;
-  const path = `/${lang}${NAV.provinces}`;
-  return {
-    title: pr.indexTitre,
-    description: pr.indexMetaDesc,
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${NAV.provinces}`, en: `/en${NAV.provinces}` },
-    },
-    openGraph: { title: pr.indexTitre, description: pr.indexMetaDesc, url: path, type: "website" },
-  };
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.provinces, title: t.province.indexTitre, description: t.province.indexMetaDesc });
 }
 
 const parNom = (a: { nom: string }, b: { nom: string }) => a.nom.localeCompare(b.nom, "fr");

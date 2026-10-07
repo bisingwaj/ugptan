@@ -13,6 +13,7 @@ import { CarteOrgane } from "@/components/equipe/CarteOrgane";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { CartesCoordination } from "@/components/equipe/CartesCoordination";
+import { metaPage } from "@/lib/seo";
 
 /** Cache aligné sur les autres pages administrées : les organes et la chronique
  *  viennent de la console, les cartes de coordination du module « L'équipe ».
@@ -23,17 +24,8 @@ export const revalidate = 120;
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const g = dict(lang).gouv;
-  const path = `/${lang}${NAV.gouvernance}`;
-  return {
-    title: g.titre,
-    description: g.metaDesc,
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${NAV.gouvernance}`, en: `/en${NAV.gouvernance}` },
-    },
-    openGraph: { title: g.titre, description: g.metaDesc, url: path, type: "website" },
-  };
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.gouvernance, title: t.gouv.titre, description: t.gouv.metaDesc });
 }
 
 export default async function GouvernancePage(props: { params: Promise<{ lang: string }> }) {

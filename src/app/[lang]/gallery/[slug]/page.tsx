@@ -9,6 +9,7 @@ import { NAV, route } from "@/lib/routes";
 import { getAlbum, listerGalerie } from "@/lib/galerie/query";
 import { PageHero } from "@/components/ui/PageHero";
 import { GalerieGrille } from "@/components/galerie/GalerieGrille";
+import { metaPage } from "@/lib/seo";
 
 /** Même politique de cache que la galerie (cf. ../page.tsx). */
 export const revalidate = 300;
@@ -34,43 +35,20 @@ export async function generateMetadata(props: {
   // page qui répondra 404 au visiteur suivant.
   if (!album) return { title: dict(lang).galerie.titre, robots: { index: false, follow: true } };
 
-  const url = `${SITE_URL}/${lang}${NAV.galerie}/${album.slug}`;
-  const description =
-    album.description ||
-    dict(lang).galerie.albumCount(album.total) + (album.lieu ? ` · ${album.lieu}` : "");
-
-  return {
-    title: album.titre,
-    description,
+  return metaPage({
+    lang,
     /* Le slug ne dépend pas de la langue — le module tient ses textes en
        colonnes bilingues, pas en table de traduction : les deux versions
        partagent donc la même adresse au préfixe de langue près. */
-    alternates: {
-      canonical: `/${lang}${NAV.galerie}/${album.slug}`,
-      languages: {
-        fr: `/fr${NAV.galerie}/${album.slug}`,
-        en: `/en${NAV.galerie}/${album.slug}`,
-      },
-    },
-    openGraph: {
-      type: "article",
-      title: `${album.titre} · UGPTN`,
-      description,
-      url,
-      siteName: "UGPTN",
-      locale: lang === "en" ? "en_US" : "fr_FR",
-      publishedTime: album.dateISO ?? undefined,
-      images: album.couverture.src
-        ? [{ url: album.couverture.src, alt: album.couverture.alt }]
-        : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: album.titre,
-      description,
-      images: album.couverture.src ? [album.couverture.src] : undefined,
-    },
-  };
+    path: `${NAV.galerie}/${album.slug}`,
+    title: album.titre,
+    description:
+      album.description ||
+      dict(lang).galerie.albumCount(album.total) + (album.lieu ? ` · ${album.lieu}` : ""),
+    type: "article",
+    article: { publishedTime: album.dateISO ?? undefined },
+    images: album.couverture.src ? [{ url: album.couverture.src, alt: album.couverture.alt }] : undefined,
+  });
 }
 
 export default async function AlbumPage(props: Params) {

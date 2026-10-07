@@ -11,10 +11,13 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { Compteur } from "@/components/motion/Compteur";
+import { metaPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
-  return { title: dict(asLang(params.lang)).contact.titre };
+  const lang = asLang(params.lang);
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.contact, title: t.contact.titre, description: t.contact.metaDesc });
 }
 
 /** Une icône par mode de saisine (ordre des modes du MGP). */

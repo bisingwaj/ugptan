@@ -9,27 +9,13 @@ import { Kicker } from "@/components/ui/Kicker";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { metaPage } from "@/lib/seo";
 
-export async function generateMetadata(props: {
-  params: Promise<{ lang: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const t = dict(lang).soumissionner;
-  const title = dict(lang).nav.soumissionnaires;
-  const description = t.heroLead;
-  const path = route(lang, NAV.soumissionnaires);
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${NAV.soumissionnaires}`, en: `/en${NAV.soumissionnaires}` },
-    },
-    openGraph: { title, description, url: path, type: "website" },
-    twitter: { card: "summary_large_image", title, description },
-  };
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.soumissionnaires, title: t.nav.soumissionnaires, description: t.soumissionner.heroLead });
 }
 
 const ICONES: IconName[] = ["compte", "dossier", "depot", "attribution"];

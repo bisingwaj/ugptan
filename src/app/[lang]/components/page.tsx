@@ -11,6 +11,7 @@ import { CompCard } from "@/components/composantes/CompCard";
 import { CompChaine } from "@/components/composantes/CompChaine";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { metaPage } from "@/lib/seo";
 
 /** Cache aligné sur les autres pages administrées, invalidé par les écritures
  *  du module (cf. lib/projet/cache.ts). */
@@ -19,17 +20,8 @@ export const revalidate = 120;
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const c = dict(lang).comp;
-  const path = `/${lang}${NAV.composantes}`;
-  return {
-    title: c.titre,
-    description: c.metaDesc,
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${NAV.composantes}`, en: `/en${NAV.composantes}` },
-    },
-    openGraph: { title: c.titre, description: c.metaDesc, url: path, type: "website" },
-  };
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.composantes, title: t.comp.titre, description: t.comp.metaDesc });
 }
 
 export default async function ComposantesPage(props: { params: Promise<{ lang: string }> }) {

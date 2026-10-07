@@ -6,6 +6,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { FilAriane } from "@/components/ui/FilAriane";
 import { CtaFin } from "@/components/ui/CtaFin";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
+import { metaPage } from "@/lib/seo";
 
 /**
  * La page ne porte plus que sa chrome. Ses blocs viennent de deux modules de la
@@ -29,17 +30,8 @@ export const revalidate = 120;
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
-  const p = dict(lang).projet;
-  const path = `/${lang}${NAV.projet}`;
-  return {
-    title: p.titre,
-    description: p.metaDesc,
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${NAV.projet}`, en: `/en${NAV.projet}` },
-    },
-    openGraph: { title: p.titre, description: p.metaDesc, url: path, type: "website" },
-  };
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.projet, title: t.projet.titre, description: t.projet.metaDesc });
 }
 
 export default async function ProjetPage(props: { params: Promise<{ lang: string }> }) {

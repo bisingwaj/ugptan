@@ -779,6 +779,12 @@ export function dict(lang: Lang) {
     /* --- Contact ---------------------------------------------------------- */
     contact: {
       titre: t("Contact", "Contact"),
+      /* Description de moteur et d'aperçu de partage : le chapeau de page,
+         trop long pour un extrait de résultat, n'y tient pas. */
+      metaDesc: t(
+        "Coordonnées de l'UGPTN à Kinshasa, points focaux dans les provinces, numéro vert et canaux de saisine du mécanisme de gestion des plaintes.",
+        "UGPTN contact details in Kinshasa, provincial focal points, toll-free number and the channels of the grievance redress mechanism.",
+      ),
       lead: t(
         "Une question sur un marché, une difficulté sur un chantier, une demande institutionnelle : chaque objet a son canal, et le bon canal est celui qui laisse une trace. Les points focaux provinciaux permettent de saisir l'Unité sans passer par Kinshasa.",
         "A question about a contract, a difficulty on a worksite, an institutional request: each matter has its channel, and the right channel is the one that leaves a record. Provincial focal points make it possible to reach the Unit without going through Kinshasa.",
@@ -819,6 +825,10 @@ export function dict(lang: Lang) {
 
     /* --- Marchés publics -------------------------------------------------- */
     marches: {
+      metaDesc: t(
+        "Avis de marchés du PTN-RDC : méthode de passation, calendrier, pièces exigées et date limite, selon les Règlements de passation de la Banque mondiale.",
+        "PTN-RDC procurement notices: procurement method, schedule, required documents and deadline, under the World Bank Procurement Regulations.",
+      ),
       heroTitle: t("Tout ce qu'il faut pour décider si vous candidatez.", "Everything you need to decide whether to bid."),
       heroLead: t(
         "Chaque avis indique la méthode de passation retenue, le calendrier prévisionnel, les pièces exigées et la date limite. Les Règlements de Passation de la Banque mondiale (2025) s'appliquent : les critères d'évaluation sont annoncés à l'avance et ne changent pas en cours de procédure, et le résultat est publié. Une entreprise doit pouvoir estimer son effort de réponse avant de l'engager.",
@@ -1360,6 +1370,10 @@ export function dict(lang: Lang) {
 
     /* --- MGP -------------------------------------------------------------- */
     mgp: {
+      metaDesc: t(
+        "Déposer une plainte liée au PTN-RDC, gratuitement et au besoin de façon anonyme, puis en suivre l'instruction. Canal confidentiel distinct pour les cas EAS/HS.",
+        "File a grievance about the PTN-RDC, free of charge and anonymously if needed, then follow its handling. A separate confidential channel handles SEA/SH cases.",
+      ),
       heroTitle: t("Signaler une difficulté ne vous expose à rien.", "Reporting a difficulty exposes you to nothing."),
       heroLead: t(
         "Le dépôt est gratuit, possible en plusieurs langues, et peut rester anonyme. Vous recevez un numéro de référence qui permet de suivre l'instruction sans avoir à vous déplacer. Aucune représaille n'est tolérée, et un canal strictement séparé traite les cas de violences basées sur le genre. L'Unité vise un traitement dans un délai de 30 jours.",
@@ -1586,6 +1600,30 @@ export function dict(lang: Lang) {
        site. Message générique, non personnalisable page par page — le besoin
        ne s'est pas présenté, et une console qui le demanderait pourrait
        reprendre le principe du message de `maintenance`. */
+    /* --- Référencement et partage (cf. lib/seo.ts) ------------------------ */
+    seo: {
+      /* Titre par défaut du site : celui de l'accueil, et de toute page qui
+         n'en déclarerait pas. */
+      titreSite: t(
+        "UGPTN — Projet de Transformation Numérique de la République Démocratique du Congo",
+        "UGPTN — Digital Transformation Project of the Democratic Republic of the Congo",
+      ),
+      imageAlt: t(
+        "UGPTN — Projet de Transformation Numérique de la RDC",
+        "UGPTN — Digital Transformation Project of the DRC",
+      ),
+      /* Textes de l'image de partage (public/partage/ugptn-*.png) : ils y
+         sont incrustés, toute modification demande de réexporter l'image. */
+      imageSousTitre: t(
+        "Transformation numérique de la République Démocratique du Congo",
+        "Digital transformation of the Democratic Republic of the Congo",
+      ),
+      imagePied: t(
+        "Banque mondiale · AFD · 26 provinces · horizon 2029",
+        "World Bank · AFD · 26 provinces · 2029 horizon",
+      ),
+    },
+
     construction: {
       kicker: t("Page en construction", "Page under construction"),
       titre: t("Cette page est en cours de préparation", "This page is being prepared"),

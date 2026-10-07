@@ -10,28 +10,21 @@ import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { MgpTracker } from "@/components/mgp/MgpTracker";
+import { metaPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang).mgp;
-  const title = t.trackPageTitle;
-  const description = t.trackPageMeta;
-  const path = route(lang, NAV.mgpSuivi);
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${NAV.mgpSuivi}`, en: `/en${NAV.mgpSuivi}` },
-    },
-    openGraph: { title, description, url: path, type: "website" },
-    twitter: { card: "summary_large_image", title, description },
+  return metaPage({
+    lang,
+    path: NAV.mgpSuivi,
+    title: t.trackPageTitle,
+    description: t.trackPageMeta,
     // Page de service, sans contenu indexable au-delà de sa notice : elle a sa
     // place dans l'index, les dossiers qu'elle affiche n'en ont aucune.
     robots: { index: true, follow: true },
-  };
+  });
 }
 
 export default async function MgpSuiviPage(props: {

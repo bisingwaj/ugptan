@@ -13,10 +13,13 @@ import { MgpTracker } from "@/components/mgp/MgpTracker";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { metaPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
-  return { title: dict(asLang(params.lang)).cta.mgp };
+  const lang = asLang(params.lang);
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.mgp, title: t.cta.mgp, description: t.mgp.metaDesc });
 }
 
 /** Une icône par mode de saisine (ordre des modes du MGP). */

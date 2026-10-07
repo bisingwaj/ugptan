@@ -20,6 +20,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { Compteur } from "@/components/motion/Compteur";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Page d'une province : fiche de référence, administration, statut dans le
@@ -49,19 +50,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
   const t = dict(lang).province;
   const fiche = await ficheProvince(slugProvince(p.nom), lang);
-  const slug = slugProvince(p.nom);
-  const path = `/${lang}${CHEMIN_PROVINCES}/${slug}`;
-  const title = `${p.nom} · ${p.prio ? t.prio : t.autre}`;
-  const description = [fiche?.description, t.metaDesc].filter(Boolean).join(" ");
-  return {
-    title,
-    description,
-    openGraph: { title, description, url: path, type: "website" },
-    alternates: {
-      canonical: path,
-      languages: { fr: `/fr${CHEMIN_PROVINCES}/${slug}`, en: `/en${CHEMIN_PROVINCES}/${slug}` },
-    },
-  };
+  return metaPage({
+    lang,
+    path: `${CHEMIN_PROVINCES}/${slugProvince(p.nom)}`,
+    title: `${p.nom} · ${p.prio ? t.prio : t.autre}`,
+    description: [fiche?.description, t.metaDesc].filter(Boolean).join(" "),
+  });
 }
 
 const ORDRE: AvancementProjet[] = ["EN_COURS", "PREVU", "ACHEVE"];

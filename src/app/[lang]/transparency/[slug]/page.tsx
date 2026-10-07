@@ -8,6 +8,7 @@ import { NAV } from "@/lib/routes";
 import { htmlToText, truncate } from "@/lib/html/sanitize";
 import { documentsLies, getDocument, type DocVue } from "@/lib/docs/query";
 import { DocumentVue } from "@/components/docs/DocumentVue";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Cinq minutes de cache, comme la liste (cf. ../page.tsx).
@@ -42,48 +43,31 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
     return { title: dict(lang).ressources.titre, robots: { index: false, follow: true } };
   }
 
-  const url = `${SITE_URL}${document.chemin}`;
   const image = document.visuel.src
     ? document.visuel.src.startsWith("http")
       ? document.visuel.src
       : `${SITE_URL}${document.visuel.src}`
     : undefined;
 
-  return {
+  return metaPage({
+    lang,
+    // Le slug est commun aux deux langues (cf. le modèle `Document`) : les
+    // deux alternatives existent toujours, contrairement aux articles dont la
+    // traduction porte sa propre adresse.
+    path: `${NAV.transparence}/${document.slug}`,
     title: document.titre,
     description: description(document),
     // L'auteur annoncé est celui qui a ÉCRIT — la signature, ou l'organisme
     // producteur à défaut. Jamais le compte qui a saisi la fiche.
     authors: [{ name: document.signature?.nom ?? document.auteur ?? meta.uniteLong }],
-    alternates: {
-      canonical: `/${lang}${NAV.transparence}/${document.slug}`,
-      // Le slug est commun aux deux langues (cf. le modèle `Document`) : les
-      // deux alternatives existent toujours, contrairement aux articles dont la
-      // traduction porte sa propre adresse.
-      languages: {
-        fr: `/fr${NAV.transparence}/${document.slug}`,
-        en: `/en${NAV.transparence}/${document.slug}`,
-      },
-    },
-    openGraph: {
-      type: "article",
-      title: document.titre,
-      description: description(document),
-      url,
-      siteName: "UGPTN",
-      locale: lang === "en" ? "en_US" : "fr_FR",
+    type: "article",
+    article: {
       publishedTime: document.dateISO ?? undefined,
       modifiedTime: document.majISO,
       section: document.categorie?.nom,
-      images: image ? [{ url: image, alt: document.visuel.alt }] : undefined,
     },
-    twitter: {
-      card: image ? "summary_large_image" : "summary",
-      title: document.titre,
-      description: description(document),
-      images: image ? [image] : undefined,
-    },
-  };
+    images: image ? [{ url: image, alt: document.visuel.alt }] : undefined,
+  });
 }
 
 export default async function DocumentPage(props: Params) {

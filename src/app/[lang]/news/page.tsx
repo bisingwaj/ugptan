@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { asLang } from "@/lib/params";
 import { dict } from "@/content/i18n";
-import { SITE_URL } from "@/lib/site";
 import { NAV, route } from "@/lib/routes";
 import { filChronologique, listerActualites, listerCategories, PAR_PAGE } from "@/lib/actus/query";
 import { Kicker } from "@/components/ui/Kicker";
@@ -11,6 +10,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { ActuCard, cheminArticle } from "@/components/actus/ActuCard";
 import { ActuFiltres } from "@/components/actus/ActuFiltres";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Deux minutes de cache.
@@ -23,25 +23,32 @@ import { ActuFiltres } from "@/components/actus/ActuFiltres";
  */
 export const revalidate = 120;
 
-export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
-  const params = await props.params;
+export async function generateMetadata(props: {
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<Recherche>;
+}): Promise<Metadata> {
+  const [params, recherche] = await Promise.all([props.params, props.searchParams]);
   const lang = asLang(params.lang);
   const t = dict(lang);
+  const page = Math.max(1, Number.parseInt(recherche.page ?? "1", 10) || 1);
+  const filtre = Boolean(recherche.categorie?.trim() || recherche.tag?.trim());
+  const q = recherche.q?.trim();
 
-  return {
+  /* Une page 3 de la liste est une page distincte de la page 1 : elle porte son
+     propre canonical, faute de quoi le moteur ne suit plus les articles qu'elle
+     seule liste. Elle n'annonce pas d'équivalent dans l'autre langue — le fil
+     anglais n'a ni les mêmes articles ni le même nombre de pages. Une liste
+     FILTRÉE (rubrique, mot-clé) se rattache à la liste complète, et une
+     RECHERCHE n'est pas indexée du tout, comme sur la page de recherche. */
+  const paginee = page > 1 && !filtre && !q;
+  return metaPage({
+    lang,
+    path: NAV.actualites,
     title: t.nav.actualites,
     description: t.actus.heroLead,
-    alternates: {
-      canonical: `/${lang}${NAV.actualites}`,
-      languages: { fr: `/fr${NAV.actualites}`, en: `/en${NAV.actualites}` },
-    },
-    openGraph: {
-      title: `${t.nav.actualites} · UGPTN`,
-      description: t.actus.heroLead,
-      url: `${SITE_URL}/${lang}${NAV.actualites}`,
-      type: "website",
-    },
-  };
+    ...(paginee ? { query: `page=${page}`, alternatesLangue: false } : {}),
+    noindex: Boolean(q),
+  });
 }
 
 type Recherche = { categorie?: string; tag?: string; q?: string; page?: string };

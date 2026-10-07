@@ -8,6 +8,7 @@ import { NAV } from "@/lib/routes";
 import { truncate } from "@/lib/html/sanitize";
 import { evenementsLies, getEvenement, voisinsEvenement, type EvtVue } from "@/lib/events/query";
 import { EvenementVue } from "@/components/events/EvenementVue";
+import { metaPage } from "@/lib/seo";
 
 /** Même politique de cache que le calendrier (cf. ../page.tsx). */
 export const revalidate = 120;
@@ -33,39 +34,25 @@ export async function generateMetadata(props: Params): Promise<Metadata> {
 
   if (!evt) return { title: dict(lang).nav.evenements, robots: { index: false, follow: true } };
 
-  const titre = evt.seoTitle?.trim() || evt.title;
-  const url = `${SITE_URL}/${evt.langue}${NAV.evenements}/${evt.slug}`;
   const image = evt.visuel.src
     ? evt.visuel.src.startsWith("http") ? evt.visuel.src : `${SITE_URL}${evt.visuel.src}`
     : undefined;
 
-  // `languages` ne liste que les langues RÉELLEMENT traduites : annoncer une
+  // `chemins` ne liste que les langues RÉELLEMENT traduites : annoncer une
   // alternative qui renverrait le même texte tromperait les moteurs autant que
   // les lecteurs.
-  const languages = Object.fromEntries(
-    Object.entries(evt.slugs).map(([locale, slug]) => [locale, `/${locale}${NAV.evenements}/${slug}`]),
+  const chemins = Object.fromEntries(
+    Object.entries(evt.slugs).map(([locale, slug]) => [locale, `${NAV.evenements}/${slug}`]),
   );
 
-  return {
-    title: titre,
+  return metaPage({
+    lang: evt.langue,
+    path: `${NAV.evenements}/${evt.slug}`,
+    chemins,
+    title: evt.seoTitle?.trim() || evt.title,
     description: description(evt),
-    alternates: { canonical: `/${evt.langue}${NAV.evenements}/${evt.slug}`, languages },
-    openGraph: {
-      type: "website",
-      title: titre,
-      description: description(evt),
-      url,
-      siteName: "UGPTN",
-      locale: evt.langue === "en" ? "en_US" : "fr_FR",
-      images: image ? [{ url: image, alt: evt.visuel.alt }] : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: titre,
-      description: description(evt),
-      images: image ? [image] : undefined,
-    },
-  };
+    images: image ? [{ url: image, alt: evt.visuel.alt }] : undefined,
+  });
 }
 
 /** Statut d'inscription au sens de schema.org, déduit de ce que la fiche permet. */

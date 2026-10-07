@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { asLang } from "@/lib/params";
@@ -31,11 +32,22 @@ import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { Compteur } from "@/components/motion/Compteur";
 import { cheminArticle } from "@/components/actus/ActuCard";
+import { metaPage } from "@/lib/seo";
 
 /** Cache aligné sur les pages « Actualités » et « Événements » : l'accueil
  *  affiche les derniers communiqués et les prochaines rencontres, invalidés par
  *  les écritures de la console (cf. lib/actus/cache.ts, lib/events/cache.ts). */
 export const revalidate = 120;
+
+/* L'accueil déclare ses propres adresses, comme toute page : le layout n'en
+   porte plus (cf. son generateMetadata), pour qu'une page oubliée ne puisse
+   plus se présenter comme un doublon de l'accueil. */
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
+  const lang = asLang(params.lang);
+  const t = dict(lang);
+  return metaPage({ lang, path: NAV.accueil, title: { absolute: t.seo.titreSite }, description: t.home.heroLead });
+}
 
 export default async function Home(props: { params: Promise<{ lang: string }> }) {
   const params = await props.params;

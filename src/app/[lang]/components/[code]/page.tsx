@@ -21,6 +21,7 @@ import { CompVideo } from "@/components/composantes/CompVideo";
 import { ProjetsPhares } from "@/components/composantes/ProjetsPhares";
 import { CompResponsable } from "@/components/composantes/CompResponsable";
 import { CompLies } from "@/components/composantes/CompLies";
+import { metaPage } from "@/lib/seo";
 
 /**
  * Adresses pré-générées, lues en base.
@@ -55,21 +56,13 @@ export async function generateMetadata(props: { params: Promise<{ lang: string; 
 
   const { composante } = trouve;
   const t = dict(lang).comp;
-  const title = `${t.one} ${composante.code.slice(1)} — ${composante.titre}`;
-  const description = composante.soustitre;
-  const path = `/${lang}${NAV.composantes}/${composante.slug}`;
-  return {
-    title,
-    description,
-    openGraph: { title, description, url: path, type: "article" },
-    alternates: {
-      canonical: path,
-      languages: {
-        fr: `/fr${NAV.composantes}/${composante.slug}`,
-        en: `/en${NAV.composantes}/${composante.slug}`,
-      },
-    },
-  };
+  return metaPage({
+    lang,
+    path: `${NAV.composantes}/${composante.slug}`,
+    title: `${t.one} ${composante.code.slice(1)} — ${composante.titre}`,
+    description: composante.soustitre,
+    type: "article",
+  });
 }
 
 export default async function ComposantePage(props: { params: Promise<{ lang: string; code: string }> }) {
