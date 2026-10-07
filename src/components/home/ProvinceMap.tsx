@@ -14,7 +14,9 @@
  * Clic → page de la province (cf. lib/provinces/chemins.ts). Au tactile, pas de
  * survol : le premier tap montre le nom, le second ouvre la page — sans quoi
  * on naviguerait sans avoir vu sur quelle province on a posé le doigt.
- * `selection` met une province en évidence en permanence (page province).
+ * `selection` marque la province de la page (page province) : encre foncée,
+ * soulevée et nommée, quel que soit son statut. Elle le reste pendant qu'on
+ * survole les autres — seule l'étiquette suit alors le survol.
  *
  * ⚠️ Le conteneur est `aria-hidden` : la carte est décorative, l'information
  * qu'elle porte (26 provinces / 10 prioritaires + légende) figure en toutes
@@ -32,6 +34,7 @@ import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { provincesPrio } from "@/content/data";
 import { provinceRoute } from "@/lib/provinces/chemins";
+import { annoncerNavigation } from "@/components/motion/NavigationProgress";
 import { provincePaths, MAP_VIEWBOX } from "./mapData";
 
 const [, , VB_W, VB_H] = MAP_VIEWBOX.split(" ").map(Number);
@@ -53,7 +56,16 @@ export function ProvinceMap({ lang, selection }: { lang: Lang; selection?: strin
       setActif(nom);
       return;
     }
-    if (nom !== selection) router.push(provinceRoute(lang, nom));
+    if (nom === selection) return;
+    annoncerNavigation();
+    router.push(provinceRoute(lang, nom));
+  };
+
+  // Pas de <Link> ici, donc pas de préchargement automatique : on le fait au
+  // survol, le clic qui suit trouve la page déjà prête.
+  const survoler = (nom: string) => {
+    setSurvol(nom);
+    if (nom !== selection) router.prefetch(provinceRoute(lang, nom));
   };
 
   // Ordre d'apparition : d'ouest en est, comme un balayage.
@@ -85,6 +97,7 @@ export function ProvinceMap({ lang, selection }: { lang: Lang; selection?: strin
   }, []);
 
   const enAvant = courant ? provinces.find((p) => p.nom === courant) : undefined;
+  const choisie = selection ? provinces.find((p) => p.nom === selection) : undefined;
   const kin = provincePaths.Kinshasa;
 
   return (
@@ -105,17 +118,29 @@ export function ProvinceMap({ lang, selection }: { lang: Lang; selection?: strin
             <path
               key={p.nom}
               d={p.path}
-              className={`carte-rdc__prov${p.prio ? " is-prio" : ""}${p.nom === courant ? " is-on" : ""}`}
+              className={`carte-rdc__prov${p.prio ? " is-prio" : ""}${p.nom === courant ? " is-on" : ""}${p.nom === selection ? " is-choisie" : ""}`}
               style={{ animationDelay: `${i * STAGGER_MS}ms` }}
               onPointerDown={(e) => { tactile.current = e.pointerType !== "mouse"; }}
-              onMouseEnter={() => setSurvol(p.nom)}
+              onMouseEnter={() => survoler(p.nom)}
               onClick={() => choisir(p.nom)}
             />
           ))}
         </g>
 
-        {/* Province active redessinée par-dessus : soulevée, ombre douce. */}
-        {enAvant && (
+        {/* Province de la page, redessinée par-dessus les autres en permanence. */}
+        {choisie && (
+          <path
+            d={choisie.path}
+            className="carte-rdc__choisie"
+            stroke="#fff"
+            strokeWidth={2.4}
+            strokeLinejoin="round"
+            pointerEvents="none"
+          />
+        )}
+
+        {/* Province survolée redessinée par-dessus : soulevée, ombre douce. */}
+        {enAvant && enAvant !== choisie && (
           <path
             d={enAvant.path}
             className={`carte-rdc__lift${enAvant.prio ? " is-prio" : ""}`}
@@ -137,7 +162,7 @@ export function ProvinceMap({ lang, selection }: { lang: Lang; selection?: strin
         <div
           // Près des bords, l'étiquette s'ancre vers l'intérieur : centrée sur
           // Nord-Kivu ou Kongo Central, elle débordait de l'écran au téléphone.
-          className={`mono carte-rdc__tip${enAvant.cx / VB_W > 0.72 ? " is-droite" : enAvant.cx / VB_W < 0.28 ? " is-gauche" : ""}`}
+          className={`mono carte-rdc__tip${enAvant === choisie ? " is-choisie" : ""}${enAvant.cx / VB_W > 0.72 ? " is-droite" : enAvant.cx / VB_W < 0.28 ? " is-gauche" : ""}`}
           data-testid="map-tooltip"
           style={{ left: `${(enAvant.cx / VB_W) * 100}%`, top: `${(enAvant.cy / VB_H) * 100}%` }}
         >
