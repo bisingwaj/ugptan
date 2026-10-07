@@ -24,7 +24,7 @@ export function Footer({ lang }: { lang: Lang }) {
         <div className="footer-brand">
           {/* Fond noir : c'est la variante à encre blanche qui s'y lit. */}
           <div className="mb-[18px] flex items-center">
-            <Marque variante="claire" hauteur={36} />
+            <Marque variante="claire" hauteur={63} />
           </div>
           <p className="max-w-[300px] text-[13.5px] leading-[1.6] text-c-50">{meta.uniteLong}</p>
           <p className="mt-4 font-mono text-[11.5px] leading-[1.7] text-c-60">{meta.tutelleLong}<br />{meta.bailleurs}</p>
