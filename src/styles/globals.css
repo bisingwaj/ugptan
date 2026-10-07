@@ -217,11 +217,24 @@ html.scroll-locked body {
 .prov-liste a[aria-current] { color: var(--c-black); font-weight: 600; }
 .prov-liste a > span { width: 9px; height: 9px; flex: none; background: var(--c-30); }
 .prov-liste a > span[data-prio] { background: var(--ac); }
-.prov-sources { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--c-20); font-size: 12.5px; color: var(--c-60); }
-.prov-sources h2 { margin: 0 0 8px; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--c-70); }
-.prov-sources p { margin: 0 0 8px; max-width: 760px; line-height: 1.55; }
-.prov-sources ul { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 0; margin: 0; }
-.prov-sources a { color: var(--c-70); }
+/* Index : une carte par province, la priorité tenue par un filet d'accent. */
+.prov-cartes { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.prov-carte { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 18px 20px; background: #fff; border: 1px solid var(--c-20); border-left: 3px solid var(--c-30); color: var(--c-black); text-decoration: none; transition: border-color .2s, box-shadow .2s; }
+.prov-carte[data-prio] { border-left-color: var(--ac); }
+.prov-carte:hover { border-color: var(--ac); box-shadow: 0 8px 22px rgba(15,25,45,.07); }
+.prov-carte:focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
+.prov-carte__nom { font-size: 16.5px; font-weight: 600; letter-spacing: -.01em; }
+.prov-carte__details { font-size: 13.5px; color: var(--c-60); }
+.prov-carte__projets { margin-top: auto; padding-top: 10px; font-size: 11.5px; letter-spacing: .04em; color: var(--c-70); }
+.prov-carte:hover .prov-carte__projets { color: var(--ac); }
+/* Fiche : province précédente / suivante dans l'ordre alphabétique. */
+.prov-voisines { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 56px; }
+.prov-voisines a { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border: 1px solid var(--c-20); color: var(--c-black); text-decoration: none; transition: border-color .2s, background .2s; }
+.prov-voisines a[data-suivante] { align-items: flex-end; text-align: right; }
+.prov-voisines a:hover { border-color: var(--ac); background: var(--ac-pale); }
+.prov-voisines span { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--c-60); }
+.prov-voisines strong { font-size: 17px; font-weight: 600; }
+@media (max-width: 520px) { .prov-voisines strong { font-size: 15px; } }
 /* Carte des provinces (components/home/ProvinceMap.tsx) */
 .carte-rdc__prov { fill: #e8ebf0; cursor: pointer; transition: fill .25s ease; opacity: 0; transform-box: fill-box; transform-origin: center; }
 .carte-rdc__prov.is-prio { fill: var(--ac); }

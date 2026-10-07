@@ -1018,9 +1018,9 @@ export function dict(lang: Lang) {
     },
 
     /* --- Résultats -------------------------------------------------------- */
-    /* Page province (app/[lang]/project/provinces/[province]). Aucun chiffre
-       propre à une province ici : le projet n'en publie pas encore. Le texte
-       s'en tient au statut (prioritaire ou non) et au cadre national. */
+    /* Page province (app/[lang]/project/provinces/[province]) et index des
+       provinces. Fiches et projets viennent de la console (module
+       « Provinces ») ; les textes ici n'en sont que le cadre. */
     province: {
       prio: t("Province prioritaire", "Priority province"),
       autre: t("Couverture nationale", "National coverage"),
@@ -1087,20 +1087,21 @@ export function dict(lang: Lang) {
         "The UN Sustainable Development Goals the projects in the province contribute to.",
       ),
       oddProjets: t("projet(s)", "project(s)"),
-      sourcesLabel: t("Sources", "Sources"),
-      sourcesNote: t(
-        "Données de référence publiques, non produites par le projet. Population et superficie : estimations de l'INS, à lire comme des ordres de grandeur.",
-        "Public reference data, not produced by the project. Population and area: INS estimates, to be read as orders of magnitude.",
-      ),
       ctaTitre: t("Une question sur votre province ?", "A question about your province?"),
       ctaLead: t(
         "Une préoccupation liée aux activités du projet près de chez vous peut être signalée, de façon confidentielle si vous le souhaitez.",
         "A concern about project activities near you can be reported, confidentially if you wish.",
       ),
       metaDesc: t(
-        "Couverture du Projet de Transformation Numérique dans la province : statut, composantes et déploiement.",
-        "Digital Transformation Project coverage in the province: status, components and rollout.",
+        "Le Projet de Transformation Numérique dans la province : chiffres de référence, administration, projets en cours, prévus et achevés.",
+        "The Digital Transformation Project in the province: reference figures, administration, ongoing, planned and completed projects.",
       ),
+      precedente: t("Province précédente", "Previous province"),
+      suivante: t("Province suivante", "Next province"),
+      oddAria: t("Objectifs de développement durable", "Sustainable Development Goals"),
+      projetsLocaux: t("{n} projet(s) dans la province", "{n} project(s) in the province"),
+      projetsNationaux: t("Couverte par les projets nationaux", "Covered by national projects"),
+      habitants: t("hab.", "inhab."),
       /* Index des provinces (app/[lang]/project/provinces). */
       indexTitre: t("Le projet dans les 26 provinces", "The project in all 26 provinces"),
       indexMetaDesc: t(

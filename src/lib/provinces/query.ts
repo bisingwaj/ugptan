@@ -85,14 +85,36 @@ const jour = (date: Date | null): string | null => (date ? date.toISOString().sl
 /* Fiche                                                                       */
 /* -------------------------------------------------------------------------- */
 
+const fichesPubliees = (lang: Lang) =>
+  cacheJson(`provinces:fiches:${lang}`, { tags: [TAG.provinces], ttl: TTL.socle }, () => fichesImpl(lang));
+
 /** Fiche publiée d'une province, ou `null` si elle n'en a pas. */
 export async function ficheProvince(slug: string, lang: Lang): Promise<FicheVue | null> {
-  const toutes = await cacheJson(
-    `provinces:fiches:${lang}`,
-    { tags: [TAG.provinces], ttl: TTL.socle },
-    () => fichesImpl(lang),
-  );
+  const toutes = await fichesPubliees(lang);
   return toutes.find((fiche) => fiche.slug === slug) ?? null;
+}
+
+export type ResumeProvince = { chefLieu: string | null; population: number | null; projets: number };
+
+/**
+ * Ce que l'index montre de chaque province : chef-lieu, population et nombre
+ * de projets qui la CITENT — les nationaux, communs aux vingt-six, n'y
+ * distingueraient rien. Lu dans les mêmes caches que les pages de détail.
+ */
+export async function resumesProvinces(lang: Lang): Promise<Map<string, ResumeProvince>> {
+  const [fiches, projets] = await Promise.all([fichesPubliees(lang), projetsPublies(lang)]);
+  const resumes = new Map<string, ResumeProvince>();
+  for (const fiche of fiches) {
+    resumes.set(fiche.slug, { chefLieu: fiche.chefLieu, population: fiche.population, projets: 0 });
+  }
+  for (const projet of projets) {
+    for (const slug of projet.provinces) {
+      const resume = resumes.get(slug) ?? { chefLieu: null, population: null, projets: 0 };
+      resume.projets += 1;
+      resumes.set(slug, resume);
+    }
+  }
+  return resumes;
 }
 
 async function fichesImpl(lang: Lang): Promise<FicheVue[]> {
@@ -146,12 +168,11 @@ async function fichesImpl(lang: Lang): Promise<FicheVue[]> {
  * projets nationaux. Les premiers d'abord — ce que le projet fait LÀ prime sur
  * ce qu'il fait partout.
  */
+const projetsPublies = (lang: Lang) =>
+  cacheJson(`provinces:projets:${lang}`, { tags: [TAG.provinces], ttl: TTL.socle }, () => projetsImpl(lang));
+
 export async function projetsProvince(slug: string, lang: Lang): Promise<ProjetVue[]> {
-  const tous = await cacheJson(
-    `provinces:projets:${lang}`,
-    { tags: [TAG.provinces], ttl: TTL.socle },
-    () => projetsImpl(lang),
-  );
+  const tous = await projetsPublies(lang);
   const locaux = tous.filter((projet) => projet.provinces.includes(slug));
   const nationaux = tous.filter((projet) => projet.provinces.length === 0);
   return [...locaux, ...nationaux];

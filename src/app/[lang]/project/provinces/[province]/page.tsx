@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { asLang, LOCALES } from "@/lib/params";
@@ -16,6 +17,8 @@ import { FilAriane } from "@/components/ui/FilAriane";
 import { Kicker } from "@/components/ui/Kicker";
 import { CtaFin } from "@/components/ui/CtaFin";
 import { Reveal } from "@/components/motion/Reveal";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { Compteur } from "@/components/motion/Compteur";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
 
 /**
@@ -80,8 +83,8 @@ export default async function ProvincePage(props: Props) {
     composantesPubliques(lang),
   ]);
 
-  const nombre = new Intl.NumberFormat(lang === "en" ? "en-GB" : "fr-FR");
-  const date = new Intl.DateTimeFormat(lang === "en" ? "en-GB" : "fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const locale = lang === "en" ? "en-GB" : "fr-FR";
+  const date = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
   const comp = new Map(composantes.map((c) => [c.code, c]));
 
   const libelleAvancement: Record<AvancementProjet, string> = {
@@ -96,21 +99,37 @@ export default async function ProvincePage(props: Props) {
   for (const projet of projets) for (const n of projet.odd) comptesOdd.set(n, (comptesOdd.get(n) ?? 0) + 1);
   const oddVises = ODD.filter((o) => comptesOdd.has(o.n)).sort((a, b) => (comptesOdd.get(b.n) ?? 0) - (comptesOdd.get(a.n) ?? 0));
 
-  const chiffres: { label: string; valeur: string; note?: string }[] = [];
+  const ordre = [...provinces].sort((a, b) => a.nom.localeCompare(b.nom, "fr"));
+  const rangIci = ordre.findIndex((x) => x.nom === p.nom);
+  const precedente = ordre[(rangIci - 1 + ordre.length) % ordre.length];
+  const suivante = ordre[(rangIci + 1) % ordre.length];
+
+  // La console admet une adresse OU un titre (« Journal officiel, 12 mars ») :
+  // seul un lien http(s) devient un lien, le reste se lit tel quel.
+  const sourceGouverneur = fiche?.gouverneurSource ?? null;
+  const sourceEstLien = sourceGouverneur !== null && /^https?:\/\//i.test(sourceGouverneur);
+
+  // Les grandeurs numériques défilent jusqu'à leur valeur (Compteur, même
+  // locale que la page) ; le HTML rendu porte déjà la valeur finale formatée.
+  const chiffres: { label: string; valeur: ReactNode; note?: string }[] = [];
   if (fiche?.chefLieu) chiffres.push({ label: pr.chefLieu, valeur: fiche.chefLieu });
   if (fiche?.population) {
     chiffres.push({
       label: pr.population,
-      valeur: nombre.format(fiche.population),
+      valeur: <Compteur valeur={fiche.population} locale={locale} />,
       note: fiche.populationAnnee ? `${pr.populationEst} ${fiche.populationAnnee}` : pr.populationEst,
     });
   }
-  if (fiche?.superficieKm2) chiffres.push({ label: pr.superficie, valeur: `${nombre.format(fiche.superficieKm2)} km²` });
+  if (fiche?.superficieKm2) chiffres.push({ label: pr.superficie, valeur: <Compteur valeur={fiche.superficieKm2} locale={locale} suffixe=" km²" /> });
   if (fiche?.population && fiche.superficieKm2) {
-    chiffres.push({ label: pr.densite, valeur: `${nombre.format(Math.round(fiche.population / fiche.superficieKm2))} ${pr.habKm2}` });
+    chiffres.push({
+      label: pr.densite,
+      valeur: <Compteur valeur={Math.round(fiche.population / fiche.superficieKm2)} locale={locale} suffixe={` ${pr.habKm2}`} />,
+    });
   }
-  if (fiche?.territoires) chiffres.push({ label: pr.territoires, valeur: String(fiche.territoires) });
-  if (fiche?.communes) chiffres.push({ label: pr.communes, valeur: String(fiche.communes) });
+  // Petits entiers : affichés sans séparateur de milliers, comme auparavant.
+  if (fiche?.territoires) chiffres.push({ label: pr.territoires, valeur: <Compteur valeur={fiche.territoires} locale={locale} options={{ useGrouping: false }} duree={1} /> });
+  if (fiche?.communes) chiffres.push({ label: pr.communes, valeur: <Compteur valeur={fiche.communes} locale={locale} options={{ useGrouping: false }} duree={1} /> });
 
   return (
     <div>
@@ -121,6 +140,7 @@ export default async function ProvincePage(props: Props) {
             items={[
               { label: t.nav.accueil, href: route(lang) },
               { label: t.nav.projet, href: route(lang, NAV.projet) },
+              { label: t.nav.provinces, href: route(lang, NAV.provinces) },
               { label: p.nom },
             ]}
           />
@@ -141,22 +161,28 @@ export default async function ProvincePage(props: Props) {
         <section className="section">
           <div className="section__inner">
             <Reveal><Kicker>{pr.ficheLabel}</Kicker></Reveal>
+            {/* Pas de cascade par cellule : RevealGroup n'a pas de <dl>, et une
+                cellule masquée laisserait voir le fond gris des filets (gap 1px
+                sur fond --c-20). Le bloc entier monte d'un seul tenant, les
+                compteurs portent le mouvement. */}
             {chiffres.length > 0 && (
-              <dl className="prov-chiffres">
-                {chiffres.map((c) => (
-                  <div key={c.label} className="prov-chiffre">
-                    <dt className="mono">{c.label}</dt>
-                    <dd>
-                      {c.valeur}
-                      {c.note && <span className="prov-chiffre__note">{c.note}</span>}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              <Reveal>
+                <dl className="prov-chiffres">
+                  {chiffres.map((c) => (
+                    <div key={c.label} className="prov-chiffre">
+                      <dt className="mono">{c.label}</dt>
+                      <dd>
+                        {c.valeur}
+                        {c.note && <span className="prov-chiffre__note">{c.note}</span>}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </Reveal>
             )}
 
-            <div className="prov-infos">
-              <div>
+            <RevealGroup className="prov-infos" gap={0.12}>
+              <RevealItem>
                 <h2 className="prov-h3">{pr.adminLabel}</h2>
                 <dl className="prov-lignes">
                   <div>
@@ -166,10 +192,14 @@ export default async function ProvincePage(props: Props) {
                       {fiche.gouverneur && fiche.gouverneurDate && (
                         <span className="prov-lignes__note">
                           {pr.gouverneurAu} {date.format(new Date(fiche.gouverneurDate))}
-                          {fiche.gouverneurSource && (
+                          {sourceGouverneur && (
                             <>
                               {" · "}
-                              <a href={fiche.gouverneurSource} target="_blank" rel="noopener noreferrer">{pr.source} ↗</a>
+                              {sourceEstLien ? (
+                                <a href={sourceGouverneur} target="_blank" rel="noopener noreferrer">{pr.source} ↗</a>
+                              ) : (
+                                <>{pr.source} : {sourceGouverneur}</>
+                              )}
                             </>
                           )}
                         </span>
@@ -183,9 +213,9 @@ export default async function ProvincePage(props: Props) {
                     </div>
                   )}
                 </dl>
-              </div>
+              </RevealItem>
               {(fiche.villes.length > 0 || fiche.langues.length > 0) && (
-                <div>
+                <RevealItem>
                   <h2 className="prov-h3">{pr.villesLangues}</h2>
                   <dl className="prov-lignes">
                     {fiche.villes.length > 0 && (
@@ -201,9 +231,9 @@ export default async function ProvincePage(props: Props) {
                       </div>
                     )}
                   </dl>
-                </div>
+                </RevealItem>
               )}
-            </div>
+            </RevealGroup>
           </div>
         </section>
       )}
@@ -211,7 +241,7 @@ export default async function ProvincePage(props: Props) {
       {/* ===== STATUT + CARTE ===== */}
       <section className="section" style={{ background: "var(--c-10)" }}>
         <div className="section__inner cols2 cols2--center" style={{ gridTemplateColumns: ".9fr 1.1fr" }}>
-          <Reveal>
+          <Reveal variant="left">
             <Kicker>{pr.statutLabel}</Kicker>
             <p style={{ margin: "18px 0 0", fontSize: 17, lineHeight: 1.65, color: "var(--c-80)", maxWidth: 460 }}>
               {p.prio ? pr.statutPrio : pr.statutAutre}
@@ -221,7 +251,9 @@ export default async function ProvincePage(props: Props) {
               <Link href={route(lang, NAV.resultats)} style={{ color: "var(--ac)" }}>{t.resultats.titre} →</Link>
             </p>
           </Reveal>
-          <ProvinceMap lang={lang} selection={p.nom} />
+          <Reveal variant="zoom" delay={0.1}>
+            <ProvinceMap lang={lang} selection={p.nom} />
+          </Reveal>
         </div>
       </section>
 
@@ -233,36 +265,44 @@ export default async function ProvincePage(props: Props) {
               <Kicker>{pr.projetsLabel}</Kicker>
               <p style={{ margin: "14px 0 0", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 640 }}>{pr.projetsLead}</p>
             </Reveal>
-            <nav className="prov-compteurs" aria-label={pr.projetsLabel}>
-              {groupes.map((g) => (
-                <a key={g.av} href={`#av-${g.av.toLowerCase()}`} className="prov-compteur" data-av={g.av}>
-                  <span className="prov-compteur__n">{g.items.length}</span>
-                  <span>{libelleAvancement[g.av]}</span>
-                </a>
-              ))}
-            </nav>
+            <Reveal delay={0.08}>
+              <nav className="prov-compteurs" aria-label={pr.projetsLabel}>
+                {groupes.map((g) => (
+                  <a key={g.av} href={`#av-${g.av.toLowerCase()}`} className="prov-compteur" data-av={g.av}>
+                    <span className="prov-compteur__n"><Compteur valeur={g.items.length} locale={locale} duree={0.9} /></span>
+                    <span>{libelleAvancement[g.av]}</span>
+                  </a>
+                ))}
+              </nav>
+            </Reveal>
             {groupes.map((g) => (
               <div key={g.av} id={`av-${g.av.toLowerCase()}`} className="prov-groupe">
-                <h2 className="prov-h3">
-                  <span className="prov-point" data-av={g.av} aria-hidden />
-                  {libelleAvancement[g.av]} <span style={{ color: "var(--c-50)", fontWeight: 400 }}>({g.items.length})</span>
-                </h2>
-                <ul className="prov-projets">
+                <Reveal>
+                  <h2 className="prov-h3">
+                    <span className="prov-point" data-av={g.av} aria-hidden />
+                    {libelleAvancement[g.av]} <span style={{ color: "var(--c-50)", fontWeight: 400 }}>({g.items.length})</span>
+                  </h2>
+                </Reveal>
+                {/* Cartes en fondu seul : `.prov-projet:hover` translate, et un
+                    transform inline laissé par framer bloquerait ce survol. */}
+                <RevealGroup as="ul" className="prov-projets" gap={0.07}>
                   {g.items.slice(0, VISIBLES).map((projet) => (
                     <CarteProjet key={projet.id} projet={projet} lang={lang} comp={projet.composante ? comp.get(projet.composante) : undefined} />
                   ))}
-                </ul>
+                </RevealGroup>
                 {/* Au-delà de VISIBLES, repliés : trente cartes empilées
                     faisaient quinze mille pixels au téléphone. <details> natif,
                     sans script, et le contenu reste dans le HTML indexé. */}
                 {g.items.length > VISIBLES && (
                   <details className="prov-plus">
                     <summary className="mono">{pr.voirPlus.replace("{n}", String(g.items.length - VISIBLES))}</summary>
-                    <ul className="prov-projets">
+                    {/* Révélée à l'ouverture : tant que <details> est fermé,
+                        la liste n'a pas de boîte et n'entre pas dans la vue. */}
+                    <RevealGroup as="ul" className="prov-projets" gap={0.05}>
                       {g.items.slice(VISIBLES).map((projet) => (
                         <CarteProjet key={projet.id} projet={projet} lang={lang} comp={projet.composante ? comp.get(projet.composante) : undefined} />
                       ))}
-                    </ul>
+                    </RevealGroup>
                   </details>
                 )}
               </div>
@@ -279,15 +319,17 @@ export default async function ProvincePage(props: Props) {
               <Kicker light>{pr.oddLabel}</Kicker>
               <p style={{ margin: "14px 0 0", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-30)", maxWidth: 620 }}>{pr.oddLead}</p>
             </Reveal>
-            <ul className="prov-odd">
+            {/* Fondu seul plutôt que zoom : `.prov-odd li:hover` translate, et
+                le transform inline d'un zoom framer neutraliserait ce survol. */}
+            <RevealGroup as="ul" className="prov-odd" gap={0.06}>
               {oddVises.map((o) => (
-                <li key={o.n} style={{ background: o.couleur }}>
+                <RevealItem as="li" fade key={o.n} style={{ background: o.couleur }}>
                   <span className="prov-odd__n">{o.n}</span>
                   <span className="prov-odd__t">{pick(o.titre, lang)}</span>
                   <span className="mono prov-odd__c">{comptesOdd.get(o.n)} {pr.oddProjets}</span>
-                </li>
+                </RevealItem>
               ))}
-            </ul>
+            </RevealGroup>
           </div>
         </section>
       )}
@@ -295,34 +337,38 @@ export default async function ProvincePage(props: Props) {
       {/* ===== LES 26 PROVINCES ===== */}
       <section className="section">
         <div className="section__inner">
+          <nav className="prov-voisines" aria-label={pr.toutesLabel}>
+            {/* Chaque lien arrive de son côté ; l'enveloppe en grille garde le
+                lien étiré sur toute la cellule (hauteurs égales). */}
+            <Reveal variant="left" style={{ display: "grid" }}>
+              <Link href={provinceRoute(lang, precedente.nom)} rel="prev">
+                <span className="mono">← {pr.precedente}</span>
+                <strong>{precedente.nom}</strong>
+              </Link>
+            </Reveal>
+            <Reveal variant="right" style={{ display: "grid" }}>
+              <Link href={provinceRoute(lang, suivante.nom)} rel="next" data-suivante>
+                <span className="mono">{pr.suivante} →</span>
+                <strong>{suivante.nom}</strong>
+              </Link>
+            </Reveal>
+          </nav>
+
           <Reveal><Kicker>{pr.toutesLabel}</Kicker></Reveal>
-          <ul className="prov-liste">
-            {[...provinces].sort((a, b) => a.nom.localeCompare(b.nom, "fr")).map((x) => {
+          <RevealGroup as="ul" className="prov-liste" gap={0.025}>
+            {ordre.map((x) => {
               const ici = x.nom === p.nom;
               return (
-                <li key={x.nom}>
+                <RevealItem as="li" key={x.nom}>
                   <Link href={provinceRoute(lang, x.nom)} aria-current={ici ? "page" : undefined}>
                     <span aria-hidden data-prio={x.prio || undefined} />
                     {x.nom}
                   </Link>
-                </li>
+                </RevealItem>
               );
             })}
-          </ul>
+          </RevealGroup>
 
-          {fiche && fiche.sources.length > 0 && (
-            <div className="prov-sources">
-              <h2 className="mono">{pr.sourcesLabel}</h2>
-              <p>{pr.sourcesNote}{fiche.populationSource ? ` (${fiche.populationSource})` : ""}</p>
-              <ul>
-                {fiche.sources.map((url) => (
-                  <li key={url}>
-                    <a href={url} target="_blank" rel="noopener noreferrer">{new URL(url).hostname.replace(/^www\./, "")}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </section>
 
@@ -349,7 +395,7 @@ function CarteProjet({
 }) {
   const pr = dict(lang).province;
   return (
-    <li className="prov-projet" style={{ borderTopColor: comp?.color ?? "var(--c-30)" }}>
+    <RevealItem as="li" fade className="prov-projet" style={{ borderTopColor: comp?.color ?? "var(--c-30)" }}>
       <div className="prov-projet__haut mono">
         {comp ? (
           <Link href={compRoute(lang, comp.slug)} title={comp.titre}>{comp.code}</Link>
@@ -364,7 +410,7 @@ function CarteProjet({
       {projet.resume && <p>{projet.resume}</p>}
       {projet.lieu && <p className="prov-projet__lieu">{projet.lieu}</p>}
       {projet.odd.length > 0 && (
-        <ul className="prov-projet__odd" aria-label="ODD">
+        <ul className="prov-projet__odd" aria-label={pr.oddAria}>
           {projet.odd.map((n) => {
             const o = oddParNumero(n);
             return o ? (
@@ -375,6 +421,6 @@ function CarteProjet({
           })}
         </ul>
       )}
-    </li>
+    </RevealItem>
   );
 }

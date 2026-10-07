@@ -4,22 +4,26 @@ import { asLang } from "@/lib/params";
 import { dict } from "@/content/i18n";
 import { provinces } from "@/content/data";
 import { NAV, route } from "@/lib/routes";
-import { provinceRoute } from "@/lib/provinces/chemins";
+import { provinceRoute, slugProvince } from "@/lib/provinces/chemins";
+import { resumesProvinces } from "@/lib/provinces/query";
 import { PageHero } from "@/components/ui/PageHero";
 import { FilAriane } from "@/components/ui/FilAriane";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
+import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
 
 /**
  * Index des provinces : la carte, puis les vingt-six pages province, les dix
  * prioritaires d'abord.
  *
- * Entrée du sous-menu « Le Projet » (cf. `NAV.provinces`). Rien n'y est lu en
- * base : la table des provinces et leur statut de priorité sont figés
- * (cf. content/data.ts), la page est donc entièrement statique. Ce que la
- * console administre (fiches, projets) vit sur les pages de détail.
+ * Entrée du sous-menu « Le Projet » (cf. `NAV.provinces`). La table des
+ * provinces et leur statut de priorité sont figés (cf. content/data.ts) ;
+ * chaque carte y ajoute ce que la console publie — chef-lieu, population,
+ * projets propres à la province — lu dans les caches des pages de détail, et
+ * revalidé au même rythme qu'elles.
  */
+export const revalidate = 120;
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const lang = asLang(params.lang);
@@ -43,6 +47,8 @@ export default async function ProvincesPage(props: { params: Promise<{ lang: str
   const lang = asLang(params.lang);
   const t = dict(lang);
   const pr = t.province;
+  const resumes = await resumesProvinces(lang);
+  const nombre = new Intl.NumberFormat(lang === "en" ? "en-GB" : "fr-FR", { notation: "compact", maximumFractionDigits: 1 });
 
   const groupes = [
     { cle: "prio", titre: pr.prioLabel, items: provinces.filter((p) => p.prio).sort(parNom) },
@@ -69,22 +75,31 @@ export default async function ProvincesPage(props: { params: Promise<{ lang: str
       {/* ===== CARTE ===== */}
       <section className="section" style={{ background: "var(--c-10)" }}>
         <div className="section__inner cols2 cols2--center" style={{ gridTemplateColumns: ".85fr 1.15fr" }}>
-          <Reveal>
-            <Kicker>{t.sec.couverture}</Kicker>
-            <h2 className="h2">26 {t.words.provinces}.<br />10 {t.words.prio}.</h2>
-            <div style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 9, fontSize: 13 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Texte depuis la gauche, puis la légende en cascade et l'aide en
+              fondu ; la carte arrive en zoom arrière (ses provinces ont en plus
+              leur propre entrée d'ouest en est, cf. ProvinceMap). */}
+          <div>
+            <Reveal variant="left">
+              <Kicker>{t.sec.couverture}</Kicker>
+              <h2 className="h2">26 {t.words.provinces}.<br />10 {t.words.prio}.</h2>
+            </Reveal>
+            <RevealGroup gap={0.1} delayChildren={0.2} style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 9, fontSize: 13 }}>
+              <RevealItem style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span aria-hidden style={{ width: 11, height: 11, background: "var(--ac)" }} />
                 <span style={{ color: "var(--c-80)" }}>{t.lbl.prio}</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              </RevealItem>
+              <RevealItem style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span aria-hidden style={{ width: 11, height: 11, border: "1px solid var(--c-50)", background: "#fff" }} />
                 <span style={{ color: "var(--c-80)" }}>{t.lbl.autres}</span>
-              </div>
-            </div>
-            <p style={{ margin: "24px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--c-60)", maxWidth: 420 }}>{pr.carteAide}</p>
+              </RevealItem>
+            </RevealGroup>
+            <Reveal variant="fade" delay={0.35}>
+              <p style={{ margin: "24px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--c-60)", maxWidth: 420 }}>{pr.carteAide}</p>
+            </Reveal>
+          </div>
+          <Reveal variant="zoom" delay={0.1}>
+            <ProvinceMap lang={lang} />
           </Reveal>
-          <ProvinceMap lang={lang} />
         </div>
       </section>
 
@@ -96,17 +111,32 @@ export default async function ProvincesPage(props: { params: Promise<{ lang: str
               <Reveal>
                 <Kicker>{groupe.titre}</Kicker>
               </Reveal>
-              <ul className="prov-liste">
-                {groupe.items.map((p) => (
-                  <li key={p.nom}>
-                    <Link href={provinceRoute(lang, p.nom)}>
-                      <span aria-hidden data-prio={p.prio || undefined} />
-                      {p.nom}
-                      {p.prio && <em className="sr-only"> ({pr.prio})</em>}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <RevealGroup as="ul" className="prov-cartes" gap={0.045}>
+                {groupe.items.map((p) => {
+                  const resume = resumes.get(slugProvince(p.nom));
+                  const details = [
+                    resume?.chefLieu,
+                    resume?.population ? `${nombre.format(resume.population)} ${pr.habitants}` : null,
+                  ].filter(Boolean);
+                  return (
+                    <RevealItem as="li" key={p.nom}>
+                      <Link href={provinceRoute(lang, p.nom)} className="prov-carte" data-prio={p.prio || undefined}>
+                        <span className="prov-carte__nom">
+                          {p.nom}
+                          {p.prio && <em className="sr-only"> ({pr.prio})</em>}
+                        </span>
+                        {details.length > 0 && <span className="prov-carte__details">{details.join(" · ")}</span>}
+                        <span className="mono prov-carte__projets">
+                          {resume?.projets
+                            ? pr.projetsLocaux.replace("{n}", String(resume.projets))
+                            : pr.projetsNationaux}
+                          <span aria-hidden> →</span>
+                        </span>
+                      </Link>
+                    </RevealItem>
+                  );
+                })}
+              </RevealGroup>
             </div>
           ))}
         </div>
