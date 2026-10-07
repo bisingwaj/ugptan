@@ -137,6 +137,15 @@ function client(): Redis | null {
   return globalForRedis.__ugptnRedis;
 }
 
+/**
+ * Le même client, pour un usage qui n'est PAS du cache : les compteurs de la
+ * limitation de débit (cf. lib/rate-limit.ts), qui doivent être partagés entre
+ * toutes les instances. `null` sans Redis configuré.
+ */
+export function redisPartage(): Redis | null {
+  return client();
+}
+
 /** La clé complète d'une entrée, préfixée et versionnée. */
 const cle = (brut: string) => `${NS}:${VERSION}:${brut}`;
 

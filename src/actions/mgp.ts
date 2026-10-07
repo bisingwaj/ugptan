@@ -90,7 +90,7 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
     };
   }
 
-  const limit = rateLimit(`mgp:submit:${requestIp(await headers())}`, SUBMIT_LIMIT, SUBMIT_WINDOW_MS);
+  const limit = await rateLimit(`mgp:submit:${requestIp(await headers())}`, SUBMIT_LIMIT, SUBMIT_WINDOW_MS);
   if (!limit.allowed) {
     return {
       ok: false,
@@ -327,7 +327,7 @@ export async function trackGrievance(rawReference: string, rawLang: string): Pro
     return { ok: false, error: t("Saisissez votre numéro de référence.", "Enter your reference number.") };
   }
 
-  const limit = rateLimit(`mgp:track:${requestIp(await headers())}`, TRACK_LIMIT, TRACK_WINDOW_MS);
+  const limit = await rateLimit(`mgp:track:${requestIp(await headers())}`, TRACK_LIMIT, TRACK_WINDOW_MS);
   if (!limit.allowed) {
     return {
       ok: false,

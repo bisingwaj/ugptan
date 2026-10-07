@@ -53,7 +53,7 @@ export async function ouvrirAvecCodeAction(_precedent: AccesState, form: FormDat
   if (!CODE_MOTIF.test(saisi)) return { erreur: "forme" };
 
   const ip = requestIp(await headers());
-  if (!rateLimit(`maintenance:${ip}`, TENTATIVES, FENETRE_MS).allowed) return { erreur: "trop" };
+  if (!(await rateLimit(`maintenance:${ip}`, TENTATIVES, FENETRE_MS)).allowed) return { erreur: "trop" };
 
   const etat = await etatMaintenance();
   // Rouvert entre l'affichage de l'écran et la saisie : la personne n'a plus

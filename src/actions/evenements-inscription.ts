@@ -66,7 +66,7 @@ export async function inscrireAction(
   }
 
   /* --- 1. Débit ---------------------------------------------------------- */
-  const limite = rateLimit(`evt:inscription:${requestIp(await headers())}`, LIMITE, FENETRE_MS);
+  const limite = await rateLimit(`evt:inscription:${requestIp(await headers())}`, LIMITE, FENETRE_MS);
   if (!limite.allowed) {
     return echec(t(
       "Trop de demandes successives depuis cette connexion. Réessayez dans quelques minutes.",

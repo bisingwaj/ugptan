@@ -1,20 +1,30 @@
 /**
- * Limite de débit en mémoire, à fenêtre glissante.
+ * Limite de débit des formulaires publics.
  *
  * Sert deux besoins du MGP, tous deux ouverts au public sans authentification :
  * le dépôt d'une plainte (inondation du dossier) et le suivi par numéro de
  * référence (balayage de numéros).
  *
- * ⚠️ PORTÉE : une instance d'exécution. En hébergement sans état (Vercel,
- * Netlify), plusieurs instances coexistent et chacune tient son propre compteur :
- * la limite effective est donc plus lâche que la valeur annoncée. C'est un
- * ralentisseur, pas une barrière — il rend le balayage coûteux, il ne l'interdit
- * pas. Le jour où le trafic le justifiera, la même interface se rebranchera sur
- * un magasin partagé (Redis, Postgres) sans toucher aux appelants.
+ * Sert aussi l'abonnement à la lettre, l'inscription aux événements et, surtout,
+ * le plafond d'essais du code de maintenance à six chiffres.
  *
- * Le compteur est déposé sur `globalThis` pour survivre au rechargement à chaud
- * du développement, comme le client Prisma.
+ * ─── Compteur PARTAGÉ (Redis), mémoire en secours ────────────────────────────
+ *
+ * En hébergement sans état (Vercel), plusieurs instances coexistent et chaque
+ * instance froide repart de zéro : un compteur en mémoire n'y est qu'un
+ * ralentisseur, contourné en multipliant les requêtes. Le compteur vit donc
+ * dans Redis (Upstash, déjà présent pour le cache), commun à toutes les
+ * instances : fenêtre FIXE, un `INCR` et une expiration par fenêtre.
+ *
+ * Redis absent (développement) ou injoignable : retombée sur le compteur en
+ * mémoire, à fenêtre glissante. Une panne Redis ne doit jamais bloquer un
+ * dépôt de plainte — mieux vaut une limite plus lâche qu'un service fermé.
+ *
+ * Le compteur mémoire est déposé sur `globalThis` pour survivre au
+ * rechargement à chaud du développement, comme le client Prisma.
  */
+import "server-only";
+import { redisPartage } from "@/lib/cache/redis";
 
 type Bucket = { hits: number[] };
 
@@ -28,12 +38,38 @@ const MAX_KEYS = 5000;
 export type RateLimitResult = { allowed: boolean; retryAfterSeconds: number };
 
 /**
- * Consomme un jeton pour `key`.
+ * Consomme un jeton pour `key`, sur le compteur partagé si Redis répond.
  *
  * @param limit   nombre d'appels tolérés sur la fenêtre
  * @param windowMs durée de la fenêtre, en millisecondes
  */
-export function rateLimit(key: string, limit: number, windowMs: number): RateLimitResult {
+export async function rateLimit(key: string, limit: number, windowMs: number): Promise<RateLimitResult> {
+  const redis = redisPartage();
+  if (redis) {
+    try {
+      const now = Date.now();
+      const fenetre = Math.floor(now / windowMs);
+      const cle = `ug:rl:${key}:${fenetre}`;
+      // INCR puis expiration à la fin de la fenêtre (+1 s de marge), en un
+      // seul aller-retour.
+      const [compte] = await redis
+        .multi()
+        .incr(cle)
+        .pexpire(cle, windowMs + 1000)
+        .exec<[number, number]>();
+      const restant = Math.max(1, Math.ceil(((fenetre + 1) * windowMs - now) / 1000));
+      return compte > limit
+        ? { allowed: false, retryAfterSeconds: restant }
+        : { allowed: true, retryAfterSeconds: 0 };
+    } catch {
+      // Redis injoignable : compteur local, cf. en-tête.
+    }
+  }
+  return rateLimitMemoire(key, limit, windowMs);
+}
+
+/** Compteur d'une instance, à fenêtre glissante : le secours sans Redis. */
+function rateLimitMemoire(key: string, limit: number, windowMs: number): RateLimitResult {
   const now = Date.now();
 
   if (buckets.size > MAX_KEYS) buckets.clear();
@@ -98,7 +134,7 @@ const ENTETES_PLATEFORME = [
 export function requestIp(headers: Headers): string {
   for (const nom of ENTETES_PLATEFORME) {
     const valeur = headers.get(nom)?.trim();
-    if (valeur) return valeur;
+    if (valeur) return reseau(valeur);
   }
 
   /* Dernier recours. L'entrée la plus à DROITE, et non la plus à gauche : la
@@ -107,8 +143,25 @@ export function requestIp(headers: Headers): string {
   const chaine = headers.get("x-forwarded-for");
   if (chaine) {
     const maillons = chaine.split(",").map((m) => m.trim()).filter(Boolean);
-    if (maillons.length > 0) return maillons[maillons.length - 1];
+    if (maillons.length > 0) return reseau(maillons[maillons.length - 1]);
   }
 
   return "local";
+}
+
+/**
+ * Une adresse IPv6 est ramenée à son préfixe /64. Un abonné reçoit en général
+ * un /64 entier : sans cela, changer d'adresse dans son propre bloc donnerait
+ * un compteur neuf à chaque requête. IPv4 inchangée.
+ */
+function reseau(ip: string): string {
+  if (!ip.includes(":")) return ip;
+  const [tete] = ip.split("%");
+  const parties = tete.split("::");
+  const gauche = parties[0] ? parties[0].split(":") : [];
+  const droite = parties.length > 1 && parties[1] ? parties[1].split(":") : [];
+  const groupes = parties.length > 1
+    ? [...gauche, ...Array(Math.max(0, 8 - gauche.length - droite.length)).fill("0"), ...droite]
+    : gauche;
+  return `${groupes.slice(0, 4).map((g) => g || "0").join(":")}::/64`;
 }

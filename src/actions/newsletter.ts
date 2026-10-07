@@ -98,7 +98,7 @@ export async function subscribeNewsletter(draft: SubscribeDraft): Promise<Subscr
   // 3. Débit par adresse IP : ralentisseur contre l'inondation de la liste
   //    (cf. la portée réelle de la limite, lib/rate-limit.ts).
   const ip = requestIp(await headers());
-  if (!rateLimit(`nl:sub:${ip}`, SUBSCRIBE_LIMIT, SUBSCRIBE_WINDOW_MS).allowed) {
+  if (!(await rateLimit(`nl:sub:${ip}`, SUBSCRIBE_LIMIT, SUBSCRIBE_WINDOW_MS)).allowed) {
     return { ok: false, error: "rate" };
   }
 
@@ -261,7 +261,7 @@ export async function requestUnsubscribeLink(
 
   if (!isValidEmail(email)) return { ok: false, error: "invalid" };
 
-  if (!rateLimit(`nl:unsub:${requestIp(await headers())}`, UNSUBSCRIBE_LINK_LIMIT, UNSUBSCRIBE_LINK_WINDOW_MS).allowed) {
+  if (!(await rateLimit(`nl:unsub:${requestIp(await headers())}`, UNSUBSCRIBE_LINK_LIMIT, UNSUBSCRIBE_LINK_WINDOW_MS)).allowed) {
     return { ok: false, error: "rate" };
   }
 
