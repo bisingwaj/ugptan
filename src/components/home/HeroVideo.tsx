@@ -33,6 +33,9 @@ export function HeroVideo({ src, srcWebm, poster }: { src: string; srcWebm?: str
 
   // Faut-il charger la vidéo ? Sinon : poster seul, zéro octet de vidéo.
   useEffect(() => {
+    // Préférence encore inconnue (hydratation) : pas d'octet de vidéo avant
+    // de savoir si la personne a demandé moins d'animations.
+    if (reduce === null) return;
     if (reduce) return setLoad(false);
     const c = (navigator as unknown as { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
     const slow = !!c && (c.saveData === true || c.effectiveType === "slow-2g" || c.effectiveType === "2g");

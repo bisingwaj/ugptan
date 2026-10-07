@@ -47,6 +47,9 @@ export function SmoothScroll() {
   }, [pathname]);
 
   useEffect(() => {
+    // Préférence encore inconnue (hydratation) : on attend de la connaître,
+    // plutôt que de monter Lenis pour le défaire au rendu suivant.
+    if (reduce === null) return;
     // Pas de Lenis au tactile (pointeur grossier) : l'inertie native (iOS/Android)
     // est plus fluide et moins gourmande. Le verrou d'overlay (.scroll-locked)
     // prend le relais quand lenis est null.
