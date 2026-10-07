@@ -8,10 +8,17 @@ import { SITE_URL } from "@/lib/site";
 import { NAV, route } from "@/lib/routes";
 import { getAlbum, listerGalerie } from "@/lib/galerie/query";
 import { PageHero } from "@/components/ui/PageHero";
-import { GalerieGrille } from "@/components/galerie/GalerieGrille";
+import { GalerieGrilleUrl } from "@/components/url/GalerieGrilleUrl";
 import { metaPage } from "@/lib/seo";
 
-/** Même politique de cache que la galerie (cf. ../page.tsx). */
+/**
+ * Même politique de cache que la galerie (cf. ../page.tsx).
+ *
+ * ⚠️ Elle ne tient que parce que la page ne lit PAS `searchParams` : le lien
+ * vers une photo de l'album (`?media=<id>`) est lu côté client
+ * (components/url/GalerieGrilleUrl.tsx). Le lire ici rendait chaque album
+ * dynamique, à chaque visite, pour un panneau que la plupart n'ouvrent pas.
+ */
 export const revalidate = 300;
 
 /**
@@ -22,7 +29,7 @@ export const revalidate = 300;
  */
 export const dynamicParams = true;
 
-type Params = { params: Promise<{ lang: string; slug: string }>; searchParams: Promise<{ media?: string }> };
+type Params = { params: Promise<{ lang: string; slug: string }> };
 
 export async function generateMetadata(props: {
   params: Promise<{ lang: string; slug: string }>;
@@ -52,7 +59,7 @@ export async function generateMetadata(props: {
 }
 
 export default async function AlbumPage(props: Params) {
-  const [params, recherche] = await Promise.all([props.params, props.searchParams]);
+  const params = await props.params;
   const lang = asLang(params.lang);
   const g = dict(lang).galerie;
 
@@ -141,7 +148,7 @@ export default async function AlbumPage(props: Params) {
           {items.length === 0 ? (
             <p className="actu-vide">{g.empty}</p>
           ) : (
-            <GalerieGrille items={items} lang={lang} ouvertParDefaut={recherche.media ?? null} />
+            <GalerieGrilleUrl items={items} lang={lang} />
           )}
 
           <p className="doc-mention">{g.disclaimer}</p>

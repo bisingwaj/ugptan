@@ -49,10 +49,14 @@ const STATUTS: Record<MarcheStatut, { fr: string; en: string; c: string }> = {
 /**
  * ⚠️ `ouvrir` porte la référence à déplier au premier rendu.
  *
- * Elle arrive du serveur, lue dans `?avis=` par la page, et non d'un
- * `useSearchParams` ici : le composant resterait sinon suspendu au rendu
- * statique, ce qui coûterait le pré-rendu de toute la page Marchés pour un
- * paramètre que quatre-vingt-dix-neuf visiteurs sur cent n'utilisent pas.
+ * Elle est lue dans `?avis=` par l'enveloppe `MarchesClientUrl`
+ * (components/url/), et non ici ni par la page. Ni ici : un `useSearchParams`
+ * sans frontière dédiée suspendrait ce composant au rendu statique. Ni par la
+ * page : lire `searchParams` la rendrait dynamique à chaque visite, ce qui
+ * coûterait le pré-rendu de toute la page Marchés pour un paramètre que
+ * quatre-vingt-dix-neuf visiteurs sur cent n'utilisent pas. L'enveloppe pose
+ * sa propre frontière `<Suspense>`, dont le repli est cette liste sans avis
+ * déplié : le prérendu est conservé, l'avis s'ouvre à l'hydratation.
  *
  * C'est ce paramètre qui rattrape les anciennes adresses `/notices/<référence>`
  * de DigiProcure : elles y redirigent, et le visiteur retombe sur l'avis qu'il

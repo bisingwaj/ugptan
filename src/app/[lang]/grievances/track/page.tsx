@@ -9,7 +9,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
-import { MgpTracker } from "@/components/mgp/MgpTracker";
+import { MgpTrackerUrl } from "@/components/url/MgpTrackerUrl";
 import { metaPage } from "@/lib/seo";
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
@@ -27,16 +27,15 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   });
 }
 
-export default async function MgpSuiviPage(props: {
-  params: Promise<{ lang: string }>;
-  searchParams: Promise<{ ref?: string }>;
-}) {
-  const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
+export default async function MgpSuiviPage(props: { params: Promise<{ lang: string }> }) {
+  const params = await props.params;
   const lang = asLang(params.lang);
   const t = dict(lang).mgp;
 
-  // Numéro transmis par l'accusé de réception : la recherche se lance seule.
-  const initialRef = typeof searchParams.ref === "string" ? searchParams.ref.slice(0, 60) : "";
+  /* Le numéro transmis par l'accusé de réception (`?ref=`) n'est PAS lu ici :
+     lire `searchParams` rendrait la page dynamique à chaque visite.
+     `MgpTrackerUrl` le lit dans le navigateur, sous `<Suspense>`, et lance la
+     recherche dès l'hydratation (cf. components/url/useParametre.ts). */
 
   return (
     <div>

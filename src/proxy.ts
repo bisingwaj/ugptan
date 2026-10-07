@@ -8,6 +8,7 @@ import { ADMIN_BASE, ADMIN_LOGIN, ADMIN_SET_PASSWORD, NEXT_PARAM } from "@/lib/a
 import { cheminActuel, navKeysPourChemin } from "@/lib/routes";
 import { COOKIE_ACCES } from "@/lib/reglages/code";
 import { etatPourProxy } from "@/lib/reglages/edge";
+import { estVarianteFiltree, varianteFiltree } from "@/lib/url/listes";
 
 const locales = ["fr", "en"];
 const defaultLocale = "fr";
@@ -97,7 +98,17 @@ export async function proxy(req: NextRequest) {
 
   /* Adresse déjà correcte dans les deux dimensions : il ne reste qu'à vérifier
      que le site — puis la page elle-même — est ouvert. */
-  if (locale && !ancien) return fermeture(req, locale, actuel);
+  if (locale && !ancien) {
+    /* L'adresse technique d'une variante filtrée n'est pas une page publique :
+       elle n'existe que comme cible de la réécriture ci-dessous, qui ne repasse
+       pas par ce proxy. Demandée telle quelle, elle répond 404 — sinon elle
+       doublerait la liste sous une seconde adresse. */
+    if (estVarianteFiltree(actuel)) return new NextResponse(null, { status: 404 });
+
+    /* La fermeture passe AVANT la réécriture : une page coupée l'est pour toutes
+       ses variantes, et `navKeysPourChemin` raisonne sur le chemin public. */
+    return (await fermeture(req, locale, actuel)) ?? listeFiltree(req, locale, actuel);
+  }
 
   const url = req.nextUrl.clone();
   url.pathname = `/${locale ?? defaultLocale}${actuel}`;
@@ -165,6 +176,26 @@ async function fermeture(req: NextRequest, locale: string, chemin: string) {
     url.search = "";
     return NextResponse.rewrite(url);
   }
+}
+
+/**
+ * Liste publique demandée AVEC un filtre : réécriture vers sa variante rendue
+ * à la demande, l'adresse affichée restant celle du visiteur.
+ *
+ * C'est ce qui permet à la version sans paramètre — de loin la plus demandée —
+ * d'être prérendue et servie par le CDN : elle ne lit plus `searchParams`, la
+ * variante filtrée le fait à sa place. Le dispositif complet, et le choix de
+ * garder le filtrage côté serveur, sont expliqués dans lib/url/listes.ts.
+ *
+ * Les requêtes RSC des navigations client (liens de filtre, pagination)
+ * passent par ici comme les autres : le routeur suit la réécriture.
+ */
+function listeFiltree(req: NextRequest, locale: string, chemin: string) {
+  const cible = varianteFiltree(chemin, req.nextUrl.searchParams);
+  if (!cible) return;
+  const url = req.nextUrl.clone();
+  url.pathname = `/${locale}${cible}`;
+  return NextResponse.rewrite(url);
 }
 
 function redirectTo(req: NextRequest, pathname: string, next?: string) {
