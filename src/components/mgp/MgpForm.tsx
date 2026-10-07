@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Lang } from "@/lib/pick";
 import { pick } from "@/lib/pick";
@@ -47,6 +47,37 @@ export function MgpForm({ lang }: { lang: Lang }) {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
+  /** Vrai après un clic sur « Suivant » refusé : le message d'aide de l'étape
+   *  passe alors en erreur. Remis à faux à chaque changement d'étape. */
+  const [tentative, setTentative] = useState(false);
+
+  /* Changement d'étape : le contenu est remplacé sans rechargement, et le
+     focus resterait sur un bouton qui a peut-être disparu (« Précédent » à
+     l'étape 1). On le porte sur le titre de l'étape, qui annonce où l'on est.
+     `deplace` évite de voler le focus au premier affichage et à la
+     présélection par `#eas`, qui ne sont pas des actions de la personne. */
+  const titreEtape = useRef<HTMLHeadingElement>(null);
+  const titreSucces = useRef<HTMLHeadingElement>(null);
+  const champDesc = useRef<HTMLTextAreaElement>(null);
+  const premiereCat = useRef<HTMLButtonElement>(null);
+  const deplace = useRef(false);
+
+  useEffect(() => {
+    if (!deplace.current) return;
+    deplace.current = false;
+    titreEtape.current?.focus();
+  }, [step]);
+
+  // Dossier enregistré : l'écran change entièrement, le focus suit le titre.
+  useEffect(() => {
+    if (ref) titreSucces.current?.focus();
+  }, [ref]);
+
+  const aller = (n: number) => {
+    deplace.current = true;
+    setTentative(false);
+    setStep(n);
+  };
 
   /* Présélection par le fragment, à l'arrivée sur la page comme à un clic sur
      le bouton de la même page (qui ne recharge rien : seul `hashchange` le
@@ -65,13 +96,26 @@ export function MgpForm({ lang }: { lang: Lang }) {
 
   const eas = isEasCategory(cat);
   const catLabel = pick(mgpCategories.find((c) => c.code === cat), lang);
-  const canNext = step === 1 ? !!cat : step === 2 ? msg.trim().length >= descriptionMinFor(cat) : true;
+  const descMin = descriptionMinFor(cat);
+  const descLen = msg.trim().length;
+  const canNext = step === 1 ? !!cat : step === 2 ? descLen >= descMin : true;
+  const descTropCourte = step === 2 && tentative && descLen < descMin;
+
+  /* « Suivant » n'est jamais inerte : refusé, il dit pourquoi et ramène au
+     champ en cause, au lieu de ne rien faire en silence. */
+  const suivant = () => {
+    if (canNext) { aller(step + 1); return; }
+    setTentative(true);
+    if (step === 1) premiereCat.current?.focus();
+    else if (step === 2) champDesc.current?.focus();
+  };
   const named = !eas && contact.fullName.trim().length > 0;
   const reachable = `${contact.email} ${contact.tel}`.trim();
 
   const reset = () => {
     setRef(null); setStep(1); setCat(""); setMsg(""); setFiles([]);
     setContact(EMPTY_CONTACT); setError(null); setCopied(false); setMailed(false);
+    setTentative(false); deplace.current = true;
   };
 
   const submit = () => {
@@ -107,9 +151,9 @@ export function MgpForm({ lang }: { lang: Lang }) {
   if (ref) {
     return (
       <div style={{ background: "#fff", padding: "clamp(26px,3vw,38px)" }}>
-        <h2 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(20px,2.4vw,26px)", letterSpacing: "-0.02em" }}>{t.formTitle}</h2>
+        <h2 ref={titreSucces} tabIndex={-1} style={{ margin: 0, fontWeight: 600, fontSize: "clamp(20px,2.4vw,26px)", letterSpacing: "-0.02em" }}>{t.formTitle}</h2>
         <div style={{ marginTop: 22, border: "1px solid var(--ok-bd)", background: "var(--ok-bg)", padding: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--ok-fg)" }}><span style={{ fontSize: 17 }}>✓</span><span style={{ fontWeight: 600, fontSize: 16 }}>{t.submittedTitle}</span></div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--ok-fg)" }}><span aria-hidden="true" style={{ fontSize: 17 }}>✓</span><span style={{ fontWeight: 600, fontSize: 16 }}>{t.submittedTitle}</span></div>
           <p style={{ margin: "12px 0 0", fontSize: 13.5, lineHeight: 1.6 }}>{t.refIntro}</p>
           <div className="mono" style={{ fontWeight: 600, fontSize: 18, color: "var(--ac)", marginTop: 8, background: "#fff", border: "1px dashed var(--ac)", padding: 14, textAlign: "center", wordBreak: "break-all" }}>{ref}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 14 }}>
@@ -125,7 +169,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
             </p>
           )}
           <p style={{ margin: "14px 0 0", fontSize: 12.5, color: "var(--c-70)", lineHeight: 1.6 }}>{t.refKeep}</p>
-          <button onClick={reset} className="mono" style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>↺ {t.newGrievance}</button>
+          <button type="button" onClick={reset} className="mono" style={{ marginTop: 18, fontSize: 13, fontWeight: 600, color: "var(--ac)" }}><span aria-hidden="true">↺</span> {t.newGrievance}</button>
         </div>
       </div>
     );
@@ -138,8 +182,9 @@ export function MgpForm({ lang }: { lang: Lang }) {
       <span id={EAS_ANCHOR} aria-hidden="true" style={{ display: "block", scrollMarginTop: 96 }} />
       <h2 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(20px,2.4vw,26px)", letterSpacing: "-0.02em" }}>{t.formTitle}</h2>
 
-      {/* Stepper */}
-      <div style={{ display: "flex", alignItems: "center", marginTop: 22 }}>
+      {/* Stepper : purement visuel, le titre d'étape ci-dessous dit la même
+          chose en toutes lettres. */}
+      <div aria-hidden="true" style={{ display: "flex", alignItems: "center", marginTop: 22 }}>
         {t.stepLabels.map((_, i) => {
           const n = i + 1;
           const done = step > n, active = step === n;
@@ -151,44 +196,68 @@ export function MgpForm({ lang }: { lang: Lang }) {
           );
         })}
       </div>
-      <div className="mono" style={{ fontSize: 11, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--ac)", marginTop: 14 }}>{t.step} {step} / 5 — {t.stepLabels[step - 1]}</div>
+      <h3 ref={titreEtape} tabIndex={-1} className="mono" style={{ margin: "14px 0 0", fontWeight: 400, fontSize: 11, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--ac)" }}>{t.step} {step} / 5 · {t.stepLabels[step - 1]}</h3>
 
       <div style={{ marginTop: 24, minHeight: 184 }}>
         {step === 1 && (
           <>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 14 }}>{t.chooseCat}</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {mgpCategories.map((c) => (
-                <button key={c.code} type="button" onClick={() => setCat(c.code)} className={cat === c.code ? "chip chip--on" : "chip"} style={{ fontSize: 13.5, padding: "11px 17px" }}>{pick(c, lang)}</button>
+            {/* Un `<label>` sans champ n'étiquetait rien : la question nomme
+                désormais le groupe, et chaque puce dit si elle est choisie. */}
+            <p id="mgp-cat-titre" style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 600 }}>{t.chooseCat}</p>
+            <div role="group" aria-labelledby="mgp-cat-titre" aria-describedby={tentative && !cat ? "mgp-cat-erreur" : undefined} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {mgpCategories.map((c, i) => (
+                <button key={c.code} ref={i === 0 ? premiereCat : undefined} type="button" aria-pressed={cat === c.code} onClick={() => { setCat(c.code); setTentative(false); }} className={cat === c.code ? "chip chip--on" : "chip"} style={{ fontSize: 13.5, padding: "11px 17px" }}>{pick(c, lang)}</button>
               ))}
             </div>
+            {tentative && !cat && (
+              <p id="mgp-cat-erreur" role="alert" style={{ margin: "12px 0 0", fontSize: 12.5, lineHeight: 1.5, color: "#a2191f" }}>{t.catRequired}</p>
+            )}
           </>
         )}
         {step === 2 && (
           <>
             <label htmlFor="mgp-desc" style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>{eas ? t.easDescribe : t.describe}</label>
-            {eas && <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.55 }}>{t.easDescribeNote}</p>}
-            <textarea id="mgp-desc" value={msg} maxLength={LIMITS.description} onChange={(e) => setMsg(e.target.value)} placeholder={eas ? t.easDescribePlaceholder : t.describePlaceholder} className="field" style={{ minHeight: 150, resize: "vertical", lineHeight: 1.6 }} />
+            {eas && <p id="mgp-desc-note" style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.55 }}>{t.easDescribeNote}</p>}
+            <textarea
+              id="mgp-desc"
+              ref={champDesc}
+              value={msg}
+              maxLength={LIMITS.description}
+              onChange={(e) => setMsg(e.target.value)}
+              placeholder={eas ? t.easDescribePlaceholder : t.describePlaceholder}
+              aria-describedby={eas ? "mgp-desc-note mgp-desc-aide" : "mgp-desc-aide"}
+              aria-invalid={descTropCourte || undefined}
+              className="field"
+              style={{ minHeight: 150, resize: "vertical", lineHeight: 1.6, ...(descTropCourte ? { borderColor: "var(--red)" } : {}) }}
+            />
+            {/* Le minimum, écrit nulle part jusqu'ici, est dit sous le champ et
+                relié à lui ; après un « Suivant » refusé, il passe en erreur. */}
+            <p id="mgp-desc-aide" style={{ margin: "8px 0 0", fontSize: 12, lineHeight: 1.5, color: descTropCourte ? "#a2191f" : "var(--c-60)" }}>
+              {descTropCourte ? t.descTooShort(descMin) : t.descMin(descMin, descLen)}
+            </p>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 12, color: "var(--ac)" }}><span className="mono">✓</span>{t.category} : <strong>{catLabel}</strong></div>
           </>
         )}
         {step === 3 && (
           <>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{t.addFiles} <span style={{ fontWeight: 400, color: "var(--c-60)" }}>{t.optional}</span></label>
-            {eas && <p style={{ margin: "6px 0 0", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.55 }}>{t.easFilesNote}</p>}
-            <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 12, padding: 28, border: "1px dashed #a8b4d0", background: "#f4f7ff", cursor: "pointer", textAlign: "center" }}>
-              <span style={{ fontSize: 24 }}>📎</span>
+            <p id="mgp-files-titre" style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t.addFiles} <span style={{ fontWeight: 400, color: "var(--c-60)" }}>{t.optional}</span></p>
+            {eas && <p id="mgp-files-note" style={{ margin: "6px 0 0", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.55 }}>{t.easFilesNote}</p>}
+            {/* Champ masqué à l'œil seulement (`.sr-only`, et non `display:
+                none`) : il reste atteignable au Tab, la zone en reprend le
+                contour de focus (`.mgp-depot`). */}
+            <label className="mgp-depot" style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 12, padding: 28, border: "1px dashed #a8b4d0", background: "#f4f7ff", cursor: "pointer", textAlign: "center" }}>
+              <span aria-hidden="true" style={{ fontSize: 24 }}>📎</span>
               <span style={{ fontSize: 13, color: "var(--c-70)" }}>{t.dropHint}</span>
-              <input type="file" multiple onChange={(e) => setFiles((f) => f.concat([...(e.target.files || [])].map((x) => ({ name: x.name, size: Math.max(1, Math.round(x.size / 1024)) }))).slice(0, LIMITS.attachments))} style={{ display: "none" }} />
+              <input type="file" multiple aria-labelledby="mgp-files-titre" aria-describedby={eas ? "mgp-files-note" : undefined} onChange={(e) => setFiles((f) => f.concat([...(e.target.files || [])].map((x) => ({ name: x.name, size: Math.max(1, Math.round(x.size / 1024)) }))).slice(0, LIMITS.attachments))} className="sr-only" />
             </label>
             {files.length > 0 && (
               <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
                 {files.map((f, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", background: "var(--c-10)", border: "1px solid var(--c-20)" }}>
-                    <span style={{ fontSize: 15 }}>📄</span>
+                    <span aria-hidden="true" style={{ fontSize: 15 }}>📄</span>
                     <span style={{ flex: 1, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
-                    <span className="mono" style={{ fontSize: 11, color: "var(--c-60)" }}>{f.size} Ko</span>
-                    <button type="button" onClick={() => setFiles((fs) => fs.filter((_, idx) => idx !== i))} style={{ color: "var(--red)", fontSize: 14 }}>✕</button>
+                    <span className="mono" style={{ fontSize: 11, color: "var(--c-60)" }}>{f.size} {t.kiloOctets}</span>
+                    <button type="button" aria-label={t.removeFile(f.name)} onClick={() => setFiles((fs) => fs.filter((_, idx) => idx !== i))} style={{ color: "var(--red)", fontSize: 14 }}><span aria-hidden="true">✕</span></button>
                   </div>
                 ))}
               </div>
@@ -197,7 +266,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
         )}
         {step === 4 && (
           <>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{t.contactStep}</label>
+            <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 600 }}>{t.contactStep}</p>
             <p style={{ margin: "0 0 16px", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.5 }}>{eas ? t.easContactNote : t.contactNote}</p>
 
             {/* Signalement EAS/HS : le nom n'est pas demandé (cf. actions/mgp.ts). */}
@@ -223,7 +292,7 @@ export function MgpForm({ lang }: { lang: Lang }) {
         )}
         {step === 5 && (
           <>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 14 }}>{t.reviewSubmit}</label>
+            <p style={{ margin: "0 0 14px", fontSize: 14, fontWeight: 600 }}>{t.reviewSubmit}</p>
             <div style={{ border: "1px solid var(--c-20)" }}>
               <Row k={t.category} v={catLabel} />
               <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--c-20)" }}><div style={{ fontSize: 12.5, color: "var(--c-60)", marginBottom: 6 }}>{t.description}</div><div style={{ fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{msg}</div></div>
@@ -242,9 +311,9 @@ export function MgpForm({ lang }: { lang: Lang }) {
       )}
 
       <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
-        {step > 1 && <button onClick={() => setStep((s) => s - 1)} disabled={pending} className="btn btn--outline">← {t.prev}</button>}
+        {step > 1 && <button type="button" onClick={() => aller(step - 1)} disabled={pending} className="btn btn--outline"><span aria-hidden="true">←</span> {t.prev}</button>}
         {step < 5 ? (
-          <button onClick={() => canNext && setStep((s) => s + 1)} className="btn" style={{ flex: 1, justifyContent: "center", background: canNext ? "var(--ac)" : "var(--c-30)", color: "#fff" }}>{t.next} <span className="arrow">→</span></button>
+          <button type="button" onClick={suivant} className="btn" style={{ flex: 1, justifyContent: "center", background: canNext ? "var(--ac)" : "var(--c-30)", color: "#fff" }}>{t.next} <span className="arrow" aria-hidden="true">→</span></button>
         ) : (
           <BoutonAction
             onClick={submit}

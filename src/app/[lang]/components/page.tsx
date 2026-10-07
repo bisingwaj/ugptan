@@ -50,8 +50,11 @@ export default async function ComposantesPage(props: { params: Promise<{ lang: s
 
       {/* Cartes */}
       {composantes.length > 0 && (
-        <section className="section">
+        <section className="section" aria-labelledby="comp-index-titre">
           <div className="section__inner">
+            {/* Intitulé lu, non vu : les cartes portent des `h3`, qui suivaient
+                sinon directement le `h1` du héros. */}
+            <h2 id="comp-index-titre" className="sr-only">{c.indexListeTitre}</h2>
             <RevealGroup className="comp-index" gap={0.06}>
               {composantes.map((comp) => (
                 <RevealItem key={comp.id}>

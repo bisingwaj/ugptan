@@ -19,6 +19,7 @@ import { plafondRole } from "@/lib/equipe/affichage";
 import type { MembreEquipe } from "@/lib/equipe/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { Photo } from "@/components/ui/Photo";
+import { espacesSimples } from "@/content/typographie";
 
 /** Numéro d'ordre affiché en incrustation : « 01 », « 02 »… */
 const n2 = (i: number) => String(i + 1).padStart(2, "0");
@@ -159,7 +160,9 @@ export function GrilleEquipe({ membres, variante = "accueil" }: Props) {
                     paddingTop: 10,
                   }}
                 >
-                  {membre.nom}
+                  {/* Saisi à la console : une double espace s'y glisse
+                      (« Noël Jean David  Litanga Sangu »). */}
+                  {espacesSimples(membre.nom)}
                 </div>
               )}
             </div>

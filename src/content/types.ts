@@ -19,7 +19,7 @@ export type Meta = {
   tutelle: string; tutelleLong: string;
   bailleurs: string;
   arrete: string; arreteDate: string;
-  mep: string; ville: string; approche: string;
+  mep: string; ville: string; approche: Bilingual;
 };
 
 export type Chiffre = { value: number; unit: string; pct?: string; label: Bilingual; sub: Bilingual };
@@ -177,7 +177,7 @@ export type GouvActivite = { date: Bilingual; org: string; color: string; titre:
  * sur le premier écran.
  */
 export type Partner = { name: string; kind: Bilingual; logo?: StaticImageData };
-export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: string; comp?: string };
+export type Ressource = { k: Bilingual; color: string; pole: Bilingual; date: Bilingual; titre: Bilingual; meta: Bilingual; comp?: string };
 export type GalleryItem = { nom: string; img: ImgKey };
 
 export type Contact = {

@@ -21,6 +21,7 @@ import { grillePleine } from "@/lib/grille";
 import { SITE_URL } from "@/lib/site";
 import { Kicker } from "@/components/ui/Kicker";
 import { Photo } from "@/components/ui/Photo";
+import { entreGuillemets } from "@/content/typographie";
 import { HeroVideo } from "@/components/home/HeroVideo";
 import { ProvinceMap } from "@/components/home/ProvinceMap";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
@@ -160,9 +161,9 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
         </div>
         <div className="backdrop-blur-[4px] max-[760px]:backdrop-blur-none" style={{ position: "relative", borderTop: "1px solid #1f2430", background: "rgba(11,15,26,.6)", fontFamily: "var(--font-mono)", fontSize: 11.5, color: "#a8a8a8", overflow: "hidden" }}>
           <div className="hero-status" style={{ maxWidth: "var(--maxw)", margin: "0 auto", padding: "11px var(--pad-x)", display: "flex", flexWrap: "wrap", gap: "8px 28px" }}>
-            <span><span style={{ color: "var(--ac-light)" }}>●</span> {t.home.statusEffective}</span>
-            <span><span style={{ color: "var(--ac-light)" }}>●</span> {t.home.statusCompletion}</span>
-            <span><span style={{ color: "var(--ac-light)" }}>●</span> {meta.approche}</span>
+            <span><span aria-hidden="true" style={{ color: "var(--ac-light)" }}>●</span> {t.home.statusEffective}</span>
+            <span><span aria-hidden="true" style={{ color: "var(--ac-light)" }}>●</span> {t.home.statusCompletion}</span>
+            <span><span aria-hidden="true" style={{ color: "var(--ac-light)" }}>●</span> {pick(meta.approche, lang)}</span>
           </div>
         </div>
       </section>
@@ -174,7 +175,9 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
           <Reveal variant="right" delay={0.1}>
             <p style={{ margin: 0, fontSize: "clamp(22px,2.7vw,34px)", lineHeight: 1.4, letterSpacing: "-0.01em", fontWeight: 300 }}>{t.home.introLead}</p>
             <Reveal variant="up" delay={0.2} style={{ marginTop: 36, padding: "28px 30px", borderLeft: "3px solid var(--ac)", background: "var(--c-10)" }}>
-              <p style={{ margin: 0, fontSize: "clamp(17px,1.8vw,21px)", lineHeight: 1.5, color: "var(--c-80)", fontStyle: "italic" }}>« {pick(question, lang)} »</p>
+              <p style={{ margin: 0, fontSize: "clamp(17px,1.8vw,21px)", lineHeight: 1.5, color: "var(--c-80)", fontStyle: "italic" }}>
+                {entreGuillemets(pick(question, lang), lang)}
+              </p>
             </Reveal>
           </Reveal>
         </div>

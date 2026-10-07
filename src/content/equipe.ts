@@ -186,7 +186,7 @@ export const equipeSeedPoles: EquipeSeedPole[] = [
 export const equipeSeedMembres: EquipeSeedMembre[] = [
   {
     key: "coordonnateur",
-    nom: "Noël Jean-David Litanga",
+    nom: "Noël Jean David Litanga Sangu",
     position: 0,
     poleKey: "direction",
     featured: true,

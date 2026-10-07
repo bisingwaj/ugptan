@@ -541,7 +541,7 @@ export const conditions: LegalDoc = {
             },
             {
               t: { fr: "Directeur de publication", en: "Director of publication" },
-              d: { fr: "Le Coordonnateur national de l'Unité, Noël Jean-David Litanga.", en: "The Unit's National Coordinator, Noël Jean-David Litanga." },
+              d: { fr: "Le Coordonnateur national de l'Unité, Noël Jean David Litanga Sangu.", en: "The Unit's National Coordinator, Noël Jean David Litanga Sangu." },
             },
             {
               t: { fr: "Contact", en: "Contact" },

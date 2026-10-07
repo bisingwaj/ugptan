@@ -22,7 +22,12 @@ export const meta: Meta = {
   arreteDate: "15 avril 2025",
   mep: "Manuel d'Exécution du Projet (MEP) — 23 juin 2025",
   ville: "Kinshasa",
-  approche: "APM IDEA — Digitalisation Inclusive en Afrique Orientale et Australe",
+  /* Bilingue : l'intitulé s'affichait en français sur l'accueil anglais. Côté
+     anglais, l'appellation de la Banque mondiale (IDEA MPA). */
+  approche: {
+    fr: "APM IDEA\u00a0: digitalisation inclusive en Afrique orientale et australe",
+    en: "IDEA MPA: Inclusive Digitalization in Eastern and Southern Africa",
+  },
 };
 
 export const chiffres: Chiffre[] = [

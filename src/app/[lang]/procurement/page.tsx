@@ -61,7 +61,9 @@ export default async function MarchesPage(props: { params: Promise<{ lang: strin
           <Reveal style={{ marginTop: "clamp(48px,6vw,80px)", background: "var(--c-black)", color: "#fff", padding: "clamp(30px,4vw,52px)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
             <div style={{ maxWidth: 560 }}>
               <Kicker light>{t.marches.bidderKicker}</Kicker>
-              <div style={{ fontWeight: 600, fontSize: "clamp(20px,2.4vw,30px)", letterSpacing: "-0.02em" }}>{t.marches.bidderTitle}</div>
+              {/* `h2`, et les étapes en `h3` : elles étaient en `h4` sous un
+                  intitulé qui n'était pas un titre. */}
+              <h2 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(20px,2.4vw,30px)", letterSpacing: "-0.02em" }}>{t.marches.bidderTitle}</h2>
               <p style={{ margin: "9px 0 0", fontSize: 14.5, color: "var(--c-30)", lineHeight: 1.55 }}>{t.marches.bidderLead}</p>
             </div>
             {/* Mène à l'inscription sur DigiProcure : le texte à côté dit que
@@ -84,7 +86,7 @@ export default async function MarchesPage(props: { params: Promise<{ lang: strin
                   <span className="step-card__icon"><Icon name={CANDIDATURE_ICONS[i]} size={26} /></span>
                   <span className="mono step-card__n">{c.n}</span>
                 </div>
-                <h4 style={{ margin: "16px 0 0", fontSize: 16, fontWeight: 600, lineHeight: 1.3 }}>{pick(c.titre, lang)}</h4>
+                <h3 style={{ margin: "16px 0 0", fontSize: 16, fontWeight: 600, lineHeight: 1.3 }}>{pick(c.titre, lang)}</h3>
                 <p style={{ margin: "9px 0 0", fontSize: 12.5, lineHeight: 1.5, color: "var(--c-60)" }}>{pick(c.desc, lang)}</p>
               </RevealItem>
             ))}

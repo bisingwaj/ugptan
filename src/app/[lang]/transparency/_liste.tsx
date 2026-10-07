@@ -211,6 +211,9 @@ export async function RessourcesListePage({ lang, filtres }: { lang: Lang; filtr
             </nav>
           )}
 
+          {/* Intitulé lu, non vu : relie le `h1` du héros aux `h3` des fiches. */}
+          <h2 className="sr-only">{r.listeTitre}</h2>
+
           <div className="doc-compte">
             <span className="mono">{r.count(documents.length)}</span>
             {filtre && (

@@ -17,6 +17,7 @@ import type { Lang } from "@/lib/pick";
 import type { ImpactItemVue } from "@/lib/impact/query";
 import { lienPublic } from "@/lib/routes";
 import { Photo } from "@/components/ui/Photo";
+import { insecables } from "@/content/typographie";
 import { useVideo } from "@/components/video/VideoProvider";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { grillePleine } from "@/lib/grille";
@@ -109,7 +110,9 @@ export function BlocTemoignages({
               )}
               {item.texte && (
                 <p style={{ margin: "16px 0 0", fontSize: 14.5, lineHeight: 1.6, color: "var(--c-80)", flex: 1 }}>
-                  {item.texte}
+                  {/* Citation saisie avec ses guillemets (« … ») : les espaces
+                      insécables les gardent collés au texte en français. */}
+                  {lang === "fr" ? insecables(item.texte) : item.texte}
                 </p>
               )}
               {item.lienUrl && item.lienLabel && (

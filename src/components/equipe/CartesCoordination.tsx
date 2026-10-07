@@ -15,6 +15,7 @@ import { plafondRole } from "@/lib/equipe/affichage";
 import type { MembreEquipe } from "@/lib/equipe/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { Photo } from "@/components/ui/Photo";
+import { espacesSimples } from "@/content/typographie";
 import { grillePleine } from "@/lib/grille";
 import { compTexteDe } from "@/lib/comp";
 
@@ -118,7 +119,7 @@ export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
               )}
               {membre.nom && (
                 <div style={{ marginTop: 14, borderTop: "1px solid var(--c-10)", paddingTop: 12 }}>
-                  <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--c-black)" }}>{membre.nom}</span>
+                  <span style={{ fontSize: 13.5, fontWeight: 600, color: "var(--c-black)" }}>{espacesSimples(membre.nom)}</span>
                 </div>
               )}
             </div>

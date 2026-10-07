@@ -311,7 +311,7 @@ function CorpsImpact({ section, lang }: { section: ImpactSectionVue; lang: Lang 
     case "JALONS":
       return <BlocJalons items={section.items} lang={lang} theme={section.theme} />;
     case "CITATION":
-      return <BlocCitation citation={section.titre} note={section.note} />;
+      return <BlocCitation citation={section.titre} note={section.note} lang={lang} />;
     case "ETAPES":
       return <BlocEtapes items={section.items} theme={section.theme} />;
     case "PRINCIPES":

@@ -9,11 +9,14 @@
    réglage de fond reste sans effet ici, et la console le dit.
 
    Les guillemets sont posés par le dessin, non par le texte : la rédaction
-   saisit la phrase seule, comme dans le contenu d'origine. */
+   saisit la phrase seule, comme dans le contenu d'origine. Ce sont ceux de la
+   langue affichée (cf. ui/guillemets.ts). */
 import { Fragment } from "react";
+import type { Lang } from "@/lib/pick";
 import { Reveal } from "@/components/motion/Reveal";
+import { entreGuillemets } from "@/content/typographie";
 
-export function BlocCitation({ citation, note }: { citation: string | null; note: string | null }) {
+export function BlocCitation({ citation, note, lang }: { citation: string | null; note: string | null; lang: Lang }) {
   if (!citation) return null;
 
   /* Les segments de références se séparent au point médian, tel qu'il est
@@ -39,7 +42,7 @@ export function BlocCitation({ citation, note }: { citation: string | null; note
               fontWeight: 300,
             }}
           >
-            « {citation} »
+            {entreGuillemets(citation, lang)}
           </p>
         </Reveal>
         {segments.length > 0 && (

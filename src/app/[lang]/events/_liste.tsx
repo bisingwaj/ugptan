@@ -96,8 +96,13 @@ export async function EvenementsListe({ lang, filtres }: { lang: Lang; filtres: 
                   actif et ne rapporte rien : l'absence est alors celle du
                   filtre, pas celle du calendrier. */}
               {(liste.aVenir.length > 0 || !filtre) && (
-                <section className="evt-section" aria-label={t.evt.sectionAVenir}>
-                  <Reveal><Kicker>{t.evt.sectionAVenir}</Kicker></Reveal>
+                /* Intitulé de section en `h2` (lu, non vu) : les cartes portent
+                   des `h3`, qui suivaient sinon directement le `h1` du héros.
+                   Le kicker visible garde son dessin, masqué à la lecture pour
+                   ne pas dire deux fois la même chose. */
+                <section className="evt-section" aria-labelledby="evt-avenir-titre">
+                  <h2 id="evt-avenir-titre" className="sr-only">{t.evt.sectionAVenir}</h2>
+                  <Reveal><div aria-hidden="true"><Kicker>{t.evt.sectionAVenir}</Kicker></div></Reveal>
                   <Reveal delay={0.1}><p className="evt-section__intro">{t.evt.sectionAVenirLead}</p></Reveal>
 
                   {liste.aVenir.length > 0 ? (
@@ -110,8 +115,9 @@ export async function EvenementsListe({ lang, filtres }: { lang: Lang; filtres: 
 
               {/* ===== Passés ===== */}
               {liste.passes.length > 0 && (
-                <section className="evt-section" aria-label={t.evt.sectionPasses}>
-                  <Reveal><Kicker>{t.evt.sectionPasses}</Kicker></Reveal>
+                <section className="evt-section" aria-labelledby="evt-passes-titre">
+                  <h2 id="evt-passes-titre" className="sr-only">{t.evt.sectionPasses}</h2>
+                  <Reveal><div aria-hidden="true"><Kicker>{t.evt.sectionPasses}</Kicker></div></Reveal>
                   <Reveal delay={0.1}><p className="evt-section__intro">{t.evt.sectionPassesLead}</p></Reveal>
                   <EventsGrid lang={lang} events={liste.passes} withImage />
                 </section>

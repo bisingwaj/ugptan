@@ -339,6 +339,20 @@ html.scroll-locked body {
   transition: all var(--dur-1) var(--ease); cursor: pointer;
 }
 .chip--on { background: var(--ac); color: #fff; border-color: var(--ac); }
+
+/* Carte cliquable dont le seul élément interactif est le bouton du titre (cf.
+   marches/MarchesClient.tsx) : son pseudo-élément couvre la carte, qui reste
+   cliquable partout sans qu'un intertitre soit enfermé dans un bouton. Le
+   contour de focus passe du titre à la carte entière. */
+.carte-etiree { position: relative; }
+.carte-etiree__action::after { content: ""; position: absolute; inset: 0; }
+.carte-etiree__action:focus-visible { outline: none; }
+.carte-etiree:has(.carte-etiree__action:focus-visible) { outline: 2px solid var(--ac); outline-offset: -2px; }
+
+/* Zone de dépôt du formulaire de plainte : le champ fichier y est masqué à
+   l'œil (`.sr-only`) mais reste atteignable au clavier ; la zone en reprend le
+   contour de focus. */
+.mgp-depot:focus-within { outline: 2px solid var(--ac); outline-offset: 2px; }
 .tag-mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ac); }
 
 /* ===========================================================================
@@ -471,6 +485,21 @@ html.scroll-locked body {
    mix-blend-mode: difference posé DIRECTEMENT sur l'anneau/point (pas de wrapper
    à z-index, qui isolerait la fusion) → toujours visible, fond clair comme sombre. */
 html.cursor-custom, html.cursor-custom * { cursor: none !important; }
+/* …sauf là où le curseur système porte une information que l'anneau ne rend
+   pas : le I de saisie dans les champs, et la sélection de texte. Le curseur
+   natif est aussi celui qu'agrandissent les réglages d'accessibilité du
+   système : le masquer partout privait de pointeur lisible les personnes qui
+   en dépendent. L'anneau reste par-dessus, décoratif. Les liens et boutons
+   placés DANS un paragraphe gardent la règle ci-dessus (ils sont eux-mêmes
+   ciblés par `*`, la valeur ne s'hérite pas du paragraphe). */
+html.cursor-custom :is(input:not([type="button"], [type="submit"], [type="reset"], [type="checkbox"], [type="radio"], [type="file"], [type="range"], [type="color"]), textarea, [contenteditable="true"]) { cursor: text !important; }
+html.cursor-custom :is(p, li, dd, dt, td, th, blockquote, figcaption, pre, code, h1, h2, h3, h4, h5, h6) { cursor: auto !important; }
+/* Couleurs forcées (contraste élevé de Windows) : l'anneau en `difference` n'y
+   a plus de sens, le curseur système revient partout. */
+@media (forced-colors: active) {
+  html.cursor-custom, html.cursor-custom * { cursor: auto !important; }
+  .cursor-ring, .cursor-dot { display: none; }
+}
 .cursor-ring { position: fixed; top: 0; left: 0; z-index: 10000; width: 28px; height: 28px; margin: -14px 0 0 -14px; border: 1.5px solid #fff; border-radius: 50%; mix-blend-mode: difference; pointer-events: none; will-change: transform; }
 .cursor-dot { position: fixed; top: 0; left: 0; z-index: 10000; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; background: #fff; border-radius: 50%; mix-blend-mode: difference; pointer-events: none; will-change: transform; }
 
@@ -1704,7 +1733,7 @@ a.actu-nav__lien:hover { background: var(--c-10); }
 .doc-card__titre { font-size: 17px; font-weight: 600; line-height: 1.35; margin: 0; }
 .doc-card__ref {
   display: block; font-size: 11px; letter-spacing: 0.06em;
-  color: var(--ac); margin-bottom: 5px;
+  color: var(--ac); margin: 0 0 5px;
 }
 .doc-card__desc {
   flex: 1; margin: 0; font-size: 14px; line-height: 1.6; color: var(--c-70);

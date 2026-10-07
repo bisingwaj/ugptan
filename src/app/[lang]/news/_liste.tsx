@@ -124,6 +124,10 @@ export async function ActualitesListe({ lang, filtres }: { lang: Lang; filtres: 
             </p>
           )}
 
+          {/* Intitulé lu, non vu : les cartes portent des `h3`, qui suivaient
+              sinon directement le `h1` du héros. */}
+          <h2 className="sr-only">{t.actus.listeTitre}</h2>
+
           {liste.items.length === 0 ? (
             <Reveal variant="fade">
               <p className="actu-vide">

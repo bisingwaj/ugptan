@@ -97,7 +97,7 @@ export async function CompLies({ code, lang }: { code: string; lang: Lang }) {
                 {docs.map((r) => (
                   <RevealItem key={r.titre.fr}>
                     <Link href={route(lang, NAV.transparence)} className="comp-lie">
-                      <span className="mono comp-lie__meta">{pick(r.k, lang)} · {pick(r.date, lang)} · {r.meta}</span>
+                      <span className="mono comp-lie__meta">{pick(r.k, lang)} · {pick(r.date, lang)} · {pick(r.meta, lang)}</span>
                       <span className="comp-lie__t">{pick(r.titre, lang)}</span>
                       <span className="mono comp-lie__go" aria-hidden>→</span>
                     </Link>

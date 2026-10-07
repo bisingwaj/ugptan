@@ -48,8 +48,11 @@ export function BlocPoles({ items, lang }: { items: ImpactItemVue[]; lang: Lang 
           </div>
 
           <div>
+            {/* Les intitulés de poste sont ceux de l'organigramme officiel,
+                saisis en français seulement (champ unique de la console) : sur
+                la page anglaise, `lang="fr"` les fait lire avec la bonne voix. */}
             {item.tags.length > 0 && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <div lang={lang === "en" ? "fr" : undefined} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {item.tags.map((tag) => (
                   <span
                     key={tag}

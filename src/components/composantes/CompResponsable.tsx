@@ -15,6 +15,7 @@ import { NAV, route } from "@/lib/routes";
 import { initials } from "@/lib/format";
 import { Kicker } from "@/components/ui/Kicker";
 import { Photo } from "@/components/ui/Photo";
+import { entreGuillemets, espacesSimples } from "@/content/typographie";
 import { Reveal } from "@/components/motion/Reveal";
 
 export function CompResponsable({
@@ -63,7 +64,7 @@ export function CompResponsable({
           <Reveal variant="right" delay={0.1} className="comp-resp__body">
             <div className="mono comp-resp__code">{comp.code}</div>
             {membre.nom ? (
-              <h3 className="comp-resp__nom">{membre.nom}</h3>
+              <h3 className="comp-resp__nom">{espacesSimples(membre.nom)}</h3>
             ) : (
               <h3 className="comp-resp__nom comp-resp__nom--vacant">{t.respSoon}</h3>
             )}
@@ -81,7 +82,7 @@ export function CompResponsable({
             )}
 
             {membre.verbatim && (
-              <blockquote className="comp-resp__verbatim">« {membre.verbatim} »</blockquote>
+              <blockquote className="comp-resp__verbatim">{entreGuillemets(membre.verbatim, lang)}</blockquote>
             )}
 
             {comp.sous.length > 0 && (

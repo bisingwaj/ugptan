@@ -103,10 +103,14 @@ export function RessourcesListe({
               {document.featured && <span className="doc-card__une mono">{t.featured}</span>}
             </div>
 
-            <h3 className="doc-card__titre">
-              {document.reference && <span className="doc-card__ref mono">{document.reference}</span>}
-              {document.titre}
-            </h3>
+            {/* La référence précède le titre sans en faire partie : dans le
+                `h3`, elle s'y collait à la lecture (« MEPtest rapport »), et
+                le nom de la fiche n'était plus son titre. L'enveloppe garde
+                l'écart de la carte entre l'en-tête et la description. */}
+            <div>
+              {document.reference && <p className="doc-card__ref mono">{document.reference}</p>}
+              <h3 className="doc-card__titre">{document.titre}</h3>
+            </div>
 
             {document.description && <p className="doc-card__desc">{document.description}</p>}
 

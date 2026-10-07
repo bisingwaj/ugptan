@@ -65,9 +65,13 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
     } as const;
 
     if (!e.aVenir) {
+      /* La pastille posée sur le visuel dit déjà l'état : la répéter au pied
+         faisait lire « Passé » deux fois par carte. Sans visuel, la mention
+         reste ici, seule, et dit « en cours » quand c'est le cas. */
+      if (withImage && e.phase !== "A_VENIR") return null;
       return (
         <span className="evt-card__action mono" style={{ fontSize: 11.5, color: "var(--c-60)", marginLeft: "auto" }}>
-          {t.evt.past} ✓
+          {e.phase === "EN_COURS" ? t.evt.ongoing : <>{t.evt.past} <span aria-hidden="true">✓</span></>}
         </span>
       );
     }

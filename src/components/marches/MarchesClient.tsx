@@ -138,20 +138,30 @@ export function MarchesClient({
   return (
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-        <div style={{ position: "relative", flex: 1, minWidth: 260, maxWidth: 540 }}>
-          <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--c-60)", fontSize: 15 }}>⌕</span>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.search} className="field" style={{ paddingLeft: 40 }} />
+        <div role="search" style={{ position: "relative", flex: 1, minWidth: 260, maxWidth: 540 }}>
+          {/* Étiquette masquée à l'œil mais lue : le placeholder disparaît dès
+              la première lettre et n'est pas un nom accessible fiable. */}
+          <label htmlFor="marches-recherche" className="sr-only">{t.searchLabel}</label>
+          <span aria-hidden="true" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--c-60)", fontSize: 15 }}>⌕</span>
+          <input id="marches-recherche" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t.search} className="field" style={{ paddingLeft: 40 }} />
         </div>
         <div className="mono" style={{ fontSize: 12, color: "var(--c-60)", whiteSpace: "nowrap" }}>
-          <strong style={{ color: "var(--green)" }}>{ouverts}</strong> {t.open} · <strong style={{ color: "var(--c-black)" }}>{marches.length}</strong> {t.results}
+          <strong style={{ color: "var(--green)" }}>{ouverts}</strong> {t.openCount(ouverts)} · <strong style={{ color: "var(--c-black)" }}>{marches.length}</strong> {t.resultsCount(marches.length)}
         </div>
       </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 30 }}>
+      {/* Bascules à choix unique : `aria-pressed` dit laquelle est active, ce
+          que seule la couleur indiquait. */}
+      <div role="group" aria-label={t.filtersLabel} style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 30 }}>
         {FILTERS.map((k) => (
-          <button key={k} onClick={() => setFilter(k)} className={filter === k ? "chip chip--on" : "chip"}>{filterLabel(k)}</button>
+          <button key={k} type="button" aria-pressed={filter === k} onClick={() => setFilter(k)} className={filter === k ? "chip chip--on" : "chip"}>{filterLabel(k)}</button>
         ))}
       </div>
+
+      {/* Le nombre d'avis retenus, annoncé à chaque filtre ou frappe : la
+          grille change sous les yeux, pas sous l'oreille. */}
+      <p className="sr-only" role="status" aria-live="polite">{t.shownCount(view.length)}</p>
+      <h2 className="sr-only">{t.listTitle}</h2>
 
       {view.length === 0 ? (
         <div style={{ textAlign: "center", padding: "64px 20px", border: "1px solid var(--c-20)", background: "var(--c-10)" }}>
@@ -167,29 +177,35 @@ export function MarchesClient({
             const showCd = cd && m.statut === "ouvert";
             return (
               <RevealItem key={m.ref}>
-              <button onClick={() => setSelRef(m.ref)} style={{ textAlign: "left", background: "#fff", padding: 24, display: "flex", flexDirection: "column" }}>
+              {/* La carte entière reste cliquable, mais le bouton ne porte que
+                  le titre : un intertitre ne peut pas vivre dans un bouton, et
+                  le nom accessible se réduit à l'objet de l'avis. Le pseudo-
+                  élément de `.carte-etiree__action` étend la zone de clic. */}
+              <div className="carte-etiree" style={{ textAlign: "left", background: "#fff", padding: 24, display: "flex", flexDirection: "column" }}>
                 <div style={{ height: 4, background: cc, margin: "-24px -24px 22px" }} />
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                   <span className="mono" style={{ fontSize: 12, color: "var(--c-70)" }}>{m.ref}</span>
                   <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 11, fontWeight: 600, color: st.c }}><span style={{ width: 7, height: 7, borderRadius: "50%", background: st.c }} />{st.label}</span>
                 </div>
-                <h3 style={{ margin: "14px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.35, flex: 1 }}>{pick(m.objet, lang)}</h3>
+                <h3 style={{ margin: "14px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.35, flex: 1 }}>
+                  <button type="button" onClick={() => setSelRef(m.ref)} className="carte-etiree__action" style={{ font: "inherit", textAlign: "left", padding: 0 }}>{pick(m.objet, lang)}</button>
+                </h3>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginTop: 16 }}>
                   <span className="mono" style={{ fontSize: 11, color: onCompDe(cc), background: cc, padding: "5px 9px" }}>{m.type}</span>
                   <span className="mono" style={{ fontSize: 11, color: "var(--c-70)", background: "var(--c-10)", padding: "5px 9px" }}>{m.comp}</span>
                   <span className="mono" style={{ fontSize: 11, color: "var(--c-70)", background: "var(--c-10)", padding: "5px 9px" }}>{pick(m.budget, lang)}</span>
-                  {m.addenda.length > 0 && <span className="mono" style={{ fontSize: 11, color: "#8a3800", background: "#fff3e0", padding: "5px 9px" }}>+{m.addenda.length} addendum</span>}
+                  {m.addenda.length > 0 && <span className="mono" style={{ fontSize: 11, color: "#8a3800", background: "#fff3e0", padding: "5px 9px" }}>{t.addendumCount(m.addenda.length)}</span>}
                 </div>
                 {showCd && (
                   <div style={{ marginTop: 16 }}>
-                    <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 600, color: cd!.urgent ? "var(--red)" : compTexteDe(cc), background: cd!.urgent ? "#fff1f1" : "var(--c-10)", padding: "7px 11px" }}>⏳ {cd!.d}j {cd!.hh}:{cd!.mm}:{cd!.ss}</span>
+                    <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 12, fontWeight: 600, color: cd!.urgent ? "var(--red)" : compTexteDe(cc), background: cd!.urgent ? "#fff1f1" : "var(--c-10)", padding: "7px 11px" }}><span aria-hidden="true">⏳</span> {cd!.d}{t.dayAbbr} {cd!.hh}:{cd!.mm}:{cd!.ss}</span>
                   </div>
                 )}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--c-20)" }}>
                   <span style={{ fontSize: 12.5, color: "var(--c-70)" }}>{t.deadline} : <strong style={{ color: "var(--c-black)" }}>{formaterDate(m.limiteISO, lang, true)}</strong></span>
-                  <span className="mono" style={{ fontSize: 13, fontWeight: 600, color: "var(--ac)", whiteSpace: "nowrap" }}>{t.viewDetail} →</span>
+                  <span className="mono" aria-hidden="true" style={{ fontSize: 13, fontWeight: 600, color: "var(--ac)", whiteSpace: "nowrap" }}>{t.viewDetail} →</span>
                 </div>
-              </button>
+              </div>
               </RevealItem>
             );
           })}
@@ -254,7 +270,7 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, background: cc, color: "#fff", padding: "15px clamp(20px,3.2vw,38px)" }}>
             <span className="mono" style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.88 }}>{t.daysLeft}</span>
             <div className="mono" style={{ display: "flex", alignItems: "baseline", gap: 11, fontWeight: 600 }}>
-              <span style={{ fontSize: 34, lineHeight: 1 }}>{cd!.d}</span><span style={{ fontSize: 12, opacity: 0.72 }}>j</span><span style={{ fontSize: 19, opacity: 0.94 }}>{cd!.hh}:{cd!.mm}:{cd!.ss}</span>
+              <span style={{ fontSize: 34, lineHeight: 1 }}>{cd!.d}</span><span style={{ fontSize: 12, opacity: 0.72 }}>{t.dayAbbr}</span><span style={{ fontSize: 19, opacity: 0.94 }}>{cd!.hh}:{cd!.mm}:{cd!.ss}</span>
             </div>
           </div>
         )}

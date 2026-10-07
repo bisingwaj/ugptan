@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { asLang } from "@/lib/params";
+import { dict } from "@/content/i18n";
 import { APERCU_PARAM, verifierApercu } from "@/lib/actus/apercu";
 import { apercuArticle, articlesLies, voisins } from "@/lib/actus/query";
 import { ArticleVue } from "@/components/actus/ArticleVue";
@@ -22,11 +23,16 @@ import { ArticleVue } from "@/components/actus/ArticleVue";
  */
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Aperçu",
-  // Un brouillon n'a rien à faire dans un index, même si l'URL fuite.
-  robots: { index: false, follow: false, nocache: true },
-};
+/* Titre dans la langue de la route : un `metadata` statique titrait
+   « Aperçu » la prévisualisation anglaise. */
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await props.params;
+  return {
+    title: dict(asLang(lang)).actus.apercuOnglet,
+    // Un brouillon n'a rien à faire dans un index, même si l'URL fuite.
+    robots: { index: false, follow: false, nocache: true },
+  };
+}
 
 type Props = {
   params: Promise<{ lang: string }>;

@@ -6,7 +6,7 @@ import { asLang, LOCALES } from "@/lib/params";
 import { dict } from "@/content/i18n";
 import { provinces } from "@/content/data";
 import { ODD, oddParNumero } from "@/content/odd";
-import { pick } from "@/lib/pick";
+import { pick, type Lang } from "@/lib/pick";
 import { onCompDe } from "@/lib/comp";
 import { NAV, route, compRoute } from "@/lib/routes";
 import { CHEMIN_PROVINCES, provinceParSlug, provinceRoute, slugProvince, slugsProvinces } from "@/lib/provinces/chemins";
@@ -62,6 +62,25 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 const ORDRE: AvancementProjet[] = ["EN_COURS", "PREVU", "ACHEVE"];
 /** Cartes affichées d'emblée par groupe ; les suivantes se déplient. */
 const VISIBLES = 6;
+
+/* Les langues des fiches sont saisies en français (« français, lingala ») et
+   s'affichaient telles quelles sur la route anglaise. Les langues nationales
+   gardent leur nom ; seule la graphie change. Une langue absente de la table
+   reste en l'état, plutôt que d'être mal traduite. */
+const LANGUES_EN: Record<string, string> = {
+  français: "French",
+  anglais: "English",
+  lingala: "Lingala",
+  kikongo: "Kikongo",
+  swahili: "Swahili",
+  kiswahili: "Kiswahili",
+  tshiluba: "Tshiluba",
+  ciluba: "Ciluba",
+  tetela: "Tetela",
+};
+
+const nomLangue = (nom: string, lang: Lang) =>
+  lang === "en" ? (LANGUES_EN[nom.trim().toLowerCase()] ?? nom) : nom;
 
 export default async function ProvincePage(props: Props) {
   const params = await props.params;
@@ -222,7 +241,7 @@ export default async function ProvincePage(props: Props) {
                     {fiche.langues.length > 0 && (
                       <div>
                         <dt>{pr.langues}</dt>
-                        <dd style={{ textTransform: "capitalize" }}>{fiche.langues.join(", ")}</dd>
+                        <dd style={{ textTransform: "capitalize" }}>{fiche.langues.map((l) => nomLangue(l, lang)).join(", ")}</dd>
                       </div>
                     )}
                   </dl>
@@ -324,7 +343,7 @@ export default async function ProvincePage(props: Props) {
                 <RevealItem as="li" fade key={o.n} style={{ background: o.couleur, color: onCompDe(o.couleur) }}>
                   <span className="prov-odd__n">{o.n}</span>
                   <span className="prov-odd__t">{pick(o.titre, lang)}</span>
-                  <span className="mono prov-odd__c">{comptesOdd.get(o.n)} {pr.oddProjets}</span>
+                  <span className="mono prov-odd__c">{comptesOdd.get(o.n)} {pr.oddProjets(comptesOdd.get(o.n) ?? 0)}</span>
                 </RevealItem>
               ))}
             </RevealGroup>

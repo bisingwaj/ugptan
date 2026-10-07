@@ -4,10 +4,14 @@
    ========================================================================== */
 import type { Lang } from "@/lib/pick";
 import type { NavKey } from "@/lib/routes";
+import { insecables } from "./typographie";
 
 export function dict(lang: Lang) {
   const en = lang === "en";
-  const t = (fr: string, e: string) => (en ? e : fr);
+  /* Côté français, espaces insécables posées au rendu (cf. typographie.ts) :
+     les chaînes ci-dessous sont saisies avec une espace ordinaire avant « ? »
+     ou « : », et un titre qui passait à la ligne laissait le signe seul. */
+  const t = (fr: string, e: string) => (en ? e : insecables(fr));
 
   return {
     /* --- Navigation principale + secondaire ------------------------------- */
@@ -612,6 +616,7 @@ export function dict(lang: Lang) {
     comp: {
       titre: t("Les composantes", "The components"),
       indexTitle: t("Cinq composantes, un seul projet.", "Five components, one project."),
+      indexListeTitre: t("Les composantes du projet", "The project components"),
       indexLead: t(
         "Cinq volets complémentaires : l'accès et l'inclusion, les fondations numériques de l'État, les compétences et l'innovation, l'exécution du projet et la réserve d'intervention. Chacun a sa page, ses projets phares et son responsable.",
         "Five complementary strands: access and inclusion, the State's digital foundations, skills and innovation, project delivery and the response reserve. Each has its own page, flagship projects and lead.",
@@ -768,8 +773,10 @@ export function dict(lang: Lang) {
         "Comité Technique du Projet — il instruit les dossiers avant qu'ils ne remontent : c'est là que les objections techniques des institutions concernées doivent être levées, pour que le Comité de Pilotage décide sur une base assainie.",
         "Project Technical Committee — it prepares files before they move up: this is where the technical objections of the institutions concerned must be resolved, so that the Steering Committee decides on a clean basis.",
       ),
-      copilMembers: ["MPTN — Président", "Présidence / ADN", "Primature", "Min. Finances", "MIS", "MESU", "MEPME", "+1 désigné"],
-      ctpMembers: ["MPTN (préside) +3", "ARPTC", "FDSU", "MIS ×2", "ONIP", "MESU", "MEPME", "MINFIN-CSPP", "ADN", "SOCOF", "Primature"],
+      /* Sigles laissés tels quels ; seules les mentions en toutes lettres se
+         traduisent, faute de quoi la page anglaise affichait « désigné ». */
+      copilMembers: [t("MPTN, président", "MPTN, Chair"), t("Présidence / ADN", "Presidency / ADN"), "Primature", t("Min. Finances", "Min. of Finance"), "MIS", "MESU", "MEPME", t("+1 désigné", "+1 appointee")],
+      ctpMembers: [t("MPTN (préside) +3", "MPTN (chair) +3"), "ARPTC", "FDSU", "MIS ×2", "ONIP", "MESU", "MEPME", "MINFIN-CSPP", "ADN", "SOCOF", "Primature"],
       actLabel: t("La coordination en action", "Coordination in action"),
       actTitle: t("Ce que la gouvernance a effectivement décidé.", "What governance has actually decided."),
       actLead: t(
@@ -855,8 +862,23 @@ export function dict(lang: Lang) {
         "Each notice states the procurement method used, the indicative schedule, the documents required and the deadline. The World Bank Procurement Regulations (2025) apply: evaluation criteria are announced in advance, do not change mid-process, and the outcome is published. A company must be able to gauge the effort of responding before committing to it.",
       ),
       search: t("Rechercher un avis, une référence, un lieu…", "Search a notice, reference, location…"),
-      results: t("avis", "notice(s)"),
-      open: t("ouverts", "open"),
+      /* Compteurs accordés au nombre : « 1 ouverts » se lisait sur la page dès
+         qu'un seul avis restait en cours. */
+      openCount: (n: number) => t(`ouvert${n > 1 ? "s" : ""}`, "open"),
+      resultsCount: (n: number) => t("avis", `notice${n > 1 ? "s" : ""}`),
+      /* Annonce vocale du résultat d'un filtre ou d'une recherche (zone
+         `aria-live`) : un lecteur d'écran ne voit pas la grille changer. */
+      shownCount: (n: number) =>
+        n === 0
+          ? t("Aucun avis affiché", "No notice shown")
+          : t(`${n} avis affiché${n > 1 ? "s" : ""}`, `${n} notice${n > 1 ? "s" : ""} shown`),
+      searchLabel: t("Rechercher dans les avis", "Search the notices"),
+      filtersLabel: t("Filtrer par type d'avis", "Filter by notice type"),
+      listTitle: t("Avis publiés", "Published notices"),
+      /* Même pluriel latin dans les deux langues, comme l'intitulé « Addenda ». */
+      addendumCount: (n: number) => `+${n} addend${n > 1 ? "a" : "um"}`,
+      /* Abréviation des jours du compte à rebours (« 12j 04:10:22 »). */
+      dayAbbr: t("j", "d"),
       deadline: t("Date limite", "Deadline"),
       daysLeft: t("jours restants", "days left"),
       viewDetail: t("Voir le détail", "View details"),
@@ -1000,6 +1022,7 @@ export function dict(lang: Lang) {
       filtresLabel: t("Filtrer par catégorie", "Filter by category"),
       rechercher: t("Rechercher dans les actualités…", "Search the news…"),
       rechercherAction: t("Rechercher", "Search"),
+      listeTitre: t("Articles publiés", "Published articles"),
       filtreEtiquette: t("Articles portant l'étiquette", "Articles tagged"),
       retirerFiltre: t("Retirer le filtre", "Clear the filter"),
       aucunArticle: t(
@@ -1041,6 +1064,8 @@ export function dict(lang: Lang) {
 
       /* --- Prévisualisation ------------------------------------------------- */
       apercuTitre: t("Aperçu.", "Preview."),
+      /* Titre d'onglet de la prévisualisation d'un brouillon. */
+      apercuOnglet: t("Aperçu", "Preview"),
       apercuTexte: t(
         "Cette page n'est pas publiée : elle n'est visible que depuis ce lien, et n'est pas indexée.",
         "This page is not published: it is visible from this link only, and is not indexed.",
@@ -1116,7 +1141,7 @@ export function dict(lang: Lang) {
         "Les ODD des Nations unies auxquels contribuent les projets conduits dans la province.",
         "The UN Sustainable Development Goals the projects in the province contribute to.",
       ),
-      oddProjets: t("projet(s)", "project(s)"),
+      oddProjets: (n: number) => t(`projet${n > 1 ? "s" : ""}`, `project${n > 1 ? "s" : ""}`),
       ctaTitre: t("Une question sur votre province ?", "A question about your province?"),
       ctaLead: t(
         "Une préoccupation liée aux activités du projet près de chez vous peut être signalée, de façon confidentielle si vous le souhaitez.",
@@ -1170,6 +1195,9 @@ export function dict(lang: Lang) {
 
     /* --- Ressources ------------------------------------------------------- */
     ressources: {
+      /* Intitulés de liste, lus seulement (`.sr-only`) : ils relient le h1 du
+         héros aux h3 des cartes, qui sautaient sinon un niveau. */
+      listeTitre: t("Documents publiés", "Published documents"),
       titre: t("Documents publiés", "Published documents"),
       hero: t(
         "Ce que nous publions, et pourquoi certaines pièces ne le sont pas.",
@@ -1447,6 +1475,26 @@ export function dict(lang: Lang) {
       notProvided: t("Non renseigné", "Not provided"),
       prev: t("Précédent", "Back"),
       next: t("Suivant", "Next"),
+      /* Règles des étapes, dites AVANT que le bouton « Suivant » ne refuse :
+         il restait muet tant que la description était trop courte. */
+      catRequired: t(
+        "Choisissez une catégorie pour passer à l'étape suivante.",
+        "Choose a category to move to the next step.",
+      ),
+      descMin: (min: number, saisis: number) =>
+        t(
+          `Au moins ${min} caractères (${saisis} saisi${saisis > 1 ? "s" : ""}).`,
+          `At least ${min} characters (${saisis} entered).`,
+        ),
+      descTooShort: (min: number) =>
+        t(
+          `Votre description doit compter au moins ${min} caractères pour passer à l'étape suivante.`,
+          `Your description must be at least ${min} characters long to move to the next step.`,
+        ),
+      /* Unité du poids d'une pièce jointe, et nom du bouton qui la retire
+         (une croix seule ne dit rien à un lecteur d'écran). */
+      kiloOctets: t("Ko", "KB"),
+      removeFile: (nom: string) => t(`Retirer ${nom}`, `Remove ${nom}`),
       submitGrievance: t("Envoyer ma plainte", "Submit my grievance"),
       submitting: t("Enregistrement…", "Registering…"),
       submittedTitle: t("Plainte enregistrée", "Grievance registered"),
