@@ -32,6 +32,13 @@ import { CompLies } from "@/components/composantes/CompLies";
  * par la liste figée au build.
  */
 export async function generateStaticParams() {
+  /* Au build seulement. En `next dev`, cette fonction s'exécute à chaque
+     requête dans un graphe de modules distinct de celui qui rend la page, et
+     sa lecture de la base faisait tomber la page en 500 à chaque visite
+     (pool Neon fermé sous la requête du rendu). Rien n'est perdu à l'ignorer
+     hors build : `dynamicParams` rend toute composante publiée à la demande,
+     et en production cette fonction n'est appelée qu'au build. */
+  if (process.env.NEXT_PHASE !== "phase-production-build") return [];
   const slugs = await slugsComposantes();
   return LOCALES.flatMap((lang) => slugs.map((code) => ({ lang, code })));
 }
