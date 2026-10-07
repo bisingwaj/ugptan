@@ -53,9 +53,21 @@ export default async function ContactPage(props: { params: Promise<{ lang: strin
               <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.emailNote}</div>
             </RevealItem>
             <RevealItem className="cell" style={{ padding: "30px 28px" }}>
-              <div className="mono" style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--green-bright)" }}><span className="blink" style={{ width: 8, height: 8, background: "var(--green-bright)", borderRadius: "50%" }} />{c.numeroVert}</div>
-              <div className="mono" style={{ fontSize: 30, fontWeight: 600, marginTop: 14 }}>{contact.numeroVert}</div>
-              <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.numeroVertNote}</div>
+              {/* Numéro pas encore attribué (cf. carbon.ts) : pas de voyant « en
+                  service », pas de numéro factice, et les canaux ouverts en attendant. */}
+              {contact.numeroVert ? (
+                <>
+                  <div className="mono" style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--green-bright)" }}><span className="blink" style={{ width: 8, height: 8, background: "var(--green-bright)", borderRadius: "50%" }} />{c.numeroVert}</div>
+                  <a href={`tel:${contact.numeroVert.replace(/\s/g, "")}`} className="mono" style={{ display: "block", fontSize: 30, fontWeight: 600, marginTop: 14, color: "inherit" }}>{contact.numeroVert}</a>
+                  <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.numeroVertNote}</div>
+                </>
+              ) : (
+                <>
+                  <div className="mono" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--c-60)" }}>{c.numeroVert}</div>
+                  <div style={{ fontSize: 22, fontWeight: 600, marginTop: 14 }}>{c.numeroVertBientot}</div>
+                  <div style={{ fontSize: 13.5, color: "var(--c-70)", marginTop: 8, lineHeight: 1.5 }}>{c.numeroVertAttente}</div>
+                </>
+              )}
             </RevealItem>
           </RevealGroup>
           {/* Bandeau des tutelles : il prolonge la grille des coordonnées, d'où un

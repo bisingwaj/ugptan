@@ -268,8 +268,15 @@ export const confidentialite: LegalDoc = {
         {
           k: "p",
           texte: {
-            fr: "Le site est hébergé par Netlify, Inc. (San Francisco, États-Unis d'Amérique) sur une infrastructure répartie. Une partie des données transite donc hors du territoire national et y est traitée.",
-            en: "The site is hosted by Netlify, Inc. (San Francisco, United States of America) on a distributed infrastructure. Part of the data therefore transits and is processed outside the national territory.",
+            fr: "Le site est hébergé par Vercel Inc. (Covina, Californie, États-Unis d'Amérique) sur une infrastructure répartie. Une partie des données transite donc hors du territoire national et y est traitée.",
+            en: "The site is hosted by Vercel Inc. (Covina, California, United States of America) on a distributed infrastructure. Part of the data therefore transits and is processed outside the national territory.",
+          },
+        },
+        {
+          k: "p",
+          texte: {
+            fr: "Le fonctionnement du site s'appuie en outre sur des sous-traitants techniques, eux aussi établis hors du territoire : Neon, Inc. (base de données), Upstash, Inc. (mémoire cache), Cloudinary Ltd. (stockage et diffusion des images, vidéos et documents), ainsi qu'un prestataire d'acheminement des courriels. Chacun n'accède aux données que dans la mesure nécessaire à sa prestation.",
+            en: "The site also relies on technical sub-processors, likewise established outside the country: Neon, Inc. (database), Upstash, Inc. (cache), Cloudinary Ltd. (storage and delivery of images, videos and documents), and an email delivery provider. Each accesses the data only to the extent its service requires.",
           },
         },
         {
@@ -542,7 +549,7 @@ export const conditions: LegalDoc = {
             },
             {
               t: { fr: "Hébergeur", en: "Host" },
-              d: { fr: "Netlify, Inc., San Francisco, États-Unis d'Amérique.", en: "Netlify, Inc., San Francisco, United States of America." },
+              d: { fr: "Vercel Inc., Covina, Californie, États-Unis d'Amérique.", en: "Vercel Inc., Covina, California, United States of America." },
             },
             {
               t: { fr: "Financement du projet", en: "Project financing" },

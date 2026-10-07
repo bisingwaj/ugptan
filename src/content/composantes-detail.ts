@@ -1137,16 +1137,16 @@ export const composantesDetail: ComposanteDetail[] = [
         corps: {
           fr: [
             "Le Mécanisme de Gestion des Plaintes (MGP) recueille, classe, instruit et clôt chaque doléance liée au projet, avec un objectif public : un traitement dans un délai de 30 jours.",
-            "Quatre modes de dépôt sont ouverts — formulaire en ligne, SMS et numéro vert gratuit, courrier électronique, point focal physique en province — et six langues sont prévues. Un canal confidentiel et strictement séparé traite les cas de violences basées sur le genre, d'exploitation et d'abus sexuels, avec un référencement vers les services sous 24 heures.",
+            "Quatre modes de dépôt sont prévus — formulaire en ligne, SMS et numéro vert gratuit, courrier électronique, point focal physique en province — ainsi que six langues ; le formulaire en ligne et le courrier électronique sont ouverts, le numéro vert le sera prochainement. Un canal confidentiel et strictement séparé traite les cas de violences basées sur le genre, d'exploitation et d'abus sexuels, avec un référencement vers les services sous 24 heures.",
           ],
           en: [
             "The Grievance Redress Mechanism (GRM) receives, classifies, investigates and closes every project-related grievance, with a public objective: handling within 30 days.",
-            "Four filing channels are open — online form, SMS and free toll-free number, email, and physical focal points in the provinces — in six languages. A confidential, strictly separate channel handles gender-based violence, sexual exploitation and abuse cases, with referral to services within 24 hours.",
+            "Four filing channels are planned — online form, SMS and free toll-free number, email, and physical focal points in the provinces — in six languages; the online form and email are open, the toll-free number will follow shortly. A confidential, strictly separate channel handles gender-based violence, sexual exploitation and abuse cases, with referral to services within 24 hours.",
           ],
         },
         points: [
           { fr: "un délai de traitement visé de 30 jours", en: "a target handling time of 30 days" },
-          { fr: "4 modes de dépôt · 6 langues · numéro vert 24/7", en: "4 filing channels · 6 languages · 24/7 toll-free number" },
+          { fr: "4 modes de dépôt prévus · formulaire et courriel ouverts", en: "4 filing channels planned · online form and email open" },
           { fr: "canal confidentiel EAS/HS centré sur la survivante", en: "confidential, survivor-centred SEA/SH channel" },
         ],
       },

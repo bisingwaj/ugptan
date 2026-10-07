@@ -220,11 +220,11 @@ export const projetSeed: ImpactSeedSection[] = [
       {
         fr: {
           titre: "Que puis-je faire si quelque chose ne va pas ?",
-          texte: "Saisissez le Mécanisme de Gestion des Plaintes : formulaire en ligne, SMS, numéro vert gratuit, e-mail ou point focal en province. Le dépôt est gratuit, possible en plusieurs langues, et peut rester anonyme. Vous recevez un numéro de référence horodaté qui permet de suivre l'instruction ; l'Unité vise une réponse dans un délai de 30 jours. Un canal confidentiel distinct traite les cas de violences basées sur le genre.",
+          texte: "Saisissez le Mécanisme de Gestion des Plaintes : formulaire en ligne ou e-mail dès aujourd'hui, bientôt SMS, numéro vert gratuit et points focaux en province. Le dépôt est gratuit, et peut rester anonyme. Vous recevez un numéro de référence horodaté qui permet de suivre l'instruction ; l'Unité vise une réponse dans un délai de 30 jours. Un canal confidentiel distinct traite les cas de violences basées sur le genre.",
         },
         en: {
           titre: "What can I do if something goes wrong?",
-          texte: "Use the Grievance Redress Mechanism: online form, SMS, free toll-free number, email or a provincial focal point. Filing is free, available in several languages, and may remain anonymous. You receive a timestamped reference number to follow the case; the Unit aims to reply within 30 days. A separate confidential channel handles gender-based violence cases.",
+          texte: "Use the Grievance Redress Mechanism: online form or email today, soon SMS, a free toll-free number and provincial focal points. Filing is free, and may remain anonymous. You receive a timestamped reference number to follow the case; the Unit aims to reply within 30 days. A separate confidential channel handles gender-based violence cases.",
         },
       },
     ],

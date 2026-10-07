@@ -47,11 +47,18 @@ export function Footer({ lang }: { lang: Lang }) {
                 {t.navSub[item.key] ?? t.nav[item.key]}
               </Link>
             ))}
-            {/* Le numéro vert accompagne le mécanisme de gestion des plaintes,
-                seul canal du pied de page ouvert 24h/24. */}
+            {/* Le numéro vert accompagne le mécanisme de gestion des plaintes.
+                Tant qu'il n'est pas attribué (cf. carbon.ts), pas de voyant
+                vert « en service » : la mention dit qu'il arrive. */}
             {group.key === "gtransparence" && (
               <Link href={route(lang, NAV.mgp)} className={colLinkAccent}>
-                <span className="blink size-[7px] rounded-full bg-green-bright" />{t.contact.numeroVert}
+                {contact.numeroVert ? (
+                  <>
+                    <span className="blink size-[7px] rounded-full bg-green-bright" />{t.contact.numeroVert}
+                  </>
+                ) : (
+                  <>{t.contact.numeroVert} · {t.contact.numeroVertBientot.toLowerCase()}</>
+                )}
               </Link>
             )}
           </nav>

@@ -229,7 +229,7 @@ export function dict(lang: Lang) {
         "Trois chantiers, et une seule logique : un réseau qui atteint les territoires, un socle numérique commun à l'État, et les compétences pour faire vivre l'un et l'autre. Pris séparément, aucun ne produit d'effet durable ; c'est leur enchaînement qui compte.",
         "Three efforts, one logic: a network that reaches the territories, a digital foundation shared across the State, and the skills to keep both running. Taken separately, none produces lasting effects; it is their sequence that matters.",
       ),
-      statusEffective: t("Entrée en vigueur 24.06.2025", "Effectiveness 24.06.2025"),
+      statusEffective: t("Entrée en vigueur 31.10.2025", "Effectiveness 31.10.2025"),
       statusCompletion: t("Achèvement technique 31.12.2029", "Technical completion 31.12.2029"),
       resultatsTitle: t(
         "Des ambitions mesurables à l'horizon 2029 — l'impact et l'inclusion au cœur.",
@@ -796,11 +796,17 @@ export function dict(lang: Lang) {
       emailNote: t("Saisine écrite · réponse tracée", "Written referral · traceable reply"),
       numeroVert: t("Numéro vert MGP", "GRM toll-free number"),
       numeroVertNote: t("Appel gratuit · 24h/24 · 6 langues", "Free call · 24/7 · 6 languages"),
+      /* Tant que le numéro n'est pas attribué (cf. carbon.ts, `numeroVert` vide). */
+      numeroVertBientot: t("Bientôt disponible", "Coming soon"),
+      numeroVertAttente: t(
+        "Le numéro sera publié ici dès son ouverture. En attendant : formulaire en ligne ou info@ugptn.cd.",
+        "The number will be published here as soon as it opens. Meanwhile: online form or info@ugptn.cd.",
+      ),
       mgpLabel: t("Mécanisme de gestion des plaintes (MGP)", "Grievance mechanism (GRM)"),
       mgpModesTitle: t("Quatre modes de dépôt", "Four ways to file a grievance"),
       mgpModes: [
         { n: "01", t: t("Formulaire web en ligne", "Online web form"), d: t("Catégorisé, horodaté, accusé immédiat.", "Categorised, timestamped, immediate acknowledgement.") },
-        { n: "02", t: t("SMS / numéro vert", "SMS / toll-free number"), d: t("Gratuit, accessible sur tout mobile.", "Free, accessible on any mobile.") },
+        { n: "02", t: t("SMS / numéro vert", "SMS / toll-free number"), d: t("Bientôt disponible : gratuit, accessible sur tout mobile.", "Coming soon: free, accessible on any mobile.") },
         { n: "03", t: "E-mail", d: t("Saisine écrite avec numéro de référence.", "Written referral with reference number.") },
         { n: "04", t: t("Point focal physique", "Physical focal point"), d: t("Annuaire provincial sur 26 provinces.", "Provincial directory across 26 provinces.") },
       ],
@@ -1379,7 +1385,7 @@ export function dict(lang: Lang) {
         "Le dépôt est gratuit, possible en plusieurs langues, et peut rester anonyme. Vous recevez un numéro de référence qui permet de suivre l'instruction sans avoir à vous déplacer. Aucune représaille n'est tolérée, et un canal strictement séparé traite les cas de violences basées sur le genre. L'Unité vise un traitement dans un délai de 30 jours.",
         "Filing is free, available in several languages, and may remain anonymous. You receive a reference number that lets you follow the case without travelling. No retaliation is tolerated, and a strictly separate channel handles gender-based violence cases. The Unit aims to handle cases within 30 days.",
       ),
-      slaBadge: t("Objectif 30 jours · 6 langues · numéro vert 24/7", "30-day objective · 6 languages · 24/7 toll-free"),
+      slaBadge: t("Objectif 30 jours · dépôt gratuit · anonymat possible", "30-day objective · free to file · anonymity possible"),
       formTitle: t("Déposer une plainte", "File a grievance"),
       step: t("Étape", "Step"),
       stepLabels: [
@@ -1494,7 +1500,7 @@ export function dict(lang: Lang) {
       ),
       modes: [
         { n: "01", t: t("Formulaire web", "Web form"), d: t("Catégorisé, horodaté, accusé immédiat.", "Categorised, timestamped, immediate acknowledgement.") },
-        { n: "02", t: t("SMS / numéro vert", "SMS / toll-free"), d: t("Gratuit, accessible sur tout mobile.", "Free, accessible on any mobile.") },
+        { n: "02", t: t("SMS / numéro vert", "SMS / toll-free"), d: t("Bientôt disponible : gratuit, accessible sur tout mobile.", "Coming soon: free, accessible on any mobile.") },
         { n: "03", t: "E-mail", d: t("Saisine écrite avec numéro de référence.", "Written referral with reference number.") },
         { n: "04", t: t("Point focal", "Focal point"), d: t("Annuaire provincial · 26 provinces.", "Provincial directory · 26 provinces.") },
       ],
