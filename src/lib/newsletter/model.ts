@@ -9,17 +9,27 @@
  * schéma Prisma — les deux doivent rester alignées.
  */
 
-export const NEWSLETTER_STATUTS = ["ACTIVE", "UNSUBSCRIBED"] as const;
+/**
+ * Ordre d'affichage du filtre de la console : les abonnés d'abord, puis ceux
+ * qui n'ont pas encore confirmé, puis ceux qui sont partis.
+ *
+ * PENDING n'est PAS un abonné : l'adresse a été saisie, mais personne n'a
+ * encore prouvé, par un clic dans le message reçu, qu'elle appartient à qui
+ * l'a saisie. Elle ne reçoit rien tant qu'elle n'est pas ACTIVE.
+ */
+export const NEWSLETTER_STATUTS = ["ACTIVE", "PENDING", "UNSUBSCRIBED"] as const;
 export type NewsletterStatut = (typeof NEWSLETTER_STATUTS)[number];
 
 export const STATUT_LABEL: Record<NewsletterStatut, string> = {
   ACTIVE: "Actif",
+  PENDING: "En attente de confirmation",
   UNSUBSCRIBED: "Désabonné",
 };
 
 /** Classe de pastille de la console (cf. styles/dashboard.css). */
 export const STATUT_BADGE: Record<NewsletterStatut, string> = {
   ACTIVE: "adm-badge--on",
+  PENDING: "adm-badge--warn",
   UNSUBSCRIBED: "adm-badge--off",
 };
 
@@ -83,8 +93,26 @@ export const HONEYPOT_FIELD = "website";
  * Délai minimal, en millisecondes, entre l'affichage du formulaire et son
  * envoi. Une personne qui saisit son adresse met plus de deux secondes ; un
  * script en met zéro.
+ *
+ * ⚠️ Le délai est EXIGÉ : une soumission qui ne le transmet pas, ou transmet
+ * autre chose qu'un nombre, est refusée comme les autres (cf. `delaiHumain`).
  */
 export const MIN_FILL_MS = 2000;
+
+/**
+ * Le délai annoncé est-il celui d'une personne ?
+ *
+ * Refus par défaut : absent, négatif, non numérique ou trop court, le délai ne
+ * prouve rien. L'ancienne règle ne refusait qu'un délai PRÉSENT et trop court,
+ * si bien qu'il suffisait de ne pas l'envoyer pour passer.
+ *
+ * Ce contrôle reste un filtre contre les scripts naïfs, rien de plus : la
+ * valeur vient du navigateur, et un script soigné l'imite. Ce qui protège
+ * réellement les tiers, c'est la double confirmation et la borne par adresse
+ * destinataire (cf. actions/newsletter.ts).
+ */
+export const delaiHumain = (delai: unknown): boolean =>
+  typeof delai === "number" && Number.isFinite(delai) && delai >= MIN_FILL_MS;
 
 /** Cinq inscriptions par quart d'heure et par adresse IP : au-delà, c'est un script. */
 export const SUBSCRIBE_LIMIT = 5;
@@ -93,6 +121,38 @@ export const SUBSCRIBE_WINDOW_MS = 15 * 60 * 1000;
 /** Le renvoi d'un lien de désabonnement est plus rare encore. */
 export const UNSUBSCRIBE_LINK_LIMIT = 3;
 export const UNSUBSCRIBE_LINK_WINDOW_MS = 30 * 60 * 1000;
+
+/* --- Limites par adresse DESTINATAIRE -------------------------------------
+   Les limites par IP ci-dessus protègent le site ; elles ne protègent pas la
+   boîte d'un tiers. Quelqu'un qui change d'adresse IP (réseau mobile, VPN)
+   pourrait faire partir un message toutes les quelques secondes vers la même
+   personne, simplement en resoumettant son adresse. D'où une seconde borne,
+   portée par l'adresse visée elle-même. */
+
+/**
+ * Au plus UN message de confirmation par adresse et par période de six heures.
+ *
+ * Six heures et non une : un message de confirmation égaré finit d'ordinaire
+ * dans les indésirables, où on le retrouve, et le lien qu'il porte vaut bien
+ * plus longtemps (cf. CONFIRM_TTL_MS). Une resoumission dans l'intervalle ne
+ * fait rien partir, et reçoit la même réponse que les autres.
+ */
+export const CONFIRM_RESEND_MS = 6 * 60 * 60 * 1000;
+
+/** Au plus un lien de désabonnement renvoyé par adresse sur la même période. */
+export const UNSUBSCRIBE_LINK_PER_ADDRESS_MS = 6 * 60 * 60 * 1000;
+
+/* --- Lien de confirmation (double confirmation) ---------------------------- */
+
+/**
+ * Validité d'un lien de confirmation : 48 heures.
+ *
+ * Assez pour un week-end sans relever sa messagerie, pas assez pour qu'un
+ * message oublié dans une boîte partagée ou transférée serve des semaines plus
+ * tard. Passé ce délai, il suffit de ressaisir l'adresse dans le formulaire.
+ */
+export const CONFIRM_TTL_HEURES = 48;
+export const CONFIRM_TTL_MS = CONFIRM_TTL_HEURES * 60 * 60 * 1000;
 
 /* --- Jeton de gestion d'abonnement ---------------------------------------- */
 

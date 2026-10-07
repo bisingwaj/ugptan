@@ -14,8 +14,10 @@
  *   - SUPPRIMER efface la ligne, donc aussi la mémoire de ce refus. Réservé aux
  *     demandes d'effacement, ce que dit la confirmation affichée à l'écran.
  *
- * Réabonner depuis la console reste possible pour traiter une demande reçue par
- * un autre canal (téléphone, courrier, guichet). Le geste est journalisé par la
+ * Réabonner (ou activer une adresse EN ATTENTE de confirmation) depuis la
+ * console reste possible pour traiter une demande reçue par un autre canal
+ * (téléphone, courrier, guichet) : c'est alors l'agent qui atteste le
+ * consentement, à la place du clic dans le message. Le geste est journalisé par la
  * seule trace qui compte ici : `subscribedAt` repart à la date du jour.
  */
 import { revalidatePath } from "next/cache";
@@ -48,8 +50,18 @@ export async function setSubscriberStatusAction(
           // la liste prétendrait que l'adresse n'a jamais quitté la diffusion.
           // Vue d'office : c'est un agent qui l'inscrit, la bulle n'a pas à
           // lui signaler son propre geste.
-          { status: "ACTIVE", subscribedAt: new Date(), unsubscribedAt: null, readAt: new Date() }
-        : { status: "UNSUBSCRIBED", unsubscribedAt: new Date() },
+          // Un lien de confirmation encore en circulation est annulé dans les
+          // deux sens : l'adresse n'en a plus besoin, ou ne doit plus pouvoir
+          // s'en servir après un désabonnement.
+          {
+            status: "ACTIVE",
+            subscribedAt: new Date(),
+            unsubscribedAt: null,
+            readAt: new Date(),
+            confirmTokenHash: null,
+            confirmExpiresAt: null,
+          }
+        : { status: "UNSUBSCRIBED", unsubscribedAt: new Date(), confirmTokenHash: null, confirmExpiresAt: null },
     });
   } catch (error) {
     if ((error as { code?: string })?.code === "P2025") {

@@ -234,13 +234,14 @@ export const ADMIN = {
 
   newsletter: {
     title: "Newsletter",
-    lead: "Adresses collectées par le formulaire d'inscription du site public. Une adresse désabonnée reste dans la liste, marquée comme telle : c'est ce qui garantit qu'elle ne sera pas réabonnée par erreur lors d'un import ou d'une nouvelle saisie.",
+    lead: "Adresses collectées par le formulaire d'inscription du site public. Une adresse saisie reste en attente tant que son titulaire n'a pas cliqué sur le lien de confirmation reçu : seules les adresses actives ont consenti à recevoir la lettre. Une adresse désabonnée reste dans la liste, marquée comme telle : c'est ce qui garantit qu'elle ne sera pas réabonnée par erreur lors d'un import ou d'une nouvelle saisie.",
     listTitle: "Abonnés",
     empty: "Aucun abonné pour le moment.",
     emptyFiltered: "Aucun abonné ne correspond à ce filtre.",
 
     kpiTotal: "Adresses",
     kpiActive: "Abonnés actifs",
+    kpiPending: "En attente de confirmation",
     kpiUnsub: "Désabonnés",
     kpiMonth: "Inscrits sur 30 jours",
 
@@ -270,7 +271,7 @@ export const ADMIN = {
     exportCsv: "Export CSV",
     exportXlsx: "Export Excel",
     exportAide:
-      "L'export reprend la sélection affichée : adresse, date d'inscription, statut, langue et provenance. Le fichier CSV est encodé en UTF-8 avec point-virgule, format attendu par Excel en configuration française.",
+      "L'export reprend la sélection affichée : adresse, date d'inscription, statut, langue et provenance. Le fichier CSV est encodé en UTF-8 avec point-virgule, format attendu par Excel en configuration française. Pour un envoi, filtrez d'abord sur le statut « Actif » : les adresses en attente n'ont pas confirmé leur inscription.",
 
     desabonner: "Désabonner",
     desabonnement: "Désabonnement…",

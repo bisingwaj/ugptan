@@ -7,7 +7,7 @@
  * Les liens sont ABSOLUS et composés depuis `APP_ORIGIN` : un e-mail n'a pas
  * d'origine, un chemin relatif n'y mène nulle part.
  */
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import type { Lang } from "@/lib/pick";
 import { APP_ORIGIN } from "@/lib/email/config";
 import { NEWSLETTER_CONFIRM, NEWSLETTER_UNSUBSCRIBE, TOKEN_PARAM, TOKEN_LENGTH } from "./model";
@@ -21,6 +21,26 @@ import { NEWSLETTER_CONFIRM, NEWSLETTER_UNSUBSCRIBE, TOKEN_PARAM, TOKEN_LENGTH }
  * d'un autre.
  */
 export const nouveauToken = (): string => randomBytes(TOKEN_LENGTH / 2).toString("hex");
+
+/**
+ * Empreinte SHA-256 (hexadécimal) d'un jeton de confirmation : c'est elle, et
+ * non le jeton, qu'enregistre `NewsletterSubscriber.confirmTokenHash`.
+ *
+ * Un hachage simple, sans sel ni étirement, suffit ici : le jeton est tiré au
+ * sort sur 256 bits, il n'y a pas de dictionnaire à opposer à une attaque par
+ * force brute. Le but est seulement qu'une copie de la table ne contienne
+ * aucun lien de confirmation utilisable.
+ */
+export const empreinteJeton = (token: string): string =>
+  createHash("sha256").update(token, "utf8").digest("hex");
+
+/**
+ * Clé de limitation de débit pour une adresse DESTINATAIRE (cf.
+ * lib/rate-limit.ts). Empreinte et non adresse en clair : le compteur vit dans
+ * Redis, qui n'a pas à devenir un second fichier d'adresses.
+ */
+export const cleAdresse = (prefixe: string, email: string): string =>
+  `${prefixe}:${createHash("sha256").update(email, "utf8").digest("hex").slice(0, 32)}`;
 
 const lien = (lang: Lang, chemin: string, token: string): string =>
   `${APP_ORIGIN}/${lang}${chemin}?${TOKEN_PARAM}=${token}`;
@@ -42,9 +62,13 @@ export const adresseDesabonnementUnClic = (token: string): string =>
   `${APP_ORIGIN}/api/newsletter/unsubscribe?${TOKEN_PARAM}=${token}`;
 
 /**
- * Lien de confirmation de réinscription. Envoyé quand une adresse DÉSABONNÉE
- * est resoumise : la remettre en liste sans ce clic reviendrait à réabonner
- * quelqu'un parce qu'un tiers a tapé son adresse (cf. actions/newsletter.ts).
+ * Lien de confirmation d'inscription (double confirmation). Envoyé à toute
+ * adresse saisie qui n'est pas déjà active, nouvelle ou désabonnée : l'inscrire
+ * sans ce clic reviendrait à abonner quelqu'un parce qu'un tiers a tapé son
+ * adresse (cf. actions/newsletter.ts).
+ *
+ * ⚠️ `token` est ici le jeton de CONFIRMATION, à usage unique, et non le jeton
+ * de gestion de l'abonnement : les deux ne se confondent pas.
  */
 export const lienConfirmation = (lang: Lang, token: string): string =>
   lien(lang, NEWSLETTER_CONFIRM, token);

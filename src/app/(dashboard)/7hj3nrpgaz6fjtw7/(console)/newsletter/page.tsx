@@ -64,7 +64,7 @@ export default async function NewsletterAdminPage(props: { searchParams: Promise
   const now = new Date();
   const depuis = new Date(now.getTime() - FENETRE_JOURS * 24 * 60 * 60 * 1000);
 
-  const [total, abonnes, actifs, desabonnes, recents, sources, nouveaux] = await Promise.all([
+  const [total, abonnes, actifs, desabonnes, enAttente, recents, sources, nouveaux] = await Promise.all([
     db().newsletterSubscriber.count({ where }),
     db().newsletterSubscriber.findMany({
       where,
@@ -81,6 +81,8 @@ export default async function NewsletterAdminPage(props: { searchParams: Promise
     // de la recherche en cours.
     db().newsletterSubscriber.count({ where: { status: "ACTIVE" } }),
     db().newsletterSubscriber.count({ where: { status: "UNSUBSCRIBED" } }),
+    // Adresses saisies mais jamais confirmées : ni abonnées, ni désabonnées.
+    db().newsletterSubscriber.count({ where: { status: "PENDING" } }),
     db().newsletterSubscriber.count({ where: { status: "ACTIVE", subscribedAt: { gte: depuis } } }),
     db().newsletterSubscriber.groupBy({ by: ["source"], _count: { source: true } }),
     compterNouveauxAbonnes(),
@@ -90,8 +92,9 @@ export default async function NewsletterAdminPage(props: { searchParams: Promise
   const filtre = filtreActif(filtres);
 
   const kpis = [
-    { key: "total", label: t.kpiTotal, value: actifs + desabonnes },
+    { key: "total", label: t.kpiTotal, value: actifs + desabonnes + enAttente },
     { key: "actifs", label: t.kpiActive, value: actifs },
+    { key: "attente", label: t.kpiPending, value: enAttente },
     { key: "desabonnes", label: t.kpiUnsub, value: desabonnes },
     { key: "recents", label: t.kpiMonth, value: recents },
   ];

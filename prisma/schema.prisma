@@ -539,7 +539,13 @@ model ArticleTranslation {
 /// d'allers-retours : un désabonnement n'efface rien, il bascule ce statut.
 /// C'est ce qui permet de refuser une réinscription silencieuse (cf.
 /// src/actions/newsletter.ts).
+///
+/// PENDING : adresse saisie dans le formulaire mais pas encore confirmée par
+/// un clic dans le message reçu à cette adresse (double confirmation). Elle ne
+/// reçoit rien, n'est pas comptée parmi les abonnés et sort de l'export sous
+/// son propre libellé : seule une adresse ACTIVE a consenti.
 enum NewsletterStatus {
+  PENDING
   ACTIVE
   UNSUBSCRIBED
 }
@@ -559,7 +565,10 @@ model NewsletterSubscriber {
   /// Langue du formulaire au moment de l'inscription. Détermine la langue des
   /// messages qui lui seront adressés.
   lang   String           @default("fr")
-  status NewsletterStatus @default(ACTIVE)
+  /// En attente par défaut : une ligne créée sans statut explicite ne doit
+  /// jamais valoir consentement. Le code pose toujours le statut lui-même ;
+  /// cette valeur par défaut est un filet, pas le mécanisme.
+  status NewsletterStatus @default(PENDING)
 
   /// Provenance de l'adresse : « site » pour le formulaire public, « console »
   /// pour une saisie interne, « import » pour une reprise de liste existante.
@@ -571,6 +580,21 @@ model NewsletterSubscriber {
   /// confirmation de réinscription). TIRÉ AU SORT et non dérivé de l'adresse :
   /// il circule dans des e-mails et ne doit rien apprendre de son porteur.
   token String @unique
+
+  /// Double confirmation : EMPREINTE (SHA-256, hexadécimal) du jeton porté par
+  /// le lien de confirmation, jamais le jeton lui-même. Une lecture de la
+  /// table, une sauvegarde ou un journal de requêtes ne livre donc aucun lien
+  /// utilisable. Distinct de `token` : ce jeton-ci est À USAGE UNIQUE (remis à
+  /// `null` au clic) et périssable, là où le jeton de gestion vit aussi
+  /// longtemps que l'abonnement. Un nouvel envoi le remplace, ce qui rend
+  /// caduc le lien précédent.
+  confirmTokenHash String?   @unique
+  /// Fin de validité du lien de confirmation en cours.
+  confirmExpiresAt DateTime?
+  /// Dernier envoi d'un message de confirmation à cette adresse. Borne le
+  /// nombre de messages qu'un tiers peut faire partir vers une même boîte en
+  /// resoumettant le formulaire (cf. CONFIRM_RESEND_MS, lib/newsletter/model.ts).
+  confirmSentAt    DateTime?
 
   /// Date de la dernière inscription effective — remise à jour lors d'une
   /// réinscription, pour que la liste dise depuis quand l'adresse est active.

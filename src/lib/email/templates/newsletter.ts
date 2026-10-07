@@ -98,7 +98,8 @@ const RUBRIQUES = (en: boolean): { title: string; text: string }[] =>
 /* --- Bienvenue ------------------------------------------------------------ */
 
 /**
- * Accusé d'inscription. Il ne demande rien : l'inscription est déjà effective.
+ * Accusé d'inscription, envoyé au clic de confirmation (cf. `confirmByToken`).
+ * Il ne demande rien : l'inscription est désormais effective.
  * Sa raison d'être est de mettre le lien de désabonnement entre les mains de
  * l'abonné dès le premier jour, sans attendre la première campagne.
  */
@@ -184,42 +185,53 @@ export function newsletterWelcomeEmail(params: {
   return { to: email, subject, html, text, listUnsubscribe: { url: oneClickUrl } };
 }
 
-/* --- Confirmation de réinscription ---------------------------------------- */
+/* --- Confirmation d'inscription (double confirmation) --------------------- */
 
 /**
- * Adressé quand une adresse DÉSABONNÉE est resoumise dans le formulaire.
+ * Adressé à toute adresse saisie dans le formulaire qui n'est pas déjà active :
+ * nouvelle adresse comme adresse désabonnée.
  *
- * ⚠️ Ce message est la garantie exigée au §4 du cahier des charges : une
- * personne désabonnée n'est jamais remise en liste par la seule saisie de son
- * adresse — n'importe qui aurait pu la taper. Seul le clic sur ce lien, reçu
- * dans SA boîte, vaut consentement.
+ * ⚠️ Ce message est la garantie de la double confirmation : personne n'est mis
+ * en liste par la seule saisie de son adresse, n'importe qui aurait pu la
+ * taper. Seul le clic sur ce lien, reçu dans SA boîte, vaut consentement (§4
+ * du cahier des charges pour la réinscription).
+ *
+ * Il ne porte ni en-tête `List-Unsubscribe` ni lien de désabonnement : son
+ * destinataire n'est PAS sur la liste, et n'a rien à faire pour qu'il n'y
+ * soit jamais. Le texte le lui dit.
  */
 export function newsletterConfirmEmail(params: {
   email: string;
   lang: Lang;
   confirmUrl: string;
+  /** Validité du lien, en heures (cf. CONFIRM_TTL_HEURES). */
+  validiteHeures: number;
 }): Mail {
-  const { email, lang, confirmUrl } = params;
+  const { email, lang, confirmUrl, validiteHeures } = params;
   const en = lang === "en";
 
   const subject = en
     ? "Confirm your subscription to the UGPTN newsletter"
     : "Confirmez votre inscription à la lettre d'information de l'UGPTN";
 
+  const validite = en
+    ? `This link is valid for ${validiteHeures} hours and can be used only once.`
+    : `Ce lien est valable ${validiteHeures} heures et ne sert qu'une fois.`;
+
   const html = renderEmail({
     lang,
     subtitle: subtitle(lang),
     signature: signature(lang),
     preheader: en
-      ? "One click is needed to put this address back on the list."
-      : "Un clic suffit à remettre cette adresse sur la liste.",
+      ? "One click is needed before this address is added to the list."
+      : "Un clic est nécessaire avant que cette adresse rejoigne la liste.",
     kicker: en ? "Confirmation required" : "Confirmation requise",
     title: en ? "Confirm your subscription" : "Confirmez votre inscription",
     blocks: [
       paragraph(
         en
-          ? `The address <strong>${esc(email)}</strong> was entered again in the newsletter form. It had previously been unsubscribed, so we do not put it back on the list on that basis alone.`
-          : `L'adresse <strong>${esc(email)}</strong> vient d'être saisie à nouveau dans le formulaire d'inscription. Elle avait été désabonnée : nous ne la remettons pas en liste sur cette seule base.`,
+          ? `The address <strong>${esc(email)}</strong> was entered in the newsletter form on the UGPTN website. It will only be added to the list once you confirm, so that no one can subscribe an address that is not theirs.`
+          : `L'adresse <strong>${esc(email)}</strong> a été saisie dans le formulaire d'inscription du site de l'UGPTN. Elle ne rejoindra la liste qu'après votre confirmation, pour que personne ne puisse inscrire une adresse qui n'est pas la sienne.`,
       ),
       button(en ? "Confirm my subscription" : "Confirmer mon inscription", confirmUrl),
       fallbackLink(
@@ -228,10 +240,15 @@ export function newsletterConfirmEmail(params: {
           ? "If the button does not appear, copy this link into your browser:"
           : "Si le bouton ne s'affiche pas, copiez ce lien dans votre navigateur :",
       ),
+      notice(
+        en
+          ? `${validite} Once it has expired, simply enter your address in the form again.`
+          : `${validite} Passé ce délai, il suffit de saisir à nouveau votre adresse dans le formulaire.`,
+      ),
       paragraph(
         en
-          ? "If this was not you, ignore this message: the address stays unsubscribed and you will receive nothing further."
-          : "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : l'adresse reste désabonnée et vous ne recevrez rien d'autre.",
+          ? "If this was not you, ignore this message: the address will not be added to the list and you will receive nothing further."
+          : "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : l'adresse ne sera pas inscrite et vous ne recevrez rien d'autre.",
         { muted: true },
       ),
     ],
@@ -242,15 +259,17 @@ export function newsletterConfirmEmail(params: {
     "=".repeat(52),
     "",
     en
-      ? `The address ${email} was entered again in the newsletter form, after having been unsubscribed.`
-      : `L'adresse ${email} a été saisie à nouveau dans le formulaire d'inscription, après avoir été désabonnée.`,
+      ? `The address ${email} was entered in the newsletter form on the UGPTN website. It will only be added to the list once you confirm.`
+      : `L'adresse ${email} a été saisie dans le formulaire d'inscription du site de l'UGPTN. Elle ne rejoindra la liste qu'après votre confirmation.`,
     "",
     en ? "Confirm with this link:" : "Confirmez avec ce lien :",
     confirmUrl,
     "",
+    validite,
+    "",
     en
-      ? "If this was not you, ignore this message: the address stays unsubscribed."
-      : "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : l'adresse reste désabonnée.",
+      ? "If this was not you, ignore this message: the address will not be added to the list."
+      : "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : l'adresse ne sera pas inscrite.",
     "",
     "--",
     "Unité de Gestion du Projet de Transformation Numérique — RDC",

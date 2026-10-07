@@ -13,8 +13,8 @@ import {
 } from "@/actions/newsletter";
 
 /**
- * Pages publiques de gestion d'abonnement : désabonnement, confirmation de
- * réinscription, et renvoi du lien à qui l'a perdu.
+ * Pages publiques de gestion d'abonnement : désabonnement, confirmation
+ * d'inscription (double confirmation), et renvoi du lien à qui l'a perdu.
  *
  * ⚠️ RIEN NE S'EXÉCUTE AU CHARGEMENT. Chaque opération demande un clic, y
  * compris le désabonnement par lien : les antivirus de messagerie et les
@@ -122,7 +122,13 @@ export function ActionAbonnement({
       already: mode === "desabonnement"
         ? { ton: "neutre", titre: t.unsubAlreadyTitle, texte: t.unsubAlreadyText }
         : { ton: "neutre", titre: t.confirmAlreadyTitle, texte: t.confirmAlreadyText },
-      invalid: { ton: "erreur", titre: t.invalidTitle, texte: t.invalidText },
+      invalid: {
+        ton: "erreur",
+        titre: t.invalidTitle,
+        texte: mode === "confirmation" ? t.confirmInvalidText : t.invalidText,
+      },
+      // Seule la confirmation périme ; le désabonnement ne renvoie jamais ce code.
+      expired: { ton: "erreur", titre: t.expiredTitle, texte: t.expiredText },
       server: { ton: "erreur", titre: t.serverTitle, texte: t.serverText },
     };
 

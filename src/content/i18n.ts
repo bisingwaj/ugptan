@@ -342,9 +342,14 @@ export function dict(lang: Lang) {
       ),
 
       /* Retours d'inscription, par code renvoyé par `subscribeNewsletter`.
-         « Déjà inscrite » et « nouvellement inscrite » partagent le même
-         message : les distinguer ferait du formulaire un moyen de vérifier
-         qu'une personne figure dans la liste. */
+         Depuis la double confirmation, l'action ne renvoie plus que
+         « confirm », quelle que soit la situation de l'adresse : nouvelle, en
+         attente, active ou désabonnée. Distinguer ces cas ferait du formulaire
+         un moyen de vérifier qu'une personne figure dans la liste. Le texte
+         est donc écrit pour être vrai dans tous : il ne promet un message
+         qu'à une adresse qui n'est pas déjà inscrite.
+         `doneTitle` / `doneText` ne sont plus affichés ; ils restent lus par
+         le composant du formulaire. */
       doneTitle: t("Inscription confirmée", "You're subscribed"),
       doneText: t(
         "Vous recevrez la prochaine édition à cette adresse.",
@@ -352,8 +357,8 @@ export function dict(lang: Lang) {
       ),
       confirmTitle: t("Vérifiez votre boîte mail", "Check your inbox"),
       confirmText: t(
-        "Cette adresse avait été désabonnée. Un message vient d'y être envoyé : ouvrez-le et confirmez pour revenir sur la liste.",
-        "This address had been unsubscribed. A message has just been sent to it: open it and confirm to rejoin the list.",
+        "Si cette adresse n'est pas déjà inscrite, un message de confirmation vient de lui être envoyé. L'inscription ne prend effet qu'après un clic sur le lien qu'il contient, valable 48 heures. Pensez à regarder dans les courriers indésirables.",
+        "If this address is not already subscribed, a confirmation message has just been sent to it. The subscription only takes effect once you click the link it contains, which is valid for 48 hours. Check your spam folder too.",
       ),
 
       erreurs: {
@@ -410,17 +415,26 @@ export function dict(lang: Lang) {
         "Nothing is sent to this address. There is nothing further to do.",
       ),
 
-      /* Confirmation de réinscription */
+      /* Confirmation d'inscription (double confirmation) */
       confirmTitle: t("Confirmer votre inscription", "Confirm your subscription"),
       confirmLead: t(
-        "Cette adresse avait été désabonnée. Elle ne revient sur la liste que par cette confirmation.",
-        "This address had been unsubscribed. It only returns to the list through this confirmation.",
+        "Une adresse saisie dans le formulaire ne rejoint la liste qu'après cette confirmation : personne ne peut ainsi inscrire une adresse qui n'est pas la sienne.",
+        "An address entered in the form only joins the list after this confirmation, so no one can subscribe an address that is not theirs.",
       ),
       confirmBtn: t("Confirmer mon inscription", "Confirm my subscription"),
-      confirmDoneTitle: t("Inscription rétablie", "Subscription restored"),
+      confirmDoneTitle: t("Inscription confirmée", "Subscription confirmed"),
       confirmDoneText: t(
-        "Cette adresse figure de nouveau sur la liste. Vous recevrez la prochaine édition.",
-        "This address is back on the list. You will receive the next edition.",
+        "Cette adresse figure désormais sur la liste. Vous recevrez la prochaine édition, et un message de bienvenue portant votre lien de désabonnement vient de vous être adressé.",
+        "This address is now on the list. You will receive the next edition, and a welcome message carrying your unsubscribe link has just been sent to you.",
+      ),
+      confirmInvalidText: t(
+        "Ce lien a déjà servi, a été remplacé par un message plus récent, ou est incomplet. Si vous avez déjà confirmé, il n'y a rien d'autre à faire. Sinon, saisissez à nouveau votre adresse dans le formulaire du site pour recevoir un nouveau lien.",
+        "This link has already been used, has been replaced by a more recent message, or is incomplete. If you have already confirmed, there is nothing further to do. Otherwise, enter your address in the form on the site again to receive a new link.",
+      ),
+      expiredTitle: t("Lien expiré", "Link expired"),
+      expiredText: t(
+        "Un lien de confirmation est valable 48 heures. Celui-ci a dépassé ce délai et l'adresse n'a pas été inscrite. Saisissez-la à nouveau dans le formulaire du site pour recevoir un nouveau lien.",
+        "A confirmation link is valid for 48 hours. This one has passed that limit and the address has not been subscribed. Enter it again in the form on the site to receive a new link.",
       ),
       confirmAlreadyTitle: t("Adresse déjà inscrite", "Address already subscribed"),
       confirmAlreadyText: t(
