@@ -24,7 +24,7 @@
 import type { Lang } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { indicateurs } from "@/lib/projet/query";
-import { Counter } from "@/components/ui/Counter";
+import { Compteur } from "@/components/motion/Compteur";
 import { FlowLines } from "@/components/ui/FlowLines";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
@@ -55,8 +55,16 @@ export async function GrilleODP({
             <div className="stat__num odp__val">
               <span className="stat__approx">{t.lbl.approx}</span>
               {/* Le compteur n'anime qu'un nombre : une valeur rédigée
-                  (« 10 000 », « IDA · AFD ») s'affiche telle qu'elle est saisie. */}
-              {o.valeurNum !== null ? <Counter to={o.valeurNum} dur={1300} /> : o.valeur}
+                  (« 10 000 », « IDA · AFD ») s'affiche telle qu'elle est saisie.
+                  `Compteur` plutôt que l'ancien `Counter` : un chiffre déjà à
+                  l'écran à l'hydratation ne repart pas de zéro, et le lecteur
+                  d'écran n'entend que la valeur finale. Format français dans
+                  les deux langues, comme les valeurs rédigées voisines. */}
+              {o.valeurNum !== null ? (
+                <Compteur valeur={o.valeurNum} locale="fr-FR" duree={1.3} />
+              ) : (
+                o.valeur
+              )}
               <span className="odp__unit">{o.unit}</span>
             </div>
             <div className="odp__label">{o.label}</div>

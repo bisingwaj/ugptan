@@ -37,74 +37,74 @@ export function CompResponsable({
         <Reveal>
           <Kicker>{t.secResponsable}</Kicker>
         </Reveal>
-        <Reveal delay={0.06}>
-          <div className="comp-resp">
-            <div className="comp-resp__media">
-              {photo ? (
-                /* `Photo` plutôt que `next/image` nu : le portrait vient de la
-                   base, il s'affiche donc derrière un aperçu flou le temps de
-                   son chargement (cf. components/ui/Photo.tsx). `.comp-resp__media`
-                   pose le cadrage, l'image n'a pas de dimensions propres à
-                   déclarer. Le `sizes` suit les trois paliers de la colonne :
-                   116 px sous 760, 180 px jusqu'à 1000, 240 px au-delà. */
-                <Photo
-                  src={photo}
-                  alt={membre.portrait.alt}
-                  unoptimized={membre.portrait.unoptimized}
-                  sizes="(max-width: 760px) 120px, (max-width: 1000px) 180px, 240px"
-                  style={{ objectPosition: "center 18%" }}
-                />
-              ) : (
-                <span className="mono comp-resp__initials">{initials(membre.nom || membre.role)}</span>
-              )}
-            </div>
+        {/* Le cadre reste fixe ; le portrait se découvre en rideau et la fiche
+            le rejoint par la droite. */}
+        <div className="comp-resp">
+          <Reveal variant="wipe" delay={0.06} className="comp-resp__media">
+            {photo ? (
+              /* `Photo` plutôt que `next/image` nu : le portrait vient de la
+                 base, il s'affiche donc derrière un aperçu flou le temps de
+                 son chargement (cf. components/ui/Photo.tsx). `.comp-resp__media`
+                 pose le cadrage, l'image n'a pas de dimensions propres à
+                 déclarer. Le `sizes` suit les trois paliers de la colonne :
+                 116 px sous 760, 180 px jusqu'à 1000, 240 px au-delà. */
+              <Photo
+                src={photo}
+                alt={membre.portrait.alt}
+                unoptimized={membre.portrait.unoptimized}
+                sizes="(max-width: 760px) 120px, (max-width: 1000px) 180px, 240px"
+                style={{ objectPosition: "center 18%" }}
+              />
+            ) : (
+              <span className="mono comp-resp__initials">{initials(membre.nom || membre.role)}</span>
+            )}
+          </Reveal>
 
-            <div className="comp-resp__body">
-              <div className="mono comp-resp__code">{comp.code}</div>
-              {membre.nom ? (
-                <h3 className="comp-resp__nom">{membre.nom}</h3>
-              ) : (
-                <h3 className="comp-resp__nom comp-resp__nom--vacant">{t.respSoon}</h3>
-              )}
-              <div className="comp-resp__role">{membre.role}</div>
+          <Reveal variant="right" delay={0.14} className="comp-resp__body">
+            <div className="mono comp-resp__code">{comp.code}</div>
+            {membre.nom ? (
+              <h3 className="comp-resp__nom">{membre.nom}</h3>
+            ) : (
+              <h3 className="comp-resp__nom comp-resp__nom--vacant">{t.respSoon}</h3>
+            )}
+            <div className="comp-resp__role">{membre.role}</div>
 
-              {/* La biographie d'abord, le périmètre à défaut.
-                  Les deux champs disent des choses différentes : « Biographie »
-                  présente la personne, « Responsabilités » dit ce dont elle
-                  répond. Une fiche de composante sans biographie affichait
-                  jusqu'ici un nom et un intitulé, sans un mot sur le travail
-                  couvert — alors que le périmètre, lui, était renseigné et ne
-                  servait qu'aux cartes de gouvernance. */}
-              {(membre.bio || membre.mandat) && (
-                <p className="comp-resp__bio">{membre.bio || membre.mandat}</p>
-              )}
+            {/* La biographie d'abord, le périmètre à défaut.
+                Les deux champs disent des choses différentes : « Biographie »
+                présente la personne, « Responsabilités » dit ce dont elle
+                répond. Une fiche de composante sans biographie affichait
+                jusqu'ici un nom et un intitulé, sans un mot sur le travail
+                couvert — alors que le périmètre, lui, était renseigné et ne
+                servait qu'aux cartes de gouvernance. */}
+            {(membre.bio || membre.mandat) && (
+              <p className="comp-resp__bio">{membre.bio || membre.mandat}</p>
+            )}
 
-              {membre.verbatim && (
-                <blockquote className="comp-resp__verbatim">« {membre.verbatim} »</blockquote>
-              )}
+            {membre.verbatim && (
+              <blockquote className="comp-resp__verbatim">« {membre.verbatim} »</blockquote>
+            )}
 
-              {comp.sous.length > 0 && (
-                <div className="comp-resp__perimetre">
-                  <div className="mono label-mono" style={{ marginBottom: 10 }}>{t.respPerimetre}</div>
-                  <ul>
-                    {comp.sous.map((s) => (
-                      <li key={s.id}>
-                        {s.reference && <span className="mono">{s.reference}</span>} {s.titre}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <div className="comp-resp__actions">
-                <Link href={route(lang, NAV.contact)} className="btn btn--primary btn--sm">
-                  {t.respContact} <span className="arrow">→</span>
-                </Link>
-                <a href={`mailto:${mail}`} className="mono comp-resp__mail">{mail}</a>
+            {comp.sous.length > 0 && (
+              <div className="comp-resp__perimetre">
+                <div className="mono label-mono" style={{ marginBottom: 10 }}>{t.respPerimetre}</div>
+                <ul>
+                  {comp.sous.map((s) => (
+                    <li key={s.id}>
+                      {s.reference && <span className="mono">{s.reference}</span>} {s.titre}
+                    </li>
+                  ))}
+                </ul>
               </div>
+            )}
+
+            <div className="comp-resp__actions">
+              <Link href={route(lang, NAV.contact)} className="btn btn--primary btn--sm">
+                {t.respContact} <span className="arrow">→</span>
+              </Link>
+              <a href={`mailto:${mail}`} className="mono comp-resp__mail">{mail}</a>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        </div>
       </div>
     </section>
   );

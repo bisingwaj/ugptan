@@ -12,6 +12,7 @@ import type { ImpactItemVue } from "@/lib/impact/query";
 import type { ImpactTheme } from "@/lib/impact/statut";
 import { themeSombre } from "@/lib/impact/statut";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { ChiffreCle } from "@/components/impact/ChiffreCle";
 
 export function BlocStats({
   items,
@@ -51,7 +52,8 @@ export function BlocStats({
         >
           <div className="stat__num" style={{ fontSize: "clamp(34px,4.4vw,52px)" }}>
             <span className="stat__approx">{approx}</span>
-            {item.valeur}
+            {/* Défile jusqu'à sa valeur quand elle se lit comme une quantité. */}
+            <ChiffreCle texte={item.valeur} />
           </div>
           {item.surtitre && (
             <div

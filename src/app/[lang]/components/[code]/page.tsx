@@ -220,7 +220,8 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
             </RevealGroup>
           </div>
 
-          <Reveal variant="fade" delay={0.1} className="comp-aside">
+          {/* L'encart des sous-composantes rejoint le texte par la droite. */}
+          <Reveal variant="right" delay={0.1} className="comp-aside">
             <div className="mono comp-aside__head">{c.sousTitle}</div>
             {comp.sous.length > 0 ? (
               <ul className="comp-aside__list">
@@ -315,9 +316,11 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
                 {/* Quatrième copie de la même grille jusqu'ici, avec ses propres
                     tailles : le composant partagé la sert désormais partout. */}
                 <GrilleODP lang={lang} variante="complet" codes={comp.odpCodes} />
-                <Link href={route(lang, NAV.resultats)} className="mono comp-aside__link">
-                  {t.cta.resultats} →
-                </Link>
+                <Reveal variant="fade" delay={0.1}>
+                  <Link href={route(lang, NAV.resultats)} className="mono comp-aside__link">
+                    {t.cta.resultats} →
+                  </Link>
+                </Reveal>
               </div>
             )}
           </div>

@@ -61,7 +61,9 @@ export function GrilleEquipe({ membres, variante = "accueil" }: Props) {
         const photo = membre.portrait.src;
 
         return (
+          /* `zoom` : carte à portrait, elle se pose plutôt qu'elle ne monte. */
           <RevealItem
+            zoom
             key={membre.id}
             style={{ background: "#fff", display: "flex", flexDirection: "column" }}
           >

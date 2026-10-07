@@ -26,20 +26,26 @@ export function BlocCitation({ citation, note }: { citation: string | null; note
 
   return (
     <section className="section--accent" style={{ padding: "clamp(56px,7vw,104px) var(--pad-x)" }}>
-      <Reveal variant="up" style={{ maxWidth: 1280, margin: "0 auto" }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: "clamp(22px,3vw,38px)",
-            lineHeight: 1.35,
-            letterSpacing: "-0.02em",
-            fontWeight: 300,
-          }}
-        >
-          « {citation} »
-        </p>
+      {/* La phrase d'abord, puis ses références en fondu : deux temps de
+          lecture plutôt qu'un seul bloc qui monte d'un coup. */}
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+        <Reveal variant="up">
+          <p
+            style={{
+              margin: 0,
+              fontSize: "clamp(22px,3vw,38px)",
+              lineHeight: 1.35,
+              letterSpacing: "-0.02em",
+              fontWeight: 300,
+            }}
+          >
+            « {citation} »
+          </p>
+        </Reveal>
         {segments.length > 0 && (
-          <div
+          <Reveal
+            variant="fade"
+            delay={0.18}
             className="mono"
             style={{
               marginTop: 32,
@@ -59,9 +65,9 @@ export function BlocCitation({ citation, note }: { citation: string | null; note
                 <span>{segment}</span>
               </Fragment>
             ))}
-          </div>
+          </Reveal>
         )}
-      </Reveal>
+      </div>
     </section>
   );
 }

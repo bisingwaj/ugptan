@@ -67,6 +67,7 @@ export function BlocTemoignages({
 
         return (
           <RevealItem
+            zoom
             key={item.id}
             style={{
               background: "#fff",

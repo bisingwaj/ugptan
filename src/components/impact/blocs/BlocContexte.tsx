@@ -15,6 +15,7 @@ import type { ImpactItemVue } from "@/lib/impact/query";
 import { Kicker } from "@/components/ui/Kicker";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { ChiffreCle } from "@/components/impact/ChiffreCle";
 
 export function BlocContexte({
   kicker,
@@ -48,7 +49,7 @@ export function BlocContexte({
               {items.map((item) => (
                 <RevealItem key={item.id} className="cell" style={{ padding: "18px 16px" }}>
                   <div className="mono" style={{ fontWeight: 600, fontSize: 26 }}>
-                    {item.valeur}
+                    <ChiffreCle texte={item.valeur} />
                     {item.surtitre && (
                       <span style={{ fontSize: 12, color: item.color ?? "var(--ac)", marginLeft: 3 }}>
                         {item.surtitre}
@@ -64,7 +65,11 @@ export function BlocContexte({
           )}
         </div>
 
-        <div
+        {/* L'aplat rejoint la colonne de texte par la droite : c'est le second
+            temps du diptyque, il arrive juste après le titre. */}
+        <Reveal
+          variant="right"
+          delay={0.1}
           style={{
             aspectRatio: "4/3",
             background: "linear-gradient(140deg, #0a1330 0%, #16315f 55%, #0f62fe 130%)",
@@ -91,7 +96,7 @@ export function BlocContexte({
               {note}
             </span>
           )}
-        </div>
+        </Reveal>
       </div>
     </section>
   );

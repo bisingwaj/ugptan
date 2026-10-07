@@ -12,6 +12,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { SectionsImpact } from "@/components/impact/SectionsImpact";
 import { GrilleODP } from "@/components/resultats/GrilleODP";
+import { ChiffreCle } from "@/components/impact/ChiffreCle";
 
 /** Cache aligné sur l'accueil : la page est entièrement administrée — la grille
  *  ODP et les indicateurs intermédiaires depuis « Le projet », les dialogues
@@ -79,9 +80,11 @@ export default async function ResultatsPage(props: { params: Promise<{ lang: str
         <section className="section">
           <div className="section__inner">
             <Reveal><Kicker>{r.interLabel}</Kicker></Reveal>
+            {/* Les cibles saisies en texte (« 11 500 », « 650 ») défilent
+                jusqu'à leur valeur ; une valeur rédigée reste telle quelle. */}
             <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", marginTop: 16 }}>
               {intermediaires.map((x, i) => (
-                <RevealItem fade key={x.id} className="cell cell--fx cell--light" style={{ padding: "22px" }}><FlowLines variant={i} /><div className="mono" style={{ fontWeight: 600, fontSize: 24, color: "var(--cell-fg)" }}><span className="stat__approx">{t.lbl.approx}</span>{x.valeur}<span style={{ fontSize: 13, color: "var(--cell-acc)", marginLeft: 4 }}>{x.unit}</span></div><div style={{ fontSize: 12.5, color: "var(--cell-mut)", marginTop: 8, lineHeight: 1.45 }}>{x.label}</div></RevealItem>
+                <RevealItem fade key={x.id} className="cell cell--fx cell--light" style={{ padding: "22px" }}><FlowLines variant={i} /><div className="mono" style={{ fontWeight: 600, fontSize: 24, color: "var(--cell-fg)" }}><span className="stat__approx">{t.lbl.approx}</span><ChiffreCle texte={x.valeur} /><span style={{ fontSize: 13, color: "var(--cell-acc)", marginLeft: 4 }}>{x.unit}</span></div><div style={{ fontSize: 12.5, color: "var(--cell-mut)", marginTop: 8, lineHeight: 1.45 }}>{x.label}</div></RevealItem>
               ))}
             </RevealGroup>
           </div>

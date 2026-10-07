@@ -47,9 +47,11 @@ export function CompProblematique({
           ))}
         </RevealGroup>
 
+        {/* Les deux colonnes se rejoignent : l'argumentaire par la gauche, les
+            renvois par la droite. */}
         <div className="comp-pb__split">
           {pb.appui.length > 0 && (
-            <Reveal className="comp-pb__appui">
+            <Reveal variant="left" className="comp-pb__appui">
               <div className="mono label-mono">{t.pbAppui}</div>
               {pb.appui.map((para, i) => (
                 <p key={i} className="comp-pb__p">{para}</p>
@@ -58,7 +60,7 @@ export function CompProblematique({
           )}
 
           {pb.liens.length > 0 && (
-            <Reveal delay={0.08} className="comp-pb__liens">
+            <Reveal variant="right" delay={0.08} className="comp-pb__liens">
               <div className="mono label-mono">{t.pbLiens}</div>
               <ul>
                 {pb.liens.map((lien) => {

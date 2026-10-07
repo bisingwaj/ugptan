@@ -37,7 +37,8 @@ export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
         const couleur = membre.color || "var(--ac)";
 
         return (
-          <RevealItem key={membre.id} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
+          /* `zoom` : carte à portrait, elle se pose plutôt qu'elle ne monte. */
+          <RevealItem zoom key={membre.id} style={{ background: "#fff", display: "flex", flexDirection: "column" }}>
             <div
               style={{
                 aspectRatio: "5/4",

@@ -11,13 +11,15 @@
    pouvait pas non plus être corrigé quand la table, elle, était fausse. */
 import type { ImpactItemVue } from "@/lib/impact/query";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { ChiffreCle } from "@/components/impact/ChiffreCle";
 
 export function BlocReperes({ items }: { items: ImpactItemVue[] }) {
   return (
     <RevealGroup className="unite-reperes" gap={0.045}>
       {items.map((item) => (
         <RevealItem key={item.id} className="cell unite-repere">
-          <div className="mono unite-repere__v">{item.valeur}</div>
+          {/* L'année de l'arrêté reste fixe : ChiffreCle n'anime que les quantités. */}
+          <div className="mono unite-repere__v"><ChiffreCle texte={item.valeur} /></div>
           <div className="unite-repere__l">{item.titre}</div>
         </RevealItem>
       ))}

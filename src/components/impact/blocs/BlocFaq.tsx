@@ -8,6 +8,7 @@
    accordéon qui se déplie sur rien ressemble à une panne. */
 import type { ImpactItemVue } from "@/lib/impact/query";
 import { Accordion } from "@/components/ui/Accordion";
+import { Reveal } from "@/components/motion/Reveal";
 
 export function BlocFaq({ items }: { items: ImpactItemVue[] }) {
   const questions = items
@@ -16,5 +17,11 @@ export function BlocFaq({ items }: { items: ImpactItemVue[] }) {
 
   if (questions.length === 0) return null;
 
-  return <Accordion items={questions} />;
+  /* L'accordéon suit son en-tête (déjà révélé par le rendu commun) avec un
+     léger retard : les questions arrivent après le titre qui les annonce. */
+  return (
+    <Reveal delay={0.08}>
+      <Accordion items={questions} />
+    </Reveal>
+  );
 }

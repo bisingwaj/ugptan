@@ -11,6 +11,7 @@
    Le glossaire occupait autrefois une section entière pour dix définitions
    d'une ligne. Il se déplie à la suite des questions, où on le cherche. */
 import type { ImpactItemVue } from "@/lib/impact/query";
+import { Reveal } from "@/components/motion/Reveal";
 
 export function BlocGlossaire({
   titre,
@@ -23,18 +24,22 @@ export function BlocGlossaire({
 }) {
   if (!titre) return null;
 
+  /* Le dépliant apparaît en fondu à la suite des questions. L'enveloppe ne
+     porte ni marge ni bordure : la marge haute de `.glossaire` la traverse. */
   return (
-    <details className="glossaire">
-      <summary className="glossaire__sum">{titre}</summary>
-      {lead && <p className="glossaire__lead">{lead}</p>}
-      <div className="glossaire__grille">
-        {items.map((item) => (
-          <div key={item.id} className="glossaire__item">
-            <span className="mono glossaire__s">{item.valeur}</span>
-            <span className="glossaire__d">{item.texte}</span>
-          </div>
-        ))}
-      </div>
-    </details>
+    <Reveal variant="fade">
+      <details className="glossaire">
+        <summary className="glossaire__sum">{titre}</summary>
+        {lead && <p className="glossaire__lead">{lead}</p>}
+        <div className="glossaire__grille">
+          {items.map((item) => (
+            <div key={item.id} className="glossaire__item">
+              <span className="mono glossaire__s">{item.valeur}</span>
+              <span className="glossaire__d">{item.texte}</span>
+            </div>
+          ))}
+        </div>
+      </details>
+    </Reveal>
   );
 }

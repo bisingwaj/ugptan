@@ -20,7 +20,8 @@ export function CompVideo({ comp, lang }: { comp: ComposanteVue; lang: Lang }) {
   return (
     <section className="section section--sm" id="video" data-anchor>
       <div className="section__inner">
-        <Reveal>
+        {/* Rideau gauche → droite : l'affiche se découvre comme une photo. */}
+        <Reveal variant="wipe">
           <div className="comp-video" style={{ ["--duo" as string]: "var(--comp)" }}>
             <div className="duo comp-video__stage">
               <Photo

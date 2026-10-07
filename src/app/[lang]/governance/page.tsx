@@ -178,11 +178,11 @@ export default async function GouvernancePage(props: { params: Promise<{ lang: s
             <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)" }}>{g.leadsLead}</p>
           </Reveal>
           <CartesCoordination membres={leads} />
-          <div style={{ marginTop: 24, textAlign: "right" }}>
+          <Reveal variant="fade" delay={0.1} style={{ marginTop: 24, textAlign: "right" }}>
             <Link href={route(lang, NAV.ugptn)} className="mono" style={{ fontSize: 13, color: "var(--ac)", display: "inline-flex", alignItems: "center", gap: 8 }}>
               {t.cta.toutEquipe} →
             </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
