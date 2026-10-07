@@ -28,6 +28,7 @@ import { sanitizeHtml } from "@/lib/html/sanitize";
 import { decouperProse } from "@/lib/html/graphique";
 import type { Lang } from "@/lib/pick";
 import { Graphique } from "@/components/prose/Graphique";
+import { Reveal } from "@/components/motion/Reveal";
 
 export function ProseRiche({
   html,
@@ -54,7 +55,13 @@ export function ProseRiche({
     <div className={className} style={style}>
       {morceaux.map((morceau, index) =>
         morceau.kind === "graphique" ? (
-          <Graphique key={`graphique-${index}`} graphique={morceau.graphique} lang={lang} />
+          // Seule la FIGURE apparaît au défilement, jamais le texte : une
+          // lecture paragraphe par paragraphe gênerait plus qu'elle n'aiderait.
+          // L'enveloppe ne pèse pas sur la mise en page : sans bordure ni
+          // marge intérieure, ses marges fusionnent avec celles de la figure.
+          <Reveal key={`graphique-${index}`} variant="zoom">
+            <Graphique graphique={morceau.graphique} lang={lang} />
+          </Reveal>
         ) : (
           <div
             key={`html-${index}`}

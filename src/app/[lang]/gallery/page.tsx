@@ -12,6 +12,7 @@ import {
   type GalerieTri, type GalerieTypeMedia,
 } from "@/lib/galerie/statut";
 import { PageHero } from "@/components/ui/PageHero";
+import { Reveal } from "@/components/motion/Reveal";
 import { AlbumsBandeau } from "@/components/galerie/AlbumsBandeau";
 import { GalerieGrille } from "@/components/galerie/GalerieGrille";
 
@@ -152,10 +153,10 @@ export default async function GaleriePage(props: {
           {/* Le titre de la mosaïque n'apparaît qu'en présence d'albums : sans
               eux, la galerie EST la mosaïque et n'a pas à s'annoncer. */}
           {bandeauAlbums.length > 0 && (
-            <div className="gal-toutes">
+            <Reveal className="gal-toutes">
               <h2 className="h2--sm">{g.toutesImages}</h2>
               <p className="gal-albums__lead">{g.toutesImagesLead}</p>
-            </div>
+            </Reveal>
           )}
 
           {/* Recherche et tri : un formulaire GET, donc partageable par URL,
@@ -253,7 +254,7 @@ export default async function GaleriePage(props: {
           </div>
 
           {items.length === 0 ? (
-            <p className="actu-vide">{filtre ? g.noResult : g.empty}</p>
+            <Reveal variant="fade"><p className="actu-vide">{filtre ? g.noResult : g.empty}</p></Reveal>
           ) : (
             <GalerieGrille items={items} lang={lang} ouvertParDefaut={recherche.media ?? null} />
           )}

@@ -18,6 +18,7 @@ import { NAV } from "@/lib/routes";
 import type { Lang } from "@/lib/pick";
 import type { AlbumVue } from "@/lib/galerie/query";
 import { Photo } from "@/components/ui/Photo";
+import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function AlbumsBandeau({ albums, lang }: { albums: AlbumVue[]; lang: Lang }) {
@@ -27,17 +28,17 @@ export function AlbumsBandeau({ albums, lang }: { albums: AlbumVue[]; lang: Lang
   return (
     <section className="gal-albums" aria-labelledby="gal-albums-titre">
       <div className="gal-albums__tete">
-        <div>
+        <Reveal>
           <h2 id="gal-albums-titre" className="h2--sm">{t.albums}</h2>
           <p className="gal-albums__lead">{t.albumsLead}</p>
-        </div>
+        </Reveal>
       </div>
 
       {/* `RevealGroup` REMPLACE la grille et `RevealItem` la cellule : aucun
           conteneur intermédiaire, conformément au contrat du composant. */}
       <RevealGroup as="ul" className="gal-albums__grille" gap={0.05}>
         {albums.map((album) => (
-          <RevealItem as="li" key={album.id} className="gal-album">
+          <RevealItem as="li" key={album.id} zoom className="gal-album">
             <Link href={`/${lang}${NAV.galerie}/${album.slug}`} className="gal-album__lien">
               <span className="gal-album__visuel">
                 {album.couverture.src ? (

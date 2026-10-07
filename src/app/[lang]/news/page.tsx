@@ -114,15 +114,17 @@ export default async function ActualitesPage(props: {
           )}
 
           {liste.items.length === 0 ? (
-            <p className="actu-vide">
-              {filtre ? t.actus.aucunResultat : t.actus.aucunArticle}
-              {filtre && (
-                <>
-                  {" "}
-                  <Link href={route(lang, NAV.actualites)} className="actu-avis__lien">{t.actus.retirerFiltre}</Link>
-                </>
-              )}
-            </p>
+            <Reveal variant="fade">
+              <p className="actu-vide">
+                {filtre ? t.actus.aucunResultat : t.actus.aucunArticle}
+                {filtre && (
+                  <>
+                    {" "}
+                    <Link href={route(lang, NAV.actualites)} className="actu-avis__lien">{t.actus.retirerFiltre}</Link>
+                  </>
+                )}
+              </p>
+            </Reveal>
           ) : (
             <RevealGroup
               className="celled-flow"
@@ -130,7 +132,7 @@ export default async function ActualitesPage(props: {
               gap={0.045}
             >
               {liste.items.map((actu, index) => (
-                <RevealItem key={actu.id}>
+                <RevealItem key={actu.id} zoom>
                   {/* Les trois premières vignettes sont au-dessus de la ligne de
                       flottaison : elles se chargent sans attendre. */}
                   <ActuCard actu={actu} lang={lang} priority={index < 3} />
@@ -140,21 +142,23 @@ export default async function ActualitesPage(props: {
           )}
 
           {liste.pages > 1 && (
-            <nav className="actu-pagination" aria-label={t.actus.paginationLabel}>
-              {liste.page > 1 && (
-                <Link href={lienPage(liste.page - 1)} rel="prev" className="btn btn--ghost btn--sm">
-                  ← {t.actus.precedent}
-                </Link>
-              )}
-              <span className="mono actu-pagination__etat">
-                {t.actus.page} {liste.page} / {liste.pages}
-              </span>
-              {liste.page < liste.pages && (
-                <Link href={lienPage(liste.page + 1)} rel="next" className="btn btn--ghost btn--sm">
-                  {t.actus.suivant} →
-                </Link>
-              )}
-            </nav>
+            <Reveal variant="fade">
+              <nav className="actu-pagination" aria-label={t.actus.paginationLabel}>
+                {liste.page > 1 && (
+                  <Link href={lienPage(liste.page - 1)} rel="prev" className="btn btn--ghost btn--sm">
+                    ← {t.actus.precedent}
+                  </Link>
+                )}
+                <span className="mono actu-pagination__etat">
+                  {t.actus.page} {liste.page} / {liste.pages}
+                </span>
+                {liste.page < liste.pages && (
+                  <Link href={lienPage(liste.page + 1)} rel="next" className="btn btn--ghost btn--sm">
+                    {t.actus.suivant} →
+                  </Link>
+                )}
+              </nav>
+            </Reveal>
           )}
 
           {/* Fil chronologique : les articles réellement publiés, dans l'ordre
@@ -167,7 +171,7 @@ export default async function ActualitesPage(props: {
               <Reveal>
                 <Kicker>{t.actus.timeline}</Kicker>
               </Reveal>
-              <Reveal>
+              <Reveal delay={0.08}>
                 <p className="actu-fil__intro">{t.actus.timelineLead}</p>
               </Reveal>
 

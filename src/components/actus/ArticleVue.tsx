@@ -108,57 +108,67 @@ export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = fals
           <ProseRiche html={actu.contentHtml} lang={lang} />
 
           {actu.videoYt && (
-            <VideoButton
-              id={actu.videoYt}
-              className="btn btn--ghost actu-video"
-              meta={{ titre: actu.title, source: "UGPTN · PTN-RDC" }}
-              dataSlot="Vidéo de l'article"
-              dataRatio="16:9"
-            >
-              <span className="actu-video__play">▶</span>
-              {t.relatedVideo}
-            </VideoButton>
+            <Reveal variant="fade">
+              <VideoButton
+                id={actu.videoYt}
+                className="btn btn--ghost actu-video"
+                meta={{ titre: actu.title, source: "UGPTN · PTN-RDC" }}
+                dataSlot="Vidéo de l'article"
+                dataRatio="16:9"
+              >
+                <span className="actu-video__play">▶</span>
+                {t.relatedVideo}
+              </VideoButton>
+            </Reveal>
           )}
 
           {actu.tags.length > 0 && (
-            <div className="actu-tags">
-              <span className="mono actu-tags__label">{t.etiquettes}</span>
-              {actu.tags.map((tag) => (
-                <Link
-                  key={tag.slug}
-                  href={`${route(lang, NAV.actualites)}?tag=${encodeURIComponent(tag.slug)}`}
-                  className="actu-tag"
-                >
-                  {tag.nom}
-                </Link>
-              ))}
-            </div>
+            <Reveal>
+              <div className="actu-tags">
+                <span className="mono actu-tags__label">{t.etiquettes}</span>
+                {actu.tags.map((tag) => (
+                  <Link
+                    key={tag.slug}
+                    href={`${route(lang, NAV.actualites)}?tag=${encodeURIComponent(tag.slug)}`}
+                    className="actu-tag"
+                  >
+                    {tag.nom}
+                  </Link>
+                ))}
+              </div>
+            </Reveal>
           )}
 
-          <PartageArticle lang={lang} titre={actu.title} />
+          <Reveal>
+            <PartageArticle lang={lang} titre={actu.title} />
+          </Reveal>
 
           {/* ===== Navigation entre articles ===== */}
           {(precedent || suivant) && (
-            <nav className="actu-nav" aria-label={t.navigationLabel}>
-              {precedent ? (
-                <Link href={cheminArticle(lang, precedent.slug)} className="actu-nav__lien">
-                  <span className="mono actu-nav__sens">← {t.precedent}</span>
-                  <span className="actu-nav__titre">{precedent.title}</span>
-                </Link>
-              ) : <span />}
+            <Reveal>
+              <nav className="actu-nav" aria-label={t.navigationLabel}>
+                {precedent ? (
+                  <Link href={cheminArticle(lang, precedent.slug)} className="actu-nav__lien">
+                    <span className="mono actu-nav__sens">← {t.precedent}</span>
+                    <span className="actu-nav__titre">{precedent.title}</span>
+                  </Link>
+                ) : <span />}
 
-              {suivant ? (
-                <Link href={cheminArticle(lang, suivant.slug)} className="actu-nav__lien actu-nav__lien--droite">
-                  <span className="mono actu-nav__sens">{t.suivant} →</span>
-                  <span className="actu-nav__titre">{suivant.title}</span>
-                </Link>
-              ) : <span />}
-            </nav>
+                {suivant ? (
+                  <Link href={cheminArticle(lang, suivant.slug)} className="actu-nav__lien actu-nav__lien--droite">
+                    <span className="mono actu-nav__sens">{t.suivant} →</span>
+                    <span className="actu-nav__titre">{suivant.title}</span>
+                  </Link>
+                ) : <span />}
+              </nav>
+            </Reveal>
           )}
 
-          <p className="actu-retour">
-            <Link href={route(lang, NAV.actualites)} className="mono actu-retour__lien">← {t.allNews}</Link>
-          </p>
+          <Reveal variant="fade">
+            <p className="actu-retour">
+              <Link href={route(lang, NAV.actualites)} className="mono actu-retour__lien">← {t.allNews}</Link>
+            </p>
+          </Reveal>
         </div>
       </div>
 
@@ -173,7 +183,7 @@ export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = fals
               gap={0.045}
             >
               {lies.map((lie) => (
-                <RevealItem key={lie.id}>
+                <RevealItem key={lie.id} zoom>
                   <ActuCard actu={lie} lang={lang} />
                 </RevealItem>
               ))}

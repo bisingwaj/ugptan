@@ -102,14 +102,14 @@ export default async function MediasPage(props: { params: Promise<{ lang: string
             })}
           </RevealGroup>
 
-          <div style={{ marginTop: 22, display: "flex", gap: 12, padding: "18px 22px", background: "var(--c-10)", borderLeft: "3px solid var(--ac)" }}>
+          <Reveal style={{ marginTop: 22, display: "flex", gap: 12, padding: "18px 22px", background: "var(--c-10)", borderLeft: "3px solid var(--ac)" }}>
             <span style={{ fontSize: 15 }}>ℹ</span>
             <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: "var(--c-70)" }}>
               {en
                 ? "Source of truth: src/content/videos.ts. Playback ids live in src/content/media.ts (default film) and src/content/actualites.ts (per-article). Animations can be produced with Remotion (npm run remotion:studio) and exported into these slots."
                 : "Source de vérité : src/content/videos.ts. Les identifiants de lecture vivent dans src/content/media.ts (film par défaut) et src/content/actualites.ts (par article). Les animations se produisent avec Remotion (npm run remotion:studio) et s'exportent dans ces emplacements."}
             </p>
-          </div>
+          </Reveal>
         </div>
       </section>
     </div>

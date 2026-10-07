@@ -146,7 +146,7 @@ export function GalerieGrille({
           des trous dans la trame. L'image entière reste dans la visionneuse. */}
       <RevealGroup as="ul" className="gal-grille" gap={0.035}>
         {items.map((item, position) => (
-          <RevealItem as="li" key={item.id} className="gal-cell">
+          <RevealItem as="li" key={item.id} zoom className="gal-cell">
             <button
               type="button"
               className="gal-cell__btn"
