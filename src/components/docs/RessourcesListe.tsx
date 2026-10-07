@@ -24,12 +24,13 @@
  * téléchargement. Proposer « Lire » sur un PDF, ou « Télécharger » sur un texte
  * qui n'a pas de fichier, promettrait ce qui n'existe pas.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import type { DocVue } from "@/lib/docs/query";
 import { dict } from "@/content/i18n";
 import type { Lang } from "@/lib/pick";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { usePiegeFocus } from "@/components/ui/usePiegeFocus";
 
 export function RessourcesListe({
   documents,
@@ -69,14 +70,11 @@ export function RessourcesListe({
     majAdresse(null);
   }, [majAdresse]);
 
-  useEffect(() => {
-    if (!ouvert) return;
-    const surTouche = (event: KeyboardEvent) => {
-      if (event.key === "Escape") fermer();
-    };
-    window.addEventListener("keydown", surTouche);
-    return () => window.removeEventListener("keydown", surTouche);
-  }, [ouvert, fermer]);
+  /* Le focus entre dans la fiche (bouton de fermeture), y reste piégé, et
+     revient au document cliqué à la fermeture ; Échap ferme. */
+  const fiche = useRef<HTMLDivElement>(null);
+  const boutonFermer = useRef<HTMLButtonElement>(null);
+  usePiegeFocus(fiche, ouvert !== null, { fermer, initial: boutonFermer });
 
   return (
     <>
@@ -152,6 +150,7 @@ export function RessourcesListe({
       {ouvert && (
         <div className="scrim scrim--center" onClick={fermer}>
           <div
+            ref={fiche}
             className="modal doc-modal"
             role="dialog"
             aria-modal="true"
@@ -167,7 +166,7 @@ export function RessourcesListe({
                 </div>
                 <h2 className="doc-modal__titre">{ouvert.titre}</h2>
               </div>
-              <button type="button" className="doc-modal__fermer" onClick={fermer} aria-label={t.close}>
+              <button ref={boutonFermer} type="button" className="doc-modal__fermer" onClick={fermer} aria-label={t.close}>
                 ✕
               </button>
             </div>

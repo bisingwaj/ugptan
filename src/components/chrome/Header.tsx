@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { DUREE, EASE } from "@/components/motion/variants";
+import { usePiegeFocus } from "@/components/ui/usePiegeFocus";
 import type { Lang } from "@/lib/pick";
 import { cn } from "@/lib/cn";
 import { dict } from "@/content/i18n";
@@ -44,18 +45,11 @@ export function Header({ lang }: { lang: Lang }) {
     setOpenGroup(null);
   }, [pathname]);
 
-  /* Tiroir ouvert : Échap le referme, et le focus part sur son bouton de
-     fermeture. Sans ce déplacement, la tabulation continuerait dans la page
-     masquée derrière le voile, que rien n'indique au clavier. */
-  useEffect(() => {
-    if (!navOpen) return;
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setNavOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [navOpen]);
+  /* Tiroir ouvert : le focus part sur son bouton de fermeture et reste piégé
+     dedans ; Échap le referme. Sans le piège, la tabulation repartait dans la
+     page masquée derrière le voile, que rien n'indique au clavier. */
+  const tiroirRef = useRef<HTMLDivElement>(null);
+  usePiegeFocus(tiroirRef, navOpen, { fermer: () => setNavOpen(false), initial: closeRef });
 
   /** Ferme le tiroir en rendant le focus au bouton qui l'a ouvert. */
   const closeNav = () => {
@@ -321,6 +315,7 @@ export function Header({ lang }: { lang: Lang }) {
             transition={{ duration: reduce ? DUREE.rapide : DUREE.moyenne, ease: EASE }}
           >
             <m.div
+              ref={tiroirRef}
               id="tiroir-navigation"
               role="dialog"
               aria-modal="true"

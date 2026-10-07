@@ -18,13 +18,14 @@
  * pendant l'hydratation : c'est un vrai `<form action={…}>`, pas un
  * gestionnaire de clic.
  */
-import { useActionState, useEffect, useId, useRef } from "react";
+import { useActionState, useId, useRef } from "react";
 import { inscrireAction } from "@/actions/evenements-inscription";
 import { dict } from "@/content/i18n";
 import type { EvtVue } from "@/lib/events/query";
 import { INSCRIPTION_INITIALE, INSCRIPTION_LIMITES } from "@/lib/events/inscription";
 import type { Lang } from "@/lib/pick";
 import { BoutonAction } from "@/components/ui/BoutonAction";
+import { usePiegeFocus } from "@/components/ui/usePiegeFocus";
 
 export function InscriptionModal({
   evt,
@@ -40,22 +41,17 @@ export function InscriptionModal({
   const idBase = useId();
   const fermerRef = useRef<HTMLButtonElement>(null);
 
-  // Échappement : la modale se ferme comme toutes celles du site.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  // Le focus entre dans la modale à l'ouverture : sans cela, la navigation au
-  // clavier resterait derrière, sur la page qu'on vient de recouvrir.
-  useEffect(() => { fermerRef.current?.focus(); }, []);
+  // Le focus entre dans la modale à l'ouverture et y reste piégé, puis revient
+  // au bouton d'inscription ; Échap ferme, comme toutes les modales du site.
+  const dialogue = useRef<HTMLDivElement>(null);
+  usePiegeFocus(dialogue, true, { fermer: onClose, initial: fermerRef });
 
   const titreId = `${idBase}-titre`;
 
   return (
     <div className="scrim scrim--center" onClick={onClose}>
       <div
+        ref={dialogue}
         className="modal"
         role="dialog"
         aria-modal="true"

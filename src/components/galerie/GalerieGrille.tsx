@@ -29,6 +29,7 @@ import { dict } from "@/content/i18n";
 import type { Lang } from "@/lib/pick";
 import type { GalerieVue } from "@/lib/galerie/query";
 import { Photo } from "@/components/ui/Photo";
+import { usePiegeFocus } from "@/components/ui/usePiegeFocus";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function GalerieGrille({
@@ -130,6 +131,8 @@ export function GalerieGrille({
   useEffect(() => {
     if (index !== null) panneau.current?.focus();
   }, [index]);
+  // Tab et Maj+Tab restent dans la visionneuse (Échap et flèches : ci-dessus).
+  usePiegeFocus(panneau, index !== null, { initial: panneau });
 
   const total = items.length;
 

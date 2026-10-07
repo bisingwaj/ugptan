@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Lang } from "@/lib/pick";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
@@ -13,6 +13,7 @@ import { NAV, route } from "@/lib/routes";
 import { Photo } from "@/components/ui/Photo";
 import { useVideo } from "@/components/video/VideoProvider";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
+import { usePiegeFocus } from "@/components/ui/usePiegeFocus";
 
 /* Types d'AVIS, et non méthodes de passation : l'avis à manifestation d'intérêt
    ouvre une sélection de consultants, il se filtre donc comme les autres même
@@ -203,16 +204,30 @@ function MarcheDrawer({ lang, m, now, onClose, openVideo }: { lang: Lang; m: Mar
   const statutLabel = lang === "en" ? st.en : st.fr;
   let seenCur = false;
 
+  // Fiche d'avis modale : focus piégé dedans, rendu à la carte d'origine à la
+  // fermeture ; Échap ferme (cf. aussi le parent).
+  const tiroir = useRef<HTMLDivElement>(null);
+  const boutonFermer = useRef<HTMLButtonElement>(null);
+  usePiegeFocus(tiroir, true, { fermer: onClose, initial: boutonFermer });
+
   return (
     <div className="scrim scrim--right" onClick={onClose}>
-      <div className="drawer" onClick={(e) => e.stopPropagation()} data-lenis-prevent>
+      <div
+        ref={tiroir}
+        className="drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label={pick(m.objet, lang)}
+        onClick={(e) => e.stopPropagation()}
+        data-lenis-prevent
+      >
         <div className="duo" data-video-slot="Bannière de l'avis (vidéo)" data-slot-ratio="16:9" style={{ minHeight: "clamp(260px,35vw,360px)", display: "flex", flexDirection: "column", ["--duo" as string]: cc }}>
           <Photo src={media.img[compImg[m.comp] || "fibre"]} alt={pick(m.objet, lang)} />
           <div style={{ position: "relative", zIndex: 10, padding: "calc(16px + var(--sa-t, 0px)) 16px 0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
             <button onClick={() => openVideo()} style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "8px 14px 8px 8px", background: "rgba(255,255,255,.92)", color: "var(--c-black)", fontSize: 12.5, fontWeight: 600 }}>
               <span style={{ width: 26, height: 26, background: cc, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, paddingLeft: 1 }}>▶</span>{dict(lang).video.watch}
             </button>
-            <button onClick={onClose} aria-label="Fermer" className="backdrop-blur-[6px] max-[760px]:backdrop-blur-none" style={{ flex: "0 0 auto", width: 44, height: 44, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.55)" }}>✕</button>
+            <button ref={boutonFermer} onClick={onClose} aria-label={lang === "en" ? "Close" : "Fermer"} className="backdrop-blur-[6px] max-[760px]:backdrop-blur-none" style={{ flex: "0 0 auto", width: 44, height: 44, border: "1px solid rgba(255,255,255,.3)", color: "#fff", fontSize: 16, background: "rgba(22,22,22,.55)" }}>✕</button>
           </div>
           <div style={{ position: "relative", zIndex: 5, marginTop: "auto", padding: "32px clamp(20px,3vw,34px) clamp(18px,2.6vw,28px)" }}>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 9, marginBottom: 12 }}>

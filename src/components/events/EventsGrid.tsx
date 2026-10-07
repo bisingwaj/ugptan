@@ -48,8 +48,13 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
    * Trois formes selon ce que la fiche permet, et une seule visible à la fois :
    * s'inscrire ailleurs, demander à participer ici, ou simplement lire la fiche
    * quand l'événement est passé.
+   *
+   * Fonction de rendu appelée telle quelle, et non composant `<Action />` :
+   * un composant déclaré dans le rendu change d'identité à chaque mise à jour,
+   * React le démonte et le remonte, et le bouton cliqué perdait le focus —
+   * qui ne revenait donc pas sur lui à la fermeture de la modale.
    */
-  const Action = ({ e }: { e: EvtVue }) => {
+  const action = (e: EvtVue) => {
     const style = {
       display: "inline-flex", alignItems: "center", gap: 7,
       fontSize: 13, fontWeight: 600, color: e.accent, background: "none",
@@ -90,7 +95,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
   };
 
   /** Pastille d'état, posée sur le visuel quand la date le justifie. */
-  const Etat = ({ e }: { e: EvtVue }) =>
+  const etat = (e: EvtVue) =>
     e.phase === "EN_COURS" ? (
       <span className="mono evt-etat evt-etat--encours">{t.evt.ongoing}</span>
     ) : e.phase === "TERMINE" ? (
@@ -108,7 +113,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
                 {e.categorie && (
                   <span className="mono" style={{ position: "absolute", top: 12, left: 12, fontSize: 11, fontWeight: 600, color: "#fff", background: e.accent, padding: "4px 10px", textTransform: "uppercase", letterSpacing: "0.04em" }}>{e.categorie.nom}</span>
                 )}
-                <span style={{ position: "absolute", top: 12, right: 12 }}><Etat e={e} /></span>
+                <span style={{ position: "absolute", top: 12, right: 12 }}>{etat(e)}</span>
               </div>
               <div style={{ padding: "22px clamp(18px,2vw,24px) 24px", display: "flex", flexDirection: "column", flex: 1 }}>
                 <div className="mono" style={{ fontSize: 11.5, color: "var(--c-50)" }}>
@@ -124,7 +129,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
                   {e.aVenir && e.places && (
                     <span className="mono" style={{ fontSize: 11.5, color: "var(--c-70)" }}>{e.places}</span>
                   )}
-                  <Action e={e} />
+                  {action(e)}
                 </div>
               </div>
             </RevealItem>
@@ -141,7 +146,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
               </h3>
               <div className="evt-card__pied" style={{ paddingTop: 14 }}>
                 <span className="mono" style={{ fontSize: 11.5, color: "var(--c-70)" }}>{e.lieu ?? ""}</span>
-                <Action e={e} />
+                {action(e)}
               </div>
             </RevealItem>
           ),
