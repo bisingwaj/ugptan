@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { asLang } from "@/lib/params";
 import { NAV, route } from "@/lib/routes";
+import { EAS_ANCHOR } from "@/lib/mgp/model";
 import { dict } from "@/content/i18n";
 import { contact } from "@/content/carbon";
 import { Kicker } from "@/components/ui/Kicker";
@@ -110,6 +111,9 @@ export default async function ContactPage(props: { params: Promise<{ lang: strin
             <RevealItem style={{ background: "var(--c-10)", padding: "34px clamp(20px,3vw,36px)", borderLeft: "3px solid var(--c-50)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ fontSize: 15 }}>🔒</span><div style={{ fontSize: 16, fontWeight: 600 }}>{c.easLabel}</div></div>
               <p style={{ margin: "12px 0 0", fontSize: 13, color: "var(--c-70)", lineHeight: 1.55 }}>{c.easText}</p>
+              {/* Vers le formulaire MGP, catégorie EAS/HS présélectionnée par le
+                  fragment (lu côté client, cf. MgpForm). */}
+              <Link href={`${route(lang, NAV.mgp)}#${EAS_ANCHOR}`} className="btn btn--dark btn--sm" style={{ marginTop: 18 }}>{c.easCta}<span className="arrow">→</span></Link>
             </RevealItem>
           </RevealGroup>
         </div>

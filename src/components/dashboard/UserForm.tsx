@@ -5,6 +5,7 @@ import { createUserAction, updateUserAction, type UserFormState } from "@/action
 import { ADMIN, MODULE_LABEL } from "@/content/admin";
 import {
   assignablePermissions,
+  isRestrictedPermission,
   ROLES,
   ROLE_HINT,
   ROLE_LABEL,
@@ -141,25 +142,32 @@ export function UserForm({ mode, user, isSelf = false }: Props) {
       <fieldset className="adm-fieldset">
         <legend className="label-mono" style={{ marginBottom: 0 }}>{t.fieldPermissions}</legend>
 
-        {role === "ADMIN" ? (
-          <p className="adm-hint">{t.fieldPermissionsAdmin}</p>
-        ) : (
-          <>
-            <p className="adm-hint" style={{ marginBottom: 12 }}>{t.fieldPermissionsHint}</p>
-            <div className="adm-checks">
-              {extras.map((permission) => (
-                <label key={permission} className="adm-check">
-                  <input
-                    type="checkbox"
-                    name="permissions"
-                    value={permission}
-                    defaultChecked={user?.permissions.includes(permission)}
-                  />
-                  <span>{MODULE_LABEL[permission] ?? permission}</span>
-                </label>
-              ))}
-            </div>
-          </>
+        <p className="adm-hint" style={{ marginBottom: 12 }}>
+          {role === "ADMIN" ? t.fieldPermissionsAdmin : t.fieldPermissionsHint}
+        </p>
+        <div className="adm-checks">
+          {extras.map((permission) => {
+            const held = Boolean(user?.permissions.includes(permission));
+            // Permission nominative : on ne se l'accorde pas à soi-même. Le
+            // refus est refait côté serveur (cf. actions/admin-users.ts) ;
+            // désactiver la case évite seulement de le découvrir à l'envoi.
+            const locked = isSelf && isRestrictedPermission(permission) && !held;
+            return (
+              <label key={permission} className="adm-check">
+                <input
+                  type="checkbox"
+                  name="permissions"
+                  value={permission}
+                  defaultChecked={held}
+                  disabled={locked}
+                />
+                <span>{MODULE_LABEL[permission] ?? permission}</span>
+              </label>
+            );
+          })}
+        </div>
+        {extras.some(isRestrictedPermission) && (
+          <p className="adm-hint" style={{ marginTop: 12 }}>{t.fieldPermissionsRestricted}</p>
         )}
       </fieldset>
 

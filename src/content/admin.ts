@@ -102,7 +102,8 @@ export const ADMIN = {
     fieldRole: "Rôle",
     fieldPermissions: "Modules supplémentaires",
     fieldPermissionsHint: "Le rôle ouvre déjà un socle de modules. Cochez ici les accès accordés en plus.",
-    fieldPermissionsAdmin: "Un administrateur accède à tous les modules : aucun ajout n'est nécessaire.",
+    fieldPermissionsAdmin: "Un administrateur accède à tous les modules, à une exception près : les signalements EAS/HS, qui ne s'ouvrent que sur désignation expresse.",
+    fieldPermissionsRestricted: "L'accès aux signalements EAS/HS est nominatif : il se coche ici pour la personne désignée par l'Unité (spécialiste VBG/EAS), aucun rôle ne le donne d'office, administrateur compris, et nul ne peut se l'accorder à lui-même.",
 
     create: "Créer le compte",
     creating: "Création…",
@@ -144,6 +145,16 @@ export const ADMIN = {
     empty: "Aucune plainte reçue pour le moment.",
     emptyFiltered: "Aucun dossier ne correspond à ce filtre.",
     back: "Retour aux plaintes",
+
+    /* Périmètre du compte, rappelé sous le titre (cf. lib/mgp/acces.ts). */
+    scopeAll: "Votre accès couvre les plaintes ordinaires et les signalements EAS/HS cloisonnés.",
+    scopeOrdinaryOnly: "Les signalements EAS/HS (exploitation, abus et harcèlement sexuels) sont cloisonnés : ils n'apparaissent ni dans cette liste ni dans ses compteurs, et relèvent de la personne désignée par l'Unité.",
+    scopeEasOnly: "Votre accès est limité aux signalements EAS/HS. Les plaintes ordinaires relèvent de l'équipe MGP.",
+    easBadge: "EAS/HS · cloisonné",
+    easCaseTitle: "Signalement EAS/HS · dossier cloisonné",
+    easCaseNotice: "Ce dossier n'est visible que des comptes titulaires de l'accès nominatif EAS/HS. Approche centrée sur la survivante : son consentement éclairé précède toute transmission, l'orientation vers les services médicaux, psychosociaux et juridiques est proposée dans tous les cas, et aucune question n'est posée sur les circonstances au-delà de ce qu'elle choisit de dire. Ne recopiez rien de ce dossier hors de la console.",
+    easMessageLead: "Ce texte s'affiche dans le suivi public, que lit quiconque détient le numéro de référence, y compris une personne de l'entourage. N'y écrivez ni la nature des faits, ni un nom, ni un lieu : seulement ce qu'un tiers pourrait lire sans danger pour la survivante (par exemple, une invitation à rappeler).",
+    assigneeHintEas: "Comptes actifs titulaires de l'accès nominatif EAS/HS.",
 
     filterAll: "Tous",
     filterUnread: "Non lues",
@@ -2010,9 +2021,12 @@ export const ADMIN_NAV_SECTIONS: AdminNavSection[] = [
 export const ADMIN_NAV: AdminNavItem[] = ADMIN_NAV_SECTIONS.flatMap((section) => section.items);
 
 /** Libellé d'un module par sa permission — cases à cocher du module Utilisateurs. */
-export const MODULE_LABEL: Record<string, string> = Object.fromEntries(
-  ADMIN_NAV.map((item) => [item.key, item.label]),
-);
+export const MODULE_LABEL: Record<string, string> = {
+  ...Object.fromEntries(ADMIN_NAV.map((item) => [item.key, item.label])),
+  /* Permission sans entrée de menu : elle élargit l'écran « Plaintes » aux
+     dossiers cloisonnés (cf. lib/mgp/acces.ts). */
+  "mgp-eas": "Signalements EAS/HS (accès nominatif)",
+};
 
 /** KPIs du tableau de bord (§8.2.1) — valeurs branchées au jalon Prisma. */
 export const ADMIN_KPIS = [

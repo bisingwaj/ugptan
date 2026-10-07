@@ -3,8 +3,13 @@
 /**
  * Traitement des plaintes depuis la console.
  *
- * ⚠️ INVARIANT : chaque action commence par `assertPermission("mgp")`. Le proxy
- * laisse passer les POST (cf. src/proxy.ts), la barrière est donc ici.
+ * ⚠️ INVARIANT : chaque action commence par `assertGrievanceAccess()`, et toute
+ * lecture ou écriture d'un dossier passe par son périmètre (`within(scope, …)`).
+ * Le proxy laisse passer les POST (cf. src/proxy.ts), la barrière est donc ici.
+ * Le périmètre est ce qui cloisonne les signalements EAS/HS : un agent MGP
+ * ordinaire qui forgerait l'identifiant d'un tel dossier obtient « Dossier
+ * introuvable », sur chaque action, sans rien en lire ni y écrire
+ * (cf. lib/mgp/acces.ts).
  *
  * Second invariant, propre à ce module : AUCUNE écriture ne se fait sans
  * inscrire l'événement correspondant au journal du dossier. C'est ce qui donne
@@ -26,8 +31,9 @@
 import { revalidatePath } from "next/cache";
 import { ADMIN_GRIEVANCES, adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
-import { assertPermission, type AdminUser } from "@/lib/auth/guard";
-import { can, type AdminRole } from "@/lib/auth/permissions";
+import type { AdminUser } from "@/lib/auth/guard";
+import type { AdminRole } from "@/lib/auth/permissions";
+import { assertGrievanceAccess, canHandleCategory, within, type GrievanceScope } from "@/lib/mgp/acces";
 import {
   LIMITS,
   isClosingStatus,
@@ -71,22 +77,29 @@ function refresh(id: string) {
   revalidatePath(adminPath(`/grievances/${id}`));
 }
 
+/** Le dossier existe-t-il DANS le périmètre du compte ? */
+const visible = async (scope: GrievanceScope, id: string): Promise<boolean> =>
+  (await db().grievance.count({ where: within(scope, { id }) })) > 0;
+
 const readText = (formData: FormData, field: string, max: number): string =>
   String(formData.get(field) ?? "").trim().slice(0, max);
 
 /**
- * Comptes à qui un dossier peut être confié : actifs, et disposant du module.
+ * Comptes à qui un dossier peut être confié : actifs, et habilités pour sa
+ * catégorie (`mgp-eas` pour un signalement EAS/HS, `mgp` sinon).
  * Recalculé côté serveur plutôt que d'accepter l'identifiant envoyé par le
  * formulaire — une liste d'options n'est pas une autorisation.
  */
-async function assignableUserIds(): Promise<Set<string>> {
+async function assignableUserIds(category: string): Promise<Set<string>> {
   const users = await db().user.findMany({
     where: { banned: false },
     select: { id: true, role: true, permissions: true },
   });
   return new Set(
     users
-      .filter((user) => can({ role: user.role as AdminRole, permissions: user.permissions }, "mgp"))
+      .filter((user) =>
+        canHandleCategory({ role: user.role as AdminRole, permissions: user.permissions }, category),
+      )
       .map((user) => user.id),
   );
 }
@@ -100,15 +113,15 @@ export async function updateGrievanceAction(
   _prev: GrievanceActionState,
   formData: FormData,
 ): Promise<GrievanceActionState> {
-  const actor = await assertPermission("mgp");
+  const { user: actor, scope } = await assertGrievanceAccess();
 
   const id = String(formData.get("id") ?? "");
   if (!id) return { error: NOT_FOUND, ok: null };
 
-  const current = await db().grievance.findUnique({
-    where: { id },
+  const current = await db().grievance.findFirst({
+    where: within(scope, { id }),
     select: {
-      id: true, status: true, stage: true, priority: true, closedAt: true,
+      id: true, category: true, status: true, stage: true, priority: true, closedAt: true,
       assigneeId: true, assignee: { select: { name: true, email: true } },
     },
   });
@@ -130,7 +143,7 @@ export async function updateGrievanceAction(
   let assigneeId: string | null = null;
   let assigneeLabel = "Non affecté";
   if (rawAssignee) {
-    if (!(await assignableUserIds()).has(rawAssignee)) {
+    if (!(await assignableUserIds(current.category)).has(rawAssignee)) {
       return { error: "Ce compte ne peut pas recevoir de dossier MGP.", ok: null };
     }
     const target = await db().user.findUnique({
@@ -183,16 +196,14 @@ export async function addGrievanceNoteAction(
   _prev: GrievanceActionState,
   formData: FormData,
 ): Promise<GrievanceActionState> {
-  const actor = await assertPermission("mgp");
+  const { user: actor, scope } = await assertGrievanceAccess();
 
   const id = String(formData.get("id") ?? "");
   const note = readText(formData, "note", LIMITS.note);
   if (!id) return { error: NOT_FOUND, ok: null };
   if (note.length < 2) return { error: "La note est vide.", ok: null };
 
-  if ((await db().grievance.count({ where: { id } })) === 0) {
-    return { error: NOT_FOUND, ok: null };
-  }
+  if (!(await visible(scope, id))) return { error: NOT_FOUND, ok: null };
 
   await db().grievanceEvent.create({
     data: eventData(id, actor, { type: "NOTE", message: note }),
@@ -211,16 +222,14 @@ export async function addGrievanceUpdateAction(
   _prev: GrievanceActionState,
   formData: FormData,
 ): Promise<GrievanceActionState> {
-  const actor = await assertPermission("mgp");
+  const { user: actor, scope } = await assertGrievanceAccess();
 
   const id = String(formData.get("id") ?? "");
   const message = readText(formData, "message", LIMITS.message);
   if (!id) return { error: NOT_FOUND, ok: null };
   if (message.length < 2) return { error: "Le message est vide.", ok: null };
 
-  if ((await db().grievance.count({ where: { id } })) === 0) {
-    return { error: NOT_FOUND, ok: null };
-  }
+  if (!(await visible(scope, id))) return { error: NOT_FOUND, ok: null };
 
   await db().grievanceEvent.create({
     data: eventData(id, actor, { type: "MESSAGE", isPublic: true, message }),
@@ -239,7 +248,7 @@ export async function logGrievanceContactAction(
   _prev: GrievanceActionState,
   formData: FormData,
 ): Promise<GrievanceActionState> {
-  const actor = await assertPermission("mgp");
+  const { user: actor, scope } = await assertGrievanceAccess();
 
   const id = String(formData.get("id") ?? "");
   const channel = readText(formData, "channel", 40);
@@ -247,8 +256,8 @@ export async function logGrievanceContactAction(
   if (!id) return { error: NOT_FOUND, ok: null };
   if (summary.length < 2) return { error: "Résumez l'échange avant de l'enregistrer.", ok: null };
 
-  const target = await db().grievance.findUnique({
-    where: { id },
+  const target = await db().grievance.findFirst({
+    where: within(scope, { id }),
     select: { isAnonymous: true, email: true, phone: true },
   });
   if (!target) return { error: NOT_FOUND, ok: null };
@@ -276,17 +285,17 @@ export async function logGrievanceContactAction(
  * rejoué. Renvoie le nouveau compte, pour que la bulle baisse sans attendre.
  */
 export async function markGrievanceReadAction(id: string): Promise<number> {
-  await assertPermission("mgp");
+  const { scope } = await assertGrievanceAccess();
 
   if (typeof id === "string" && id) {
     const { count } = await db().grievance.updateMany({
-      where: { id, ...UNREAD_WHERE },
+      where: within(scope, { id, ...UNREAD_WHERE }),
       data: { readAt: new Date() },
     });
     if (count > 0) revalidatePath(ADMIN_GRIEVANCES);
   }
 
-  return countUnreadGrievances();
+  return countUnreadGrievances(scope);
 }
 
 /**
@@ -297,16 +306,18 @@ export async function markGrievanceReadAction(id: string): Promise<number> {
  * rester signalée. Une date absente ou illisible ne marque rien.
  */
 export async function markAllGrievancesReadAction(formData: FormData): Promise<number> {
-  await assertPermission("mgp");
+  // Borné au périmètre : sans quoi l'agent ordinaire ferait passer pour lus
+  // des signalements EAS/HS que la spécialiste n'a jamais ouverts.
+  const { scope } = await assertGrievanceAccess();
 
   const before = new Date(String(formData.get("before") ?? ""));
   if (!Number.isNaN(before.getTime())) {
     const { count } = await db().grievance.updateMany({
-      where: { ...UNREAD_WHERE, submittedAt: { lte: before } },
+      where: within(scope, { ...UNREAD_WHERE, submittedAt: { lte: before } }),
       data: { readAt: new Date() },
     });
     if (count > 0) revalidatePath(ADMIN_GRIEVANCES);
   }
 
-  return countUnreadGrievances();
+  return countUnreadGrievances(scope);
 }

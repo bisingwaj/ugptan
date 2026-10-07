@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import type { Lang } from "@/lib/pick";
 import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { mgpCategories } from "@/content/mgp";
 import { NAV, route } from "@/lib/routes";
-import { LIMITS } from "@/lib/mgp/model";
+import { EAS_ANCHOR, EAS_CATEGORY, FORM_ANCHOR, LIMITS, descriptionMinFor, isEasCategory } from "@/lib/mgp/model";
 import { submitGrievance } from "@/actions/mgp";
 import { BoutonAction } from "@/components/ui/BoutonAction";
 
@@ -26,6 +26,12 @@ const EMPTY_CONTACT: Contact = { fullName: "", email: "", tel: "", prov: "" };
  *
  * L'envoi passe par une server action qui revalide TOUT (cf. actions/mgp.ts) :
  * les contrôles ci-dessous sont du confort de saisie, pas une garantie.
+ *
+ * Catégorie EAS/HS : le même parcours, allégé. Quelques mots suffisent, aucune
+ * pièce n'est demandée et le nom n'est pas proposé (le serveur l'écarte de
+ * toute façon). Elle se présélectionne par le fragment `#eas`, que pose le
+ * bouton « Accéder au canal confidentiel » : lu ici, côté client, pour que la
+ * page reste statique et que l'intention ne parte jamais au serveur.
  */
 export function MgpForm({ lang }: { lang: Lang }) {
   const t = dict(lang).mgp;
@@ -42,9 +48,25 @@ export function MgpForm({ lang }: { lang: Lang }) {
   const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
 
+  /* Présélection par le fragment, à l'arrivée sur la page comme à un clic sur
+     le bouton de la même page (qui ne recharge rien : seul `hashchange` le
+     signale). On revient à l'étape 1, catégorie cochée, pour que la personne
+     voie ce qui a été choisi pour elle et puisse en changer. */
+  useEffect(() => {
+    const apply = () => {
+      if (window.location.hash !== `#${EAS_ANCHOR}`) return;
+      setCat(EAS_CATEGORY);
+      setStep(1);
+    };
+    apply();
+    window.addEventListener("hashchange", apply);
+    return () => window.removeEventListener("hashchange", apply);
+  }, []);
+
+  const eas = isEasCategory(cat);
   const catLabel = pick(mgpCategories.find((c) => c.code === cat), lang);
-  const canNext = step === 1 ? !!cat : step === 2 ? msg.trim().length >= LIMITS.descriptionMin : true;
-  const named = contact.fullName.trim().length > 0;
+  const canNext = step === 1 ? !!cat : step === 2 ? msg.trim().length >= descriptionMinFor(cat) : true;
+  const named = !eas && contact.fullName.trim().length > 0;
   const reachable = `${contact.email} ${contact.tel}`.trim();
 
   const reset = () => {
@@ -58,7 +80,8 @@ export function MgpForm({ lang }: { lang: Lang }) {
       const result = await submitGrievance({
         category: cat,
         description: msg,
-        fullName: contact.fullName,
+        // Signalement EAS/HS : aucun nom ne part, même saisi avant de changer de catégorie.
+        fullName: eas ? "" : contact.fullName,
         email: contact.email,
         phone: contact.tel,
         province: contact.prov,
@@ -109,7 +132,10 @@ export function MgpForm({ lang }: { lang: Lang }) {
   }
 
   return (
-    <div style={{ background: "#fff", padding: "clamp(26px,3vw,38px)" }}>
+    <div id={FORM_ANCHOR} style={{ background: "#fff", padding: "clamp(26px,3vw,38px)", scrollMarginTop: 96 }}>
+      {/* Cible du fragment `#eas` : le navigateur fait défiler jusqu'ici, et
+          l'effet ci-dessus coche la catégorie. */}
+      <span id={EAS_ANCHOR} aria-hidden="true" style={{ display: "block", scrollMarginTop: 96 }} />
       <h2 style={{ margin: 0, fontWeight: 600, fontSize: "clamp(20px,2.4vw,26px)", letterSpacing: "-0.02em" }}>{t.formTitle}</h2>
 
       {/* Stepper */}
@@ -140,14 +166,16 @@ export function MgpForm({ lang }: { lang: Lang }) {
         )}
         {step === 2 && (
           <>
-            <label htmlFor="mgp-desc" style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>{t.describe}</label>
-            <textarea id="mgp-desc" value={msg} maxLength={LIMITS.description} onChange={(e) => setMsg(e.target.value)} placeholder={t.describePlaceholder} className="field" style={{ minHeight: 150, resize: "vertical", lineHeight: 1.6 }} />
+            <label htmlFor="mgp-desc" style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>{eas ? t.easDescribe : t.describe}</label>
+            {eas && <p style={{ margin: "0 0 12px", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.55 }}>{t.easDescribeNote}</p>}
+            <textarea id="mgp-desc" value={msg} maxLength={LIMITS.description} onChange={(e) => setMsg(e.target.value)} placeholder={eas ? t.easDescribePlaceholder : t.describePlaceholder} className="field" style={{ minHeight: 150, resize: "vertical", lineHeight: 1.6 }} />
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10, fontSize: 12, color: "var(--ac)" }}><span className="mono">✓</span>{t.category} : <strong>{catLabel}</strong></div>
           </>
         )}
         {step === 3 && (
           <>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{t.addFiles} <span style={{ fontWeight: 400, color: "var(--c-50)" }}>{t.optional}</span></label>
+            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{t.addFiles} <span style={{ fontWeight: 400, color: "var(--c-60)" }}>{t.optional}</span></label>
+            {eas && <p style={{ margin: "6px 0 0", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.55 }}>{t.easFilesNote}</p>}
             <label style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 12, padding: 28, border: "1px dashed #a8b4d0", background: "#f4f7ff", cursor: "pointer", textAlign: "center" }}>
               <span style={{ fontSize: 24 }}>📎</span>
               <span style={{ fontSize: 13, color: "var(--c-70)" }}>{t.dropHint}</span>
@@ -170,15 +198,20 @@ export function MgpForm({ lang }: { lang: Lang }) {
         {step === 4 && (
           <>
             <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{t.contactStep}</label>
-            <p style={{ margin: "0 0 16px", fontSize: 12.5, color: "var(--c-50)", lineHeight: 1.5 }}>{t.contactNote}</p>
+            <p style={{ margin: "0 0 16px", fontSize: 12.5, color: "var(--c-60)", lineHeight: 1.5 }}>{eas ? t.easContactNote : t.contactNote}</p>
 
-            <label htmlFor="mgp-name" className="mono" style={{ display: "block", fontSize: 11, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--c-50)", marginBottom: 6 }}>
-              {t.fullName} <span style={{ textTransform: "none", letterSpacing: 0 }}>{t.optional}</span>
-            </label>
-            <input id="mgp-name" value={contact.fullName} maxLength={LIMITS.fullName} onChange={(e) => setContact({ ...contact, fullName: e.target.value })} placeholder={t.fullName} autoComplete="name" className="field" />
-            <p style={{ margin: "8px 0 16px", fontSize: 12, lineHeight: 1.5, color: named ? "var(--ok-fg)" : "var(--c-60)" }}>
-              {named ? t.namedBadge : t.anonymousBadge}
-            </p>
+            {/* Signalement EAS/HS : le nom n'est pas demandé (cf. actions/mgp.ts). */}
+            {!eas && (
+              <>
+                <label htmlFor="mgp-name" className="mono" style={{ display: "block", fontSize: 11, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--c-60)", marginBottom: 6 }}>
+                  {t.fullName} <span style={{ textTransform: "none", letterSpacing: 0 }}>{t.optional}</span>
+                </label>
+                <input id="mgp-name" value={contact.fullName} maxLength={LIMITS.fullName} onChange={(e) => setContact({ ...contact, fullName: e.target.value })} placeholder={t.fullName} autoComplete="name" className="field" />
+                <p style={{ margin: "8px 0 16px", fontSize: 12, lineHeight: 1.5, color: named ? "var(--ok-fg)" : "var(--c-60)" }}>
+                  {named ? t.namedBadge : t.anonymousBadge}
+                </p>
+              </>
+            )}
 
             {/* aria-label : ces trois champs n'ont pas de label visible (design
                 compact) — le placeholder disparaît à la saisie et n'est pas un

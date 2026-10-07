@@ -246,6 +246,32 @@ export const normalizeReference = (value: string): string => {
 
 export const isValidReference = (value: string): boolean => REFERENCE_PATTERN.test(value);
 
+/* --- Signalements EAS/HS -------------------------------------------------- */
+
+/**
+ * Code de la catégorie « exploitation, abus et harcèlement sexuels ».
+ *
+ * Le signalement EAS/HS passe par le MÊME formulaire que les autres plaintes,
+ * mais il n'en partage ni la file, ni les compteurs, ni l'équipe : tout dossier
+ * de cette catégorie est cloisonné en console (cf. lib/mgp/acces.ts) et réservé
+ * aux comptes titulaires de la permission `mgp-eas`.
+ *
+ * ⚠️ Code stable, écrit en base, et clé du cloisonnement : le renommer
+ * rouvrirait d'un coup à toute l'équipe MGP les dossiers déjà déposés.
+ */
+export const EAS_CATEGORY = "eas-hs";
+
+export const isEasCategory = (code: string | null | undefined): boolean => code === EAS_CATEGORY;
+
+/**
+ * Ancre de la section du formulaire sur la page MGP, et fragment qui y
+ * présélectionne la catégorie EAS/HS (`/fr/grievances#eas`). Un fragment et non
+ * un paramètre de requête : la page reste statique, et le fragment ne part
+ * jamais au serveur, donc n'apparaît dans aucun journal d'accès.
+ */
+export const FORM_ANCHOR = "depot";
+export const EAS_ANCHOR = "eas";
+
 /* --- Garde-fous de saisie ------------------------------------------------- */
 
 export const isGrievanceStage = (value: string): value is GrievanceStage =>
@@ -261,6 +287,10 @@ export const isGrievancePriority = (value: string): value is GrievancePriority =
 export const LIMITS = {
   description: 6000,
   descriptionMin: 20,
+  /** Signalement EAS/HS : quelques mots suffisent. Exiger un récit détaillé
+   *  irait contre l'approche centrée sur la survivante, qui ne demande ni
+   *  circonstances ni preuve (cf. content/legal.ts, régime EAS/HS). */
+  descriptionMinEas: 3,
   fullName: 120,
   email: 254,
   phone: 40,
@@ -270,3 +300,7 @@ export const LIMITS = {
   note: 4000,
   message: 2000,
 } as const;
+
+/** Longueur minimale du récit selon la catégorie choisie. */
+export const descriptionMinFor = (category: string): number =>
+  isEasCategory(category) ? LIMITS.descriptionMinEas : LIMITS.descriptionMin;

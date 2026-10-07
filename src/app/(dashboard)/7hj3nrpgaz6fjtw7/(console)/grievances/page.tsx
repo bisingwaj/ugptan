@@ -4,12 +4,13 @@ import { ADMIN } from "@/content/admin";
 import { mgpCategoryLabel } from "@/content/mgp";
 import { ADMIN_GRIEVANCES, adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
-import { requirePermission } from "@/lib/auth/guard";
+import { requireGrievanceAccess, within } from "@/lib/mgp/acces";
 import { formatDate } from "@/lib/format";
 import {
   GRIEVANCE_STATUSES,
   STAGE_LABEL,
   isClosingStatus,
+  isEasCategory,
   isOpenStatus,
   type GrievanceStage,
   type GrievanceStatus,
@@ -64,7 +65,11 @@ const asFilter = (value: string | undefined): FilterKey =>
 export default async function PlaintesPage(props: { searchParams: Promise<{ f?: string }> }) {
   // Indispensable en plus du garde du layout : pages et layouts rendent en
   // parallèle (cf. lib/auth/guard.ts).
-  await requirePermission("mgp");
+  //
+  // Le garde rend aussi le PÉRIMÈTRE du compte : chaque lecture ci-dessous le
+  // compose, compteurs compris (cf. lib/mgp/acces.ts). Un agent MGP ordinaire
+  // ne voit ni les signalements EAS/HS, ni leur nombre.
+  const { scope } = await requireGrievanceAccess();
   const t = ADMIN.grievances;
 
   const { f } = await props.searchParams;
@@ -73,7 +78,7 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
 
   const [grievances, total, nouvelles, ouvertes, horsDelai, nonLues] = await Promise.all([
     db().grievance.findMany({
-      where: whereFor(filter, now),
+      where: within(scope, whereFor(filter, now)),
       select: {
         id: true,
         reference: true,
@@ -91,11 +96,11 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
       orderBy: { submittedAt: "desc" },
       take: 200,
     }),
-    db().grievance.count(),
-    db().grievance.count({ where: { status: "NOUVELLE" } }),
-    db().grievance.count({ where: { status: { in: OPEN_STATUSES } } }),
-    db().grievance.count({ where: { dueAt: { lt: now }, status: { in: OPEN_STATUSES } } }),
-    db().grievance.count({ where: UNREAD_WHERE }),
+    db().grievance.count({ where: within(scope) }),
+    db().grievance.count({ where: within(scope, { status: "NOUVELLE" }) }),
+    db().grievance.count({ where: within(scope, { status: { in: OPEN_STATUSES } }) }),
+    db().grievance.count({ where: within(scope, { dueAt: { lt: now }, status: { in: OPEN_STATUSES } }) }),
+    db().grievance.count({ where: within(scope, UNREAD_WHERE) }),
   ]);
 
   const kpis = [
@@ -109,6 +114,12 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
     <>
       <h1 className="adm__title">{t.title}</h1>
       <p className="adm__lead">{t.lead}</p>
+      {/* Le compte sait ce que sa liste contient : sans cette ligne, la
+          spécialiste ne verrait pas que la file ordinaire lui est fermée, ni
+          l'agent qu'une partie des dossiers ne lui est pas montrée. */}
+      <p className="adm-hint" style={{ marginTop: 10 }}>
+        {scope.ordinary && scope.eas ? t.scopeAll : scope.eas ? t.scopeEasOnly : t.scopeOrdinaryOnly}
+      </p>
 
       <div className="adm-grid" style={{ marginTop: 26 }}>
         {kpis.map((kpi) => (
@@ -183,7 +194,12 @@ export default async function PlaintesPage(props: { searchParams: Promise<{ f?: 
                       </span>
                     </td>
                     <td className="adm-table__meta">{formatDate(g.submittedAt)}</td>
-                    <td>{mgpCategoryLabel(g.category).fr}</td>
+                    <td>
+                      {mgpCategoryLabel(g.category).fr}
+                      {isEasCategory(g.category) && (
+                        <span className="adm-table__sub"><span className="adm-badge adm-badge--warn">{t.easBadge}</span></span>
+                      )}
+                    </td>
                     <td><StatusBadge status={status} /></td>
                     <td className="adm-table__meta">{STAGE_LABEL[g.stage as GrievanceStage].fr}</td>
                     <td>{g.assignee ? (g.assignee.name ?? g.assignee.email) : <span className="adm-hint">{t.unassigned}</span>}</td>

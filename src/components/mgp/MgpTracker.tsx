@@ -117,7 +117,8 @@ export function MgpTracker({ lang, initialRef = "" }: { lang: Lang; initialRef?:
           </p>
 
           <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 8 }}>
-            <Tag>{pick(mgpCategoryLabel(result.categoryCode), lang)}</Tag>
+            {/* Catégorie absente pour un signalement EAS/HS (cf. `PublicCase`). */}
+            {result.categoryCode && <Tag>{pick(mgpCategoryLabel(result.categoryCode), lang)}</Tag>}
             <Tag>{result.isAnonymous ? t.trackAnonymous : t.trackNamed}</Tag>
           </div>
 

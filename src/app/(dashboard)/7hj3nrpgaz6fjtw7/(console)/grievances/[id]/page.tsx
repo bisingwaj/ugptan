@@ -5,8 +5,8 @@ import { ADMIN } from "@/content/admin";
 import { mgpCategoryLabel } from "@/content/mgp";
 import { ADMIN_GRIEVANCES } from "@/lib/admin";
 import { db } from "@/lib/db";
-import { requirePermission } from "@/lib/auth/guard";
-import { can, type AdminRole } from "@/lib/auth/permissions";
+import type { AdminRole } from "@/lib/auth/permissions";
+import { canHandleCategory, requireGrievanceAccess, within } from "@/lib/mgp/acces";
 import { formatDate, formatDateTime } from "@/lib/format";
 import {
   EVENT_TYPE_LABEL,
@@ -16,6 +16,7 @@ import {
   STATUS_LABEL,
   daysUntil,
   isClosingStatus,
+  isEasCategory,
   isGrievancePriority,
   isGrievanceStage,
   isGrievanceStatus,
@@ -52,12 +53,16 @@ function describeChange(type: GrievanceEventType, value: string | null): string 
 }
 
 export default async function PlaintePage({ params }: { params: Promise<{ id: string }> }) {
-  await requirePermission("mgp");
+  const { scope } = await requireGrievanceAccess();
   const t = ADMIN.grievances;
   const { id } = await params;
 
-  const grievance = await db().grievance.findUnique({
-    where: { id },
+  // `findFirst` dans le périmètre, et non `findUnique` par identifiant : un
+  // signalement EAS/HS ouvert par l'URL depuis un compte non habilité répond
+  // 404, exactement comme un dossier qui n'existe pas. Un refus explicite
+  // confirmerait son existence (cf. lib/mgp/acces.ts).
+  const grievance = await db().grievance.findFirst({
+    where: within(scope, { id }),
     select: {
       id: true,
       reference: true,
@@ -103,8 +108,13 @@ export default async function PlaintePage({ params }: { params: Promise<{ id: st
     select: { id: true, name: true, email: true, role: true, permissions: true },
     orderBy: [{ role: "asc" }, { email: "asc" }],
   });
+  // Filtrés sur la catégorie du dossier : un signalement EAS/HS ne se confie
+  // qu'à un titulaire de l'accès nominatif.
+  const eas = isEasCategory(grievance.category);
   const users: AssignableUser[] = candidates
-    .filter((user) => can({ role: user.role as AdminRole, permissions: user.permissions }, "mgp"))
+    .filter((user) =>
+      canHandleCategory({ role: user.role as AdminRole, permissions: user.permissions }, grievance.category),
+    )
     .map((user) => ({ id: user.id, label: user.name ?? user.email }));
 
   const reachable = Boolean(grievance.email || grievance.phone);
@@ -124,6 +134,13 @@ export default async function PlaintePage({ params }: { params: Promise<{ id: st
         <span className="adm-badge adm-badge--off">{PRIORITY_LABEL[grievance.priority as GrievancePriority]}</span>
       </div>
       <p className="adm__lead">{STATUS_HINT[status].fr}</p>
+
+      {eas && (
+        <div className="adm-panel" role="note" style={{ marginTop: 18, borderLeft: "3px solid var(--orange)" }}>
+          <div className="label-mono">{t.easCaseTitle}</div>
+          <p style={{ margin: "8px 0 0", fontSize: 14, lineHeight: 1.6 }}>{t.easCaseNotice}</p>
+        </div>
+      )}
 
       {/* Repères du dossier */}
       <div className="adm-grid" style={{ marginTop: 22 }}>
@@ -207,12 +224,13 @@ export default async function PlaintePage({ params }: { params: Promise<{ id: st
           priority={grievance.priority as GrievancePriority}
           assigneeId={grievance.assigneeId}
           users={users}
+          assigneeHint={eas ? t.assigneeHintEas : undefined}
         />
       </div>
 
       {/* Message au plaignant */}
       <div className="adm__section-title">{t.messageTitle}</div>
-      <p className="adm__lead" style={{ marginTop: 0, marginBottom: 18 }}>{t.messageLead}</p>
+      <p className="adm__lead" style={{ marginTop: 0, marginBottom: 18 }}>{eas ? t.easMessageLead : t.messageLead}</p>
       <div className="adm-panel">
         <GrievanceMessageForm id={grievance.id} />
       </div>

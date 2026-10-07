@@ -1,6 +1,6 @@
 /* Mécanisme de Gestion des Plaintes (MGP) — catégories, pipeline, FAQ. */
 import type { Bilingual } from "@/lib/pick";
-import { GRIEVANCE_STAGES, STAGE_LABEL } from "@/lib/mgp/model";
+import { EAS_CATEGORY, GRIEVANCE_STAGES, STAGE_LABEL } from "@/lib/mgp/model";
 import type { MgpCategory, MgpFaqItem } from "./types";
 
 /**
@@ -16,6 +16,15 @@ export const mgpCategories: MgpCategory[] = [
   { code: "environnementale-sociale", fr: "Environnementale & sociale", en: "Environmental & social" },
   { code: "conduite-personnel", fr: "Conduite du personnel", en: "Staff conduct" },
   { code: "autre", fr: "Autre", en: "Other" },
+  /* Signalement EAS/HS : même formulaire, dossier cloisonné en console et
+     réservé à la personne désignée (cf. lib/mgp/acces.ts). Placée en dernier,
+     à part des catégories ordinaires, et nommée sans euphémisme : la personne
+     doit pouvoir la reconnaître sans hésiter, et le libellé ne dit rien d'elle. */
+  {
+    code: EAS_CATEGORY,
+    fr: "Exploitation, abus ou harcèlement sexuels (EAS/HS)",
+    en: "Sexual exploitation, abuse or harassment (SEA/SH)",
+  },
 ];
 
 export const mgpCategory = (code: string): MgpCategory | undefined =>
@@ -38,5 +47,5 @@ export const mgpFaq: MgpFaqItem[] = [
   { q: { fr: "Sous quel délai aurai-je une réponse ?", en: "How quickly will I get a response?" }, r: { fr: "Accusé de réception immédiat avec numéro de référence ; l'Unité vise un traitement et une réponse dans un délai de 30 jours.", en: "Immediate acknowledgement with a reference number; the Unit aims to process and respond within 30 days." } },
   { q: { fr: "Ma plainte peut-elle se retourner contre moi ?", en: "Could my grievance be used against me?" }, r: { fr: "Non. La plainte n'est pas communiquée à l'entreprise ou au service mis en cause sous une forme qui vous identifie, sauf si vous y consentez. Toute mesure de représailles constatée constitue elle-même un manquement instruit par le mécanisme. L'accès aux dossiers est limité aux agents habilités et journalisé.", en: "No. The grievance is not passed to the company or department concerned in a form that identifies you, unless you consent. Any retaliation observed is itself a breach investigated by the mechanism. Access to case files is limited to authorised officers and is logged." } },
   { q: { fr: "Que se passe-t-il si je ne suis pas satisfait de la réponse ?", en: "What if I am not satisfied with the response?" }, r: { fr: "Demandez le réexamen en citant votre numéro de référence : le dossier est repris à un niveau supérieur, par une personne qui n'a pas rendu la première décision. Saisir le mécanisme ne vous prive d'aucun droit : les voies administratives et judiciaires de droit commun, ainsi que le recours auprès du bailleur, restent ouvertes en parallèle.", en: "Request a review quoting your reference number: the case is taken up at a higher level, by someone who did not make the first decision. Using the mechanism deprives you of no rights: ordinary administrative and judicial remedies, and recourse to the donor, remain open in parallel." } },
-  { q: { fr: "Le canal EAS/HS est-il vraiment séparé ?", en: "Is the SEA/SH channel truly separate?" }, r: { fr: "Oui. Il est strictement cloisonné, centré sur la survivante, et géré uniquement par le Spécialiste VBG/EAS. Aucune de ses données n'apparaît ailleurs sur le site.", en: "Yes. It is strictly siloed, survivor-centred, and managed solely by the GBV/SEA Specialist. None of its data appears elsewhere on the site." } },
+  { q: { fr: "Le canal EAS/HS est-il vraiment séparé ?", en: "Is the SEA/SH channel truly separate?" }, r: { fr: "Oui, par les accès plutôt que par l'adresse. Le signalement se dépose avec le même formulaire, en choisissant la catégorie EAS/HS ; le dossier est alors cloisonné : il n'apparaît ni dans la file, ni dans les compteurs, ni dans les notifications de l'équipe chargée des autres plaintes, et seuls les comptes nominativement désignés par l'Unité, autour de la spécialiste VBG/EAS, peuvent l'ouvrir. Aucun nom n'est demandé, aucune preuve n'est exigée, et le suivi public par numéro ne montre ni la catégorie ni le récit.", en: "Yes, through access rights rather than a separate address. The report is filed with the same form, choosing the SEA/SH category; the case is then siloed: it appears neither in the queue, nor in the counters, nor in the notifications of the team handling other grievances, and only the accounts named by the Unit, around the GBV/SEA specialist, can open it. No name is asked for, no evidence is required, and public tracking by reference number shows neither the category nor the account." } },
 ];

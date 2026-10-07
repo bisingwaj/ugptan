@@ -32,7 +32,7 @@ import { ADMIN_USERS, adminPath } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { assertPermission } from "@/lib/auth/guard";
 import { auth, SET_PASSWORD_REDIRECT } from "@/lib/auth/server";
-import { assignablePermissions, isRole, type AdminRole } from "@/lib/auth/permissions";
+import { assignablePermissions, isRestrictedPermission, isRole, type AdminRole } from "@/lib/auth/permissions";
 import { isValidEmail, normalizeEmail, normalizeName, passwordIssue } from "@/lib/auth/validate";
 import { emailConfigured } from "@/lib/email/config";
 import { takeSendResult } from "@/lib/email/send";
@@ -234,11 +234,28 @@ export async function updateUserAction(
 
   const target = await db().user.findUnique({
     where: { id },
-    select: { id: true, role: true, banned: true },
+    select: { id: true, role: true, banned: true, permissions: true },
   });
   if (!target) return { error: NOT_FOUND, ok: null };
 
   const isSelf = target.id === actor.id;
+
+  /* Permissions nominatives (`mgp-eas`) : un administrateur ne peut pas se les
+     accorder à lui-même. L'accès aux signalements EAS/HS doit résulter d'une
+     désignation faite par une autre personne, faute de quoi le cloisonnement
+     ne tiendrait qu'à la retenue de celui qui détient les comptes. Y renoncer
+     reste possible : on ne garde, pour soi, que ce qui était déjà acquis. */
+  const permissions = readPermissions(formData, role);
+  if (isSelf) {
+    const held = new Set(target.permissions.filter(isRestrictedPermission));
+    const gained = permissions.filter((p) => isRestrictedPermission(p) && !held.has(p));
+    if (gained.length > 0) {
+      return {
+        error: "Vous ne pouvez pas vous accorder vous-même l'accès aux signalements EAS/HS : il doit l'être par un autre administrateur.",
+        ok: null,
+      };
+    }
+  }
 
   if (isSelf && role !== target.role) {
     return { error: "Vous ne pouvez pas modifier votre propre rôle.", ok: null };
@@ -265,7 +282,7 @@ export async function updateUserAction(
     await auth().api.adminUpdateUser({
       body: {
         userId: id,
-        data: { name: name ?? email, email, role, permissions: readPermissions(formData, role) },
+        data: { name: name ?? email, email, role, permissions },
       },
       headers: requestHeaders,
     });

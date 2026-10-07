@@ -5,6 +5,7 @@ import { pick } from "@/lib/pick";
 import { dict } from "@/content/i18n";
 import { mgpFaq } from "@/content/mgp";
 import { NAV, route } from "@/lib/routes";
+import { EAS_ANCHOR } from "@/lib/mgp/model";
 import { Kicker } from "@/components/ui/Kicker";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Accordion } from "@/components/ui/Accordion";
@@ -83,7 +84,12 @@ export default async function MgpPage(props: { params: Promise<{ lang: string }>
               </div>
             </div>
             <p style={{ margin: "18px 0 0", fontSize: 14, lineHeight: 1.65, color: "var(--c-70)", maxWidth: 880 }}>{t.easBody}</p>
-            <button className="btn btn--dark" style={{ marginTop: 22 }}>{t.easCta} →</button>
+            {/* Une ancre `<a>` et non un `Link` : la navigation est interne à la
+                page, et seul un vrai changement de fragment déclenche le
+                `hashchange` qu'écoute le formulaire pour cocher la catégorie
+                EAS/HS. Le fragment ne part jamais au serveur : la page reste
+                statique (cf. `EAS_ANCHOR`). */}
+            <a href={`#${EAS_ANCHOR}`} className="btn btn--dark" style={{ marginTop: 22 }}>{t.easCta} <span className="arrow">→</span></a>
           </Reveal>
 
           {/* FAQ */}

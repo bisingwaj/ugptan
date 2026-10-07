@@ -109,6 +109,16 @@ const PATHS: Record<Permission, ReactElement> = {
       <path d="M11.3 12.3h1.4v1.4h-1.4z" />
     </>
   ),
+  /* Signalements EAS/HS : le cadenas. Permission sans entrée de menu (elle
+     élargit l'écran « Plaintes ») ; l'icône n'existe que parce que le jeu est
+     indexé sur toutes les permissions. */
+  "mgp-eas": (
+    <>
+      <path d="M5 11h14v10H5z" />
+      <path d="M8 11V7h8v4" />
+      <path d="M12 15v2.5" />
+    </>
+  ),
   /* Traductions : deux glyphes de langue, et le passage de l'un à l'autre */
   traductions: (
     <>

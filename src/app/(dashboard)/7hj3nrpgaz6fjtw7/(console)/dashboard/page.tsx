@@ -4,7 +4,8 @@ import { ADMIN, ADMIN_KPIS, ADMIN_NAV_SECTIONS } from "@/content/admin";
 import { ADMIN_GRIEVANCES } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/guard";
-import { can } from "@/lib/auth/permissions";
+import { can, visibleModules } from "@/lib/auth/permissions";
+import { grievanceScope, within } from "@/lib/mgp/acces";
 import { compterEnLigne } from "@/lib/actus/query";
 import { compterAVenir } from "@/lib/events/query";
 import { GRIEVANCE_STATUSES, isOpenStatus } from "@/lib/mgp/model";
@@ -21,9 +22,10 @@ export default async function TableauDeBordPage() {
 
   // Même filtrage que la barre latérale : un compte ne lit ici que les modules
   // auxquels il a effectivement accès.
+  const modules = new Set<string>(visibleModules(user));
   const sections = ADMIN_NAV_SECTIONS.map((section) => ({
     ...section,
-    items: section.items.filter((item) => can(user, item.key)),
+    items: section.items.filter((item) => modules.has(item.key)),
   })).filter((section) => section.items.length > 0);
 
   // Premier indicateur branché : les plaintes ouvertes, et celles dont
@@ -33,11 +35,14 @@ export default async function TableauDeBordPage() {
   // injoignable faisait tomber le tableau de bord entier — et l'objet levé par
   // le pilote Neon n'étant pas une `Error`, l'incident ne laissait qu'une ligne
   // « ⨯ Error: [object Object] » dans le journal.
-  const seesGrievances = can(user, "mgp");
+  // Comptés dans le périmètre du compte (cf. lib/mgp/acces.ts) : les
+  // signalements EAS/HS n'entrent dans ces chiffres que pour qui peut les ouvrir.
+  const scope = grievanceScope(user);
+  const seesGrievances = scope.ordinary || scope.eas;
   const [openGrievances, lateGrievances] = seesGrievances
     ? await Promise.all([
-        db().grievance.count({ where: { status: { in: OPEN_STATUSES } } }),
-        db().grievance.count({ where: { dueAt: { lt: new Date() }, status: { in: OPEN_STATUSES } } }),
+        db().grievance.count({ where: within(scope, { status: { in: OPEN_STATUSES } }) }),
+        db().grievance.count({ where: within(scope, { dueAt: { lt: new Date() }, status: { in: OPEN_STATUSES } }) }),
       ]).catch((): [null, null] => [null, null])
     : [null, null];
 

@@ -24,8 +24,10 @@ import { grievanceReceiptEmail } from "@/lib/email/templates/grievance-receipt";
 import {
   LIMITS,
   daysUntil,
+  descriptionMinFor,
   dueDateFrom,
   isClosingStatus,
+  isEasCategory,
   isValidReference,
   normalizeReference,
   type GrievanceStage,
@@ -108,21 +110,34 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
     return { ok: false, error: t("Choisissez une catégorie.", "Choose a category.") };
   }
   const category = categoryEntry.code;
+  const eas = isEasCategory(category);
 
   const description = cleanText(draft?.description, LIMITS.description);
-  if (description.length < LIMITS.descriptionMin) {
+  const descriptionMin = descriptionMinFor(category);
+  if (description.length < descriptionMin) {
     return {
       ok: false,
-      error: t(
-        `Décrivez les faits en ${LIMITS.descriptionMin} caractères au minimum : sans récit, la plainte ne peut pas être instruite.`,
-        `Describe the facts in at least ${LIMITS.descriptionMin} characters: without an account, the grievance cannot be investigated.`,
-      ),
+      error: eas
+        ? t(
+            "Indiquez en quelques mots ce qui s'est passé. Vous n'avez à donner ni circonstances ni preuve : seulement ce que vous choisissez de dire.",
+            "Say in a few words what happened. You need give neither circumstances nor evidence: only what you choose to say.",
+          )
+        : t(
+            `Décrivez les faits en ${descriptionMin} caractères au minimum : sans récit, la plainte ne peut pas être instruite.`,
+            `Describe the facts in at least ${descriptionMin} characters: without an account, the grievance cannot be investigated.`,
+          ),
     };
   }
 
   // Le nom seul décide de l'anonymat : une personne peut vouloir être
   // recontactée sans se nommer, et cela reste un dépôt anonyme.
-  const fullName = clean(draft?.fullName, LIMITS.fullName) || null;
+  //
+  // Signalement EAS/HS : le nom n'est pas demandé, et s'il arrive quand même
+  // (champ rempli avant de changer de catégorie, requête forgée), il n'est pas
+  // conservé. Le régime publié est que l'identité de la survivante n'est « ni
+  // recherchée, ni conservée » (cf. content/legal.ts) ; seul un moyen de la
+  // joindre, si elle en laisse un, sert à l'orienter vers les services.
+  const fullName = eas ? null : clean(draft?.fullName, LIMITS.fullName) || null;
   const email = clean(draft?.email, LIMITS.email).toLowerCase() || null;
   const phone = clean(draft?.phone, LIMITS.phone) || null;
   const province = clean(draft?.province, LIMITS.province) || null;
@@ -185,6 +200,7 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
       grievanceId: created.id,
       reference,
       lang,
+      eas,
       email,
       categoryLabel: pick(categoryEntry, lang),
       description,
@@ -214,7 +230,11 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
 
 /**
  * Renvoie à la personne son numéro de référence et le contenu de son dépôt,
- * dès lors qu'elle a laissé une adresse.
+ * dès lors qu'elle a laissé une adresse. Pour un signalement EAS/HS, le
+ * message se réduit au numéro et au lien de suivi : ni catégorie, ni récit, ni
+ * coordonnées (une boîte de réception se partage, se consulte par-dessus
+ * l'épaule, et la réponse à ce message arriverait dans la boîte générale de
+ * l'Unité, qui n'est pas cloisonnée).
  *
  * ⚠️ NE LÈVE JAMAIS. Quand cette fonction s'exécute, la plainte est déjà écrite
  * en base : une erreur qui remonterait ferait afficher « l'enregistrement a
@@ -231,6 +251,8 @@ async function sendReceipt(params: {
   grievanceId: string;
   reference: string;
   lang: Lang;
+  /** Signalement EAS/HS : accusé réduit au numéro (cf. grievance-receipt.ts). */
+  eas: boolean;
   email: string | null;
   categoryLabel: string;
   description: string;
@@ -300,7 +322,10 @@ async function sendReceipt(params: {
 export type PublicCase = {
   reference: string;
   submittedAt: string;
-  categoryCode: string;
+  /** `null` pour un signalement EAS/HS : quiconque détient le numéro lit cette
+   *  page, y compris une personne de l'entourage qui l'aurait trouvé. La nature
+   *  du dossier ne s'y lit donc pas, pas plus que le récit. */
+  categoryCode: string | null;
   status: GrievanceStatus;
   stage: GrievanceStage;
   isAnonymous: boolean;
@@ -392,7 +417,7 @@ export async function trackGrievance(rawReference: string, rawLang: string): Pro
     case: {
       reference: record.reference,
       submittedAt: record.submittedAt.toISOString(),
-      categoryCode: record.category,
+      categoryCode: isEasCategory(record.category) ? null : record.category,
       status,
       stage: record.stage as GrievanceStage,
       isAnonymous: record.isAnonymous,

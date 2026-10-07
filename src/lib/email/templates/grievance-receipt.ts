@@ -67,6 +67,8 @@ export type GrievanceReceipt = {
   dueAt: Date;
   /** Page publique de suivi, en absolu, numéro pré-rempli. */
   trackUrl: string;
+  /** Signalement EAS/HS : message réduit au numéro (cf. `easReceipt`). */
+  eas?: boolean;
 };
 
 /**
@@ -89,6 +91,9 @@ const dateFmt: Record<Lang, Intl.DateTimeFormat> = {
 };
 
 export function grievanceReceiptEmail(receipt: GrievanceReceipt): Mail {
+  // Signalement EAS/HS : accusé minimal, composé à part (cf. `easReceipt`).
+  if (receipt.eas) return easReceipt(receipt);
+
   const {
     reference, lang, email, categoryLabel, description, fullName, phone, province,
     attachments, submittedAt, dueAt, trackUrl,
@@ -231,6 +236,93 @@ export function grievanceReceiptEmail(receipt: GrievanceReceipt): Mail {
     en
       ? "Automated message sent to the address given at submission."
       : "Message automatique envoyé à l'adresse indiquée lors du dépôt.",
+  ].join("\n");
+
+  return { to: email, subject, html, text };
+}
+
+/**
+ * Accusé de réception d'un signalement EAS/HS.
+ *
+ * Le parti pris n° 2 ci-dessus s'inverse ici, pour une raison propre à ces
+ * dossiers : une boîte de réception se partage, se lit sur un téléphone prêté
+ * ou par-dessus l'épaule, et l'auteur présumé peut appartenir à l'entourage.
+ * Le message ne contient donc QUE ce qui permet de suivre le dossier : le
+ * numéro, la date et le lien. Ni la catégorie, ni le récit, ni les
+ * coordonnées, ni même le mot « plainte » dans l'objet.
+ *
+ * Il dissuade aussi d'y répondre : la réponse arriverait dans la boîte générale
+ * de l'Unité, que lit l'équipe MGP ordinaire et qui n'est pas cloisonnée.
+ */
+function easReceipt(receipt: GrievanceReceipt): Mail {
+  const { reference, lang, email, submittedAt, trackUrl } = receipt;
+  const en = lang === "en";
+  const depotDate = dateTimeFmt[lang].format(submittedAt);
+  const refLabel = en ? "Reference number" : "Numéro de référence";
+
+  const subject = en ? `Acknowledgement of receipt · ${reference}` : `Accusé de réception · ${reference}`;
+
+  const intro = en
+    ? `Hello,<br>Your submission reached the Unit on ${esc(depotDate)}. It is registered under the number below.`
+    : `Bonjour,<br>Votre dépôt est parvenu à l'Unité le ${esc(depotDate)}. Il est enregistré sous le numéro suivant.`;
+  const keep = en
+    ? "Keep this number to yourself: it opens the tracking page, which shows neither what you wrote nor any detail about you. You may delete this message once the number is noted."
+    : "Gardez ce numéro pour vous : il ouvre la page de suivi, qui n'affiche ni ce que vous avez écrit ni aucune information sur vous. Vous pouvez supprimer ce message une fois le numéro noté.";
+  const next = en
+    ? "Your file is handled only by the people designated for this type of case. If you left a way to reach you, they will contact you discreetly to offer you support services (medical, psychosocial, legal), whatever you decide afterwards."
+    : "Votre dossier n'est traité que par les personnes désignées pour ce type de situation. Si vous avez laissé un moyen de vous joindre, elles vous contacteront discrètement pour vous proposer une orientation vers des services d'accompagnement (médical, psychosocial, juridique), quelle que soit la suite que vous choisirez.";
+  const noReply = en
+    ? "Please do not reply to this message to add information: replies reach a general mailbox. To add something, file again quoting this number."
+    : "Merci de ne pas répondre à ce message pour compléter votre dépôt : les réponses arrivent dans une boîte générale. Pour ajouter un élément, déposez à nouveau en citant ce numéro.";
+
+  const html = renderEmail({
+    lang,
+    subtitle: en ? "Grievance mechanism" : "Mécanisme de gestion des plaintes",
+    signature: en
+      ? "Automated message sent to the address given at submission."
+      : "Message automatique envoyé à l'adresse indiquée lors du dépôt.",
+    preheader: en ? `Reference number ${reference}.` : `Numéro de référence ${reference}.`,
+    kicker: en ? "Acknowledgement of receipt" : "Accusé de réception",
+    title: en ? "Your submission is registered" : "Votre dépôt est enregistré",
+    blocks: [
+      paragraph(intro),
+      codeBox(refLabel, reference),
+      notice(keep),
+      button(en ? "Track my case" : "Suivre mon dossier", trackUrl),
+      fallbackLink(
+        trackUrl,
+        en
+          ? "If the button does not appear, copy this link into your browser:"
+          : "Si le bouton ne s'affiche pas, copiez ce lien dans votre navigateur :",
+      ),
+      paragraph(next),
+      paragraph(noReply, { muted: true }),
+    ],
+    footnote: en
+      ? "You are receiving this message because this address was entered in a form on the UGPTN website. If you did not make this submission, you may ignore this message."
+      : "Vous recevez ce message parce que cette adresse a été saisie dans un formulaire du site de l'UGPTN. Si vous n'êtes pas à l'origine de ce dépôt, vous pouvez ignorer ce message.",
+  });
+
+  const text = [
+    en ? "ACKNOWLEDGEMENT OF RECEIPT" : "ACCUSÉ DE RÉCEPTION",
+    "",
+    en ? "Hello," : "Bonjour,",
+    en
+      ? `Your submission reached the Unit on ${depotDate}.`
+      : `Votre dépôt est parvenu à l'Unité le ${depotDate}.`,
+    "",
+    `${refLabel.toUpperCase()} : ${reference}`,
+    "",
+    keep,
+    en ? "Track your case:" : "Suivre votre dossier :",
+    trackUrl,
+    "",
+    next,
+    "",
+    noReply,
+    "",
+    "--",
+    "Unité de Gestion du Projet de Transformation Numérique — RDC",
   ].join("\n");
 
   return { to: email, subject, html, text };

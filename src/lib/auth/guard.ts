@@ -150,8 +150,13 @@ export async function requireAdmin(): Promise<AdminUser> {
  * connexion : le compte est authentifié, c'est son périmètre qui est en cause.
  */
 export async function requirePermission(permission: Permission): Promise<AdminUser> {
+  return requireAccess((user) => can(user, permission));
+}
+
+/** Forme générale de `requirePermission` (cf. `assertAccess`). */
+export async function requireAccess(allowed: (user: AdminUser) => boolean): Promise<AdminUser> {
   const user = await requireAdmin();
-  if (!can(user, permission)) redirect(ADMIN_HOME);
+  if (!allowed(user)) redirect(ADMIN_HOME);
   return user;
 }
 
@@ -161,6 +166,15 @@ export async function requirePermission(permission: Permission): Promise<AdminUs
  * une exception ne peut pas être confondue avec un succès par l'appelant.
  */
 export async function assertPermission(permission: Permission): Promise<AdminUser> {
+  return assertAccess((user) => can(user, permission));
+}
+
+/**
+ * Forme générale d'`assertPermission`, pour un droit qui ne se réduit pas à un
+ * seul module : l'écran des plaintes s'ouvre au titre de `mgp` OU de `mgp-eas`
+ * (cf. lib/mgp/acces.ts). Mêmes refus, mêmes messages.
+ */
+export async function assertAccess(allowed: (user: AdminUser) => boolean): Promise<AdminUser> {
   let user: AdminUser | null;
 
   try {
@@ -182,6 +196,6 @@ export async function assertPermission(permission: Permission): Promise<AdminUse
   }
 
   if (!user) throw new Error("Session expirée. Reconnectez-vous.");
-  if (!can(user, permission)) throw new Error("Droits insuffisants pour cette opération.");
+  if (!allowed(user)) throw new Error("Droits insuffisants pour cette opération.");
   return user;
 }

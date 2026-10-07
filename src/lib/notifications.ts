@@ -8,6 +8,7 @@ import "server-only";
  */
 import type { AdminUser } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/permissions";
+import { grievanceScope, seesGrievances } from "@/lib/mgp/acces";
 import { countUnreadGrievances } from "@/lib/mgp/query";
 import { compterNouveauxAbonnes } from "@/lib/newsletter/query";
 import type { Notifications } from "@/lib/notifications-model";
@@ -22,7 +23,9 @@ const compter = (autorise: boolean, lire: () => Promise<number>): Promise<number
 
 export async function compterNotifications(user: AdminUser): Promise<Notifications> {
   const [mgp, newsletter] = await Promise.all([
-    compter(can(user, "mgp"), countUnreadGrievances),
+    // Compté dans le périmètre du compte : un signalement EAS/HS ne fait pas
+    // monter la bulle d'un agent qui ne peut pas l'ouvrir (cf. lib/mgp/acces.ts).
+    compter(seesGrievances(user), () => countUnreadGrievances(grievanceScope(user))),
     compter(can(user, "newsletter"), compterNouveauxAbonnes),
   ]);
   return { mgp, newsletter };

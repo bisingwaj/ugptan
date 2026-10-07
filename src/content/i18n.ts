@@ -832,8 +832,8 @@ export function dict(lang: Lang) {
       ),
       easLabel: t("Canal confidentiel MGP-EAS/HS", "Confidential GBV/SEA-SH channel"),
       easText: t(
-        "Strictement séparé du MGP général et centré sur la survivante : identité optionnelle, consentement éclairé, aucune donnée visible ailleurs. Référencement vers les services (médical, psychosocial, juridique) sous 24 heures. Aucun export, aucune copie.",
-        "A strictly separate, survivor-centred channel: optional identity, informed consent, no data visible elsewhere. Referral to services (medical, psychosocial, legal) within 24 hours. No export, no copy.",
+        "Même formulaire que le MGP général, sous une catégorie dédiée, mais dossier cloisonné et centré sur la survivante : aucun nom demandé, consentement éclairé, accès réservé aux personnes désignées. Référencement vers les services (médical, psychosocial, juridique) sous 24 heures.",
+        "Same form as the general GRM, under a dedicated category, but a siloed, survivor-centred case: no name asked for, informed consent, access restricted to designated staff. Referral to services (medical, psychosocial, legal) within 24 hours.",
       ),
       easSub: t(
         "Violences basées sur le genre · exploitation et abus sexuels · harcèlement",
@@ -1460,8 +1460,22 @@ export function dict(lang: Lang) {
       refTrackCta: t("Suivre mon dossier", "Track my case"),
       newGrievance: t("Déposer une autre plainte", "File another grievance"),
       formFootnote: t(
-        "Multilingue (FR + langues nationales). Aucune donnée du canal confidentiel EAS/HS ne transite par ce formulaire.",
-        "Multilingual (FR + national languages). No data from the confidential GBV/SEA-SH channel passes through this form.",
+        "En français et en anglais pour l'instant ; les langues nationales sont prévues. Un signalement d'exploitation, d'abus ou de harcèlement sexuels se dépose ici, sous sa catégorie : le dossier est alors cloisonné et seules les personnes désignées pour ces situations y ont accès.",
+        "In French and English for now; national languages are planned. A report of sexual exploitation, abuse or harassment is filed here, under its own category: the case is then siloed and only the people designated for such situations can access it.",
+      ),
+      easDescribe: t("Dites, avec vos mots, ce qui s'est passé", "Say, in your own words, what happened"),
+      easDescribeNote: t(
+        "Quelques mots suffisent. Vous n'avez à préciser ni les circonstances, ni le lieu, ni la date, et aucune preuve n'est demandée : seulement ce que vous choisissez de partager.",
+        "A few words are enough. You need not give the circumstances, the place or the date, and no evidence is asked for: only what you choose to share.",
+      ),
+      easDescribePlaceholder: t("Ce que vous souhaitez nous dire…", "What you wish to tell us…"),
+      easFilesNote: t(
+        "Aucun document n'est nécessaire pour ce type de signalement. Vous pouvez passer cette étape.",
+        "No document is needed for this type of report. You may skip this step.",
+      ),
+      easContactNote: t(
+        "Votre nom n'est pas demandé. Si vous le souhaitez, laissez un moyen de vous joindre sans danger : il ne sert qu'à vous proposer, discrètement, une orientation vers des services médicaux, psychosociaux et juridiques. Sans coordonnées, conservez votre numéro de référence.",
+        "Your name is not asked for. If you wish, leave a safe way to reach you: it is used only to offer you, discreetly, a referral to medical, psychosocial and legal services. Without contact details, keep your reference number.",
       ),
       trackTitle: t("Suivre ma plainte", "Track my grievance"),
       trackLead: t(
@@ -1529,8 +1543,8 @@ export function dict(lang: Lang) {
         "Gender-based violence · sexual exploitation and abuse · harassment",
       ),
       easBody: t(
-        "Ce canal ne suit pas la procédure ordinaire, et c'est délibéré. La survivante décide de ce qui est partagé et avec qui : rien n'est transmis sans son consentement éclairé, l'identité est facultative, et aucune donnée n'apparaît dans les statistiques ni ailleurs sur ce site. La priorité n'est pas l'instruction du dossier mais l'orientation vers les services — médical, psychosocial, juridique — sous 24 heures. Aucun export, aucune copie.",
-        "This channel does not follow the ordinary procedure, and that is deliberate. The survivor decides what is shared and with whom: nothing is passed on without their informed consent, identity is optional, and no data appears in statistics or anywhere else on this site. The priority is not case investigation but referral to services — medical, psychosocial, legal — within 24 hours. No export, no copy.",
+        "Ce canal ne suit pas la procédure ordinaire, et c'est délibéré. Le signalement se dépose avec le formulaire ci-dessus, sous la catégorie EAS/HS que le bouton présélectionne : aucun nom n'est demandé, quelques mots suffisent, aucune preuve n'est exigée. Le dossier est aussitôt cloisonné : l'équipe chargée des autres plaintes ne le voit ni dans sa liste, ni dans ses compteurs, et seules les personnes désignées par l'Unité, autour de la spécialiste VBG/EAS, peuvent l'ouvrir. La survivante décide de ce qui est partagé et avec qui : rien n'est transmis sans son consentement éclairé, et le suivi par numéro n'affiche ni la nature des faits ni le récit. La priorité n'est pas l'instruction du dossier mais l'orientation vers les services médicaux, psychosociaux et juridiques, sous 24 heures.",
+        "This channel does not follow the ordinary procedure, and that is deliberate. The report is filed with the form above, under the SEA/SH category that the button preselects: no name is asked for, a few words are enough, no evidence is required. The case is siloed at once: the team handling other grievances sees it neither in its list nor in its counters, and only the people designated by the Unit, around the GBV/SEA specialist, can open it. The survivor decides what is shared and with whom: nothing is passed on without their informed consent, and tracking by reference number shows neither the nature of the facts nor the account. The priority is not case investigation but referral to medical, psychosocial and legal services, within 24 hours.",
       ),
       easCta: t("Accéder au canal confidentiel", "Access the confidential channel"),
       faqLabel: "FAQ · MGP",

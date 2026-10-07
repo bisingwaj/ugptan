@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { ADMIN } from "@/content/admin";
 import type { AdminUser } from "@/lib/auth/guard";
-import { grantedPermissions, ROLE_LABEL } from "@/lib/auth/permissions";
+import { ROLE_LABEL, visibleModules } from "@/lib/auth/permissions";
 import { compterNotifications } from "@/lib/notifications";
 import { parseSidebarCollapsed, SIDEBAR_COOKIE } from "@/lib/sidebar";
 import { AdminChrome } from "@/components/dashboard/AdminChrome";
@@ -17,7 +17,9 @@ import { LogoutButton } from "@/components/dashboard/LogoutButton";
  */
 export async function AdminShell({ user, children }: { user: AdminUser; children: React.ReactNode }) {
   // Calculé côté serveur : la règle d'autorisation ne descend jamais au client.
-  const granted = grantedPermissions(user);
+  // `visibleModules` et non `grantedPermissions` : l'écran « Plaintes » s'ouvre
+  // aussi au seul titre de `mgp-eas` (cf. lib/auth/permissions.ts).
+  const granted = visibleModules(user);
   const collapsed = parseSidebarCollapsed((await cookies()).get(SIDEBAR_COOKIE)?.value);
 
   // Bulles de notification (plaintes, inscriptions) : `null` pour un module que

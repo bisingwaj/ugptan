@@ -49,6 +49,10 @@ export const PERMISSIONS = [
   "ugptn",
   "projet",
   "mgp",
+  /* Signalements EAS/HS (exploitation, abus et harcèlement sexuels), déposés
+     par le formulaire MGP mais cloisonnés : ni `mgp` ni le rôle ADMIN n'y
+     donnent accès (cf. `RESTRICTED` ci-dessous et lib/mgp/acces.ts). */
+  "mgp-eas",
   "reglages",
   "utilisateurs",
 ] as const;
@@ -66,6 +70,28 @@ export type Permission = (typeof PERMISSIONS)[number];
  * personne ne perd un droit qu'il exerçait.
  */
 const ADMIN_ONLY: readonly Permission[] = ["utilisateurs", "reglages"];
+
+/**
+ * Permissions NOMINATIVES : aucun rôle ne les contient, pas même ADMIN. Elles
+ * ne s'acquièrent que par une inscription expresse dans `User.permissions`.
+ *
+ * Motif, pour `mgp-eas` : le régime EAS/HS réserve les dossiers à la personne
+ * désignée pour les instruire (le ou la spécialiste VBG/EAS), sous accès
+ * nominatif (cf. content/legal.ts, section « eas »). L'administrateur de la
+ * console est un rôle TECHNIQUE (comptes, réglages) : lui ouvrir d'office des
+ * récits de violences sexuelles contredirait l'approche centrée sur la
+ * survivante et les engagements publiés. Un administrateur peut l'accorder,
+ * y compris à un autre administrateur, mais jamais à lui-même
+ * (cf. actions/admin-users.ts) : l'accès suppose l'acte d'une seconde personne.
+ *
+ * C'est la seule entorse au « pas de retrait individuel » posé en tête : elle
+ * ne retire rien à personne, elle refuse de déduire d'un rôle ce qui doit être
+ * une désignation.
+ */
+const RESTRICTED: readonly Permission[] = ["mgp-eas"];
+
+export const isRestrictedPermission = (permission: string): boolean =>
+  (RESTRICTED as readonly string[]).includes(permission);
 
 /**
  * Socle de chaque rôle. `"*"` vaut « tous les modules ».
@@ -107,7 +133,8 @@ export function isRole(value: string): value is AdminRole {
 
 /** Permissions accordables individuellement à un rôle donné. */
 export function assignablePermissions(role: AdminRole): Permission[] {
-  if (role === "ADMIN") return [];
+  // Un administrateur a déjà tout, sauf les permissions nominatives.
+  if (role === "ADMIN") return [...RESTRICTED];
   const base = ROLE_BASE[role];
   const granted = base === "*" ? PERMISSIONS : base;
   return PERMISSIONS.filter((p) => !granted.includes(p) && !ADMIN_ONLY.includes(p));
@@ -115,6 +142,8 @@ export function assignablePermissions(role: AdminRole): Permission[] {
 
 /** Décide de l'accès à un module. Unique source de vérité des autorisations. */
 export function can(actor: Grantee, permission: Permission): boolean {
+  // Avant le passe-droit ADMIN, délibérément (cf. `RESTRICTED`).
+  if (RESTRICTED.includes(permission)) return actor.permissions.includes(permission);
   if (actor.role === "ADMIN") return true;
   if (ADMIN_ONLY.includes(permission)) return false;
 
@@ -126,4 +155,18 @@ export function can(actor: Grantee, permission: Permission): boolean {
 /** Liste effective des modules ouverts à un compte (rôle + ajouts). */
 export function grantedPermissions(actor: Grantee): Permission[] {
   return PERMISSIONS.filter((permission) => can(actor, permission));
+}
+
+/**
+ * Modules à afficher dans la barre latérale et sur le tableau de bord.
+ *
+ * Diffère de `grantedPermissions` sur un seul point : l'écran « Plaintes »
+ * s'ouvre aussi au seul titre de `mgp-eas`. La spécialiste VBG/EAS n'a pas à
+ * recevoir le module MGP général pour atteindre ses propres dossiers ; elle n'y
+ * verra que ceux-là (cf. lib/mgp/acces.ts). `mgp-eas` n'a pas d'entrée propre.
+ */
+export function visibleModules(actor: Grantee): Permission[] {
+  const granted = grantedPermissions(actor);
+  if (granted.includes("mgp-eas") && !granted.includes("mgp")) granted.push("mgp");
+  return granted;
 }

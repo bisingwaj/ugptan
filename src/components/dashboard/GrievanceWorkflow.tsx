@@ -35,6 +35,7 @@ export function GrievanceWorkflow({
   priority,
   assigneeId,
   users,
+  assigneeHint,
 }: {
   id: string;
   status: GrievanceStatus;
@@ -42,6 +43,9 @@ export function GrievanceWorkflow({
   priority: GrievancePriority;
   assigneeId: string | null;
   users: AssignableUser[];
+  /** Remplace l'aide par défaut : un signalement EAS/HS ne s'affecte qu'aux
+   *  titulaires de l'accès nominatif (cf. lib/mgp/acces.ts). */
+  assigneeHint?: string;
 }) {
   const t = ADMIN.grievances;
   const [state, formAction, pending] = useActionState(updateGrievanceAction, initialState);
@@ -91,7 +95,7 @@ export function GrievanceWorkflow({
               <option key={user.id} value={user.id}>{user.label}</option>
             ))}
           </select>
-          <p className="adm-hint" style={{ marginTop: 8 }}>{t.assigneeHint}</p>
+          <p className="adm-hint" style={{ marginTop: 8 }}>{assigneeHint ?? t.assigneeHint}</p>
         </div>
       </div>
 
