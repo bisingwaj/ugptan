@@ -86,7 +86,7 @@ export default async function GouvernancePage(props: { params: Promise<{ lang: s
             <Kicker>{g.bodiesLabel}</Kicker>
             <h2 className="h2--sm" style={{ margin: "0 0 40px" }}>{g.bodiesTitle}</h2>
           </Reveal>
-          <RevealGroup className="grid-3 celled--top" gap={0.05}>
+          <RevealGroup className="grid-3 celled--top" gap={0.06}>
             {organes.map((b) => (
               <RevealItem key={b.id} className="cell organe-cell">
                 {/* L'Unité a sa propre page : on referme la boucle entre les
@@ -112,7 +112,7 @@ export default async function GouvernancePage(props: { params: Promise<{ lang: s
             <Kicker>{g.compLabel}</Kicker>
             <h2 className="h2--sm" style={{ margin: "0 0 40px" }}>{g.compTitle}</h2>
           </Reveal>
-          <RevealGroup className="cols2" gap={0.05} style={{ gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
+          <RevealGroup className="cols2" gap={0.06} style={{ gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)" }}>
             {composes.map((organe) => (
               <RevealItem key={organe.id} style={{ background: "#fff", padding: "34px clamp(20px,3vw,38px)" }}>
                 <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
@@ -148,7 +148,7 @@ export default async function GouvernancePage(props: { params: Promise<{ lang: s
             <h2 className="h2--sm" style={{ margin: "0 0 14px" }}>{g.actTitle}</h2>
             <p style={{ margin: "0 0 44px", fontSize: 16, lineHeight: 1.6, color: "var(--c-40)", maxWidth: 680 }}>{g.actLead}</p>
           </Reveal>
-          <RevealGroup gap={0.045} style={{ display: "flex", flexDirection: "column", gap: 1, background: "var(--c-80)", border: "1px solid var(--c-80)" }}>
+          <RevealGroup gap={0.04} style={{ display: "flex", flexDirection: "column", gap: 1, background: "var(--c-80)", border: "1px solid var(--c-80)" }}>
             {activites.map((a) => (
               <RevealItem key={a.id} className="gov-act" style={{ background: "var(--c-black)", padding: "24px clamp(20px,2.4vw,30px)", display: "grid", gridTemplateColumns: "150px 1fr", gap: "clamp(14px,2vw,32px)", alignItems: "start", borderLeft: `3px solid ${a.color}` }}>
                 <div>

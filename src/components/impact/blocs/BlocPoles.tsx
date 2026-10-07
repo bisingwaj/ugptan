@@ -25,7 +25,7 @@ export function BlocPoles({ items, lang }: { items: ImpactItemVue[]; lang: Lang 
   const t = dict(lang);
 
   return (
-    <RevealGroup className="poles" gap={0.045}>
+    <RevealGroup className="poles" gap={0.04}>
       {items.map((item) => (
         <RevealItem
           key={item.id}

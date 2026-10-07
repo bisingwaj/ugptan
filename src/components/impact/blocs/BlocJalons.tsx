@@ -39,7 +39,7 @@ export function BlocJalons({
         marginLeft: 8,
         marginTop: 20,
       }}
-      gap={0.045}
+      gap={0.04}
     >
       {items.map((item) => {
         const accent = item.color ?? "var(--ac)";

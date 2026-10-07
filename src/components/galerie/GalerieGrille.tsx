@@ -144,7 +144,7 @@ export function GalerieGrille({
           globals.css) : ni ratio propre à l'image, ni double largeur pour la
           mise en avant. Les deux faisaient des rangées de hauteurs inégales et
           des trous dans la trame. L'image entière reste dans la visionneuse. */}
-      <RevealGroup as="ul" className="gal-grille" gap={0.035}>
+      <RevealGroup as="ul" className="gal-grille" gap={0.04}>
         {items.map((item, position) => (
           <RevealItem as="li" key={item.id} zoom className="gal-cell">
             <button

@@ -40,7 +40,7 @@ export function CompResponsable({
         {/* Le cadre reste fixe ; le portrait se découvre en rideau et la fiche
             le rejoint par la droite. */}
         <div className="comp-resp">
-          <Reveal variant="wipe" delay={0.06} className="comp-resp__media">
+          <Reveal variant="wipe" delay={0.1} className="comp-resp__media">
             {photo ? (
               /* `Photo` plutôt que `next/image` nu : le portrait vient de la
                  base, il s'affiche donc derrière un aperçu flou le temps de
@@ -60,7 +60,7 @@ export function CompResponsable({
             )}
           </Reveal>
 
-          <Reveal variant="right" delay={0.14} className="comp-resp__body">
+          <Reveal variant="right" delay={0.1} className="comp-resp__body">
             <div className="mono comp-resp__code">{comp.code}</div>
             {membre.nom ? (
               <h3 className="comp-resp__nom">{membre.nom}</h3>

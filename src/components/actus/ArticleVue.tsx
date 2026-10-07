@@ -180,7 +180,7 @@ export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = fals
             <RevealGroup
               className="celled-flow"
               style={{ gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", marginTop: 18 }}
-              gap={0.045}
+              gap={0.04}
             >
               {lies.map((lie) => (
                 <RevealItem key={lie.id} zoom>

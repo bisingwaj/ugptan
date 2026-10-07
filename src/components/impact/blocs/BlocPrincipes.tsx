@@ -12,7 +12,7 @@ import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function BlocPrincipes({ items }: { items: ImpactItemVue[] }) {
   return (
-    <RevealGroup className="grid-3" gap={0.05}>
+    <RevealGroup className="grid-3" gap={0.06}>
       {items.map((item, index) => (
         <RevealItem key={item.id} className="cell" style={{ padding: "30px 28px" }}>
           <div className="mono" style={{ fontSize: 13, color: item.color ?? "var(--ac)" }}>

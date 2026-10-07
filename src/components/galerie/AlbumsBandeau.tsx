@@ -36,7 +36,7 @@ export function AlbumsBandeau({ albums, lang }: { albums: AlbumVue[]; lang: Lang
 
       {/* `RevealGroup` REMPLACE la grille et `RevealItem` la cellule : aucun
           conteneur intermédiaire, conformément au contrat du composant. */}
-      <RevealGroup as="ul" className="gal-albums__grille" gap={0.05}>
+      <RevealGroup as="ul" className="gal-albums__grille" gap={0.06}>
         {albums.map((album) => (
           <RevealItem as="li" key={album.id} zoom className="gal-album">
             <Link href={`/${lang}${NAV.galerie}/${album.slug}`} className="gal-album__lien">

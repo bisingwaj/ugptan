@@ -151,7 +151,7 @@ export function MarchesClient({
           <button onClick={() => { setFilter("tous"); setQ(""); }} className="mono" style={{ fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>↺ {t.reset}</button>
         </div>
       ) : (
-        <RevealGroup className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,400px),1fr))" }} gap={0.045}>
+        <RevealGroup className="celled-flow" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(min(100%,400px),1fr))" }} gap={0.04}>
           {view.map((m) => {
             const cc = compColors[m.comp] || "#0f62fe";
             const st = statut(m);

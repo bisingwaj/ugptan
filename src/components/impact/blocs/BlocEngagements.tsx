@@ -9,7 +9,7 @@ import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 export function BlocEngagements({ items }: { items: ImpactItemVue[] }) {
   return (
-    <RevealGroup className="grid-4" gap={0.045}>
+    <RevealGroup className="grid-4" gap={0.04}>
       {items.map((item) => (
         <RevealItem
           key={item.id}

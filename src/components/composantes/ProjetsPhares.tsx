@@ -62,7 +62,7 @@ export function ProjetsPhares({ projets, label }: { projets: ProjetPhareVue[]; l
         ))}
       </aside>
 
-      <RevealGroup className="projets-body" gap={0.05}>
+      <RevealGroup className="projets-body" gap={0.06}>
         {projets.map((p) => (
           <RevealItem key={p.id} className="projet-bloc">
             <article id={`projet-${p.slug}`} data-anchor>

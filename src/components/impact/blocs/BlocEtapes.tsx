@@ -19,7 +19,7 @@ export function BlocEtapes({ items, theme }: { items: ImpactItemVue[]; theme: Im
   const sombre = themeSombre(theme);
 
   return (
-    <RevealGroup className={sombre ? "grid-5 celled--dark" : "grid-5"} gap={0.045}>
+    <RevealGroup className={sombre ? "grid-5 celled--dark" : "grid-5"} gap={0.04}>
       {items.map((item, index) => (
         <RevealItem
           key={item.id}

@@ -45,7 +45,7 @@ export function BlocCitation({ citation, note }: { citation: string | null; note
         {segments.length > 0 && (
           <Reveal
             variant="fade"
-            delay={0.18}
+            delay={0.2}
             className="mono"
             style={{
               marginTop: 32,

@@ -67,7 +67,7 @@ export default async function MgpSuiviPage(props: {
               <h2 className="h2--sm" style={{ margin: "0 0 10px" }}>{t.generalTitle}</h2>
               <p style={{ margin: "0 0 24px", fontSize: 14, lineHeight: 1.65, color: "var(--c-70)" }}>{t.generalDesc}</p>
 
-              <RevealGroup style={{ display: "flex", flexDirection: "column", gap: 0 }} gap={0.045}>
+              <RevealGroup style={{ display: "flex", flexDirection: "column", gap: 0 }} gap={0.04}>
                 {GRIEVANCE_STAGES.map((stage, i) => {
                   const next = STAGE_NEXT_STEP[stage];
                   return (

@@ -45,7 +45,7 @@ export function BlocContexte({
           </Reveal>
 
           {items.length > 0 && (
-            <RevealGroup className="grid-3" style={{ marginTop: 34 }} gap={0.05}>
+            <RevealGroup className="grid-3" style={{ marginTop: 34 }} gap={0.06}>
               {items.map((item) => (
                 <RevealItem key={item.id} className="cell" style={{ padding: "18px 16px" }}>
                   <div className="mono" style={{ fontWeight: 600, fontSize: 26 }}>

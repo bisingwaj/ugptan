@@ -91,7 +91,7 @@ export default async function SoumissionnairesPage(props: {
       >
         <Reveal
           variant="up"
-          delay={0.18}
+          delay={0.2}
           style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 30 }}
         >
           {plateforme ? (
@@ -154,7 +154,7 @@ export default async function SoumissionnairesPage(props: {
             </h2>
           </Reveal>
 
-          <RevealGroup className="grid-4" style={{ marginTop: 26 }} gap={0.045}>
+          <RevealGroup className="grid-4" style={{ marginTop: 26 }} gap={0.04}>
             {etapes.map((e, i) => (
               <RevealItem
                 key={e.titre}
@@ -234,7 +234,7 @@ export default async function SoumissionnairesPage(props: {
             </h2>
           </Reveal>
 
-          <RevealGroup className="grid-3" gap={0.045}>
+          <RevealGroup className="grid-3" gap={0.04}>
             {reserves.map((r, i) => (
               <RevealItem
                 key={r}

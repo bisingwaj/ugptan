@@ -129,7 +129,7 @@ export default async function ActualitesPage(props: {
             <RevealGroup
               className="celled-flow"
               style={{ gridTemplateColumns: "repeat(auto-fill,minmax(358px,1fr))" }}
-              gap={0.045}
+              gap={0.04}
             >
               {liste.items.map((actu, index) => (
                 <RevealItem key={actu.id} zoom>
@@ -171,11 +171,11 @@ export default async function ActualitesPage(props: {
               <Reveal>
                 <Kicker>{t.actus.timeline}</Kicker>
               </Reveal>
-              <Reveal delay={0.08}>
+              <Reveal delay={0.1}>
                 <p className="actu-fil__intro">{t.actus.timelineLead}</p>
               </Reveal>
 
-              <RevealGroup as="ul" className="actu-fil" gap={0.045}>
+              <RevealGroup as="ul" className="actu-fil" gap={0.04}>
                 {fil.map((jalon, index) => (
                   <RevealItem as="li" key={jalon.id} className="actu-fil__item">
                     {/* Intertitre d'année, posé au premier article de chaque

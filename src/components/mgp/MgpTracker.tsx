@@ -125,7 +125,7 @@ export function MgpTracker({ lang, initialRef = "" }: { lang: Lang; initialRef?:
           <div style={{ marginTop: 18, height: 6, background: "var(--c-80)", overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${Math.round(((current + 1) / stages.length) * 100)}%`, background: "var(--ac)" }} />
           </div>
-          <RevealGroup style={{ marginTop: 16, display: "flex", flexDirection: "column" }} gap={0.045}>
+          <RevealGroup style={{ marginTop: 16, display: "flex", flexDirection: "column" }} gap={0.04}>
             {stages.map((label, i) => {
               const done = i < current, cur = i === current;
               return (

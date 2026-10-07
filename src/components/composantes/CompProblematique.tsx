@@ -37,7 +37,7 @@ export function CompProblematique({
           {pb.lead && <p className="comp-pb__lead">{pb.lead}</p>}
         </Reveal>
 
-        <RevealGroup className="comp-pb__axes celled-flow" gap={0.05}>
+        <RevealGroup className="comp-pb__axes celled-flow" gap={0.06}>
           {pb.axes.map((axe, i) => (
             <RevealItem key={axe.id} className="comp-pb__axe">
               <span className="mono comp-pb__n">{String(i + 1).padStart(2, "0")}</span>
@@ -60,7 +60,7 @@ export function CompProblematique({
           )}
 
           {pb.liens.length > 0 && (
-            <Reveal variant="right" delay={0.08} className="comp-pb__liens">
+            <Reveal variant="right" delay={0.1} className="comp-pb__liens">
               <div className="mono label-mono">{t.pbLiens}</div>
               <ul>
                 {pb.liens.map((lien) => {

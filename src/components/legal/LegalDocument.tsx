@@ -52,7 +52,7 @@ export function LegalDocument({ doc, lang }: { doc: LegalDoc; lang: Lang }) {
         title={pick(doc.titre, lang)}
         lead={pick(doc.chapeau, lang)}
       >
-        <Reveal variant="up" delay={0.18} className="legal-meta">
+        <Reveal variant="up" delay={0.2} className="legal-meta">
           <span className="mono legal-meta__maj">
             {t.legal.maj} — {pick(doc.maj, lang)}
           </span>

@@ -128,8 +128,8 @@ export default async function ProvincePage(props: Props) {
     });
   }
   // Petits entiers : affichés sans séparateur de milliers, comme auparavant.
-  if (fiche?.territoires) chiffres.push({ label: pr.territoires, valeur: <Compteur valeur={fiche.territoires} locale={locale} options={{ useGrouping: false }} duree={1} /> });
-  if (fiche?.communes) chiffres.push({ label: pr.communes, valeur: <Compteur valeur={fiche.communes} locale={locale} options={{ useGrouping: false }} duree={1} /> });
+  if (fiche?.territoires) chiffres.push({ label: pr.territoires, valeur: <Compteur valeur={fiche.territoires} locale={locale} options={{ useGrouping: false }} /> });
+  if (fiche?.communes) chiffres.push({ label: pr.communes, valeur: <Compteur valeur={fiche.communes} locale={locale} options={{ useGrouping: false }} /> });
 
   return (
     <div>
@@ -148,7 +148,7 @@ export default async function ProvincePage(props: Props) {
         title={p.nom}
         lead={fiche?.description ?? (p.prio ? pr.leadPrio : pr.leadAutre)}
       >
-        <Reveal variant="up" delay={0.16}>
+        <Reveal variant="up" delay={0.2}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 26 }}>
             <span className="mono prov-badge" data-prio={p.prio || undefined}>{p.prio ? pr.prio : pr.autre}</span>
             {fiche?.administration && <span className="mono prov-badge prov-badge--alerte">{fiche.administration}</span>}
@@ -181,7 +181,7 @@ export default async function ProvincePage(props: Props) {
               </Reveal>
             )}
 
-            <RevealGroup className="prov-infos" gap={0.12}>
+            <RevealGroup className="prov-infos" gap={0.1}>
               <RevealItem>
                 <h2 className="prov-h3">{pr.adminLabel}</h2>
                 <dl className="prov-lignes">
@@ -265,11 +265,11 @@ export default async function ProvincePage(props: Props) {
               <Kicker>{pr.projetsLabel}</Kicker>
               <p style={{ margin: "14px 0 0", fontSize: 15.5, lineHeight: 1.6, color: "var(--c-70)", maxWidth: 640 }}>{pr.projetsLead}</p>
             </Reveal>
-            <Reveal delay={0.08}>
+            <Reveal delay={0.1}>
               <nav className="prov-compteurs" aria-label={pr.projetsLabel}>
                 {groupes.map((g) => (
                   <a key={g.av} href={`#av-${g.av.toLowerCase()}`} className="prov-compteur" data-av={g.av}>
-                    <span className="prov-compteur__n"><Compteur valeur={g.items.length} locale={locale} duree={0.9} /></span>
+                    <span className="prov-compteur__n"><Compteur valeur={g.items.length} locale={locale} /></span>
                     <span>{libelleAvancement[g.av]}</span>
                   </a>
                 ))}
@@ -285,7 +285,7 @@ export default async function ProvincePage(props: Props) {
                 </Reveal>
                 {/* Cartes en fondu seul : `.prov-projet:hover` translate, et un
                     transform inline laissé par framer bloquerait ce survol. */}
-                <RevealGroup as="ul" className="prov-projets" gap={0.07}>
+                <RevealGroup as="ul" className="prov-projets" gap={0.06}>
                   {g.items.slice(0, VISIBLES).map((projet) => (
                     <CarteProjet key={projet.id} projet={projet} lang={lang} comp={projet.composante ? comp.get(projet.composante) : undefined} />
                   ))}
@@ -298,7 +298,7 @@ export default async function ProvincePage(props: Props) {
                     <summary className="mono">{pr.voirPlus.replace("{n}", String(g.items.length - VISIBLES))}</summary>
                     {/* Révélée à l'ouverture : tant que <details> est fermé,
                         la liste n'a pas de boîte et n'entre pas dans la vue. */}
-                    <RevealGroup as="ul" className="prov-projets" gap={0.05}>
+                    <RevealGroup as="ul" className="prov-projets" gap={0.06}>
                       {g.items.slice(VISIBLES).map((projet) => (
                         <CarteProjet key={projet.id} projet={projet} lang={lang} comp={projet.composante ? comp.get(projet.composante) : undefined} />
                       ))}
@@ -355,7 +355,7 @@ export default async function ProvincePage(props: Props) {
           </nav>
 
           <Reveal><Kicker>{pr.toutesLabel}</Kicker></Reveal>
-          <RevealGroup as="ul" className="prov-liste" gap={0.025}>
+          <RevealGroup as="ul" className="prov-liste" gap={0.04}>
             {ordre.map((x) => {
               const ici = x.nom === p.nom;
               return (

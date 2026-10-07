@@ -84,7 +84,7 @@ export function RessourcesListe({
           conteneur intermédiaire, conformément au contrat du composant. Une
           liste de documents est une LISTE — d'où `ul` / `li` plutôt que des
           `div`, pour que la navigation au lecteur d'écran en annonce le nombre. */}
-      <RevealGroup as="ul" className="doc-grille" gap={0.045}>
+      <RevealGroup as="ul" className="doc-grille" gap={0.04}>
         {documents.map((document) => (
           <RevealItem as="li" key={document.id} className="doc-card">
             <div className="doc-card__top">

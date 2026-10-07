@@ -29,7 +29,7 @@ export function BlocStats({
   return (
     <RevealGroup
       className="grid-4 celled--top"
-      gap={0.05}
+      gap={0.06}
       style={{ background: "var(--c-black)", borderColor: "var(--c-black)" }}
     >
       {items.map((item) => (

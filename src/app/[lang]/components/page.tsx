@@ -60,7 +60,7 @@ export default async function ComposantesPage(props: { params: Promise<{ lang: s
       {composantes.length > 0 && (
         <section className="section">
           <div className="section__inner">
-            <RevealGroup className="comp-index" gap={0.05}>
+            <RevealGroup className="comp-index" gap={0.06}>
               {composantes.map((comp) => (
                 <RevealItem key={comp.id}>
                   <CompCard comp={comp} lang={lang} />

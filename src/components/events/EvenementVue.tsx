@@ -200,7 +200,7 @@ export function EvenementVue({ evt, lang, lies, precedent, suivant }: Props) {
               (.scrim, position fixe) est rendue DANS ce bloc, et un ancêtre
               transformé la calerait sur lui au lieu de la fenêtre. */}
           {evt.aVenir && (
-            <Reveal variant="fade" delay={0.08}>
+            <Reveal variant="fade" delay={0.1}>
               <div className="evt-actions">
                 {evt.registrationUrl ? (
                   <a href={evt.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn--primary">

@@ -99,7 +99,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
 
   return (
     <>
-      <RevealGroup className="grid-auto" gap={0.045}>
+      <RevealGroup className="grid-auto" gap={0.04}>
         {events.map((e) =>
           withImage ? (
             <RevealItem key={e.id} zoom className="evt-card" style={{ background: "#fff", display: "flex", flexDirection: "column" }}>

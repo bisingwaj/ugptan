@@ -20,7 +20,7 @@ export function BlocFaq({ items }: { items: ImpactItemVue[] }) {
   /* L'accordéon suit son en-tête (déjà révélé par le rendu commun) avec un
      léger retard : les questions arrivent après le titre qui les annonce. */
   return (
-    <Reveal delay={0.08}>
+    <Reveal delay={0.1}>
       <Accordion items={questions} />
     </Reveal>
   );

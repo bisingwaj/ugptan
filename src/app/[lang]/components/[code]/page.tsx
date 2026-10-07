@@ -8,7 +8,7 @@ import { compTintDe, onCompDe } from "@/lib/comp";
 import { composantePublique, slugsComposantes } from "@/lib/projet/query";
 import { membreComposante } from "@/lib/equipe/query";
 import { Kicker } from "@/components/ui/Kicker";
-import { Counter } from "@/components/ui/Counter";
+import { Compteur } from "@/components/motion/Compteur";
 import { Reveal } from "@/components/motion/Reveal";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { FilAriane } from "@/components/ui/FilAriane";
@@ -129,7 +129,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
               />
             </Reveal>
 
-            <Reveal variant="fade" delay={0.05}>
+            <Reveal variant="fade" delay={0.1}>
               <div className="comp-hero__badges">
                 <span className="mono comp-hero__code" style={{ background: comp.color, color: onColor }}>
                   {comp.code}
@@ -138,11 +138,11 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
               </div>
             </Reveal>
 
-            <Reveal variant="mask" delay={0.08}>
+            <Reveal variant="mask" delay={0.1}>
               <h1 className="comp-hero__h1">{comp.titreLong}</h1>
             </Reveal>
 
-            <Reveal variant="up" delay={0.14}>
+            <Reveal variant="up" delay={0.1}>
               <p className="comp-hero__lead">{comp.soustitre}</p>
             </Reveal>
 
@@ -160,14 +160,14 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
           </div>
 
           {/* Encart chiffres */}
-          <Reveal variant="fade" delay={0.12} className="comp-hero__figures">
+          <Reveal variant="fade" delay={0.1} className="comp-hero__figures">
             <div className="mono comp-hero__figures-head">
               <span>{c.perimetre}</span>
               <span style={{ color: "var(--ac-light)" }}>{comp.code}</span>
             </div>
             <div className="comp-hero__figure comp-hero__figure--big">
               <div className="stat__num">
-                {comp.projets.length > 0 ? <Counter to={comp.projets.length} dur={900} /> : "—"}
+                {comp.projets.length > 0 ? <Compteur valeur={comp.projets.length} heros /> : "—"}
               </div>
               <div className="mono comp-hero__sub">
                 {comp.projets.length > 0 ? c.share : c.noDotation}
@@ -211,7 +211,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
             <Reveal>
               <Kicker>{c.secContexte}</Kicker>
             </Reveal>
-            <RevealGroup gap={0.05}>
+            <RevealGroup gap={0.06}>
               {comp.chapeau.map((para, i) => (
                 <RevealItem key={i}>
                   <p className={i === 0 ? "comp-chapeau comp-chapeau--first" : "comp-chapeau"}>{para}</p>
@@ -257,7 +257,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
                 {comp.objectifs.length} {c.objectifsCount}
               </h2>
             </Reveal>
-            <RevealGroup className="comp-objectifs" gap={0.035}>
+            <RevealGroup className="comp-objectifs" gap={0.04}>
               {comp.objectifs.map((o, i) => (
                 <RevealItem key={o.id} className="comp-objectif">
                   <span className="mono comp-objectif__n">{String(i + 1).padStart(2, "0")}</span>
@@ -296,7 +296,7 @@ export default async function ComposantePage(props: { params: Promise<{ lang: st
                   <h2 className="h2--sm comp-h2">{comp.ecosysteme.titre}</h2>
                   <p className="comp-eco__lead">{comp.ecosysteme.lead}</p>
                 </Reveal>
-                <RevealGroup className="comp-eco" gap={0.045}>
+                <RevealGroup className="comp-eco" gap={0.04}>
                   {comp.ecosysteme.couches.map((k, i) => (
                     <RevealItem key={k.id} className="comp-eco__row">
                       <span className="mono comp-eco__n">{String(i + 1).padStart(2, "0")}</span>

@@ -93,7 +93,7 @@ export default async function ProvincesPage(props: { params: Promise<{ lang: str
                 <span style={{ color: "var(--c-80)" }}>{t.lbl.autres}</span>
               </RevealItem>
             </RevealGroup>
-            <Reveal variant="fade" delay={0.35}>
+            <Reveal variant="fade" delay={0.3}>
               <p style={{ margin: "24px 0 0", fontSize: 14, lineHeight: 1.6, color: "var(--c-60)", maxWidth: 420 }}>{pr.carteAide}</p>
             </Reveal>
           </div>
@@ -111,7 +111,7 @@ export default async function ProvincesPage(props: { params: Promise<{ lang: str
               <Reveal>
                 <Kicker>{groupe.titre}</Kicker>
               </Reveal>
-              <RevealGroup as="ul" className="prov-cartes" gap={0.045}>
+              <RevealGroup as="ul" className="prov-cartes" gap={0.04}>
                 {groupe.items.map((p) => {
                   const resume = resumes.get(slugProvince(p.nom));
                   const details = [

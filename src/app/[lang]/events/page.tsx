@@ -111,7 +111,7 @@ export default async function EvenementsPage(props: {
               {(liste.aVenir.length > 0 || !filtre) && (
                 <section className="evt-section" aria-label={t.evt.sectionAVenir}>
                   <Reveal><Kicker>{t.evt.sectionAVenir}</Kicker></Reveal>
-                  <Reveal delay={0.08}><p className="evt-section__intro">{t.evt.sectionAVenirLead}</p></Reveal>
+                  <Reveal delay={0.1}><p className="evt-section__intro">{t.evt.sectionAVenirLead}</p></Reveal>
 
                   {liste.aVenir.length > 0 ? (
                     <EventsGrid lang={lang} events={liste.aVenir} withImage />
@@ -125,7 +125,7 @@ export default async function EvenementsPage(props: {
               {liste.passes.length > 0 && (
                 <section className="evt-section" aria-label={t.evt.sectionPasses}>
                   <Reveal><Kicker>{t.evt.sectionPasses}</Kicker></Reveal>
-                  <Reveal delay={0.08}><p className="evt-section__intro">{t.evt.sectionPassesLead}</p></Reveal>
+                  <Reveal delay={0.1}><p className="evt-section__intro">{t.evt.sectionPassesLead}</p></Reveal>
                   <EventsGrid lang={lang} events={liste.passes} withImage />
                 </section>
               )}

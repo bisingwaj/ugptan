@@ -56,7 +56,7 @@ export function GrilleEquipe({ membres, variante = "accueil" }: Props) {
   const tailleRole = variante === "accueil" ? 15 : 14.5;
 
   return (
-    <RevealGroup gap={0.05} className={conteneur.className} style={conteneur.style}>
+    <RevealGroup gap={0.06} className={conteneur.className} style={conteneur.style}>
       {membres.map((membre, i) => {
         const photo = membre.portrait.src;
 

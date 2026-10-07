@@ -76,7 +76,7 @@ export default async function MediasPage(props: { params: Promise<{ lang: string
           <Reveal>
             <Kicker>{en ? "Video slots" : "Emplacements vidéo"}</Kicker>
           </Reveal>
-          <RevealGroup gap={0.05} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", marginTop: 16 }}>
+          <RevealGroup gap={0.06} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(340px,1fr))", gap: 1, background: "var(--c-20)", border: "1px solid var(--c-20)", marginTop: 16 }}>
             {videoSlots.map((s) => {
               const sc = statusColor(s.status);
               const rb = ratioBox[s.ratio];

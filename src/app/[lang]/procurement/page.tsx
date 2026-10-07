@@ -49,7 +49,7 @@ export default async function MarchesPage(props: {
   return (
     <div>
       <PageHero crumb={`UGPTN / ${t.nav.marches}`} title={t.marches.heroTitle} lead={t.marches.heroLead}>
-        <Reveal variant="up" delay={0.18} style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 30 }}>
+        <Reveal variant="up" delay={0.2} style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 30 }}>
           {marchesMethodes.map((m) => (
             <div key={m.sigle} style={{ display: "flex", alignItems: "center", gap: 9, border: "1px solid var(--c-20)", padding: "8px 14px" }}>
               <span className="mono" style={{ fontWeight: 600, fontSize: 12, color: "var(--ac)" }}>{m.sigle}</span>
@@ -82,7 +82,7 @@ export default async function MarchesPage(props: {
             )}
           </Reveal>
 
-          <RevealGroup className="grid-4" style={{ marginTop: 1 }} gap={0.045}>
+          <RevealGroup className="grid-4" style={{ marginTop: 1 }} gap={0.04}>
             {candidature.map((c, i) => (
               <RevealItem key={c.n} className="cell step-card" style={{ padding: "26px 22px", minHeight: 192, display: "flex", flexDirection: "column" }}>
                 <div className="step-card__head">

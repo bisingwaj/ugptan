@@ -15,7 +15,7 @@ import { ChiffreCle } from "@/components/impact/ChiffreCle";
 
 export function BlocReperes({ items }: { items: ImpactItemVue[] }) {
   return (
-    <RevealGroup className="unite-reperes" gap={0.045}>
+    <RevealGroup className="unite-reperes" gap={0.04}>
       {items.map((item) => (
         <RevealItem key={item.id} className="cell unite-repere">
           {/* L'année de l'arrêté reste fixe : ChiffreCle n'anime que les quantités. */}

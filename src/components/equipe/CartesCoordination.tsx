@@ -21,7 +21,7 @@ export function CartesCoordination({ membres }: { membres: MembreEquipe[] }) {
 
   return (
     <RevealGroup
-      gap={0.05}
+      gap={0.06}
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill,minmax(262px,1fr))",

@@ -28,7 +28,7 @@ export function BlocAvantApres({
     <RevealGroup
       className="celled-flow"
       style={{ gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))" }}
-      gap={0.045}
+      gap={0.04}
     >
       {items.map((item) => {
         const accent = item.color ?? "var(--ac)";

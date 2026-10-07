@@ -20,7 +20,7 @@ export async function BlocComposantes({ lang }: { lang: Lang }) {
   if (composantes.length === 0) return null;
 
   return (
-    <RevealGroup style={{ borderTop: "2px solid var(--c-black)" }} gap={0.045}>
+    <RevealGroup style={{ borderTop: "2px solid var(--c-black)" }} gap={0.04}>
       {composantes.map((comp) => (
         <RevealItem key={comp.id}>
           <CompRow comp={comp} lang={lang} />

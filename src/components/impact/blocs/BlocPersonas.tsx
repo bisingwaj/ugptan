@@ -15,7 +15,7 @@ export function BlocPersonas({ items }: { items: ImpactItemVue[] }) {
     <RevealGroup
       className="celled-flow celled-flow--top"
       style={{ gridTemplateColumns: "repeat(auto-fit,minmax(258px,1fr))" }}
-      gap={0.045}
+      gap={0.04}
     >
       {items.map((item) => (
         <RevealItem

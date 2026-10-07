@@ -41,7 +41,7 @@ export async function CompLies({ code, lang }: { code: string; lang: Lang }) {
               <h3 className="comp-lies__h">{c.liesActus}</h3>
             </Reveal>
             {actus.length > 0 ? (
-              <RevealGroup className="comp-lies__list" gap={0.05}>
+              <RevealGroup className="comp-lies__list" gap={0.06}>
                 {actus.map((a) => (
                   <RevealItem key={a.id}>
                     <Link href={cheminArticle(lang, a.slug)} className="comp-lie">
@@ -68,7 +68,7 @@ export async function CompLies({ code, lang }: { code: string; lang: Lang }) {
               <h3 className="comp-lies__h">{c.liesMarches}</h3>
             </Reveal>
             {avis.length > 0 ? (
-              <RevealGroup className="comp-lies__list" gap={0.05}>
+              <RevealGroup className="comp-lies__list" gap={0.06}>
                 {avis.map((m) => (
                   <RevealItem key={m.ref}>
                     <Link href={route(lang, NAV.marches)} className="comp-lie">
@@ -93,7 +93,7 @@ export async function CompLies({ code, lang }: { code: string; lang: Lang }) {
               <Reveal>
                 <h3 className="comp-lies__h">{c.liesRessources}</h3>
               </Reveal>
-              <RevealGroup className="comp-lies__list" gap={0.05}>
+              <RevealGroup className="comp-lies__list" gap={0.06}>
                 {docs.map((r) => (
                   <RevealItem key={r.titre.fr}>
                     <Link href={route(lang, NAV.transparence)} className="comp-lie">

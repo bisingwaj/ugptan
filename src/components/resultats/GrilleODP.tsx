@@ -47,7 +47,7 @@ export async function GrilleODP({
     <>
       {/* `RevealGroup` REMPLACE l'élément de grille et `RevealItem` la cellule :
           un conteneur intermédiaire ferait sauter les filets de 1 px. */}
-      <RevealGroup className={`${codes ? "odp__grid" : "grid-4"} celled--dark`} gap={0.05}>
+      <RevealGroup className={`${codes ? "odp__grid" : "grid-4"} celled--dark`} gap={0.06}>
         {liste.map((o, i) => (
           <RevealItem fade={complet} key={o.id} className={complet ? "cell cell--fx odp__cell" : "cell odp__cell"}>
             {complet && <FlowLines variant={i} />}
@@ -61,7 +61,7 @@ export async function GrilleODP({
                   d'écran n'entend que la valeur finale. Format français dans
                   les deux langues, comme les valeurs rédigées voisines. */}
               {o.valeurNum !== null ? (
-                <Compteur valeur={o.valeurNum} locale="fr-FR" duree={1.3} />
+                <Compteur valeur={o.valeurNum} locale="fr-FR" />
               ) : (
                 o.valeur
               )}

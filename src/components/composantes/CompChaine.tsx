@@ -38,7 +38,7 @@ export function CompChaine({ composantes, lang }: { composantes: ComposanteVue[]
   if (blocs.length === 0) return null;
 
   return (
-    <RevealGroup className="celled-flow chaine" gap={0.05}>
+    <RevealGroup className="celled-flow chaine" gap={0.06}>
       {blocs.map(({ comp, liens }) => (
         <RevealItem key={comp.id} className="chaine__bloc" style={{ borderTop: `3px solid ${comp.color}` }}>
           <div className="chaine__head">

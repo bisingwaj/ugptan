@@ -31,7 +31,7 @@ export default async function MgpPage(props: { params: Promise<{ lang: string }>
   return (
     <div>
       <PageHero crumb={`UGPTN / ${dict(lang).cta.mgp}`} title={t.heroTitle} lead={t.heroLead}>
-        <Reveal variant="up" delay={0.18} style={{ display: "inline-flex", alignItems: "center", gap: 11, marginTop: 26, border: "1px solid var(--ok-bd)", background: "var(--ok-bg)", padding: "10px 16px" }}>
+        <Reveal variant="up" delay={0.2} style={{ display: "inline-flex", alignItems: "center", gap: 11, marginTop: 26, border: "1px solid var(--ok-bd)", background: "var(--ok-bg)", padding: "10px 16px" }}>
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--green)" }} />
           <span className="mono" style={{ fontSize: 12, color: "var(--ok-fg)" }}>{t.slaBadge}</span>
         </Reveal>
@@ -40,7 +40,7 @@ export default async function MgpPage(props: { params: Promise<{ lang: string }>
       <section style={{ padding: "clamp(48px,6vw,84px) var(--pad-x) clamp(64px,8vw,110px)" }}>
         <div className="section__inner">
           {/* Modes */}
-          <RevealGroup className="grid-4" style={{ marginBottom: "clamp(40px,5vw,60px)" }} gap={0.045}>
+          <RevealGroup className="grid-4" style={{ marginBottom: "clamp(40px,5vw,60px)" }} gap={0.04}>
             {t.modes.map((m, i) => (
               <RevealItem key={m.n} className="cell step-card" style={{ padding: 22, minHeight: 182, display: "flex", flexDirection: "column" }}>
                 <div className="step-card__head">

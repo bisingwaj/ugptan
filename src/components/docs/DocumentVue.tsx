@@ -159,7 +159,7 @@ export function DocumentVue({
               La version fichier de la publication, quand elle existe. Elle vient
               APRÈS le texte : c'est un complément, pas la porte d'entrée. */}
           {document.fichier && (
-            <Reveal delay={0.05}>
+            <Reveal delay={0.1}>
               <section className="doc-piece" aria-label={t.attachment}>
                 <div className="doc-piece__tete">
                   <span className="doc-card__ext mono" aria-hidden="true">{document.fichier.format}</span>
@@ -212,7 +212,7 @@ export function DocumentVue({
             <RevealGroup
               className="celled-flow"
               style={{ gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))", marginTop: 18 }}
-              gap={0.045}
+              gap={0.04}
             >
               {lies.map((lie) => (
                 <RevealItem key={lie.id}>

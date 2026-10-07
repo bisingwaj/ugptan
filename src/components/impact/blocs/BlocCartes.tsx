@@ -17,7 +17,7 @@ import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 export function BlocCartes({ items, lang }: { items: ImpactItemVue[]; lang: Lang }) {
   return (
     <RevealGroup
-      gap={0.045}
+      gap={0.04}
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill,minmax(282px,1fr))",

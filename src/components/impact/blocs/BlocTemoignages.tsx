@@ -33,7 +33,7 @@ export function BlocTemoignages({
   const openVideo = useVideo();
 
   return (
-    <RevealGroup className="grid-auto" gap={0.045}>
+    <RevealGroup className="grid-auto" gap={0.04}>
       {items.map((item) => {
         const accent = item.color ?? "var(--ac)";
         const visuel = (
