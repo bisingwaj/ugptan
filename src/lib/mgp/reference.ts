@@ -20,6 +20,7 @@
  * à l'archivage, et ne dit rien de la personne.
  */
 import { randomInt } from "node:crypto";
+import { anneeAKinshasa } from "@/lib/format";
 import { REFERENCE_ALPHABET, REFERENCE_LENGTH, REFERENCE_PREFIX } from "./model";
 
 /**
@@ -48,7 +49,11 @@ export const buildReference = (year: number): string =>
  */
 export async function uniqueReference(
   exists: (reference: string) => Promise<boolean>,
-  year: number = new Date().getFullYear(),
+  /* Année au fuseau de Kinshasa, jamais `getFullYear()` : celle-ci lit le
+     fuseau de la machine (UTC sur l'hébergement), et une plainte déposée le
+     1er janvier entre 00 h et 01 h, heure de Kinshasa, aurait reçu le numéro
+     de l'année précédente. Cf. lib/format.ts. */
+  year: number = anneeAKinshasa(new Date()),
 ): Promise<string> {
   for (let attempt = 0; attempt < 5; attempt++) {
     const reference = buildReference(year);

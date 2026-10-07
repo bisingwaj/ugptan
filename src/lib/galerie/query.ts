@@ -27,7 +27,7 @@ import { formatArticleDate } from "@/lib/format";
 import { estOptimisable } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
 import { ratioVisuel } from "@/lib/galerie/fichier";
-import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
+import { cacheJson, normaliserRecherche, TAG, TTL } from "@/lib/cache/redis";
 import {
   dureeISO, dureeLisible, sourceVideo, typeMediaLabel,
   type GalerieTri, type GalerieTypeMedia, type SourceVideo,
@@ -318,10 +318,16 @@ export type FiltresGalerie = {
  * PostgreSQL fait mieux.
  */
 export async function listerGalerie(filtres: FiltresGalerie): Promise<GalerieVue[]> {
+  // Bornes de clé : cf. « Clés bornées » dans lib/cache/redis.ts. `type` et
+  // `tri` arrivent déjà validés (énumérations) ; la rubrique et l'album sont
+  // des slugs libres, d'où le refus de déposer une liste vide.
+  const q = normaliserRecherche(filtres.recherche);
+  const params = { ...filtres, recherche: q };
+  if (q) return listerGalerieImpl(params);
   return cacheJson(
-    `galerie:liste:${JSON.stringify([filtres.lang, filtres.rubrique ?? "", filtres.type ?? "", filtres.recherche?.trim() ?? "", filtres.tri ?? "", filtres.limite ?? 0, filtres.album ?? ""])}`,
-    { tags: [TAG.galerie], ttl: TTL.liste },
-    () => listerGalerieImpl(filtres),
+    `galerie:liste:${JSON.stringify([filtres.lang, filtres.rubrique ?? "", filtres.type ?? "", filtres.tri ?? "", filtres.limite ?? 0, filtres.album ?? ""])}`,
+    { tags: [TAG.galerie], ttl: TTL.liste, memoriserSi: (liste) => liste.length > 0 },
+    () => listerGalerieImpl(params),
   );
 }
 
@@ -535,10 +541,14 @@ export async function listerAlbums(
   lang: Lang,
   options: { limite?: number; rubrique?: string | null; recherche?: string | null } = {},
 ): Promise<AlbumVue[]> {
+  // Mêmes bornes que `listerGalerie`.
+  const q = normaliserRecherche(options.recherche);
+  const params = { ...options, recherche: q };
+  if (q) return listerAlbumsImpl(lang, params);
   return cacheJson(
-    `galerie:albums:${JSON.stringify([lang, options.limite ?? 0, options.rubrique ?? "", options.recherche?.trim() ?? ""])}`,
-    { tags: [TAG.galerie], ttl: TTL.liste },
-    () => listerAlbumsImpl(lang, options),
+    `galerie:albums:${JSON.stringify([lang, options.limite ?? 0, options.rubrique ?? ""])}`,
+    { tags: [TAG.galerie], ttl: TTL.liste, memoriserSi: (albums) => albums.length > 0 },
+    () => listerAlbumsImpl(lang, params),
   );
 }
 
@@ -576,9 +586,11 @@ async function listerAlbumsImpl(
  * vide, que les moteurs indexeraient.
  */
 export async function getAlbum(lang: Lang, slug: string): Promise<AlbumVue | null> {
+  // Le slug vient de l'URL : un album introuvable (`null`) n'est pas déposé,
+  // sans quoi chaque adresse inventée laisserait sa clé (cf. lib/cache/redis.ts).
   return cacheJson(
     `galerie:album:${lang}:${slug}`,
-    { tags: [TAG.galerie], ttl: TTL.liste },
+    { tags: [TAG.galerie], ttl: TTL.liste, memoriserSi: (album) => album !== null },
     () => getAlbumImpl(lang, slug),
   );
 }
@@ -659,10 +671,15 @@ async function listerRubriquesGalerieImpl(lang: Lang): Promise<GalerieRubrique[]
 export async function compterParType(
   filtres: Pick<FiltresGalerie, "rubrique" | "recherche">,
 ): Promise<Record<GalerieTypeMedia, number>> {
+  // Mêmes bornes que `listerGalerie` : un décompte nul (rubrique inventée)
+  // n'est pas déposé.
+  const q = normaliserRecherche(filtres.recherche);
+  const params = { ...filtres, recherche: q };
+  if (q) return compterParTypeImpl(params);
   return cacheJson(
-    `galerie:compte:${JSON.stringify([filtres.rubrique ?? "", filtres.recherche?.trim() ?? ""])}`,
-    { tags: [TAG.galerie], ttl: TTL.liste },
-    () => compterParTypeImpl(filtres),
+    `galerie:compte:${JSON.stringify([filtres.rubrique ?? ""])}`,
+    { tags: [TAG.galerie], ttl: TTL.liste, memoriserSi: (compte) => compte.PHOTO + compte.VIDEO > 0 },
+    () => compterParTypeImpl(params),
   );
 }
 

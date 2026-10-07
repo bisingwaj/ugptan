@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Actualités : barre de filtres, puis la grille à filets.
  *
@@ -7,10 +9,14 @@
  * de flottaison.
  */
 import { SqEcran, SqPageHero, SqFiltres, SqCarte } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran libelle="Chargement des actualités">
+    <SqEcran libelle={libelleChargement(lang, "actus")}>
       <SqPageHero />
       <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(56px,7vw,90px)" }}>
         <div className="section__inner">

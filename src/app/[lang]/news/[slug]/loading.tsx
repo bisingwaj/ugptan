@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Un article : titre, métadonnées, visuel de couverture, puis le corps.
  *
@@ -5,10 +7,14 @@
  * texte sauterait latéralement à son arrivée.
  */
 import { SqEcran, SqBloc, SqTexte } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran libelle="Chargement de l'article">
+    <SqEcran libelle={libelleChargement(lang, "article")}>
       <section className="page-hero">
         <div className="section__inner" style={{ maxWidth: 860 }}>
           <SqBloc largeur={210} hauteur={12} style={{ marginBottom: 22 }} />

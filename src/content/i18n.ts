@@ -1329,6 +1329,10 @@ export function dict(lang: Lang) {
     recherche: {
       titre: t("Recherche", "Search"),
       hero: t("Chercher dans tout le site.", "Search the whole site."),
+      tropRapide: t(
+        "Trop de recherches en peu de temps depuis cette connexion. Patientez une minute, puis relancez la recherche.",
+        "Too many searches in a short time from this connection. Wait a minute, then search again.",
+      ),
       lead: t(
         "Une seule requête interroge les six fonds du site : communiqués, événements, documents publiés, galeries, composantes du Projet et avis de marché.",
         "A single query covers the six collections on this site: releases, events, published documents, galleries, Project components and tender notices.",

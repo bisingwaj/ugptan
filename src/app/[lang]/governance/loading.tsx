@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Gouvernance : les cartes de coordination, seul bloc de la page qui interroge
  * la base (`membresEnAvant`). Le gabarit reprend celui de
@@ -5,10 +7,14 @@
  * en haut de carte.
  */
 import { SqEcran, SqPageHero, SqBloc } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran libelle="Chargement de la gouvernance">
+    <SqEcran libelle={libelleChargement(lang, "gouvernance")}>
       <SqPageHero />
       <section className="section">
         <div className="section__inner">

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Écran de chargement par DÉFAUT des pages publiques.
  *
@@ -7,10 +9,14 @@
  * garantit qu'aucune route n'attend sur un écran blanc.
  */
 import { SqEcran, SqPageHero, SqBloc, SqTexte } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran>
+    <SqEcran libelle={libelleChargement(lang, "page")}>
       <SqPageHero />
       <section className="section">
         <div className="section__inner" style={{ display: "flex", flexDirection: "column", gap: 40 }}>

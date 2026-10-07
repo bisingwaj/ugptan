@@ -22,7 +22,7 @@ import { formatArticleDate } from "@/lib/format";
 import { readingMinutes } from "@/lib/html/sanitize";
 import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import { NAV } from "@/lib/routes";
-import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
+import { cacheJson, normaliserRecherche, TAG, TTL } from "@/lib/cache/redis";
 import type { Lang } from "@/lib/pick";
 import {
   apercuPossible, formatLisible, ligneTechnique, poidsLisible, urlTelechargement,
@@ -375,10 +375,16 @@ export type FiltresDoc = {
  * PostgreSQL fait mieux.
  */
 export async function listerDocuments(filtres: FiltresDoc): Promise<DocVue[]> {
+  // Bornes de clé : cf. « Clés bornées » dans lib/cache/redis.ts. `type` et
+  // `tri` arrivent validés ; la catégorie est un slug libre, d'où le refus de
+  // déposer une liste vide. La recherche libre lit la base directement.
+  const q = normaliserRecherche(filtres.recherche);
+  const params = { ...filtres, recherche: q };
+  if (q) return listerDocumentsImpl(params);
   return cacheJson(
-    `docs:liste:${JSON.stringify([filtres.lang, filtres.categorie ?? "", filtres.type ?? "", filtres.recherche?.trim() ?? "", filtres.tri ?? "", filtres.limite ?? 0])}`,
-    { tags: [TAG.docs], ttl: TTL.liste },
-    () => listerDocumentsImpl(filtres),
+    `docs:liste:${JSON.stringify([filtres.lang, filtres.categorie ?? "", filtres.type ?? "", filtres.tri ?? "", filtres.limite ?? 0])}`,
+    { tags: [TAG.docs], ttl: TTL.liste, memoriserSi: (liste) => liste.length > 0 },
+    () => listerDocumentsImpl(params),
   );
 }
 

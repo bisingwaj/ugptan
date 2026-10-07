@@ -1,12 +1,18 @@
+"use client";
+
 /**
  * L'UGPTN : la grille de l'équipe, en colonnes de 212 px et portraits carrés,
  * comme `GrilleEquipe` variante « unite ».
  */
 import { SqEcran, SqPageHero, SqBloc } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran libelle="Chargement de la page « L'UGPTN »">
+    <SqEcran libelle={libelleChargement(lang, "ugptn")}>
       <SqPageHero />
       <section className="section">
         <div className="section__inner">

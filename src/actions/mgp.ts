@@ -34,6 +34,7 @@ import {
   type GrievanceStatus,
 } from "@/lib/mgp/model";
 import { uniqueReference } from "@/lib/mgp/reference";
+import { anneeAKinshasa } from "@/lib/format";
 import { rateLimit, requestIp } from "@/lib/rate-limit";
 import { ecrituresSuspendues } from "@/lib/reglages/maintenance";
 
@@ -165,7 +166,10 @@ export async function submitGrievance(draft: GrievanceDraft): Promise<SubmitResu
     const reference = await uniqueReference(
       async (candidate) =>
         (await db().grievance.count({ where: { reference: candidate } })) > 0,
-      submittedAt.getFullYear(),
+      /* L'année du numéro est celle de Kinshasa, où la plainte est déposée,
+         et non celle du serveur (UTC) : sans quoi le dépôt fait le 1er janvier
+         entre 00 h et 01 h porterait l'année écoulée. Cf. lib/format.ts. */
+      anneeAKinshasa(submittedAt),
     );
 
     const created = await db().grievance.create({

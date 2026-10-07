@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Écran d'attente de la recherche.
  *
@@ -8,10 +10,14 @@
  * n'annonce rien.
  */
 import { SqEcran, SqPageHero, SqBloc, SqTexte } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran>
+    <SqEcran libelle={libelleChargement(lang, "recherche")}>
       <SqPageHero />
       <section className="section">
         <div className="section__inner" style={{ display: "flex", flexDirection: "column", gap: 34 }}>

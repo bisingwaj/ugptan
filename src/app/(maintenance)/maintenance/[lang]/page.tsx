@@ -1,8 +1,9 @@
 /**
- * L'écran servi pendant une fermeture. Atteint UNIQUEMENT par réécriture du
- * proxy : personne n'y arrive en tapant l'adresse, et si quelqu'un le fait
- * alors que le site est ouvert, il est renvoyé à l'accueil plutôt que de lire
- * une fermeture qui n'existe pas.
+ * L'écran servi pendant une fermeture. Atteint UNIQUEMENT par le proxy — lu
+ * par lui pour être servi en 503, ou par réécriture (cf. src/proxy.ts) :
+ * personne n'y arrive en tapant l'adresse, et si quelqu'un le fait alors que
+ * le site est ouvert, il est renvoyé à l'accueil plutôt que de lire une
+ * fermeture qui n'existe pas.
  */
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";

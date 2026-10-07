@@ -56,6 +56,9 @@ import { listerDocuments } from "@/lib/docs/query";
 import { listerAlbums } from "@/lib/galerie/query";
 import { composantesPubliques } from "@/lib/projet/query";
 import { chargerMarches } from "@/lib/digiprocure";
+import { headers } from "next/headers";
+import { normaliserRecherche } from "@/lib/cache/redis";
+import { rateLimit, requestIp } from "@/lib/rate-limit";
 
 /* -------------------------------------------------------------------------- */
 /* Formes                                                                      */
@@ -123,7 +126,27 @@ export type Recherche = {
   q: string;
   groupes: GroupeResultats[];
   total: number;
+  /**
+   * Présent quand la recherche n'a PAS été exécutée faute de débit (cf.
+   * `RECHERCHES_PAR_MINUTE`) : délai, en secondes, avant de pouvoir réessayer.
+   * Les groupes sont alors vides sans que la requête soit restée sans réponse,
+   * et la page peut le dire plutôt que d'annoncer « aucun résultat ».
+   */
+  reessayerDans?: number;
 };
+
+/**
+ * Recherches tolérées par minute et par adresse.
+ *
+ * Chaque recherche paie quatre lectures en base SANS cache (la recherche libre
+ * n'y passe jamais, cf. lib/cache/redis.ts), sur une page rendue à chaque
+ * requête : c'est la page la moins chère à demander et la plus chère à servir.
+ * Le plafond est volontairement large — les opérateurs mobiles congolais
+ * partagent une même adresse publique entre de nombreux abonnés (CGNAT), et un
+ * humain qui affine sa requête n'en lance pas une par seconde — : il ne vise
+ * que l'automate qui balaierait la base.
+ */
+const RECHERCHES_PAR_MINUTE = 60;
 
 /** Résultats montrés par fonds avant de renvoyer à la recherche de la section. */
 export const PAR_GROUPE = 6;
@@ -213,8 +236,19 @@ export async function rechercher(options: {
   type?: TypeResultat | null;
 }): Promise<Recherche> {
   const { lang } = options;
-  const q = options.q.trim();
+  // Bornée et normalisée comme sur les pages de section : quatre des six
+  // lectures sont les leurs, et la même requête doit y trouver la même chose.
+  const q = normaliserRecherche(options.q);
   if (q.length < MIN_CARACTERES) return { q, groupes: [], total: 0 };
+
+  /* Le débit n'est compté que pour une recherche qui va réellement interroger
+     la base : la page nue, ou une saisie trop courte, ne coûtent rien. */
+  const debit = await rateLimit(
+    `recherche:${requestIp(await headers())}`,
+    RECHERCHES_PAR_MINUTE,
+    60_000,
+  );
+  if (!debit.allowed) return { q, groupes: [], total: 0, reessayerDans: debit.retryAfterSeconds };
 
   const veut = (type: TypeResultat) => !options.type || options.type === type;
 

@@ -47,6 +47,8 @@ export async function GET(requete: Request): Promise<NextResponse> {
     {
       ferme: etat.ferme,
       empreinte: etat.ferme && etat.code ? laissezPasser(etat.code) : null,
+      // Réouverture annoncée, pour l'en-tête `Retry-After` du 503 (cf. proxy).
+      reouverture: etat.ferme && etat.jusqua ? etat.jusqua.toISOString() : null,
       pagesFermees: pages,
     },
     { headers: { "cache-control": "no-store" } },

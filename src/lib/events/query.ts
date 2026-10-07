@@ -23,7 +23,7 @@ import { lecteur } from "@/lib/lecture";
 import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
 import { describeError } from "@/lib/errors";
-import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
+import { cacheJson, normaliserRecherche, TAG, TTL } from "@/lib/cache/redis";
 import { anneeEvenement, intervalleDates, isoEvenement, plageHoraire } from "@/lib/events/dates";
 import {
   estAVenir, finEffective, phaseEvenement,
@@ -316,11 +316,16 @@ export async function listerEvenements(options: ListeEvtOptions): Promise<{
   passes: EvtVue[];
   total: number;
 }> {
-  const q = options.recherche?.trim() ?? "";
+  // Bornes de clé : cf. « Clés bornées » dans lib/cache/redis.ts. La recherche
+  // libre lit la base sans passer par le cache ; une catégorie inventée ne
+  // trouve rien, et un résultat vide n'est pas déposé.
+  const q = normaliserRecherche(options.recherche);
+  const params = { ...options, recherche: q };
+  if (q) return listerEvenementsImpl(params);
   return cacheJson(
-    `events:liste:${JSON.stringify([options.lang, options.categorie ?? "", q, options.comp ?? "", options.limite ?? 0])}`,
-    { tags: [TAG.events], ttl: TTL.liste },
-    () => listerEvenementsImpl(options),
+    `events:liste:${JSON.stringify([options.lang, options.categorie ?? "", options.comp ?? "", options.limite ?? 0])}`,
+    { tags: [TAG.events], ttl: TTL.liste, memoriserSi: (liste) => liste.total > 0 },
+    () => listerEvenementsImpl(params),
   );
 }
 

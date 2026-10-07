@@ -12,6 +12,8 @@ import {
 import { LigneResultat } from "@/components/recherche/LigneResultat";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 import { metaPage } from "@/lib/seo";
+import { parametre } from "@/lib/url/listes";
+import { normaliserRecherche } from "@/lib/cache/redis";
 
 /**
  * Aucun cache de route.
@@ -27,7 +29,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: {
   params: Promise<{ lang: string }>;
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<Metadata> {
   const [params, sp] = await Promise.all([props.params, props.searchParams]);
   const lang = asLang(params.lang);
@@ -35,7 +37,7 @@ export async function generateMetadata(props: {
   /* Le titre ne reprend la requête que si elle a bien été cherchée : sous le
      seuil, la page affiche l'invitation à saisir, et l'annoncer « Recherche :
      n » promettrait des résultats qu'elle ne montre pas. */
-  const saisie = sp.q?.trim() ?? "";
+  const saisie = normaliserRecherche(parametre(sp, "q"));
   const q = saisie.length >= MIN_CARACTERES ? saisie : "";
 
   return {
@@ -74,16 +76,20 @@ const PORTES: {
 
 export default async function RecherchePage(props: {
   params: Promise<{ lang: string }>;
-  searchParams: Promise<{ q?: string; type?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [params, sp] = await Promise.all([props.params, props.searchParams]);
   const lang = asLang(params.lang);
   const t = dict(lang);
   const r = t.recherche;
 
-  const q = sp.q?.trim() ?? "";
+  /* Première valeur d'un paramètre répété (`?q=a&q=b` arrive en tableau), et
+     même normalisation que la requête (100 caractères au plus) : le titre et
+     le champ montrent exactement ce qui a été cherché. */
+  const q = normaliserRecherche(parametre(sp, "q"));
+  const typeBrut = parametre(sp, "type");
   const type: TypeResultat | null =
-    sp.type && estTypeResultat(sp.type) ? sp.type : null;
+    typeBrut && estTypeResultat(typeBrut) ? typeBrut : null;
 
   /* Une requête trop courte n'est pas une requête vide : le champ garde ce qui a
      été tapé, et l'écran redit ce qu'il attend plutôt que d'annoncer zéro
@@ -207,7 +213,11 @@ export default async function RecherchePage(props: {
                 </nav>
               )}
 
-              {resultats!.groupes.length === 0 ? (
+              {resultats!.reessayerDans ? (
+                /* Limite de débit atteinte (cf. lib/recherche/query.ts) : la
+                   recherche n'a pas eu lieu, ce n'est pas « aucun résultat ». */
+                <p className="actu-vide" role="status">{r.tropRapide}</p>
+              ) : resultats!.groupes.length === 0 ? (
                 <p className="actu-vide">
                   {r.aucun} {r.aucunConseil}
                 </p>

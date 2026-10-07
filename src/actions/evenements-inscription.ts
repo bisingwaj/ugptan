@@ -20,6 +20,7 @@
  */
 import { headers } from "next/headers";
 import { db } from "@/lib/db";
+import { describeError } from "@/lib/errors";
 import { isValidEmail } from "@/lib/auth/validate";
 import { rateLimit, requestIp } from "@/lib/rate-limit";
 import { ecrituresSuspendues } from "@/lib/reglages/maintenance";
@@ -88,59 +89,78 @@ export async function inscrireAction(
     return echec(t("Cette adresse électronique n'est pas valide.", "This email address is not valid."));
   }
 
-  /* --- 3. État de l'événement --------------------------------------------
-     Relu en base, jamais cru sur parole. Trois refus distincts, parce qu'ils
-     n'appellent pas la même conduite du visiteur. */
-  const evenement = await db().evenement.findUnique({
-    where: { id: evenementId },
-    select: { id: true, status: true, startAt: true, endAt: true, registrationUrl: true },
-  });
+  /* Les deux accès à la base sont tenus dans un seul `try` : une salve du
+     transport vers Neon (cf. lib/lecture.ts) ne doit pas faire tomber la page
+     sur l'écran d'erreur, mais rendre au formulaire un échec lisible, avec la
+     conduite à tenir. Les refus métier (événement retiré, terminé, billetterie
+     externe) restent des retours ordinaires, à l'intérieur. */
+  const panne = () => echec(t(
+    "Votre inscription n'a pas pu être enregistrée, faute d'accès momentané au service. Réessayez dans quelques minutes, ou écrivez à info@ugptn.cd.",
+    "Your registration could not be recorded because the service is temporarily unavailable. Please try again in a few minutes, or write to info@ugptn.cd.",
+  ));
 
-  if (!evenement || evenement.status !== "PUBLISHED") {
-    return echec(t("Cet événement n'est plus annoncé.", "This event is no longer listed."));
+  try {
+    /* --- 3. État de l'événement ------------------------------------------
+       Relu en base, jamais cru sur parole. Trois refus distincts, parce
+       qu'ils n'appellent pas la même conduite du visiteur. */
+    const evenement = await db().evenement.findUnique({
+      where: { id: evenementId },
+      select: { id: true, status: true, startAt: true, endAt: true, registrationUrl: true },
+    });
+
+    if (!evenement || evenement.status !== "PUBLISHED") {
+      return echec(t("Cet événement n'est plus annoncé.", "This event is no longer listed."));
+    }
+
+    if (phaseEvenement(evenement.startAt, evenement.endAt) === "TERMINE") {
+      return echec(t(
+        "Cet événement est terminé : les inscriptions sont closes.",
+        "This event has ended: registration is closed.",
+      ));
+    }
+
+    // Billetterie externe : c'est elle qui tient la liste. En tenir une seconde
+    // ici la rendrait fausse des deux côtés.
+    if (evenement.registrationUrl) {
+      return echec(t(
+        "Les inscriptions à cet événement se font sur le service indiqué sur sa page.",
+        "Registration for this event is handled by the service shown on its page.",
+      ));
+    }
+
+    /* --- 4. Enregistrement ------------------------------------------------
+       ⚠️ CRÉATION SEULE, JAMAIS DE MISE À JOUR. La version précédente faisait
+       un `upsert` sur (événement, adresse), pour qu'un renvoi corrige une
+       faute de frappe. Mais le formulaire est public et l'adresse n'est pas
+       vérifiée : n'importe qui, connaissant l'adresse d'un inscrit, pouvait
+       réécrire son nom, son téléphone et son message — et la console aurait
+       affiché ces données forgées comme les siennes.
+
+       `createMany` + `skipDuplicates` se traduit par un seul
+       `INSERT … ON CONFLICT DO NOTHING` : atomique, sans fenêtre entre une
+       lecture et une écriture, et sans erreur d'unicité à rattraper. Une
+       demande déjà présente reste donc intacte, statut compris.
+
+       La réponse est la MÊME dans les deux cas (cf. en-tête, principe 2) : ni
+       « déjà inscrit » ni « mise à jour », qui confirmeraient qu'une adresse
+       figure sur la liste. Une personne qui veut corriger sa demande écrit à
+       l'Unité (info@ugptn.cd), qui la reprend depuis la console. */
+    await db().evenementInscription.createMany({
+      data: [{
+        evenementId,
+        nom,
+        email,
+        organisation: organisation || null,
+        telephone: telephone || null,
+        message: message || null,
+        locale: lang,
+      }],
+      skipDuplicates: true,
+    });
+  } catch (error) {
+    console.error(`[evenements] inscription non enregistrée. ${describeError(error)}`);
+    return panne();
   }
-
-  if (phaseEvenement(evenement.startAt, evenement.endAt) === "TERMINE") {
-    return echec(t(
-      "Cet événement est terminé : les inscriptions sont closes.",
-      "This event has ended: registration is closed.",
-    ));
-  }
-
-  // Billetterie externe : c'est elle qui tient la liste. En tenir une seconde
-  // ici la rendrait fausse des deux côtés.
-  if (evenement.registrationUrl) {
-    return echec(t(
-      "Les inscriptions à cet événement se font sur le service indiqué sur sa page.",
-      "Registration for this event is handled by the service shown on its page.",
-    ));
-  }
-
-  /* --- 4. Enregistrement --------------------------------------------------
-     `upsert` sur (événement, adresse) : renvoyer le formulaire après une faute
-     de frappe dans son nom doit corriger la demande, pas en créer une seconde
-     ni afficher une erreur. Le statut n'est PAS réécrit — une demande déjà
-     confirmée par l'Unité ne doit pas retomber en « reçue » parce que la
-     personne a renvoyé le formulaire. */
-  await db().evenementInscription.upsert({
-    where: { evenementId_email: { evenementId, email } },
-    update: {
-      nom,
-      organisation: organisation || null,
-      telephone: telephone || null,
-      message: message || null,
-      locale: lang,
-    },
-    create: {
-      evenementId,
-      nom,
-      email,
-      organisation: organisation || null,
-      telephone: telephone || null,
-      message: message || null,
-      locale: lang,
-    },
-  });
 
   // La console affiche le nombre de demandes par événement.
   revaliderEvenements();

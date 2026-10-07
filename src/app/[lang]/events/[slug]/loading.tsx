@@ -1,12 +1,18 @@
+"use client";
+
 /**
  * Une fiche d'événement : l'affiche à gauche, la date, le lieu et le bouton
  * d'inscription à droite, puis la description.
  */
 import { SqEcran, SqBloc, SqTexte } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran libelle="Chargement de l'événement">
+    <SqEcran libelle={libelleChargement(lang, "evenement")}>
       <section className="page-hero">
         <div className="section__inner">
           <SqBloc largeur={200} hauteur={12} style={{ marginBottom: 22 }} />

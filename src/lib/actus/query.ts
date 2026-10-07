@@ -21,7 +21,7 @@ import type { Lang } from "@/lib/pick";
 import { lecteur } from "@/lib/lecture";
 import { type ArticleStatut } from "@/lib/actus/statut";
 import { describeError } from "@/lib/errors";
-import { cacheJson, TAG, TTL } from "@/lib/cache/redis";
+import { bornerPage, cacheJson, normaliserRecherche, TAG, TTL } from "@/lib/cache/redis";
 
 /** Longueur d'un résumé déduit du corps, faute de résumé saisi. */
 const EXTRAIT_AUTO = 190;
@@ -252,19 +252,26 @@ function filtreTraductions(lang: Lang, recherche?: string | null): Record<string
  * puisque le tri secondaire est la date.
  */
 export async function listerActualites(options: ListeOptions): Promise<ListeActus> {
-  const { lang, categorie, tag, recherche, comp } = options;
+  const { lang, categorie, tag, comp } = options;
   const parPage = options.parPage ?? PAR_PAGE;
-  const page = Math.max(1, options.page ?? 1);
-  const q = recherche?.trim() ?? "";
+  // Bornés AVANT la clé : cf. « Clés bornées » dans lib/cache/redis.ts.
+  const page = bornerPage(options.page);
+  const q = normaliserRecherche(options.recherche);
+  const params = { lang, categorie, tag, recherche: q, comp, page, parPage };
+
+  // Recherche libre : jamais en cache, son espace de clés est infini.
+  if (q) return listerActualitesImpl(params);
 
   // La clé décrit exactement la liste demandée : langue, filtres, page. Deux
   // visites au même filtre partagent l'entrée ; changer un filtre en crée une
   // autre, que le TTL récupérera. `enLigne()` dépend de l'heure, mais à la
   // minute près sur des dates de publication : le grain du TTL le couvre.
+  // Une page vide (rubrique ou étiquette inventée, page au-delà de la
+  // dernière) n'est pas déposée : elle ne laisse aucune clé derrière elle.
   return cacheJson(
-    `actus:liste:${JSON.stringify([lang, categorie ?? "", tag ?? "", q, comp ?? "", page, parPage])}`,
-    { tags: [TAG.actus], ttl: TTL.liste },
-    () => listerActualitesImpl({ lang, categorie, tag, recherche, comp, page, parPage }),
+    `actus:liste:${JSON.stringify([lang, categorie ?? "", tag ?? "", comp ?? "", page, parPage])}`,
+    { tags: [TAG.actus], ttl: TTL.liste, memoriserSi: (liste) => liste.items.length > 0 },
+    () => listerActualitesImpl(params),
   );
 }
 
@@ -368,11 +375,15 @@ export async function filChronologique(options: {
   recherche?: string | null;
   limite?: number;
 }): Promise<JalonActu[]> {
-  const q = options.recherche?.trim() ?? "";
+  const q = normaliserRecherche(options.recherche);
+  const params = { ...options, recherche: q };
+  // Mêmes bornes que `listerActualites` : recherche hors cache, résultat vide
+  // jamais déposé (cf. lib/cache/redis.ts).
+  if (q) return filChronologiqueImpl(params);
   return cacheJson(
-    `actus:fil:${JSON.stringify([options.lang, options.categorie ?? "", options.tag ?? "", q, options.limite ?? FIL_MAX])}`,
-    { tags: [TAG.actus], ttl: TTL.liste },
-    () => filChronologiqueImpl(options),
+    `actus:fil:${JSON.stringify([options.lang, options.categorie ?? "", options.tag ?? "", options.limite ?? FIL_MAX])}`,
+    { tags: [TAG.actus], ttl: TTL.liste, memoriserSi: (fil) => fil.length > 0 },
+    () => filChronologiqueImpl(params),
   );
 }
 

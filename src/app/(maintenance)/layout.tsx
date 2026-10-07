@@ -6,10 +6,11 @@
  * en-tête, ni pied de page, ni avis de navigation. Le placer sous la coquille
  * publique l'aurait entouré de liens menant tous au même écran.
  *
- * Le proxy réécrit vers ce segment (cf. src/proxy.ts) : l'adresse affichée reste
- * celle que le visiteur a demandée.
+ * Le proxy sert ce segment sous l'adresse que le visiteur a demandée (cf.
+ * src/proxy.ts) : en 503 pour une page lue par un navigateur ou un moteur, par
+ * réécriture pour les actions serveur et les navigations client.
  */
-import type { Metadata, Viewport } from "next";
+import type { Viewport } from "next";
 import "@/styles/globals.css";
 import { policesClassName } from "@/lib/fonts";
 
@@ -20,9 +21,18 @@ export const viewport: Viewport = {
   themeColor: "#161616",
 };
 
-/* Rien à indexer : la page ne vit que le temps d'une intervention, et le proxy
-   répond déjà 503. Le `noindex` couvre le cas d'un moteur qui passerait outre. */
-export const metadata: Metadata = { robots: { index: false, follow: false } };
+/* PAS de `noindex` ici, et c'est délibéré. Le proxy sert cet écran sous
+   l'adresse de CHAQUE page du site (cf. src/proxy.ts, `servirEn503`) : un
+   `noindex` y serait donc lu par les moteurs comme « retirez cette page de
+   l'index », pour toutes les pages à la fois. Une fermeture de quelques jours
+   aurait fait sortir le site entier des résultats.
+
+   Le statut 503 accompagné de `Retry-After` suffit à dire « momentanément
+   indisponible, repassez » : les moteurs n'indexent pas le corps d'une 5xx et
+   conservent l'index existant. Dans les cas où l'écran part encore en 200
+   (repli décrit dans le proxy), l'absence de `noindex` reste le moindre mal :
+   l'écran remplace temporairement le contenu au lieu d'en commander le
+   retrait, et la réouverture rétablit tout au passage suivant. */
 
 export default function MaintenanceLayout({ children }: { children: React.ReactNode }) {
   return (

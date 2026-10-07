@@ -1,12 +1,18 @@
+"use client";
+
 /**
  * Une fiche de document : l'identité du fichier, ses métadonnées, puis le
  * bouton de téléchargement et le résumé.
  */
 import { SqEcran, SqBloc, SqTexte } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran libelle="Chargement du document">
+    <SqEcran libelle={libelleChargement(lang, "document")}>
       <section className="page-hero">
         <div className="section__inner" style={{ maxWidth: 860 }}>
           <SqBloc largeur={182} hauteur={12} style={{ marginBottom: 22 }} />

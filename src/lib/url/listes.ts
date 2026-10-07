@@ -105,6 +105,9 @@ export function estVarianteFiltree(chemin: string): boolean {
   return Object.keys(PARAMETRES_DE_LISTE).some((base) => nu === `${base}/${SEGMENT_FILTRE}`);
 }
 
+/** Longueur maximale retenue d'un paramètre de liste, en caractères. */
+const LONGUEUR_PARAMETRE_MAX = 100;
+
 /** Forme de `searchParams` telle que Next la remet à une page. */
 export type ParametresBruts = Record<string, string | string[] | undefined>;
 
@@ -119,5 +122,13 @@ export type ParametresBruts = Record<string, string | string[] | undefined>;
 export function parametre(brut: ParametresBruts, cle: string): string | null {
   const valeur = brut[cle];
   const premiere = Array.isArray(valeur) ? valeur[0] : valeur;
-  return typeof premiere === "string" && premiere.trim() ? premiere.trim() : null;
+  if (typeof premiere !== "string") return null;
+  /* Longueur bornée DÈS la lecture : une valeur de plusieurs kilo-octets
+     serait sinon recopiée dans le champ de recherche, le titre, les liens de
+     pagination et la requête SQL. Aucun slug ni aucune recherche légitime
+     n'approche cette borne, alignée sur `RECHERCHE_MAX` (lib/cache/redis.ts,
+     non importable d'ici : ce module est lu par le proxy). Découpe par point
+     de code, pour ne pas couper un caractère en deux. */
+  const propre = Array.from(premiere.trim()).slice(0, LONGUEUR_PARAMETRE_MAX).join("").trim();
+  return propre || null;
 }

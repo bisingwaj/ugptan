@@ -156,11 +156,18 @@ const cleTag = (tag: string) => `${NS}:${VERSION}:tag:${tag}`;
 /* Lecture mémoïsée                                                             */
 /* -------------------------------------------------------------------------- */
 
-type Options = {
+type Options<T> = {
   /** Familles auxquelles rattacher l'entrée, pour l'invalidation groupée. */
   tags: Tag[];
   /** Filet de fraîcheur en secondes (cf. `TTL`). */
   ttl: number;
+  /**
+   * Condition de dépôt : le résultat n'est mis en cache que si elle répond
+   * vrai. Sert à BORNER l'espace des clés quand l'identifiant porte une valeur
+   * venue de l'URL (rubrique, étiquette, page, slug) — cf. « Clés bornées »
+   * plus bas. Absente, tout résultat est déposé.
+   */
+  memoriserSi?: (valeur: T) => boolean;
 };
 
 /**
@@ -179,7 +186,7 @@ type Options = {
  */
 export async function cacheJson<T>(
   identifiant: string,
-  { tags, ttl }: Options,
+  { tags, ttl, memoriserSi }: Options<T>,
   produire: () => Promise<T>,
 ): Promise<T> {
   const redis = client();
@@ -198,8 +205,67 @@ export async function cacheJson<T>(
   }
 
   const valeur = await produire();
-  void deposer(redis, k, tags, ttl, valeur);
+  if (!memoriserSi || memoriserSi(valeur)) void deposer(redis, k, tags, ttl, valeur);
   return valeur;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Clés bornées                                                                */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * ⚠️ UNE CLÉ PAR VALEUR D'URL, C'EST UNE CLÉ PAR REQUÊTE FORGÉE. Les listes
+ * publiques encodent leurs filtres dans l'identifiant (cf. `cacheJson`). Tant
+ * que ces filtres viennent de l'URL sans borne, n'importe qui peut créer autant
+ * d'entrées qu'il envoie de requêtes : `?q=` aléatoire, `?page=` croissant,
+ * `?categorie=` inventée. Chaque entrée occupe de la mémoire Upstash (facturée
+ * au volume et aux commandes), et s'inscrit dans le SET de son tag, dont
+ * l'expiration est REPOUSSÉE à chaque dépôt : sous un flot continu, ce SET ne
+ * se vide jamais et enfle sans limite, jusqu'à rendre `invaliderTags` (un
+ * SMEMBERS puis un DEL de tout son contenu) lent ou impossible.
+ *
+ * D'où trois règles, appliquées par les query.ts AVANT de construire la clé :
+ *
+ *   1. La RECHERCHE LIBRE ne passe jamais par le cache. Son espace est infini
+ *      par nature, et la retenir ne profite qu'au visiteur suivant qui taperait
+ *      exactement les mêmes mots — le raisonnement de la page /search, qui
+ *      n'a pas de cache de route pour la même raison. Elle lit la base
+ *      directement, après avoir été ramenée à `RECHERCHE_MAX` caractères.
+ *   2. La PAGE est plafonnée (`PAGE_MAX`), ce qui borne aussi le décalage SQL.
+ *   3. Les filtres par SLUG (rubrique, étiquette, catégorie, album) et la page
+ *      ne déposent qu'un résultat NON VIDE (`memoriserSi`). Une valeur inventée
+ *      ne correspond à rien, donc ne laisse aucune trace ; une page au-delà de
+ *      la dernière non plus. L'espace des clés retombe ainsi sur celui des
+ *      combinaisons qui EXISTENT en base, que seule la console fait grandir.
+ */
+
+/** Longueur maximale retenue d'une recherche libre, en caractères. */
+export const RECHERCHE_MAX = 100;
+
+/**
+ * Plafond de pagination. Très au-delà de ce que le fonds atteindra (neuf
+ * articles par page : neuf mille articles), il ne sert qu'à refuser un
+ * `?page=99999999` dont le décalage SQL ne rimerait à rien.
+ */
+export const PAGE_MAX = 1000;
+
+/**
+ * Recherche libre ramenée à une forme stable et bornée : forme Unicode
+ * composée (un « é » saisi en deux points de code vaut le « é » d'un seul),
+ * espaces internes réduits à un, bords retirés, `RECHERCHE_MAX` caractères au
+ * plus. La découpe se fait par point de code et non par unité UTF-16, pour ne
+ * jamais couper un caractère hors du plan de base en deux moitiés invalides.
+ */
+export function normaliserRecherche(brut: string | null | undefined): string {
+  if (!brut) return "";
+  const propre = brut.normalize("NFC").replace(/\s+/g, " ").trim();
+  return Array.from(propre).slice(0, RECHERCHE_MAX).join("").trim();
+}
+
+/** Numéro de page ramené dans [1, PAGE_MAX] ; tout ce qui n'est pas un entier vaut 1. */
+export function bornerPage(page: number | null | undefined): number {
+  if (!page || !Number.isFinite(page)) return 1;
+  return Math.min(PAGE_MAX, Math.max(1, Math.trunc(page)));
 }
 
 /**

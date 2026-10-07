@@ -91,7 +91,10 @@ export const formatDateHeure = (date: Date, lang: "fr" | "en"): string =>
  */
 const anneeKinshasa = new Intl.DateTimeFormat("en-GB", { year: "numeric", timeZone: "Africa/Kinshasa" });
 
-export const anneeArticle = (date: Date): number => Number(anneeKinshasa.format(date));
+export const anneeAKinshasa = (date: Date): number => Number(anneeKinshasa.format(date));
+
+/** Alias historique de `anneeAKinshasa`, nommé d'après son premier usage. */
+export const anneeArticle = anneeAKinshasa;
 
 /**
  * Décalage de Kinshasa (UTC+1), constant : la RDC n'applique pas d'heure d'été.

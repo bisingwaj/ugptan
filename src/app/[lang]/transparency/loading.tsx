@@ -1,12 +1,18 @@
+"use client";
+
 /**
  * Transparence : une LISTE de documents, non une grille de cartes. Chaque ligne
  * porte un type, un titre, une date et un poids de fichier.
  */
 import { SqEcran, SqPageHero, SqFiltres, SqBloc } from "@/components/ui/Squelette";
+import { useParams } from "next/navigation";
+import { libelleChargement } from "@/lib/chargement";
 
 export default function Loading() {
+  // Libellé dans la langue du segment : cf. lib/chargement.ts.
+  const { lang } = useParams<{ lang?: string }>();
   return (
-    <SqEcran libelle="Chargement des documents">
+    <SqEcran libelle={libelleChargement(lang, "documents")}>
       <SqPageHero />
       <section style={{ padding: "clamp(40px,5vw,60px) var(--pad-x) clamp(56px,7vw,90px)" }}>
         <div className="section__inner">
