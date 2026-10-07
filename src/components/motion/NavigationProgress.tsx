@@ -19,7 +19,9 @@ import { cn } from "@/lib/cn";
  *
  * L'App Router n'expose aucun événement de routeur : le départ se déduit donc
  * du clic sur un lien interne (et de `popstate` pour les boutons précédent /
- * suivant), l'arrivée du changement de `pathname` ou de `searchParams`.
+ * suivant), l'arrivée du changement de `pathname` ou de `searchParams`. Une
+ * navigation lancée par le code (`router.push`, sans <a>) s'annonce elle-même
+ * avec `annoncerNavigation()`.
  *
  * Elle ne prétend jamais connaître l'avancement réel : la progression ralentit
  * en approchant d'un plafond et n'atteint 100 % qu'une fois la page arrivée.
@@ -36,6 +38,13 @@ const PLAFOND = 92;
 const DUREE_MAX = 20_000;
 /** Temps d'affichage du 100 % avant effacement. */
 const FONDU = 260;
+/** Événement par lequel une navigation programmée démarre la barre. */
+const EVENEMENT_DEPART = "navigation:depart";
+
+/** À appeler juste avant un `router.push` : aucun clic de lien ne l'annonce. */
+export function annoncerNavigation() {
+  window.dispatchEvent(new Event(EVENEMENT_DEPART));
+}
 
 function BarreDeNavigation() {
   const pathname = usePathname();
@@ -120,9 +129,11 @@ function BarreDeNavigation() {
 
     document.addEventListener("click", surClic, true);
     window.addEventListener("popstate", demarrer);
+    window.addEventListener(EVENEMENT_DEPART, demarrer);
     return () => {
       document.removeEventListener("click", surClic, true);
       window.removeEventListener("popstate", demarrer);
+      window.removeEventListener(EVENEMENT_DEPART, demarrer);
     };
   }, [demarrer]);
 

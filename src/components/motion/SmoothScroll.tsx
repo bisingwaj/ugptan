@@ -5,13 +5,46 @@
    - IMPORTANT : quand un overlay (.scrim : tiroir marchés, lightbox vidéo,
      modales) est ouvert, on ARRÊTE Lenis et on verrouille le fond → le contenu
      de l'overlay défile nativement (molette ET barre de défilement), et la page
-     derrière ne bouge pas. Reprise automatique à la fermeture. */
-import { useEffect } from "react";
+     derrière ne bouge pas. Reprise automatique à la fermeture.
+   - Changement de page : retour en haut (cf. plus bas). */
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { usePrefersReducedMotion } from "./useReducedMotion";
 
 export function SmoothScroll() {
   const reduce = usePrefersReducedMotion();
+  const pathname = usePathname();
+  const premierRendu = useRef(true);
+  const retourHistorique = useRef(false);
+
+  // Précédent / suivant du navigateur : la position restaurée est respectée.
+  useEffect(() => {
+    const marquer = () => { retourHistorique.current = true; };
+    window.addEventListener("popstate", marquer);
+    return () => window.removeEventListener("popstate", marquer);
+  }, []);
+
+  /* Nouvelle page → en haut. Next ne remonte que jusqu'au segment qui change,
+     et seulement s'il est hors du viewport ; entre deux pages sœurs (une
+     province puis une autre, cliquée sur la carte), la page s'ouvrait donc
+     au milieu. Lenis, qui tient sa propre position, pouvait en plus écraser
+     le saut natif : on remonte par les deux voies, sans animation. Une
+     ancre (#…) garde son saut. */
+  useEffect(() => {
+    if (premierRendu.current) {
+      premierRendu.current = false;
+      return;
+    }
+    if (retourHistorique.current) {
+      retourHistorique.current = false;
+      return;
+    }
+    if (window.location.hash) return;
+    const lenis = (window as Window & { __lenis?: Lenis }).__lenis;
+    if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     // Pas de Lenis au tactile (pointeur grossier) : l'inertie native (iOS/Android)
