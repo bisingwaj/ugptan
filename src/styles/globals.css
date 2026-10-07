@@ -255,6 +255,19 @@ html.scroll-locked body {
 .kicker::before { content: ""; width: 24px; height: 1px; background: currentColor; flex: 0 0 auto; }
 .kicker--light { color: var(--ac-light); }
 .kicker--plain::before { display: none; }
+/* Le trait du kicker se trace quand la section entre à l'écran. Animation
+   liée au défilement (CSS seul, aucun script) : un navigateur qui ne la
+   connaît pas garde le trait fixe, et « réduire les animations » la coupe
+   (règle globale plus bas). */
+@supports (animation-timeline: view()) {
+  .kicker::before {
+    transform-origin: left center;
+    animation: kicker-trait linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 90%;
+  }
+  @keyframes kicker-trait { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+}
 
 /* ===========================================================================
    Buttons

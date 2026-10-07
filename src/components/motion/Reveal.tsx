@@ -6,11 +6,14 @@
 import { m, useInView } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import type { Variants } from "framer-motion";
-import { fadeUp, fade, mask } from "./variants";
+import { fadeUp, fade, mask, zoom, wipe, fromLeft, fromRight } from "./variants";
 import { usePrefersReducedMotion } from "./useReducedMotion";
 
-type Variant = "up" | "fade" | "mask";
-const VARIANTS: Record<Variant, Variants> = { up: fadeUp, fade, mask };
+/** up : défaut · fade : sans mouvement · mask : gros titres · zoom : visuels
+ *  et cartes · wipe : photos · left / right : colonnes d'un bloc à deux. */
+export type RevealVariant = "up" | "fade" | "mask" | "zoom" | "wipe" | "left" | "right";
+type Variant = RevealVariant;
+export const VARIANTS: Record<Variant, Variants> = { up: fadeUp, fade, mask, zoom, wipe, left: fromLeft, right: fromRight };
 const TAGS = { div: m.div, section: m.section, span: m.span };
 
 function withDelay(v: Variants, delay: number): Variants {

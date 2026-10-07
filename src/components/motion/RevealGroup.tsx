@@ -14,14 +14,14 @@
      rejoue donc hidden→show. Cf. Marchés / Actualités / Transparence. */
 import { m, useInView } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
-import { stagger, fadeUp, fade } from "./variants";
+import { stagger, fadeUp, fade, zoom } from "./variants";
 import { usePrefersReducedMotion } from "./useReducedMotion";
 
 const GROUP_TAGS = { div: m.div, section: m.section, ul: m.ul };
 
 export function RevealGroup({
   children,
-  gap = 0.05,
+  gap = 0.06,
   delayChildren = 0,
   as = "div",
   className,
@@ -74,6 +74,7 @@ export function RevealItem({
   className,
   style,
   fade: fadeOnly = false,
+  zoom: zoomIn = false,
 }: {
   children: ReactNode;
   as?: keyof typeof ITEM_TAGS;
@@ -83,6 +84,8 @@ export function RevealItem({
    *  cellules à effet de survol qui translatent (cell--fx / cell--bloom),
    *  afin que framer ne laisse pas de transform inline bloquant le :hover. */
   fade?: boolean;
+  /** Fondu + léger zoom arrière : cartes à visuel (photos, vignettes). */
+  zoom?: boolean;
 }) {
   const reduce = usePrefersReducedMotion();
 
@@ -97,7 +100,7 @@ export function RevealItem({
 
   const Tag = ITEM_TAGS[as];
   return (
-    <Tag data-mo="" className={className} style={style} variants={fadeOnly ? fade : fadeUp}>
+    <Tag data-mo="" className={className} style={style} variants={fadeOnly ? fade : zoomIn ? zoom : fadeUp}>
       {children}
     </Tag>
   );
