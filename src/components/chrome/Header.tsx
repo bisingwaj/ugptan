@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
+import { DUREE, EASE } from "@/components/motion/variants";
 import type { Lang } from "@/lib/pick";
 import { cn } from "@/lib/cn";
 import { dict } from "@/content/i18n";
@@ -15,7 +16,6 @@ import { Marque } from "@/components/chrome/Marque";
 import { Icon } from "@/components/ui/Icon";
 
 /** Courbe unique du tiroir : sortie franche, arrivée posée. */
-const EASE = [0.16, 1, 0.3, 1] as const;
 
 /* Entrées de la barre desktop — liens et boutons de groupe partagent le même
    gabarit pour que le soulignement actif reste aligné d'une entrée à l'autre.
@@ -144,7 +144,7 @@ export function Header({ lang }: { lang: Lang }) {
                     {t.nav[node.labelKey]}
                     <span
                       aria-hidden
-                      className={cn("text-[8px] opacity-60 transition-transform duration-200", open && "rotate-180")}
+                      className={cn("text-[8px] opacity-60 transition-transform duration-400", open && "rotate-180")}
                     >
                       ▼
                     </span>
@@ -155,7 +155,7 @@ export function Header({ lang }: { lang: Lang }) {
                   <div
                     className={cn(
                       "absolute top-full left-0 z-[60] w-[336px] border border-c-20 bg-white shadow-[0_16px_44px_rgba(0,0,0,0.13)]",
-                      "transition-[opacity,transform,visibility] duration-200 ease-out",
+                      "transition-[opacity,transform,visibility] duration-400 ease-out",
                       open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-[6px] opacity-0",
                     )}
                   >
@@ -177,7 +177,7 @@ export function Header({ lang }: { lang: Lang }) {
                           )}
                         >
                           {subLabel(child.key)}
-                          <span className="font-mono text-[12px] text-c-40 transition-transform duration-200 group-hover:translate-x-[3px]">
+                          <span className="font-mono text-[12px] text-c-40 transition-transform duration-400 group-hover:translate-x-[3px]">
                             →
                           </span>
                         </span>
@@ -318,7 +318,7 @@ export function Header({ lang }: { lang: Lang }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0.12 : 0.26, ease: "easeOut" }}
+            transition={{ duration: reduce ? DUREE.rapide : DUREE.moyenne, ease: EASE }}
           >
             <m.div
               id="tiroir-navigation"
@@ -331,7 +331,7 @@ export function Header({ lang }: { lang: Lang }) {
               initial={reduce ? { opacity: 0 } : { x: "100%" }}
               animate={reduce ? { opacity: 1 } : { x: 0 }}
               exit={reduce ? { opacity: 0 } : { x: "100%" }}
-              transition={{ duration: reduce ? 0.12 : 0.42, ease: EASE }}
+              transition={{ duration: reduce ? DUREE.rapide : DUREE.moyenne, ease: EASE }}
               className="flex h-full w-[min(444px,100%)] flex-col bg-c-black text-white shadow-[-24px_0_60px_rgba(0,0,0,0.35)]"
             >
               <div className="flex flex-none items-center justify-between border-b border-c-80 px-(--pad-x) pt-[calc(20px+var(--sa-t))] pb-5">
@@ -376,7 +376,7 @@ export function Header({ lang }: { lang: Lang }) {
                     <Icon name="recherche" size={18} />
                     {t.recherche.titre}
                   </span>
-                  <span className="font-mono text-[13px] text-c-70 transition-transform duration-200 group-hover:translate-x-[3px]">→</span>
+                  <span className="font-mono text-[13px] text-c-70 transition-transform duration-400 group-hover:translate-x-[3px]">→</span>
                 </Link>
 
                 {NAV_DRAWER.map((node) =>
@@ -393,7 +393,7 @@ export function Header({ lang }: { lang: Lang }) {
                       )}
                     >
                       <span>{t.nav[node.key]}</span>
-                      <span className="font-mono text-[13px] text-c-70 transition-transform duration-200 group-hover:translate-x-[3px]">→</span>
+                      <span className="font-mono text-[13px] text-c-70 transition-transform duration-400 group-hover:translate-x-[3px]">→</span>
                     </Link>
                   ) : (
                     <section key={node.key} aria-label={t.nav[node.labelKey]} className="border-b border-[#232323]">
@@ -413,7 +413,7 @@ export function Header({ lang }: { lang: Lang }) {
                           )}
                         >
                           <span>{subLabel(child.key)}</span>
-                          <span className="font-mono text-[13px] text-c-70 transition-transform duration-200 group-hover:translate-x-[3px]">→</span>
+                          <span className="font-mono text-[13px] text-c-70 transition-transform duration-400 group-hover:translate-x-[3px]">→</span>
                         </Link>
                       ))}
                       <div className="h-[10px]" />

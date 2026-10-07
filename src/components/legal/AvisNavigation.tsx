@@ -25,6 +25,7 @@ import { dict } from "@/content/i18n";
 import { avisNavigation } from "@/content/legal";
 import { NAV, route } from "@/lib/routes";
 import { usePrefersReducedMotion } from "@/components/motion/useReducedMotion";
+import { DUREE, EASE } from "@/components/motion/variants";
 
 /** Version incluse dans la clé : une révision des conditions réaffiche l'avis. */
 const CLE = "ugptn.avis-code-numerique.2026-08";
@@ -109,7 +110,7 @@ export function AvisNavigation({ lang }: { lang: Lang }) {
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 28 }}
           animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: reduce ? 0.15 : 0.5, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: reduce ? DUREE.rapide : DUREE.moyenne, ease: EASE }}
         >
           <div className="avis__kicker mono">{pick(avisNavigation.kicker, lang)}</div>
 

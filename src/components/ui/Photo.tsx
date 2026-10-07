@@ -106,7 +106,7 @@ export function Photo({
           objectPosition: style?.objectPosition,
           filter: "blur(14px)",
           opacity: charge ? 0 : 1,
-          transition: "opacity 0.4s ease",
+          transition: "opacity var(--dur-3) var(--ease)",
           pointerEvents: "none",
         }}
       />
@@ -129,7 +129,7 @@ export function Photo({
           objectFit: "cover",
           ...style,
           opacity: charge ? 1 : 0,
-          transition: "opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1)",
+          transition: "opacity var(--dur-3) var(--ease)",
         }}
         onLoad={() => setCharge(true)}
         onError={() => setEchec(true)}
