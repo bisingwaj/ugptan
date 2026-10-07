@@ -6,7 +6,7 @@
 import { m, useInView } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import type { Variants } from "framer-motion";
-import { fadeUp, fade, mask, zoom, wipe, fromLeft, fromRight } from "./variants";
+import { fadeUp, fade, mask, zoom, wipe, fromLeft, fromRight, MARGE_APPARITION } from "./variants";
 import { usePrefersReducedMotion } from "./useReducedMotion";
 
 /** up : défaut · fade : sans mouvement · mask : gros titres · zoom : visuels
@@ -51,7 +51,7 @@ export function Reveal({
   // Cible `animate` persistante (via useInView) plutôt que `whileInView` one-shot :
   // un élément remonté (contenu conditionnel/filtré) rejoue hidden→show au lieu
   // de rester bloqué sur `hidden`. Cf. RevealGroup pour le détail du piège.
-  const inView = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
+  const inView = useInView(ref, { once: true, margin: MARGE_APPARITION });
   const Tag = TAGS[as] as typeof m.div;
 
   if (reduce || eager) {

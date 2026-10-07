@@ -14,14 +14,14 @@
      rejoue donc hidden→show. Cf. Marchés / Actualités / Transparence. */
 import { m, useInView } from "framer-motion";
 import { useRef, type CSSProperties, type ReactNode } from "react";
-import { stagger, fadeUp, fade, zoom } from "./variants";
+import { stagger, fadeUp, fade, zoom, CASCADE, MARGE_APPARITION } from "./variants";
 import { usePrefersReducedMotion } from "./useReducedMotion";
 
 const GROUP_TAGS = { div: m.div, section: m.section, ul: m.ul };
 
 export function RevealGroup({
   children,
-  gap = 0.06,
+  gap = CASCADE.normale,
   delayChildren = 0,
   as = "div",
   className,
@@ -38,7 +38,7 @@ export function RevealGroup({
   const ref = useRef<HTMLDivElement>(null);
   // `once: true` → ne se relance pas au scroll, mais la cible `animate` reste
   // active en permanence, donc les enfants remontés (après un filtre) révèlent.
-  const inView = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
+  const inView = useInView(ref, { once: true, margin: MARGE_APPARITION });
   // Tag runtime choisi par `as` ; cast types-only (div/section/ul acceptent les
   // mêmes props motion + ref) pour satisfaire le typage du ref sur l'union.
   const Tag = GROUP_TAGS[as] as typeof m.div;

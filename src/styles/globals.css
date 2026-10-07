@@ -35,6 +35,14 @@
 @source "../content";
 @source "../lib";
 
+/* Utilitaires de transition Tailwind (`transition-*`, `duration-*`,
+   `ease-out`) alignés sur la courbe du site (--ease, cf. tokens.css) :
+   l'en-tête, le pied de page et la barre de navigation bougent comme le reste. */
+@theme {
+  --default-transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @layer base {
   * { box-sizing: border-box; margin: 0; padding: 0; }
   /* Reprise ciblée de Preflight : les utilitaires de bordure ne posent que la

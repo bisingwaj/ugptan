@@ -10,7 +10,7 @@
    - Largeur stable : chiffres tabulaires, pour que le texte ne tremble pas. */
 import { animate, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { EASE } from "./variants";
+import { EASE, MARGE_APPARITION } from "./variants";
 import { usePrefersReducedMotion } from "./useReducedMotion";
 
 export function Compteur({
@@ -20,6 +20,7 @@ export function Compteur({
   prefixe = "",
   suffixe = "",
   duree = 1.4,
+  heros = false,
 }: {
   valeur: number;
   /** Locale de formatage (« fr-FR », « en-GB »). */
@@ -29,10 +30,13 @@ export function Compteur({
   suffixe?: string;
   /** Durée du décompte, en secondes. */
   duree?: number;
+  /** Chiffre d'un héros : il défile dès l'arrivée sur la page, même déjà
+   *  visible — c'est la première chose qu'on voit bouger. */
+  heros?: boolean;
 }) {
   const reduce = usePrefersReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
+  const inView = useInView(ref, { once: true, margin: MARGE_APPARITION });
   const format = new Intl.NumberFormat(locale, options);
   const final = `${prefixe}${format.format(valeur)}${suffixe}`;
   const [texte, setTexte] = useState(final);
@@ -45,7 +49,7 @@ export function Compteur({
     const el = ref.current;
     if (reduce !== false || !el) return;
     const haut = el.getBoundingClientRect().top;
-    if (haut > window.innerHeight * 0.9 || haut < 0) {
+    if (heros || haut > window.innerHeight * 0.9 || haut < 0) {
       arme.current = true;
       setTexte(`${prefixe}${format.format(0)}${suffixe}`);
     }

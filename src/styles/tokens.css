@@ -51,6 +51,15 @@
   --ok-bd: #a7d4b4;
   --ok-fg: #0e6027;
 
+  /* Mouvement — une courbe, trois durées (miroir de components/motion/variants.ts).
+     --dur-1 : couleurs, bordures, fonds (réponse immédiate au survol)
+     --dur-2 : déplacements, lavis, ouvertures (survol qui bouge, tiroirs)
+     --dur-3 : apparitions et visuels (entrée à l'écran, zoom des photos) */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-1: 0.2s;
+  --dur-2: 0.4s;
+  --dur-3: 0.7s;
+
   /* Layout */
   --maxw: 1600px;
   --pad-x: clamp(20px, 5vw, 80px);
