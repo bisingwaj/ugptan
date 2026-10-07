@@ -1,5 +1,4 @@
-"use client";
-/* Avis d'utilisation — bandeau bas de page, première visite.
+/* Avis d'utilisation — bandeau bas de page, première visite (partie serveur).
 
    Deux régimes distincts, que l'avis ne doit pas confondre. Le Code du
    numérique s'applique du seul fait de l'accès : aucun clic ne le déclenche ni
@@ -8,149 +7,49 @@
    bouton ne crée donc pas l'acceptation, il la constate et la date côté
    visiteur, pour ne pas reposer la question à chaque page.
 
-   L'acquittement est mémorisé dans le navigateur. Rien n'est transmis au
-   serveur, rien n'est bloqué tant que l'avis est ouvert.
+   Pourquoi un composant serveur en tête : l'avis est monté sur TOUTES les
+   pages. Importer `@/content/i18n` et `@/content/legal` depuis le composant
+   client faisait partir ces deux dictionnaires complets (FR + EN, plus de
+   160 Ko de source) dans le JavaScript commun du site. Ici, on n'en extrait
+   que les quelques chaînes du bandeau, dans la langue courante, et seules
+   elles traversent la frontière client.
 
-   Le refus n'est pas une variante de la fermeture : qui n'accepte pas les
-   conditions n'a pas à rester sur le site, et les conditions elles-mêmes
-   organisent la voie de repli (communication des documents sur demande
-   écrite). Le bouton efface donc l'acquittement éventuel et quitte la page,
-   sans rien enregistrer. */
-import Link from "next/link";
-import { AnimatePresence, m } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+   Pourquoi un bandeau et plus un encart : l'encart (titre, deux paragraphes,
+   trois actions) mesurait près de 600 px de haut sur téléphone, soit l'écran
+   entier, et la moitié du héros sur ordinateur. L'avis informe, il ne
+   conditionne rien : deux lignes et une action suffisent, le texte complet
+   reste à un clic, dans les conditions d'utilisation. */
 import type { Lang } from "@/lib/pick";
 import { pick } from "@/lib/pick";
-import { dict } from "@/content/i18n";
 import { avisNavigation } from "@/content/legal";
 import { NAV, route } from "@/lib/routes";
-import { usePrefersReducedMotion } from "@/components/motion/useReducedMotion";
-import { DUREE, EASE } from "@/components/motion/variants";
+import { AvisBandeau, type LibellesAvis } from "./AvisBandeau";
 
-/** Version incluse dans la clé : une révision des conditions réaffiche l'avis. */
-const CLE = "ugptn.avis-code-numerique.2026-08";
-
-/* Où reprendre la navigation quand on refuse. Revenir d'où l'on vient est plus
-   utile qu'une page vide, mais le référent n'existe pas toujours (accès direct,
-   référent masqué) et il peut désigner le site lui-même : dans ces deux cas,
-   une page vierge est la seule sortie honnête. */
-function sortie() {
-  try {
-    const provenance = document.referrer;
-    if (provenance && new URL(provenance).origin !== window.location.origin) {
-      return provenance;
-    }
-  } catch {
-    /* référent illisible : on retombe sur la page vierge. */
-  }
-  return "about:blank";
-}
+/* Texte court du bandeau. La seconde phrase est celle de l'article « Objet et
+   acceptation » des conditions d'utilisation, reprise mot pour mot comme dans
+   `avisNavigation.corps` : un avis qui annonce autre chose que ce que dit le
+   texte qu'il fait accepter n'a aucune valeur. Le lien porte les derniers mots,
+   pour que la phrase se lise d'un trait avec ou sans lecteur d'écran.
+   À terme, ces chaînes ont leur place dans `avisNavigation` (src/content/legal.ts). */
+const RESUME = {
+  avant: {
+    fr: "Ce site est régi par le droit congolais, notamment par le Code du numérique. L'accès au site et l'usage de ses services valent acceptation pleine et sans réserve des ",
+    en: "This site is governed by Congolese law, in particular by the Digital Code. Accessing the site and using its services constitute full and unreserved acceptance of the ",
+  },
+  lien: { fr: "conditions d'utilisation", en: "terms of use" },
+  apres: { fr: ".", en: "." },
+  compris: { fr: "J'ai compris", en: "Got it" },
+};
 
 export function AvisNavigation({ lang }: { lang: Lang }) {
-  const t = dict(lang);
-  const reduce = usePrefersReducedMotion();
-  const [ouvert, setOuvert] = useState(false);
-
-  useEffect(() => {
-    let lu = false;
-    try {
-      lu = window.localStorage.getItem(CLE) === "1";
-    } catch {
-      /* stockage indisponible (navigation privée stricte) : on affiche l'avis. */
-    }
-    if (lu) return;
-    // Laisse la page se poser avant d'interrompre la lecture.
-    const id = window.setTimeout(() => setOuvert(true), 1100);
-    return () => window.clearTimeout(id);
-  }, []);
-
-  /* Refuser : aucun acquittement conservé, et on quitte. `window.close()` n'est
-     honoré que si l'onglet a été ouvert par un script ; sinon on REMPLACE
-     l'entrée d'historique, pour que le bouton « précédent » ne ramène pas sur
-     le site que l'on vient de refuser. */
-  const refuser = useCallback(() => {
-    setOuvert(false);
-    try {
-      window.localStorage.removeItem(CLE);
-    } catch {
-      /* stockage indisponible : il n'y avait de toute façon rien à effacer. */
-    }
-    const destination = sortie();
-    window.close();
-    window.setTimeout(() => window.location.replace(destination), 150);
-  }, []);
-
-  const acquitter = useCallback(() => {
-    setOuvert(false);
-    try {
-      window.localStorage.setItem(CLE, "1");
-    } catch {
-      /* sans stockage, l'avis réapparaîtra à la prochaine visite : acceptable. */
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!ouvert) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") acquitter();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [ouvert, acquitter]);
-
-  return (
-    <AnimatePresence>
-      {ouvert && (
-        <m.aside
-          className="avis"
-          role="dialog"
-          aria-modal={false}
-          aria-labelledby="avis-titre"
-          aria-describedby="avis-corps"
-          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 28 }}
-          animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-          exit={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: reduce ? DUREE.rapide : DUREE.moyenne, ease: EASE }}
-        >
-          <div className="avis__kicker mono">{pick(avisNavigation.kicker, lang)}</div>
-
-          <h2 id="avis-titre" className="avis__titre">
-            {pick(avisNavigation.titre, lang)}
-          </h2>
-
-          <p id="avis-corps" className="avis__corps">
-            {pick(avisNavigation.corps, lang)}
-          </p>
-
-          <p className="avis__precision">{pick(avisNavigation.precision, lang)}</p>
-
-          <div className="avis__actions">
-            <button type="button" className="avis__btn" onClick={acquitter}>
-              {pick(avisNavigation.accepter, lang)}
-            </button>
-            <button
-              type="button"
-              className="avis__btn avis__btn--refus"
-              onClick={refuser}
-              aria-describedby="avis-refus-aide"
-            >
-              {pick(avisNavigation.refuser, lang)}
-            </button>
-            <span className="avis__liens">
-              <Link href={route(lang, NAV.conditions)} className="avis__lien">
-                {t.nav.conditions}
-              </Link>
-              <Link href={route(lang, NAV.confidentialite)} className="avis__lien">
-                {t.nav.confidentialite}
-              </Link>
-            </span>
-          </div>
-
-          <p id="avis-refus-aide" className="avis__aide">
-            {pick(avisNavigation.refuserAide, lang)}
-          </p>
-        </m.aside>
-      )}
-    </AnimatePresence>
-  );
+  const libelles: LibellesAvis = {
+    region: pick(avisNavigation.kicker, lang),
+    avant: pick(RESUME.avant, lang),
+    lien: pick(RESUME.lien, lang),
+    apres: pick(RESUME.apres, lang),
+    compris: pick(RESUME.compris, lang),
+    refuser: pick(avisNavigation.refuser, lang),
+    refuserAide: pick(avisNavigation.refuserAide, lang),
+  };
+  return <AvisBandeau libelles={libelles} hrefConditions={route(lang, NAV.conditions)} />;
 }

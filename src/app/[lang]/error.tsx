@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { dict } from "@/content/i18n";
 import { isLang, type Lang } from "@/lib/pick";
 
 /**
@@ -15,6 +14,29 @@ import { isLang, type Lang } from "@/lib/pick";
  * Placée dans le segment de langue, elle laisse l'en-tête et le pied de page en
  * place et parle la langue de l'URL.
  */
+/**
+ * Libellés en ligne, et non `dict()` : un error.tsx est un composant client
+ * monté sur TOUTES les pages, et importer le dictionnaire y embarquait ses
+ * deux langues entières (≈ 100 Ko) dans le JavaScript de chaque page, pour
+ * cinq phrases.
+ */
+const LIBELLES: Record<Lang, { titre: string; corps: string; reessayer: string; accueil: string; reference: string }> = {
+  fr: {
+    titre: "Cette page n'a pas pu être affichée",
+    corps: "Une donnée nécessaire à cette page n'a pas pu être lue. Rien n'est perdu : seul l'affichage a échoué. Réessayez dans un instant.",
+    reessayer: "Réessayer",
+    accueil: "Retour à l'accueil",
+    reference: "Référence",
+  },
+  en: {
+    titre: "This page could not be displayed",
+    corps: "Data required by this page could not be read. Nothing is lost: only the display failed. Please try again in a moment.",
+    reessayer: "Try again",
+    accueil: "Back to home",
+    reference: "Reference",
+  },
+};
+
 export default function SiteError({
   error,
   reset,
@@ -26,7 +48,7 @@ export default function SiteError({
   // error.tsx ne reçoit pas les paramètres de route : la langue se lit sur l'URL.
   const segment = pathname.split("/")[1] ?? "";
   const lang: Lang = isLang(segment) ? segment : "fr";
-  const t = dict(lang).erreur;
+  const t = LIBELLES[lang];
 
   /* Aucune journalisation ici, délibérément. Le message transmis au navigateur
      est la sérialisation d'un objet du pilote base, que la production remplace

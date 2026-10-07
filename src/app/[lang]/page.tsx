@@ -108,7 +108,7 @@ export default async function Home(props: { params: Promise<{ lang: string }> })
       />
       {/* ===== HERO ===== */}
       <section data-hero style={{ position: "relative", borderBottom: "1px solid #1f2430", overflow: "hidden", background: "#0b0f1a", color: "#fff", minHeight: "calc(100svh - 64px)", display: "flex", flexDirection: "column" }}>
-        <HeroVideo src={media.heroFilm} poster={media.img.hero} />
+        <HeroVideo src={media.heroFilm} poster={media.img.hero} lang={lang} />
         <div className="hero-grid" style={{ position: "relative", flex: 1, width: "100%", maxWidth: "var(--maxw)", margin: "0 auto", padding: "clamp(40px,6vw,88px) var(--pad-x) 0", display: "grid", gridTemplateColumns: "1.35fr .9fr", gap: "clamp(32px,5vw,72px)", alignItems: "end", alignContent: "end" }}>
           <div style={{ paddingBottom: "clamp(48px,7vw,96px)" }}>
             {/* `eager` : le bloc de texte du héros est au-dessus de la ligne de

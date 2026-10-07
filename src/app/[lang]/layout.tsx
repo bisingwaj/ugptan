@@ -14,8 +14,6 @@ import { AvisNavigation } from "@/components/legal/AvisNavigation";
 import { SlotsOverlay } from "@/components/dev/SlotsOverlay";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { NavigationProgress } from "@/components/motion/NavigationProgress";
-import { SmoothScroll } from "@/components/motion/SmoothScroll";
-import { Cursor } from "@/components/motion/Cursor";
 import { policesClassName } from "@/lib/fonts";
 
 export function generateStaticParams() {
@@ -116,10 +114,10 @@ export default async function LangLayout(props: { children: React.ReactNode; par
         <a href="#contenu" className="skip-link">
           {lang === "en" ? "Skip to content" : "Aller au contenu"}
         </a>
+        {/* Le défilement doux (Lenis) et le curseur personnalisé sont montés
+            par MotionProvider lui-même, en différé et côté client seulement. */}
         <MotionProvider>
           <NavigationProgress />
-          <SmoothScroll />
-          <Cursor />
           <VideoProvider lang={lang}>
             <Header lang={lang} />
             <main id="contenu">{children}</main>

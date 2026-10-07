@@ -18,8 +18,27 @@ const colLabel = "mb-4 font-mono text-[11px] uppercase tracking-[0.1em] text-c-5
 const colLink = "footer-link block py-[7px] text-[14px] text-c-30 transition-colors duration-200 hover:text-white";
 const colLinkAccent = "footer-link flex items-center gap-2 py-[7px] text-[14px] text-ac-light transition-colors duration-200 hover:text-white";
 
+/* Identité de l'Unité en anglais. `meta` et `contact` (src/content/data.ts,
+   src/content/carbon.ts) ne portent que l'intitulé officiel français : le pied
+   de page anglais affichait donc le nom de l'Unité, la tutelle et l'adresse en
+   français. Les formulations reprennent celles des mentions légales anglaises
+   (src/content/legal.ts), pour qu'un même organisme ne porte pas deux noms.
+   À terme, ces versions ont leur place à côté des originaux, dans les fichiers
+   de contenu. Le français reste la source : seul l'anglais est surchargé. */
+const IDENTITE_EN = {
+  uniteLong: "Digital Transformation Project Management Unit",
+  tutelleLong: "Ministry of Posts, Telecommunications and Digital Affairs",
+  bailleurs: "IDA (World Bank) · AFD",
+  adresse: "15 Avenue Pumbu — Immeuble H, Building B, 4th floor",
+  quartier: "Gombe, Kinshasa — Democratic Republic of the Congo",
+};
+
 export function Footer({ lang }: { lang: Lang }) {
   const t = dict(lang);
+  const id =
+    lang === "en"
+      ? IDENTITE_EN
+      : { uniteLong: meta.uniteLong, tutelleLong: meta.tutelleLong, bailleurs: meta.bailleurs, adresse: contact.adresse, quartier: contact.quartier };
   return (
     <footer className="bg-c-black text-c-30">
       <div className="footer-grid mx-auto grid max-w-(--maxw) grid-cols-[1.6fr_repeat(4,1fr)] gap-x-[clamp(24px,3vw,48px)] gap-y-[clamp(32px,4vw,44px)] px-(--pad-x) pt-[clamp(54px,7vw,88px)] pb-10">
@@ -28,12 +47,12 @@ export function Footer({ lang }: { lang: Lang }) {
           <div className="mb-[18px] flex items-center">
             <Marque variante="claire" hauteur={63} />
           </div>
-          <p className="max-w-[300px] text-[13.5px] leading-[1.6] text-c-50">{meta.uniteLong}</p>
-          <p className="mt-4 font-mono text-[11.5px] leading-[1.7] text-c-50">{meta.tutelleLong}<br />{meta.bailleurs}</p>
+          <p className="max-w-[300px] text-[13.5px] leading-[1.6] text-c-50">{id.uniteLong}</p>
+          <p className="mt-4 font-mono text-[11.5px] leading-[1.7] text-c-50">{id.tutelleLong}<br />{id.bailleurs}</p>
           <p className="mt-3 max-w-[320px] font-mono text-[11px] leading-[1.6] text-c-50">{t.foot.source}</p>
           <div className="mt-5 flex flex-col gap-[7px] text-[13px] leading-[1.5] text-c-30">
-            <span>{contact.adresse}</span>
-            <span className="text-c-50">{contact.quartier}</span>
+            <span>{id.adresse}</span>
+            <span className="text-c-50">{id.quartier}</span>
             <a href={`tel:${contact.tel.replace(/\s/g, "")}`} className="text-c-30">{contact.tel}</a>
             <a href={`mailto:${contact.email}`} className="text-ac-light">{contact.email}</a>
           </div>

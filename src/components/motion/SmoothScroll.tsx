@@ -6,10 +6,14 @@
      modales) est ouvert, on ARRÊTE Lenis et on verrouille le fond → le contenu
      de l'overlay défile nativement (molette ET barre de défilement), et la page
      derrière ne bouge pas. Reprise automatique à la fermeture.
-   - Changement de page : retour en haut (cf. plus bas). */
+   - Changement de page : retour en haut (cf. plus bas).
+   - Chargement : ce composant est monté en différé (cf. MotionProvider), et
+     la bibliothèque Lenis elle-même n'est importée QUE si elle va servir
+     (pointeur fin, animations non réduites). Un téléphone ne la télécharge
+     jamais. */
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import Lenis from "lenis";
+import type Lenis from "lenis";
 import { usePrefersReducedMotion } from "./useReducedMotion";
 
 export function SmoothScroll() {
@@ -54,47 +58,64 @@ export function SmoothScroll() {
     // est plus fluide et moins gourmande. Le verrou d'overlay (.scroll-locked)
     // prend le relais quand lenis est null.
     const coarse = window.matchMedia("(pointer: coarse)").matches;
-    const lenis = reduce || coarse ? null : new Lenis({ lerp: 0.09, wheelMultiplier: 1, smoothWheel: true });
-
-    // Exposé pour les ancres internes (cf. composantes/CompSubNav) : un saut de
-    // hash natif se ferait écraser par la boucle Lenis — on passe par son API.
-    (window as Window & { __lenis?: unknown }).__lenis = lenis ?? undefined;
-
+    let lenis: Lenis | null = null;
+    let annule = false;
     let raf = 0;
-    if (lenis) {
-      const loop = (time: number) => {
-        lenis.raf(time);
-        raf = requestAnimationFrame(loop);
-      };
-      raf = requestAnimationFrame(loop);
-    }
 
     // Verrou de défilement tant qu'un overlay (.scrim) est présent dans le DOM.
     let locked = false;
+    /* Verrou posé par la voie native (.scroll-locked) : il doit être levé par
+       la même voie, même si Lenis est arrivé entre-temps (chargement différé). */
+    let verrouNatif = false;
     let scrollY = 0;
     const sync = () => {
       const open = !!document.querySelector(".scrim");
       if (open === locked) return;
       locked = open;
-      if (lenis) {
-        if (open) lenis.stop();
-        else lenis.start();
-      } else {
-        if (open) {
+      if (open) {
+        if (lenis) {
+          lenis.stop();
+        } else {
+          verrouNatif = true;
           scrollY = window.scrollY;
           document.documentElement.style.setProperty("--scroll-y", `${scrollY}px`);
           document.documentElement.classList.add("scroll-locked");
-        } else {
+        }
+      } else {
+        if (verrouNatif) {
+          verrouNatif = false;
           document.documentElement.classList.remove("scroll-locked");
           window.scrollTo(0, scrollY);
         }
+        lenis?.start();
       }
     };
     const mo = new MutationObserver(sync);
     mo.observe(document.body, { childList: true, subtree: true });
     sync();
 
+    if (!reduce && !coarse) {
+      void import("lenis").then(({ default: Lenis }) => {
+        if (annule) return;
+        const instance = new Lenis({ lerp: 0.09, wheelMultiplier: 1, smoothWheel: true });
+        lenis = instance;
+        // Exposé pour les ancres internes (cf. composantes/CompSubNav) : un saut
+        // de hash natif se ferait écraser par la boucle Lenis — on passe par son
+        // API. Tant qu'il est absent, les appelants retombent sur le natif.
+        (window as Window & { __lenis?: unknown }).__lenis = instance;
+        const loop = (time: number) => {
+          instance.raf(time);
+          raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+        // Overlay ouvert pendant le chargement : il garde son verrou natif, et
+        // Lenis reste à l'arrêt jusqu'à sa fermeture (cf. `sync`).
+        if (locked) instance.stop();
+      });
+    }
+
     return () => {
+      annule = true;
       mo.disconnect();
       if (raf) cancelAnimationFrame(raf);
       lenis?.destroy();
