@@ -57,8 +57,8 @@ export function dict(lang: Lang) {
         "Objectives, financing and implementation schedule to 2029.",
       ),
       composantes: t(
-        "Les cinq composantes, leur périmètre et leurs projets phares.",
-        "The five components, their scope and flagship projects.",
+        "Les cinq composantes, leur périmètre et leurs principaux projets.",
+        "The five components, their scope and main projects.",
       ),
       resultats: t(
         "Indicateurs d'objectif et intermédiaires, suivis province par province.",
@@ -145,16 +145,16 @@ export function dict(lang: Lang) {
     sec: {
       chiffres: t("Le projet en bref", "The project at a glance"),
       composantes: t("Les cinq composantes", "The five components"),
-      resultats: t("Cadre de résultats — ambitions à l'horizon 2029", "Results framework — ambitions towards 2029"),
+      resultats: t("Cadre de résultats : cibles 2029", "Results framework: 2029 targets"),
       couverture: t("Couverture géographique", "Geographic coverage"),
-      gouvernance: t("Architecture de gouvernance", "Governance architecture"),
+      gouvernance: t("Organes de gouvernance", "Governance bodies"),
       equipe: t("L'équipe de l'Unité", "The Unit's team"),
       actus: t("Actualités & communiqués", "News & releases"),
       repondre: t("Répondre à un marché", "Respond to a tender"),
     },
     lbl: {
       baseline: t("Point de départ", "Starting point"),
-      cible: t("Ambition à l'horizon 2029", "Ambition towards 2029"),
+      cible: t("Cible 2029", "2029 target"),
       dont: t("dont", "incl."),
       prio: t("Provinces prioritaires", "Priority provinces"),
       autres: t("Autres provinces", "Other provinces"),
@@ -167,8 +167,8 @@ export function dict(lang: Lang) {
       ariane: t("Fil d'Ariane", "Breadcrumb"),
       /* Mention affichée sous tout bloc d'indicateurs prospectifs. */
       indicatif: t(
-        "Ordres de grandeur issus du cadre de résultats du projet. Ces ambitions orientent l'exécution ; elles sont revues périodiquement avec les partenaires et ne constituent pas un engagement de résultat.",
-        "Orders of magnitude drawn from the project's results framework. These ambitions guide implementation; they are reviewed periodically with partners and do not constitute a guarantee of results.",
+        "Ordres de grandeur issus du cadre de résultats du projet. Ces cibles orientent l'exécution ; elles sont revues périodiquement avec les partenaires et ne constituent pas un engagement de résultat.",
+        "Orders of magnitude drawn from the project's results framework. These targets guide implementation; they are reviewed periodically with partners and do not constitute a guarantee of results.",
       ),
     },
     foot: {
@@ -223,25 +223,25 @@ export function dict(lang: Lang) {
     /* --- Accueil ---------------------------------------------------------- */
     home: {
       heroKicker: t("Projet de Transformation Numérique · RDC", "Digital Transformation Project · DRC"),
-      heroTitle: t("Transformer la RDC, une connexion à la fois.", "Transforming the DRC, one connection at a time."),
+      heroTitle: t("Étendre l'accès au numérique en RDC.", "Extending digital access in the DRC."),
       heroLead: t(
-        "L'Unité qui pilote la transformation numérique de la RDC — un programme cofinancé par la Banque mondiale et l'AFD, engagé sur les 26 provinces pour élargir progressivement l'accès, les services et les compétences numériques.",
-        "The Unit steering the DRC's digital transformation — a programme co-financed by the World Bank and AFD, engaged across all 26 provinces to progressively widen access, services and digital skills.",
+        "L'Unité de gestion du Projet de Transformation Numérique, cofinancé par la Banque mondiale et l'AFD. Le projet couvre les 26 provinces et finance l'accès à internet, des services publics numériques et la formation aux compétences numériques.",
+        "The management unit of the Digital Transformation Project, co-financed by the World Bank and AFD. The project covers all 26 provinces and funds internet access, digital public services and digital skills training.",
       ),
-      introKicker: t("Notre ambition", "Our ambition"),
+      introKicker: t("Le projet", "The project"),
       introLead: t(
-        "Trois chantiers, et une seule logique : un réseau qui atteint les territoires, un socle numérique commun à l'État, et les compétences pour faire vivre l'un et l'autre. Pris séparément, aucun ne produit d'effet durable ; c'est leur enchaînement qui compte.",
-        "Three efforts, one logic: a network that reaches the territories, a digital foundation shared across the State, and the skills to keep both running. Taken separately, none produces lasting effects; it is their sequence that matters.",
+        "Le projet mène trois chantiers liés : étendre le réseau dans les provinces, mettre en place des outils numériques communs aux administrations, et former les personnes qui les font fonctionner.",
+        "The project runs three linked workstreams: extending the network into the provinces, setting up digital tools shared by government administrations, and training the people who operate them.",
       ),
       statusEffective: t("Entrée en vigueur 31.10.2025", "Effectiveness 31.10.2025"),
       statusCompletion: t("Achèvement technique 31.12.2029", "Technical completion 31.12.2029"),
       resultatsTitle: t(
-        "Des ambitions mesurables à l'horizon 2029 — l'impact et l'inclusion au cœur.",
-        "Measurable ambitions towards 2029 — impact and inclusion at the core.",
+        "Les cibles du projet à l'horizon 2029.",
+        "The project's targets for 2029.",
       ),
       couvertureLead: t(
-        "Le projet couvre les 26 provinces, mais pas au même rythme : dix d'entre elles, retenues dans le Cadre de Partenariat-Pays, sont traitées en priorité. Cet ordre est publié — c'est ce qui permet à chacun de savoir où en est son territoire.",
-        "The project covers all 26 provinces, but not at the same pace: ten of them, identified in the Country Partnership Framework, are treated first. That order is published — which is what allows each territory to know where it stands.",
+        "Le projet couvre les 26 provinces, mais pas au même rythme : dix d'entre elles, retenues dans le Cadre de Partenariat-Pays, sont traitées en priorité. Cet ordre est publié : chacun peut voir où en est sa province.",
+        "The project covers all 26 provinces, but not at the same pace: ten of them, identified in the Country Partnership Framework, are treated first. That order is published, so anyone can see where their province stands.",
       ),
       equipeLead: t(
         "Une équipe d'exécution organisée en cinq pôles, du pilotage national à la liaison avec les provinces.",
@@ -255,8 +255,8 @@ export function dict(lang: Lang) {
         "What the project builds, in five strands.",
       ),
       composantesNote: t(
-        "Chaque volet a sa page : périmètre, objectifs, projets phares et responsable.",
-        "Each strand has its own page: scope, objectives, flagship projects and lead.",
+        "Chaque volet a sa page : périmètre, objectifs, principaux projets et responsable.",
+        "Each strand has its own page: scope, objectives, main projects and lead.",
       ),
       gouvLead: t(
         "Trois niveaux, et une règle : celui qui oriente ne met pas en œuvre. Qui préside, à quelle majorité et à quelle fréquence, se lit sur la page dédiée.",
@@ -264,20 +264,20 @@ export function dict(lang: Lang) {
       ),
       watchStory: t("Voir le témoignage", "Watch the testimonial"),
       evtLabel: t("Événements & activités", "Events & activities"),
-      evtTitle: t("Échanger, participer, contribuer.", "Exchange, take part, contribute."),
+      evtTitle: t("Consultations, ateliers et forums.", "Consultations, workshops and forums."),
       evtLead: t(
-        "Les consultations publiques ne sont pas des séances d'information : ce qui s'y dit est consigné et doit être pris en compte avant que les travaux ne démarrent. Les forums, ateliers et webinaires suivent la même règle — on y vient pour contribuer, pas pour assister.",
-        "Public consultations are not briefing sessions: what is said there is recorded and must be taken into account before works begin. Forums, workshops and webinars follow the same rule — you come to contribute, not to attend.",
+        "Les consultations publiques recueillent l'avis des personnes concernées : ce qui s'y dit est consigné et pris en compte avant le début des travaux. Les forums, ateliers et webinaires sont aussi ouverts aux contributions.",
+        "Public consultations gather the views of the people concerned: what is said there is recorded and taken into account before works begin. Forums, workshops and webinars are also open to contributions.",
       ),
       evtUpcoming: t("À venir", "Upcoming"),
       galleryLabel: t("En images", "In pictures"),
-      galleryTitle: t("La transformation, province par province.", "The transformation, province by province."),
+      galleryTitle: t("Le projet sur le terrain.", "The project on the ground."),
       galleryLead: t(
-        "Le déploiement vu du terrain, d'une province à l'autre.",
-        "Deployment seen from the ground, province by province.",
+        "Photos et vidéos des chantiers et des activités dans les provinces.",
+        "Photos and videos of worksites and activities in the provinces.",
       ),
       partenairesLabel: t("Partenaires & institutions", "Partners & institutions"),
-      partenairesTitle: t("Construit avec ceux qui le rendent possible.", "Built with those who make it possible."),
+      partenairesTitle: t("Les institutions associées au projet.", "Institutions involved in the project."),
       partenairesLead: t(
         "Un projet de cette nature ne se conduit pas depuis une seule institution : le régulateur, les ministères sectoriels, l'agence du numérique et l'organisme d'identification portent chacun une part du résultat.",
         "A project of this kind cannot be run from a single institution: the regulator, sector ministries, the digital agency and the identification body each carry part of the result.",
@@ -585,16 +585,16 @@ export function dict(lang: Lang) {
          ne dit rien de plus à un moteur de recherche. */
       titre: t("Le Projet", "The Project"),
       h1: t(
-        "Trois chantiers menés ensemble, parce qu'aucun ne produit d'effet seul.",
-        "Three efforts pursued together, because none produces an effect alone.",
+        "Trois chantiers liés, de 2025 à 2029.",
+        "Three linked workstreams, from 2025 to 2029.",
       ),
       metaDesc: t(
-        "Pourquoi le Projet de Transformation Numérique de la RDC existe, à qui il profite, ce qu'il change et selon quel calendrier jusqu'en 2029.",
-        "Why the DRC Digital Transformation Project exists, who it benefits, what it changes and on what schedule to 2029.",
+        "Pourquoi le Projet de Transformation Numérique de la RDC existe, à qui il s'adresse, ce qu'il finance et selon quel calendrier jusqu'en 2029.",
+        "Why the DRC Digital Transformation Project exists, who it is for, what it funds and on what schedule to 2029.",
       ),
       lead: t(
-        "Trois chantiers menés ensemble parce qu'aucun ne produit d'effet seul : élargir l'accès au réseau, doter l'État d'un socle numérique commun, et former les compétences qui feront vivre l'un et l'autre. Horizon 2029.",
-        "Three efforts pursued together because none works alone: widening access to the network, giving the State a common digital foundation, and building the skills that will keep both running. Horizon 2029.",
+        "Trois chantiers liés : élargir l'accès au réseau, mettre en place des outils numériques communs aux administrations, et former les personnes qui les font fonctionner. Fin prévue en 2029.",
+        "Three linked workstreams: widening access to the network, setting up digital tools shared by government administrations, and training the people who operate them. Scheduled to end in 2029.",
       ),
       /* ⚠️ Les en-têtes des blocs de la page — contexte, publics visés, aperçus
          des composantes et des résultats, questions citoyennes — ne sont plus
@@ -605,10 +605,10 @@ export function dict(lang: Lang) {
          voisine : les deux dates de signature qu'elle affichait en dur figurent
          dans la frise des jalons, huit cents pixels plus bas sur la même page.
          Une date publiée à deux endroits finit par diverger. */
-      ctaTitle: t("Prenez part à la transformation.", "Take part in the transformation."),
+      ctaTitle: t("Suivre le projet ou y participer.", "Follow or take part in the project."),
       ctaLead: t(
-        "Candidater à un marché, suivre l'avancement province par province, ou signaler une difficulté : chacune de ces portes est ouverte et tracée.",
-        "Bid for a contract, follow progress province by province, or report a difficulty: each of these doors is open and traceable.",
+        "Candidater à un marché, suivre l'avancement province par province, ou signaler une difficulté : chaque démarche est enregistrée.",
+        "Bid for a contract, follow progress province by province, or report a difficulty: each request is recorded.",
       ),
     },
 
@@ -618,24 +618,24 @@ export function dict(lang: Lang) {
       indexTitle: t("Cinq composantes, un seul projet.", "Five components, one project."),
       indexListeTitre: t("Les composantes du projet", "The project components"),
       indexLead: t(
-        "Cinq volets complémentaires : l'accès et l'inclusion, les fondations numériques de l'État, les compétences et l'innovation, l'exécution du projet et la réserve d'intervention. Chacun a sa page, ses projets phares et son responsable.",
-        "Five complementary strands: access and inclusion, the State's digital foundations, skills and innovation, project delivery and the response reserve. Each has its own page, flagship projects and lead.",
+        "Cinq volets complémentaires : l'accès et l'inclusion, les fondations numériques de l'État, les compétences et l'innovation, l'exécution du projet et la réserve d'intervention. Chacun a sa page, ses principaux projets et son responsable.",
+        "Five complementary strands: access and inclusion, the State's digital foundations, skills and innovation, project delivery and the response reserve. Each has its own page, main projects and lead.",
       ),
       one: t("Composante", "Component"),
       metaDesc: t(
-        "Les cinq composantes du projet : périmètre, objectifs, projets phares, responsable, et ce que chacune attend des autres.",
-        "The project's five components: scope, objectives, flagship projects, lead, and what each needs from the others.",
+        "Les cinq composantes du projet : périmètre, objectifs, principaux projets, responsable, et ce que chacune attend des autres.",
+        "The project's five components: scope, objectives, main projects, lead, and what each needs from the others.",
       ),
       /* `rowsNote` a été retirée : elle paraphrasait `indexLead` sur la même
          page, en dessous des mêmes cinq cartes. */
       liensLabel: t("Lecture transversale", "Cross-cutting reading"),
       liensTitle: t(
-        "Aucune composante ne produit son effet seule.",
-        "No component produces its effect on its own.",
+        "Les liens entre composantes.",
+        "How the components connect.",
       ),
       liensLead: t(
-        "Les renvois ci-dessous ne sont pas de courtoisie : ils disent ce qu'une composante attend d'une autre pour que son propre résultat tienne.",
-        "The cross-references below are not a courtesy: they state what one component needs from another for its own result to hold.",
+        "Ce que chaque composante attend des autres pour atteindre ses propres résultats.",
+        "What each component needs from the others to reach its own results.",
       ),
       chaineDepend: t("Dépend de", "Depends on"),
       see: t("Voir la composante", "View the component"),
@@ -643,7 +643,7 @@ export function dict(lang: Lang) {
       prev: t("Composante précédente", "Previous component"),
       next: t("Composante suivante", "Next component"),
       perimetre: t("Périmètre de la composante", "Component scope"),
-      share: t("chantiers structurants", "structuring workstreams"),
+      share: t("chantiers", "workstreams"),
       sousTitle: t("Sous-composantes", "Sub-components"),
       horizon: t("Horizon", "Horizon"),
       statutExec: t("En exécution", "Under implementation"),
@@ -658,10 +658,10 @@ export function dict(lang: Lang) {
       aProblematique: t("Problématique", "Problem"),
       secContexte: t("Contexte & périmètre", "Context & scope"),
       secObjectifs: t("Objectifs de la composante", "Component objectives"),
-      secProjets: t("Projets phares", "Flagship projects"),
+      secProjets: t("Principaux projets", "Main projects"),
       secProjetsLead: t(
-        "Les chantiers structurants portés par la composante.",
-        "The structuring workstreams carried by the component.",
+        "Les principaux projets menés par la composante.",
+        "The main projects run by the component.",
       ),
       secEcosysteme: t("Vue d'ensemble", "The bigger picture"),
       secFinalite: t("Finalité", "Purpose"),
@@ -672,7 +672,7 @@ export function dict(lang: Lang) {
       aContexte: t("Contexte", "Context"),
       aVideo: t("Vidéo", "Video"),
       aObjectifs: t("Objectifs", "Objectives"),
-      aProjets: t("Projets phares", "Flagship projects"),
+      aProjets: t("Principaux projets", "Main projects"),
       aEcosysteme: t("Vue d'ensemble", "Bigger picture"),
       aFinalite: t("Finalité", "Purpose"),
       aResponsable: t("Responsable", "Lead"),
@@ -696,7 +696,7 @@ export function dict(lang: Lang) {
       liesActusVide: t("Aucune actualité rattachée pour l'instant.", "No news attached yet."),
       liesMarchesVide: t("Aucun avis en cours pour cette composante.", "No live notice for this component."),
       /* Divers */
-      projets: t("projets phares", "flagship projects"),
+      projets: t("principaux projets", "main projects"),
       objectifsCount: t("objectifs", "objectives"),
       sommaire: t("Sommaire", "Contents"),
       toValidate: t(
@@ -709,8 +709,8 @@ export function dict(lang: Lang) {
     ugptn: {
       titre: t("L'UGPTN", "The UGPTN"),
       lead: t(
-        "Une unité d'exécution, pas une administration de plus. Elle prépare, passe les marchés, supervise et rend compte, dans un cadre où la décision appartient aux autorités de tutelle et où les prérogatives des cofinanceurs restent entières.",
-        "A delivery unit, not another administration. It prepares, procures, supervises and accounts, within a framework where decisions belong to the supervising authorities and where co-financiers' prerogatives remain intact.",
+        "L'unité chargée d'exécuter le projet. Elle prépare, passe les marchés, supervise et rend compte, dans un cadre où la décision appartient aux autorités de tutelle et où les prérogatives des cofinanceurs restent entières.",
+        "The unit responsible for delivering the project. It prepares, procures, supervises and accounts, within a framework where decisions belong to the supervising authorities and where co-financiers' prerogatives remain intact.",
       ),
       metaDesc: t(
         "L'unité d'exécution du Projet de Transformation Numérique : son mandat, les règles qui bornent ses décisions, ses cinq pôles et la méthode qu'elle répète marché après marché.",
@@ -738,8 +738,8 @@ export function dict(lang: Lang) {
     gouv: {
       titre: t("Gouvernance", "Governance"),
       lead: t(
-        "Trois niveaux, et une règle : celui qui oriente ne met pas en œuvre, et celui qui met en œuvre ne s'auto-évalue pas. Cette séparation est ce qui rend les décisions contrôlables.",
-        "Three levels, and one rule: whoever sets direction does not implement, and whoever implements does not assess themselves. That separation is what makes decisions controllable.",
+        "Trois niveaux, et une règle : celui qui oriente ne met pas en œuvre, et celui qui met en œuvre ne s'auto-évalue pas.",
+        "Three levels, and one rule: whoever sets direction does not implement, and whoever implements does not assess themselves.",
       ),
       metaDesc: t(
         "Les trois organes qui décident du Projet de Transformation Numérique : comité de pilotage, comité technique et unité d'exécution, leur composition, leurs règles de décision et leur trace datée.",
@@ -778,16 +778,16 @@ export function dict(lang: Lang) {
       copilMembers: [t("MPTN, président", "MPTN, Chair"), t("Présidence / ADN", "Presidency / ADN"), "Primature", t("Min. Finances", "Min. of Finance"), "MIS", "MESU", "MEPME", t("+1 désigné", "+1 appointee")],
       ctpMembers: [t("MPTN (préside) +3", "MPTN (chair) +3"), "ARPTC", "FDSU", "MIS ×2", "ONIP", "MESU", "MEPME", "MINFIN-CSPP", "ADN", "SOCOF", "Primature"],
       actLabel: t("La coordination en action", "Coordination in action"),
-      actTitle: t("Ce que la gouvernance a effectivement décidé.", "What governance has actually decided."),
+      actTitle: t("Les décisions des organes de gouvernance.", "Decisions of the governance bodies."),
       actLead: t(
-        "Une gouvernance ne se juge pas à sa composition mais à ses décisions et à leur date. Voici la trace de celles qui engagent l'exécution.",
-        "Governance is judged not by its composition but by its decisions and their dates. Here is the record of those that commit delivery.",
+        "Les décisions qui engagent l'exécution du projet, avec leur date.",
+        "Decisions that commit project delivery, with their dates.",
       ),
       leadsLabel: t("L'équipe de coordination", "The coordination team"),
       leadsTitle: t("Qui répond de quoi.", "Who answers for what."),
       leadsLead: t(
-        "Dans un projet à plusieurs bailleurs et plusieurs ministères, l'ambiguïté sur la responsabilité coûte des mois. Chaque rôle ci-dessous porte un périmètre défini et répond de ses livrables devant la coordination.",
-        "In a project with several donors and several ministries, ambiguity about responsibility costs months. Each role below carries a defined scope and answers for its deliverables to the coordination.",
+        "Chaque rôle ci-dessous porte un périmètre défini et répond de ses livrables devant la coordination.",
+        "Each role below carries a defined scope and answers for its deliverables to the coordination.",
       ),
       bodyLabels: {
         nature: t("Nature", "Nature"),
@@ -1004,8 +1004,8 @@ export function dict(lang: Lang) {
     actus: {
       heroTitle: t("Décisions, jalons et communiqués.", "Decisions, milestones and releases."),
       heroLead: t(
-        "L'avancement du Projet, au plus près : décisions, jalons et communiqués officiels, publiés au fur et à mesure de leur adoption.",
-        "The Project's progress, up close: decisions, milestones and official releases, published as they are adopted.",
+        "L'avancement du Projet : décisions, jalons et communiqués officiels, publiés au fur et à mesure de leur adoption.",
+        "The Project's progress: decisions, milestones and official releases, published as they are adopted.",
       ),
       readArticle: t("Lire l'article", "Read the article"),
       allFilter: t("Tout", "All"),
@@ -1015,6 +1015,10 @@ export function dict(lang: Lang) {
         "Each release at its date, most recent first. Featured articles are not promoted here: the order is that of the calendar.",
       ),
       relatedVideo: t("Voir la vidéo associée", "Watch the related video"),
+      pdfTitre: t("Version PDF", "PDF version"),
+      pdfLead: t("Le texte officiel de ce communiqué, à télécharger.", "The official text of this release, to download."),
+      pdfOuvrir: t("Ouvrir", "Open"),
+      pdfTelecharger: t("Télécharger le PDF", "Download the PDF"),
       allNews: t("Toutes les actualités", "All news"),
 
       /* --- Liste : filtres, recherche, pagination -------------------------- */
@@ -1181,7 +1185,7 @@ export function dict(lang: Lang) {
         "Les indicateurs d'objectif et intermédiaires du projet, leur point de départ, ce qu'ils mesurent réellement et ce que la mesure ne dit pas.",
         "The project's objective and intermediate indicators, their starting point, what they actually measure and what measurement does not say.",
       ),
-      odpLabel: t("ODP · ambitions à l'horizon 2029", "PDO · ambitions towards 2029"),
+      odpLabel: t("ODP · cibles 2029", "PDO · 2029 targets"),
       interLabel: t("Indicateurs intermédiaires — ce que le projet livre", "Intermediate indicators — what the project delivers"),
       /* La section « Le projet en vidéos » a été retirée : ses cinq cartes
          portaient un bouton de lecture et une durée devant des films qui ne
@@ -1282,10 +1286,10 @@ export function dict(lang: Lang) {
     /* --- Vidéos & galeries ------------------------------------------------ */
     galerie: {
       titre: t("Vidéos & galeries", "Videos & galleries"),
-      hero: t("Ce que le Projet change, vu du terrain.", "What the Project changes, seen from the ground."),
+      hero: t("Le Projet sur le terrain.", "The Project on the ground."),
       lead: t(
-        "Un chantier de fibre optique, un atelier de formation, une salle de serveurs qui s'allume : ces images disent ce qu'un tableau d'indicateurs ne montre pas. Elles sont prises au fil de l'exécution, dans les provinces où le Projet travaille, et publiées telles quelles.",
-        "A fibre-optic worksite, a training workshop, a server room powering up: these images say what a table of indicators cannot show. They are taken as implementation proceeds, in the provinces where the Project works, and published as they are.",
+        "Chantiers de fibre optique, ateliers de formation, installations techniques. Les images sont prises au fil de l'exécution, dans les provinces où le Projet travaille, et publiées telles quelles.",
+        "Fibre-optic worksites, training workshops, technical installations. The images are taken as implementation proceeds, in the provinces where the Project works, and published as they are.",
       ),
 
       /* Barre de recherche, filtres et tri. */

@@ -31,7 +31,7 @@ export const meta: Meta = {
 };
 
 export const chiffres: Chiffre[] = [
-  { value: 510, unit: "M USD", label: { fr: "Enveloppe totale", en: "Total envelope" }, sub: { fr: "Investissement structurant", en: "Structuring investment" } },
+  { value: 510, unit: "M USD", label: { fr: "Enveloppe totale", en: "Total envelope" }, sub: { fr: "Cofinancement IDA et AFD", en: "IDA and AFD co-financing" } },
   { value: 400, unit: "M USD", pct: "79 %", label: { fr: "Financement IDA", en: "IDA financing" }, sub: { fr: "Banque mondiale — chef de file", en: "World Bank — lead" } },
   { value: 110, unit: "M USD", pct: "21 %", label: { fr: "Financement AFD", en: "AFD financing" }, sub: { fr: "soit 100 M EUR", en: "i.e. EUR 100M" } },
   { value: 165, unit: "M USD", label: { fr: "Capitaux privés (cible)", en: "Private capital (target)" }, sub: { fr: "Partenariats public-privé — mobilisation visée", en: "Public-private partnerships — mobilisation sought" } },
@@ -43,7 +43,7 @@ export const chiffres: Chiffre[] = [
 export const reperes: Repere[] = [
   { v: "26", label: { fr: "Provinces couvertes", en: "Provinces covered" }, sub: { fr: "déploiement priorisé sur 10 d'entre elles", en: "rollout prioritised across 10 of them" } },
   { v: "05", label: { fr: "Composantes", en: "Components" }, sub: { fr: "un seul programme national", en: "a single national programme" } },
-  { v: "2029", label: { fr: "Horizon de la transformation", en: "Horizon of the transformation" }, sub: { fr: "achèvement technique visé", en: "targeted technical completion" } },
+  { v: "2029", label: { fr: "Fin du projet", en: "Project end" }, sub: { fr: "achèvement technique visé", en: "targeted technical completion" } },
   { v: "IDA · AFD", label: { fr: "Cofinancement", en: "Co-financing" }, sub: { fr: "Banque mondiale & Agence Française de Développement", en: "World Bank & French Development Agency" } },
 ];
 
@@ -68,7 +68,7 @@ export const composantes: Composante[] = [
   {
     code: "C1", montant: 385, ida: 302, afd: 83,
     titre: { fr: "Accès & inclusion numériques", en: "Digital access & inclusion" },
-    desc: { fr: "Porter l'accès à internet à l'échelle du pays : dorsales en fibre optique, couverture mobile haut débit et raccordement des écoles, des universités et des institutions publiques.", en: "Bring internet access to nationwide scale: fibre-optic backbones, mobile broadband coverage and the connection of schools, universities and public institutions." },
+    desc: { fr: "Étendre l'accès à internet : dorsales en fibre optique, couverture mobile haut débit et raccordement des écoles, des universités et des institutions publiques.", en: "Extend internet access: fibre-optic backbones, mobile broadband coverage and the connection of schools, universities and public institutions." },
     sous: [
       { ref: "1.1", montant: 15, text: { fr: "Cadres et facilitateurs pour l'accès et l'inclusion", en: "Frameworks and enablers for access and inclusion" } },
       { ref: "1.2", montant: 190, text: { fr: "Extension des réseaux de transmission", en: "Extension of transmission networks" } },
@@ -88,7 +88,7 @@ export const composantes: Composante[] = [
   {
     code: "C3", montant: 45, ida: 35.3, afd: 9.7,
     titre: { fr: "Compétences & innovation", en: "Skills & innovation" },
-    desc: { fr: "Former une génération aux compétences numériques avancées et soutenir l'innovation locale : universités, hubs technologiques, startups et financements à la performance.", en: "Equip a generation with advanced digital skills and back local innovation: universities, tech hubs, startups and performance-based grants." },
+    desc: { fr: "Former aux compétences numériques avancées et soutenir l'innovation locale : universités, hubs technologiques, startups et financements à la performance.", en: "Train people in advanced digital skills and support local innovation: universities, tech hubs, startups and performance-based grants." },
     sous: [
       { ref: "3.1", montant: 32, text: { fr: "Compétences numériques avancées (EES, hubs)", en: "Advanced digital skills (HEIs, hubs)" } },
       { ref: "3.2", montant: 13, text: { fr: "Système de contenu local et innovation", en: "Local content system and innovation" } },
@@ -97,7 +97,7 @@ export const composantes: Composante[] = [
   {
     code: "C4", montant: 25, ida: 19.6, afd: 5.4,
     titre: { fr: "Coordination & gestion", en: "Coordination & management" },
-    desc: { fr: "Donner à l'Unité les moyens d'exécuter avec rigueur : coordination, gestion fiduciaire, passation des marchés, suivi-évaluation, sauvegardes environnementales et sociales, communication.", en: "Give the Unit the means to deliver with rigour: coordination, fiduciary management, procurement, monitoring and evaluation, environmental and social safeguards, communication." },
+    desc: { fr: "Financer le fonctionnement de l'Unité : coordination, gestion fiduciaire, passation des marchés, suivi-évaluation, sauvegardes environnementales et sociales, communication.", en: "Fund the Unit's operations: coordination, fiduciary management, procurement, monitoring and evaluation, environmental and social safeguards, communication." },
     sous: [],
   },
   {
@@ -258,13 +258,13 @@ export const langues: Langue[] = [
 ];
 
 export const question: Bilingual = {
-  fr: "Quand un pays se connecte, tout change : l'école apprend autrement, la santé soigne plus loin, le marché s'ouvre et l'État se rapproche du citoyen.",
-  en: "When a country connects, everything changes: classrooms teach in new ways, healthcare reaches further, markets open up, and the State draws closer to its citizens.",
+  fr: "Concrètement : des écoles, des universités et des administrations raccordées à internet, des services publics accessibles en ligne, et des formations pour celles et ceux qui les utilisent.",
+  en: "In practice: schools, universities and government offices connected to the internet, public services available online, and training for the people who use them.",
 };
 
 export const engagement: Bilingual = {
-  fr: "Faire du numérique un droit, et non un privilège : un investissement structurant pour qu'un nombre croissant de Congolaises et de Congolais puisse accéder, apprendre et entreprendre.",
-  en: "Making digital a right, not a privilege: a structuring investment so that a growing number of Congolese women and men can connect, learn and build.",
+  fr: "Permettre à un plus grand nombre de Congolaises et de Congolais d'accéder à internet, aux services publics en ligne et aux formations numériques.",
+  en: "Enabling more Congolese women and men to access the internet, online public services and digital training.",
 };
 
 /* Component colour code → accent (C1 blue, C2 teal, C3 violet, C4 magenta, C5 grey). */
