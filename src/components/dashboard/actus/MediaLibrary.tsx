@@ -33,6 +33,7 @@ import {
   type MediaRef,
 } from "@/lib/medias";
 import { vignette } from "@/lib/images";
+import { compresserImage } from "@/lib/compression-image";
 
 const etatInitial: ActuFormState = { error: null, ok: null };
 
@@ -63,8 +64,11 @@ export function MediaLibrary({ medias, stockageActif }: { medias: MediaAvecUsage
 
     const refus: string[] = [];
     let recus = 0;
-    for (const [rang, fichier] of fichiers.entries()) {
+    for (const [rang, original] of fichiers.entries()) {
       setProgression(fichiers.length > 1 ? `${rang + 1}/${fichiers.length}` : "");
+      // Images réduites et converties en WebP avant l'envoi ; les documents
+      // partent tels quels (cf. lib/compression-image.ts).
+      const fichier = estImage(original.type) ? await compresserImage(original) : original;
       const envoi = new FormData();
       envoi.set("fichier", fichier);
       if (fichiers.length === 1) {

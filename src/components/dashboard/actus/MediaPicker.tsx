@@ -18,6 +18,7 @@ import { media as registre } from "@/content/media";
 import type { ImgKey } from "@/content/types";
 import { estImage, MIMES_IMAGE, mediaSrc, poidsLisible, TAILLE_MAX, type MediaRef } from "@/lib/medias";
 import { vignette } from "@/lib/images";
+import { compresserImage } from "@/lib/compression-image";
 
 /** Ce que le sélecteur renvoie à son appelant. */
 export type ChoixMedia =
@@ -82,8 +83,10 @@ export function MediaPicker({
   }, [open, onClose]);
 
   /** Dépose UN fichier et renvoie le média créé, ou le motif du refus. */
-  const deposer = useCallback(async (fichier: File): Promise<MediaRef | string> => {
+  const deposer = useCallback(async (original: File): Promise<MediaRef | string> => {
     try {
+      // Réduite et convertie en WebP avant l'envoi (cf. lib/compression-image.ts).
+      const fichier = await compresserImage(original);
       const formData = new FormData();
       formData.set("fichier", fichier);
       const resultat = await televerserMediaAction(formData);

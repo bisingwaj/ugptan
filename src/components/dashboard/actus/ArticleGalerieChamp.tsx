@@ -19,6 +19,7 @@ import { ADMIN_ACTUS } from "@/content/admin";
 import type { ImageGalerie } from "@/lib/actus/saisie";
 import { estImage, mediaSrc, MIMES_IMAGE, poidsLisible, TAILLE_MAX, type MediaRef } from "@/lib/medias";
 import { vignette } from "@/lib/images";
+import { compresserImage } from "@/lib/compression-image";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
 
 /** Plafond d'une galerie : au-delà, c'est un album, qui a son propre module. */
@@ -54,7 +55,10 @@ export function ArticleGalerieChamp({ initial, assets }: { initial: ImageGalerie
     setErreurs([]);
     setEnvoi({ fait: 0, total: aEnvoyer.length });
 
-    for (const [rang, fichier] of aEnvoyer.entries()) {
+    for (const [rang, original] of aEnvoyer.entries()) {
+      // Réduite et convertie en WebP avant l'envoi : une photo d'appareil de
+      // 8 Mo repasse sous le plafond et part en quelques centaines de ko.
+      const fichier = estImage(original.type) ? await compresserImage(original) : original;
       if (!estImage(fichier.type)) {
         refus.push(`${fichier.name} : ${t.galerieRefusFormat}`);
       } else if (fichier.size > TAILLE_MAX) {

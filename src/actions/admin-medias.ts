@@ -131,6 +131,8 @@ export async function televerserMediaAction(formData: FormData): Promise<Telever
       filename: nom,
       mimeType: fichier.type,
       sousDossier: estImage(fichier.type) ? "medias" : "documents",
+      // Images converties en WebP compressé ; documents conservés tels quels.
+      optimiser: estImage(fichier.type),
     });
   } catch (erreur) {
     console.error("[medias] dépôt Cloudinary impossible", erreur);
@@ -143,8 +145,10 @@ export async function televerserMediaAction(formData: FormData): Promise<Telever
   try {
     media = await db().mediaAsset.create({
       data: {
-        filename: nom,
-        mimeType: fichier.type,
+        // Le nom suit le fichier STOCKÉ : « photo.jpg » converti devient
+        // « photo.webp », sans quoi la bibliothèque annoncerait un JPEG.
+        filename: depot.mimeType === fichier.type ? nom : nom.replace(/\.[^.]+$/, "") + ".webp",
+        mimeType: depot.mimeType,
         size: depot.size || fichier.size,
         width: depot.width ?? taille?.width ?? null,
         height: depot.height ?? taille?.height ?? null,
@@ -159,7 +163,7 @@ export async function televerserMediaAction(formData: FormData): Promise<Telever
   } catch (erreur) {
     // Le fichier est déjà chez Cloudinary : le retirer évite d'y laisser un
     // orphelin que plus rien en base ne désigne.
-    await supprimerFichier(depot.publicId, fichier.type);
+    await supprimerFichier(depot.publicId, depot.mimeType);
     throw erreur;
   }
 

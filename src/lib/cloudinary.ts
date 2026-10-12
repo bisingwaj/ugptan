@@ -152,6 +152,24 @@ const formatBloque = (extension: string): boolean =>
   (FORMATS_RESTREINTS as readonly string[]).includes(extension) &&
   process.env.CLOUDINARY_PDF_DELIVERY?.trim() !== "1";
 
+/**
+ * Optimisation des images au dépôt : conversion en WebP, côté le plus long
+ * ramené à 2560 px, qualité choisie par Cloudinary (« auto:good »).
+ *
+ * Appliquée par Cloudinary lui-même, à l'entrée (transformation « incoming ») :
+ * le fichier STOCKÉ est le WebP, et non l'original servi converti à la volée.
+ * Le visiteur ne télécharge donc jamais une photo d'appareil de 8 Mo, quel que
+ * soit le chemin par lequel elle est arrivée.
+ *
+ * Écartés : le GIF, qui peut être animé (le WebP animé n'est pas produit par
+ * cette conversion), et le SVG, déjà vectoriel. Le WebP déjà fourni repasse
+ * quand même par la limite de taille.
+ */
+export const IMAGE_OPTIMISEE = { format: "webp", cote: 2560, qualite: "auto:good" } as const;
+
+export const imageOptimisable = (mimeType: string): boolean =>
+  mimeType.startsWith("image/") && mimeType !== "image/gif" && mimeType !== "image/svg+xml";
+
 /** Ce que le dépôt renvoie, tel que l'enregistre `MediaAsset`. */
 export type DepotResultat = {
   /** Identifiant Cloudinary — la seule prise pour supprimer plus tard. */
@@ -163,6 +181,11 @@ export type DepotResultat = {
   /** Poids réellement stocké, tel que Cloudinary le rapporte. */
   size: number;
   format: string | null;
+  /**
+   * Type MIME du fichier STOCKÉ : « image/webp » pour une image optimisée,
+   * sinon celui de l'envoi. C'est lui qu'il faut enregistrer en base.
+   */
+  mimeType: string;
   /**
    * Durée en secondes, arrondie. Renseignée pour les seules vidéos : le service
    * la relève au transcodage. La lire ici évite de la faire saisir à la main,
@@ -195,7 +218,16 @@ type ReponseUpload = {
  */
 export function deposerFichier(
   octets: Uint8Array,
-  options: { filename: string; mimeType: string; sousDossier?: string },
+  options: {
+    filename: string;
+    mimeType: string;
+    sousDossier?: string;
+    /**
+     * Convertir une image en WebP compressé (cf. `IMAGE_OPTIMISEE`). Réservé aux
+     * visuels : un document publié doit ressortir octet pour octet.
+     */
+    optimiser?: boolean;
+  },
 ): Promise<DepotResultat> {
   if (!preparer()) {
     return Promise.reject(
@@ -205,6 +237,7 @@ export function deposerFichier(
 
   const resourceType = typeRessource(options.mimeType);
   const dossier = [dossierRacine(), options.sousDossier].filter(Boolean).join("/");
+  const optimiser = options.optimiser === true && imageOptimisable(options.mimeType);
 
   return new Promise<DepotResultat>((resolve, reject) => {
     const flux = cloudinary.uploader.upload_stream(
@@ -213,6 +246,19 @@ export function deposerFichier(
         public_id: nomDeDepot(options.filename, resourceType),
         resource_type: resourceType,
         overwrite: false,
+        ...(optimiser
+          ? {
+              format: IMAGE_OPTIMISEE.format,
+              transformation: [
+                {
+                  width: IMAGE_OPTIMISEE.cote,
+                  height: IMAGE_OPTIMISEE.cote,
+                  crop: "limit",
+                  quality: IMAGE_OPTIMISEE.qualite,
+                },
+              ],
+            }
+          : {}),
       },
       (erreur, reponse) => {
         if (erreur) {
@@ -232,6 +278,7 @@ export function deposerFichier(
           height: r.height ?? null,
           size: r.bytes ?? octets.byteLength,
           format: r.format ?? null,
+          mimeType: optimiser ? "image/webp" : options.mimeType,
           duree: typeof r.duration === "number" ? Math.round(r.duration) : null,
           resourceType:
             r.resource_type === "raw" || r.resource_type === "video" || r.resource_type === "image"

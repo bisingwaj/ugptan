@@ -205,13 +205,14 @@ async function deposerVisuel(
       filename: nom,
       mimeType: fichier.type,
       sousDossier: DOSSIER_VISUEL,
+      optimiser: true,
     });
 
     return {
       visuel: {
         imageUrl: depot.url,
         imagePublicId: depot.publicId,
-        imageMime: fichier.type,
+        imageMime: depot.mimeType,
         imageWidth: depot.width ?? taille?.width ?? null,
         imageHeight: depot.height ?? taille?.height ?? null,
         imageSize: depot.size || fichier.size,
@@ -735,6 +736,7 @@ export async function verserDansAlbumAction(formData: FormData): Promise<Verseme
       filename: nom.slice(0, 180) || "media",
       mimeType: fichier.type,
       sousDossier: type === "VIDEO" ? DOSSIER_VIDEO : DOSSIER_VISUEL,
+      optimiser: type === "PHOTO",
     });
   } catch (erreur) {
     console.error("[galerie] dépôt Cloudinary impossible", erreur);
@@ -766,7 +768,7 @@ export async function verserDansAlbumAction(formData: FormData): Promise<Verseme
         // Nul pour une vidéo : la vignette est une dérivée du film, pas un
         // fichier distinct à effacer (cf. `vignetteDeVideo`).
         imagePublicId: type === "PHOTO" ? depot.publicId : null,
-        imageMime: type === "PHOTO" ? fichier.type : null,
+        imageMime: type === "PHOTO" ? depot.mimeType : null,
         imageWidth: type === "PHOTO" ? depot.width ?? taille?.width ?? null : null,
         imageHeight: type === "PHOTO" ? depot.height ?? taille?.height ?? null : null,
         imageSize: type === "PHOTO" ? depot.size || fichier.size : 0,
