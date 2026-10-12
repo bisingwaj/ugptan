@@ -856,10 +856,10 @@ export function dict(lang: Lang) {
         "Avis de marchés du PTN-RDC : méthode de passation, calendrier, pièces exigées et date limite, selon les Règlements de passation de la Banque mondiale.",
         "PTN-RDC procurement notices: procurement method, schedule, required documents and deadline, under the World Bank Procurement Regulations.",
       ),
-      heroTitle: t("Tout ce qu'il faut pour décider si vous candidatez.", "Everything you need to decide whether to bid."),
+      heroTitle: t("Les avis de marché du projet.", "The project's procurement notices."),
       heroLead: t(
-        "Chaque avis indique la méthode de passation retenue, le calendrier prévisionnel, les pièces exigées et la date limite. Les Règlements de Passation de la Banque mondiale (2025) s'appliquent : les critères d'évaluation sont annoncés à l'avance et ne changent pas en cours de procédure, et le résultat est publié. Une entreprise doit pouvoir estimer son effort de réponse avant de l'engager.",
-        "Each notice states the procurement method used, the indicative schedule, the documents required and the deadline. The World Bank Procurement Regulations (2025) apply: evaluation criteria are announced in advance, do not change mid-process, and the outcome is published. A company must be able to gauge the effort of responding before committing to it.",
+        "Chaque avis indique la méthode de passation, le calendrier, les pièces exigées et la date limite. Les Règlements de Passation de la Banque mondiale (2025) s'appliquent : critères annoncés à l'avance, résultat publié.",
+        "Each notice states the procurement method, the schedule, the documents required and the deadline. The World Bank Procurement Regulations (2025) apply: criteria announced in advance, outcome published.",
       ),
       search: t("Rechercher un avis, une référence, un lieu…", "Search a notice, reference, location…"),
       /* Compteurs accordés au nombre : « 1 ouverts » se lisait sur la page dès
