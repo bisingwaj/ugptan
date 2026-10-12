@@ -255,6 +255,32 @@ function filtreTraductions(lang: Lang, recherche?: string | null): Record<string
 }
 
 /**
+ * Filtre complet d'une recherche libre, au niveau de l'ARTICLE.
+ *
+ * Le texte de la langue lue (titre, résumé, corps) ne suffit pas : un
+ * communiqué rangé sous l'étiquette « Communiqué de presse » doit répondre à
+ * « presse » même si le mot n'apparaît pas dans son texte. Étiquettes et
+ * catégorie sont donc interrogées aussi, sous leurs DEUX noms : une étiquette
+ * n'a pas toujours été traduite au moment où l'article est publié.
+ *
+ * La langue reste exigée dans tous les cas : un article sans traduction dans
+ * la langue de lecture ne remonte pas, même si son étiquette correspond.
+ */
+function filtreRecherche(lang: Lang, recherche?: string | null): Record<string, unknown> {
+  const q = recherche?.trim();
+  if (!q) return { translations: { some: filtreTraductions(lang) } };
+  const motif = { contains: q, mode: "insensitive" };
+  return {
+    translations: { some: { locale: lang } },
+    OR: [
+      { translations: { some: filtreTraductions(lang, q) } },
+      { tags: { some: { tag: { OR: [{ nomFr: motif }, { nomEn: motif }] } } } },
+      { category: { OR: [{ nomFr: motif }, { nomEn: motif }] } },
+    ],
+  };
+}
+
+/**
  * Liste paginée de la page « Actualités ».
  *
  * Les articles mis en avant remontent en tête, quel que soit le filtre : c'est
@@ -292,7 +318,7 @@ async function listerActualitesImpl(
 
   const where = {
     ...enLigne(),
-    translations: { some: filtreTraductions(lang, recherche) },
+    ...filtreRecherche(lang, recherche),
     ...(categorie ? { category: { slug: categorie } } : {}),
     ...(tag ? { tags: { some: { tag: { slug: tag } } } } : {}),
     ...(comp ? { comps: { has: comp } } : {}),
@@ -408,7 +434,7 @@ async function filChronologiqueImpl(options: {
 
   const where = {
     ...enLigne(),
-    translations: { some: filtreTraductions(lang, recherche) },
+    ...filtreRecherche(lang, recherche),
     ...(categorie ? { category: { slug: categorie } } : {}),
     ...(tag ? { tags: { some: { tag: { slug: tag } } } } : {}),
   };
