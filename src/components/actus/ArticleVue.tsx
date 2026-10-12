@@ -38,6 +38,8 @@ type Props = {
 export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = false }: Props) {
   const t = dict(lang).actus;
   const accent = actu.categorie?.color ?? "var(--ac)";
+  // `?? []` : une entrée de cache antérieure à la galerie n'a pas ce champ.
+  const avecGalerie = (actu.galerie ?? []).length > 0;
 
   return (
     <article>
@@ -92,128 +94,143 @@ export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = fals
         </div>
       </header>
 
-      {/* ===== Corps ===== */}
+      {/* ===== Corps =====
+          Avec une galerie, deux colonnes sur grand écran : le texte à gauche,
+          la galerie à droite, collée sous l'en-tête pendant la lecture. Sans
+          galerie, la colonne de lecture centrée habituelle. Sur un écran
+          étroit, la galerie se place après le texte et le PDF, avant les
+          étiquettes (cf. `.actu-2col` dans globals.css). */}
       <div className="actu-corps">
-        <div className="actu-corps__inner">
-          {/* Traduction absente : on le dit, plutôt que de laisser croire à un
-              texte rédigé dans la langue de navigation. Le lien renvoie vers la
-              version servie, dans son propre contexte de langue. */}
-          {!actu.traduit && (
-            <p className="actu-avis" role="note">
-              {t.traductionAbsente(actu.langue)}
-              {actu.slugs[actu.langue] && (
-                <>
-                  {" "}
-                  <Link href={cheminArticle(actu.langue, actu.slugs[actu.langue]!)} className="actu-avis__lien">
-                    {t.lireDansLaLangue(actu.langue)} →
-                  </Link>
-                </>
-              )}
-            </p>
-          )}
+        <div className={avecGalerie ? "actu-2col" : "actu-corps__inner"}>
+          <div className="actu-2col__corps">
+            {/* Traduction absente : on le dit, plutôt que de laisser croire à un
+                texte rédigé dans la langue de navigation. Le lien renvoie vers la
+                version servie, dans son propre contexte de langue. */}
+            {!actu.traduit && (
+              <p className="actu-avis" role="note">
+                {t.traductionAbsente(actu.langue)}
+                {actu.slugs[actu.langue] && (
+                  <>
+                    {" "}
+                    <Link href={cheminArticle(actu.langue, actu.slugs[actu.langue]!)} className="actu-avis__lien">
+                      {t.lireDansLaLangue(actu.langue)} →
+                    </Link>
+                  </>
+                )}
+              </p>
+            )}
 
-          {actu.excerpt && <p className="actu-chapeau">{actu.excerpt}</p>}
+            {actu.excerpt && <p className="actu-chapeau">{actu.excerpt}</p>}
 
-          {/* Assainissement et dessin des graphiques : cf. components/prose/ProseRiche.tsx. */}
-          <ProseRiche html={actu.contentHtml} lang={lang} />
+            {/* Assainissement et dessin des graphiques : cf. components/prose/ProseRiche.tsx. */}
+            <ProseRiche html={actu.contentHtml} lang={lang} />
 
-          {actu.videoYt && (
-            <Reveal variant="fade">
-              <VideoButton
-                id={actu.videoYt}
-                className="btn btn--ghost actu-video"
-                meta={{ titre: actu.title, source: "UGPTN · PTN-RDC" }}
-                dataSlot="Vidéo de l'article"
-                dataRatio="16:9"
-              >
-                <span className="actu-video__play">▶</span>
-                {t.relatedVideo}
-              </VideoButton>
-            </Reveal>
-          )}
+            {actu.videoYt && (
+              <Reveal variant="fade">
+                <VideoButton
+                  id={actu.videoYt}
+                  className="btn btn--ghost actu-video"
+                  meta={{ titre: actu.title, source: "UGPTN · PTN-RDC" }}
+                  dataSlot="Vidéo de l'article"
+                  dataRatio="16:9"
+                >
+                  <span className="actu-video__play">▶</span>
+                  {t.relatedVideo}
+                </VideoButton>
+              </Reveal>
+            )}
 
-          {/* Galerie : après le texte et la vidéo, avant le PDF. */}
-          {actu.galerie?.length > 0 && <ArticleGalerie images={actu.galerie} lang={lang} titre={t.galerieTitre} />}
-
-          {/* Le PDF vient APRÈS le texte : c'est la version officielle à
-              conserver, pas la porte d'entrée. Même bloc que la pièce jointe
-              d'un document publié (cf. components/docs/DocumentVue.tsx). */}
-          {actu.fichier && (
-            <Reveal>
-              <section className="doc-piece" aria-label={t.pdfTitre}>
-                <div className="doc-piece__tete">
-                  <span className="doc-card__ext mono" aria-hidden="true">{actu.fichier.format}</span>
-                  <div style={{ minWidth: 0 }}>
-                    <div className="doc-piece__titre">{t.pdfTitre}</div>
-                    <p className="doc-piece__note">{t.pdfLead}</p>
-                    <p className="mono doc-piece__meta">
-                      {[actu.fichier.format, actu.fichier.poids].filter(Boolean).join(" · ")}
-                    </p>
+            {/* Le PDF vient APRÈS le texte : c'est la version officielle à
+                conserver, pas la porte d'entrée. Même bloc que la pièce jointe
+                d'un document publié (cf. components/docs/DocumentVue.tsx). */}
+            {actu.fichier && (
+              <Reveal>
+                <section className="doc-piece" aria-label={t.pdfTitre}>
+                  <div className="doc-piece__tete">
+                    <span className="doc-card__ext mono" aria-hidden="true">{actu.fichier.format}</span>
+                    <div style={{ minWidth: 0 }}>
+                      <div className="doc-piece__titre">{t.pdfTitre}</div>
+                      <p className="doc-piece__note">{t.pdfLead}</p>
+                      <p className="mono doc-piece__meta">
+                        {[actu.fichier.format, actu.fichier.poids].filter(Boolean).join(" · ")}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="doc-piece__actions">
-                  {actu.fichier.apercu && (
-                    <a href={actu.fichier.url} target="_blank" rel="noopener noreferrer" className="btn btn--outline btn--sm">
-                      {t.pdfOuvrir} ↗
+                  <div className="doc-piece__actions">
+                    {actu.fichier.apercu && (
+                      <a href={actu.fichier.url} target="_blank" rel="noopener noreferrer" className="btn btn--outline btn--sm">
+                        {t.pdfOuvrir} ↗
+                      </a>
+                    )}
+                    {/* `download` seul ne suffit pas sur une origine tierce : c'est
+                        l'URL qui porte la demande (cf. lib/docs/fichier.ts). */}
+                    <a href={actu.fichier.urlDl} className="btn btn--primary btn--sm" download>
+                      <span className="arrow">↓</span> {t.pdfTelecharger}
                     </a>
-                  )}
-                  {/* `download` seul ne suffit pas sur une origine tierce : c'est
-                      l'URL qui porte la demande (cf. lib/docs/fichier.ts). */}
-                  <a href={actu.fichier.urlDl} className="btn btn--primary btn--sm" download>
-                    <span className="arrow">↓</span> {t.pdfTelecharger}
-                  </a>
-                </div>
-              </section>
-            </Reveal>
-          )}
+                  </div>
+                </section>
+              </Reveal>
+            )}
 
-          {actu.tags.length > 0 && (
-            <Reveal>
-              <div className="actu-tags">
-                <span className="mono actu-tags__label">{t.etiquettes}</span>
-                {actu.tags.map((tag) => (
-                  <Link
-                    key={tag.slug}
-                    href={`${route(lang, NAV.actualites)}?tag=${encodeURIComponent(tag.slug)}`}
-                    className="actu-tag"
-                  >
-                    {tag.nom}
-                  </Link>
-                ))}
+          </div>
+
+          {avecGalerie && (
+            <aside className="actu-2col__aside" aria-label={t.galerieTitre}>
+              <div className="actu-2col__colle">
+                <ArticleGalerie images={actu.galerie} lang={lang} titre={t.galerieTitre} />
               </div>
-            </Reveal>
+            </aside>
           )}
 
-          <Reveal>
-            <PartageArticle lang={lang} titre={actu.title} />
-          </Reveal>
+          <div className="actu-2col__fin">
+            {actu.tags.length > 0 && (
+              <Reveal>
+                <div className="actu-tags">
+                  <span className="mono actu-tags__label">{t.etiquettes}</span>
+                  {actu.tags.map((tag) => (
+                    <Link
+                      key={tag.slug}
+                      href={`${route(lang, NAV.actualites)}?tag=${encodeURIComponent(tag.slug)}`}
+                      className="actu-tag"
+                    >
+                      {tag.nom}
+                    </Link>
+                  ))}
+                </div>
+              </Reveal>
+            )}
 
-          {/* ===== Navigation entre articles ===== */}
-          {(precedent || suivant) && (
             <Reveal>
-              <nav className="actu-nav" aria-label={t.navigationLabel}>
-                {precedent ? (
-                  <Link href={cheminArticle(lang, precedent.slug)} className="actu-nav__lien">
-                    <span className="mono actu-nav__sens">← {t.precedent}</span>
-                    <span className="actu-nav__titre">{precedent.title}</span>
-                  </Link>
-                ) : <span />}
-
-                {suivant ? (
-                  <Link href={cheminArticle(lang, suivant.slug)} className="actu-nav__lien actu-nav__lien--droite">
-                    <span className="mono actu-nav__sens">{t.suivant} →</span>
-                    <span className="actu-nav__titre">{suivant.title}</span>
-                  </Link>
-                ) : <span />}
-              </nav>
+              <PartageArticle lang={lang} titre={actu.title} />
             </Reveal>
-          )}
 
-          <Reveal variant="fade">
-            <p className="actu-retour">
-              <Link href={route(lang, NAV.actualites)} className="mono actu-retour__lien">← {t.allNews}</Link>
-            </p>
-          </Reveal>
+            {/* ===== Navigation entre articles ===== */}
+            {(precedent || suivant) && (
+              <Reveal>
+                <nav className="actu-nav" aria-label={t.navigationLabel}>
+                  {precedent ? (
+                    <Link href={cheminArticle(lang, precedent.slug)} className="actu-nav__lien">
+                      <span className="mono actu-nav__sens">← {t.precedent}</span>
+                      <span className="actu-nav__titre">{precedent.title}</span>
+                    </Link>
+                  ) : <span />}
+
+                  {suivant ? (
+                    <Link href={cheminArticle(lang, suivant.slug)} className="actu-nav__lien actu-nav__lien--droite">
+                      <span className="mono actu-nav__sens">{t.suivant} →</span>
+                      <span className="actu-nav__titre">{suivant.title}</span>
+                    </Link>
+                  ) : <span />}
+                </nav>
+              </Reveal>
+            )}
+
+            <Reveal variant="fade">
+              <p className="actu-retour">
+                <Link href={route(lang, NAV.actualites)} className="mono actu-retour__lien">← {t.allNews}</Link>
+              </p>
+            </Reveal>
+          </div>
         </div>
       </div>
 

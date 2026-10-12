@@ -1017,6 +1017,7 @@ export function dict(lang: Lang) {
       ),
       relatedVideo: t("Voir la vidéo associée", "Watch the related video"),
       galerieTitre: t("Galerie", "Gallery"),
+      galerieVoirTout: t("Voir toutes les photos", "View all photos"),
       pdfTitre: t("Version PDF", "PDF version"),
       pdfLead: t("Le texte officiel de ce communiqué, à télécharger.", "The official text of this release, to download."),
       pdfOuvrir: t("Ouvrir", "Open"),

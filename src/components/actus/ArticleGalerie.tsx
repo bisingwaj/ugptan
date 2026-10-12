@@ -17,8 +17,17 @@ import { Photo } from "@/components/ui/Photo";
 import { usePiegeFocus } from "@/components/ui/usePiegeFocus";
 import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
+/**
+ * Vignettes montrées au plus. La galerie vit dans une colonne collée à
+ * l'écran : au-delà de six, elle dépasserait la hauteur d'un portable et son
+ * bas deviendrait inaccessible. La dernière vignette annonce le reste (« +4 »),
+ * et la visionneuse parcourt toutes les images.
+ */
+const VIGNETTES_MAX = 6;
+
 export function ArticleGalerie({ images, lang, titre }: { images: ImageActu[]; lang: Lang; titre: string }) {
   const t = dict(lang).galerie;
+  const ta = dict(lang).actus;
   const [index, setIndex] = useState<number | null>(null);
   const declencheur = useRef<HTMLElement | null>(null);
   const panneau = useRef<HTMLDivElement>(null);
@@ -68,24 +77,40 @@ export function ArticleGalerie({ images, lang, titre }: { images: ImageActu[]; l
       </div>
 
       <RevealGroup as="ul" className="gal-grille actu-galerie__grille" gap={0.04}>
-        {images.map((image, position) => (
-          <RevealItem as="li" key={image.id} zoom className="gal-cell">
-            <button
-              type="button"
-              className="gal-cell__btn"
-              onClick={() => ouvrir(position)}
-              aria-label={`${t.openPhoto} : ${image.legende ?? image.alt}`}
-            >
-              <Photo
-                src={image.src}
-                alt={image.alt}
-                unoptimized={image.unoptimized}
-                sizes="(max-width: 700px) 50vw, 260px"
-              />
-            </button>
-          </RevealItem>
-        ))}
+        {images.slice(0, VIGNETTES_MAX).map((image, position) => {
+          const reste = position === VIGNETTES_MAX - 1 ? total - VIGNETTES_MAX : 0;
+          return (
+            <RevealItem as="li" key={image.id} zoom className="gal-cell">
+              <button
+                type="button"
+                className="gal-cell__btn"
+                onClick={() => ouvrir(position)}
+                aria-label={
+                  reste > 0
+                    ? `${ta.galerieVoirTout} (${total})`
+                    : `${t.openPhoto} : ${image.legende ?? image.alt}`
+                }
+              >
+                <Photo
+                  src={image.src}
+                  alt={image.alt}
+                  unoptimized={image.unoptimized}
+                  sizes="(max-width: 960px) 33vw, 170px"
+                />
+                {reste > 0 && (
+                  <span className="actu-galerie__reste" aria-hidden="true">+{reste}</span>
+                )}
+              </button>
+            </RevealItem>
+          );
+        })}
       </RevealGroup>
+
+      {total > 1 && (
+        <button type="button" className="actu-galerie__tout" onClick={() => ouvrir(0)}>
+          {ta.galerieVoirTout} ({total}) →
+        </button>
+      )}
 
       {ouverte && index !== null && (
         <div className="scrim scrim--center gal-scrim" onClick={fermer}>
