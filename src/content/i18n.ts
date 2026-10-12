@@ -1204,12 +1204,12 @@ export function dict(lang: Lang) {
       listeTitre: t("Documents publiés", "Published documents"),
       titre: t("Documents publiés", "Published documents"),
       hero: t(
-        "Ce que nous publions, et pourquoi certaines pièces ne le sont pas.",
-        "What we publish, and why some documents are not published.",
+        "Les documents publiés par le projet.",
+        "Documents published by the project.",
       ),
       lead: t(
-        "Deux natures de pièces cohabitent ici. D'abord les instruments dont la publication s'impose au Projet (manuel d'exécution, plans de passation, cadres de sauvegardes environnementales et sociales), en application de la norme environnementale et sociale n°10 et de la politique d'accès à l'information de la Banque mondiale. Ensuite les notes, études et rapports sur lesquels les arbitrages s'appuient, publiés pour être discutés. Le versionnage est explicite : une version remplacée reste identifiable. Ne sont pas publiés les documents contenant des données personnelles, des informations commercialement sensibles avant attribution, ou des éléments couverts par une obligation de confidentialité.",
-        "Two kinds of material sit side by side here. First, the instruments the Project is required to disclose (project implementation manual, procurement plans, environmental and social safeguards frameworks), under Environmental and Social Standard 10 and the World Bank's access-to-information policy. Second, the notes, studies and reports on which trade-offs rest, published so they can be debated. Versioning is explicit: a superseded version remains identifiable. Not published are documents containing personal data, commercially sensitive information ahead of award, or material covered by a confidentiality obligation.",
+        "Les documents dont la publication est obligatoire (manuel d'exécution, plans de passation, cadres de sauvegardes), ainsi que les études et rapports du projet. Les données personnelles et les informations commerciales sensibles avant attribution ne sont pas publiées.",
+        "Documents the project is required to disclose (implementation manual, procurement plans, safeguards frameworks), along with its studies and reports. Personal data and commercially sensitive information ahead of award are not published.",
       ),
       download: t("Télécharger", "Download"),
 
