@@ -314,6 +314,8 @@ export type ListeEvtOptions = {
 export async function listerEvenements(options: ListeEvtOptions): Promise<{
   aVenir: EvtVue[];
   passes: EvtVue[];
+  /** Tous les événements, du plus lointain à venir au plus ancien passé. */
+  tous: EvtVue[];
   total: number;
 }> {
   // Bornes de clé : cf. « Clés bornées » dans lib/cache/redis.ts. La recherche
@@ -323,7 +325,9 @@ export async function listerEvenements(options: ListeEvtOptions): Promise<{
   const params = { ...options, recherche: q };
   if (q) return listerEvenementsImpl(params);
   return cacheJson(
-    `events:liste:${JSON.stringify([options.lang, options.categorie ?? "", options.comp ?? "", options.limite ?? 0])}`,
+    // « v2 » : la liste porte désormais `tous`. Une entrée de l'ancienne forme,
+    // relue sous l'ancienne clé, ferait tomber la page sur `undefined`.
+    `events:liste:v2:${JSON.stringify([options.lang, options.categorie ?? "", options.comp ?? "", options.limite ?? 0])}`,
     { tags: [TAG.events], ttl: TTL.liste, memoriserSi: (liste) => liste.total > 0 },
     () => listerEvenementsImpl(params),
   );
@@ -332,6 +336,7 @@ export async function listerEvenements(options: ListeEvtOptions): Promise<{
 async function listerEvenementsImpl(options: ListeEvtOptions): Promise<{
   aVenir: EvtVue[];
   passes: EvtVue[];
+  tous: EvtVue[];
   total: number;
 }> {
   const { lang, categorie, recherche, comp } = options;
@@ -378,6 +383,10 @@ async function listerEvenementsImpl(options: ListeEvtOptions): Promise<{
   return {
     aVenir: limite ? aVenir.slice(0, limite) : aVenir,
     passes: limite ? passes.slice(0, limite) : passes,
+    // La page publique montre UNE seule grille, ordonnée par date de début
+    // décroissante : les rencontres à venir d'abord, puis les passées. C'est
+    // l'ordre de la lecture SQL ; la mise en avant n'y joue pas.
+    tous: limite ? vues.slice(0, limite) : vues,
     total: vues.length,
   };
 }

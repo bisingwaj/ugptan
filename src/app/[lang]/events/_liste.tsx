@@ -7,7 +7,6 @@ import { listerCategoriesEvt, listerEvenements } from "@/lib/events/query";
 import { parametre, type ParametresBruts } from "@/lib/url/listes";
 import { EventsGrid } from "@/components/events/EventsGrid";
 import { EvtFiltres } from "@/components/events/EvtFiltres";
-import { Kicker } from "@/components/ui/Kicker";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/motion/Reveal";
 import { metaPage } from "@/lib/seo";
@@ -49,7 +48,7 @@ export async function EvenementsListe({ lang, filtres }: { lang: Lang; filtres: 
   ]);
 
   const filtre = Boolean(categorie || q);
-  const rien = liste.aVenir.length === 0 && liste.passes.length === 0;
+  const rien = liste.tous.length === 0;
 
   return (
     <div>
@@ -87,42 +86,19 @@ export async function EvenementsListe({ lang, filtres }: { lang: Lang; filtres: 
               )}
             </p>
           ) : (
-            <>
-              {/* ===== À venir =====
-                  Toujours en tête, y compris vide : c'est ce que le visiteur
-                  vient chercher, et le dire explicitement vaut mieux que de le
-                  laisser déduire d'une page qui commence par des dates
-                  passées. La section disparaît en revanche quand un filtre est
-                  actif et ne rapporte rien : l'absence est alors celle du
-                  filtre, pas celle du calendrier. */}
-              {(liste.aVenir.length > 0 || !filtre) && (
-                /* Intitulé de section en `h2` (lu, non vu) : les cartes portent
-                   des `h3`, qui suivaient sinon directement le `h1` du héros.
-                   Le kicker visible garde son dessin, masqué à la lecture pour
-                   ne pas dire deux fois la même chose. */
-                <section className="evt-section" aria-labelledby="evt-avenir-titre">
-                  <h2 id="evt-avenir-titre" className="sr-only">{t.evt.sectionAVenir}</h2>
-                  <Reveal><div aria-hidden="true"><Kicker>{t.evt.sectionAVenir}</Kicker></div></Reveal>
-                  <Reveal delay={0.1}><p className="evt-section__intro">{t.evt.sectionAVenirLead}</p></Reveal>
-
-                  {liste.aVenir.length > 0 ? (
-                    <EventsGrid lang={lang} events={liste.aVenir} withImage />
-                  ) : (
-                    <Reveal variant="fade"><p className="evt-vide">{t.evt.aucunAVenir}</p></Reveal>
-                  )}
-                </section>
+            /* ===== Une seule grille, par date =====
+                Du plus lointain à venir au plus ancien passé : les deux
+                sections séparées laissaient croire, quand une seule
+                rencontre était programmée, que la liste s'arrêtait là. Chaque
+                carte porte son état (à venir, en cours, passé). Sans rencontre
+                programmée, on le dit en tête plutôt que de le laisser déduire. */
+            <section className="evt-section" aria-labelledby="evt-tous-titre">
+              <h2 id="evt-tous-titre" className="sr-only">{t.evt.sectionTous}</h2>
+              {liste.aVenir.length === 0 && !filtre && (
+                <Reveal variant="fade"><p className="evt-vide">{t.evt.aucunAVenir}</p></Reveal>
               )}
-
-              {/* ===== Passés ===== */}
-              {liste.passes.length > 0 && (
-                <section className="evt-section" aria-labelledby="evt-passes-titre">
-                  <h2 id="evt-passes-titre" className="sr-only">{t.evt.sectionPasses}</h2>
-                  <Reveal><div aria-hidden="true"><Kicker>{t.evt.sectionPasses}</Kicker></div></Reveal>
-                  <Reveal delay={0.1}><p className="evt-section__intro">{t.evt.sectionPassesLead}</p></Reveal>
-                  <EventsGrid lang={lang} events={liste.passes} withImage />
-                </section>
-              )}
-            </>
+              <EventsGrid lang={lang} events={liste.tous} withImage />
+            </section>
           )}
         </div>
       </section>

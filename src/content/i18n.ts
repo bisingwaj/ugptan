@@ -512,6 +512,7 @@ export function dict(lang: Lang) {
       ),
 
       /* --- Sections du calendrier ---------------------------------------- */
+      sectionTous: t("Tous les événements, par date", "All events, by date"),
       sectionAVenir: t("Prochaines rencontres", "Upcoming events"),
       sectionAVenirLead: t(
         "Les dates déjà arrêtées, de la plus proche à la plus lointaine.",
