@@ -1175,10 +1175,10 @@ export function dict(lang: Lang) {
       ),
     },
     resultats: {
-      heroTitle: t("Ce que nous mesurons, comment, et ce que la mesure ne dit pas.", "What we measure, how, and what measurement does not say."),
+      heroTitle: t("Ce que le projet mesure, et comment.", "What the project measures, and how."),
       heroLead: t(
-        "Un cadre de résultats distingue deux ordres de grandeur qu'il ne faut pas confondre. Les indicateurs d'objectif mesurent l'effet recherché sur la société — des personnes connectées, des services utilisés — et bougent lentement. Les indicateurs intermédiaires mesurent ce que le projet livre — des kilomètres, des sites, des inscrits — et répondent plus vite. Les seconds ne garantissent pas les premiers : c'est précisément pourquoi les deux sont suivis, province par province, et pourquoi ces ambitions sont revues au fil de l'exécution.",
-        "A results framework distinguishes two orders of magnitude that should not be confused. Objective indicators measure the intended effect on society — people connected, services used — and move slowly. Intermediate indicators measure what the project delivers — kilometres, sites, enrolments — and respond faster. The latter do not guarantee the former: that is precisely why both are tracked, province by province, and why these ambitions are reviewed as implementation proceeds.",
+        "Deux types d'indicateurs sont suivis, province par province. Les indicateurs d'objectif mesurent l'effet sur la population (personnes connectées, services utilisés) et évoluent lentement ; les indicateurs intermédiaires mesurent ce que le projet livre (kilomètres de fibre, sites, personnes formées) et réagissent plus vite.",
+        "Two kinds of indicator are tracked, province by province. Objective indicators measure the effect on people (users connected, services used) and change slowly; intermediate indicators measure what the project delivers (kilometres of fibre, sites, people trained) and respond faster.",
       ),
       titre: t("Cadre de résultats", "Results framework"),
       metaDesc: t(
