@@ -55,10 +55,10 @@ export function ActuCard({ actu, lang, priority = false }: { actu: ActuVue; lang
           {actu.dateLabel}{actu.lieu ? ` · ${actu.lieu}` : ""}{actu.fichier ? " · PDF" : ""}
         </div>
 
-        <h3 style={{ margin: "12px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.32 }}>{actu.title}</h3>
+        <h3 className="actu-card__titre" style={{ margin: "12px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.32 }}>{actu.title}</h3>
 
         {actu.excerpt && (
-          <p style={{ margin: "10px 0 0", fontSize: 14.5, lineHeight: 1.6, color: "var(--c-70)", flex: 1 }}>
+          <p className="actu-card__resume" style={{ margin: "10px 0 0", fontSize: 14.5, lineHeight: 1.6, color: "var(--c-70)", flex: 1 }}>
             {actu.excerpt}
           </p>
         )}

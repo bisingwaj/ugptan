@@ -79,6 +79,15 @@ export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = fals
               {actu.auteur.role && <span className="actu-hero__role"> — {actu.auteur.role}</span>}
             </p>
           )}
+
+          {/* Le PDF se télécharge dès l'en-tête : c'est souvent ce qu'on vient
+              chercher sur un communiqué. Le bloc détaillé reste sous le texte. */}
+          {actu.fichier && (
+            <a href={actu.fichier.urlDl} className="btn btn--primary btn--sm actu-hero__pdf" download>
+              <span className="arrow">↓</span> {t.pdfTelecharger}
+              {actu.fichier.poids && <span className="mono actu-hero__pdf-poids">PDF · {actu.fichier.poids}</span>}
+            </a>
+          )}
         </div>
       </header>
 
