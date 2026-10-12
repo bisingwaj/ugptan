@@ -41,8 +41,8 @@ export const composantesDetail: ComposanteDetail[] = [
         {
           t: { fr: "Une géographie qui multiplie les coûts fixes", en: "A geography that multiplies fixed costs" },
           d: {
-            fr: "Sur 2,3 millions de kilomètres carrés, la population congolaise se répartit entre quelques pôles urbains denses et un semis de localités éloignées, souvent mal reliées par la route. Chaque kilomètre de fibre y coûte plus cher à poser, à protéger et à maintenir que dans un pays compact — et dessert moins d'abonnés une fois posé. C'est cette équation, et non un retard technique, qui explique une bande passante internationale de 6,65 kbit/s par habitant au démarrage du projet.",
-            en: "Across 2.3 million square kilometres, the Congolese population is split between a few dense urban centres and a scattering of remote localities, often poorly served by road. Each kilometre of fibre costs more to lay, protect and maintain than in a compact country — and serves fewer subscribers once laid. That equation, not a technology lag, explains international bandwidth of 6.65 kbit/s per capita at project start.",
+            fr: "Sur 2,3 millions de kilomètres carrés, la population congolaise se répartit entre quelques pôles urbains denses et un semis de localités éloignées, souvent mal reliées par la route. Chaque kilomètre de fibre y coûte plus cher à poser, à protéger et à maintenir que dans un pays compact — et dessert moins d'abonnés une fois posé. C'est cette équation qui explique en grande partie une bande passante internationale de 6,65 kbit/s par habitant au démarrage du projet.",
+            en: "Across 2.3 million square kilometres, the Congolese population is split between a few dense urban centres and a scattering of remote localities, often poorly served by road. Each kilometre of fibre costs more to lay, protect and maintain than in a compact country — and serves fewer subscribers once laid. That equation largely explains international bandwidth of 6.65 kbit/s per capita at project start.",
           },
         },
         {
@@ -55,20 +55,20 @@ export const composantesDetail: ComposanteDetail[] = [
         {
           t: { fr: "Une fracture qui s'aggrave à mesure que l'État se numérise", en: "A divide that widens as the State digitalises" },
           d: {
-            fr: "Chaque service public porté en ligne devient, pour les territoires non couverts, un service de moins accessible qu'auparavant. Une école sans connexion ne peut pas ouvrir les ressources en ligne à ses élèves ; un centre de santé isolé reste hors du dossier partagé ; un commerçant sans réseau reste enfermé dans son marché de quartier. La modernisation, si elle n'est pas précédée par l'accès, produit de l'exclusion.",
-            en: "Every public service moved online becomes, for uncovered territories, one more service that is less accessible than before. A school without a connection cannot open online resources to its pupils; an isolated health centre stays outside the shared record; a trader without a network stays confined to a neighbourhood market. Modernisation, if it is not preceded by access, produces exclusion.",
+            fr: "Chaque service public porté en ligne devient, pour les territoires non couverts, un service de moins accessible qu'auparavant. Une école sans connexion ne peut pas ouvrir les ressources en ligne à ses élèves ; un centre de santé isolé reste hors du dossier partagé ; un commerçant sans réseau reste enfermé dans son marché de quartier. Sans accès préalable, la mise en ligne des services publics exclut ceux qui ne sont pas connectés.",
+            en: "Every public service moved online becomes, for uncovered territories, one more service that is less accessible than before. A school without a connection cannot open online resources to its pupils; an isolated health centre stays outside the shared record; a trader without a network stays confined to a neighbourhood market. Without prior access, moving public services online excludes those who are not connected.",
           },
         },
       ],
       appui: {
         fr: [
           "Les réseaux de transport présentent les caractéristiques classiques qui justifient un financement public : coûts fixes très élevés, coût marginal faible, rendements croissants et bénéfices largement captés par des tiers — écoles, hôpitaux, administrations, entreprises — qui ne participent pas à la décision d'investissement. Un opérateur isolé n'a aucune raison de porter seul une dorsale dont ses concurrents profiteront ; l'État, lui, a intérêt à ce qu'elle existe et soit ouverte à tous.",
-          "Une partie de la réponse ne coûte d'ailleurs presque rien en investissement : le partage des infrastructures passives entre opérateurs, la simplification des droits de passage, la transparence des tarifs de gros et le suivi de la qualité de service font baisser les prix par la règle plutôt que par la dépense. La Composante 1 combine délibérément les deux leviers — poser des infrastructures, et corriger les conditions de marché qui les rendraient inutiles.",
+          "Une partie de la réponse ne coûte d'ailleurs presque rien en investissement : le partage des infrastructures passives entre opérateurs, la simplification des droits de passage, la transparence des tarifs de gros et le suivi de la qualité de service peuvent faire baisser les prix sans investissement lourd. La Composante 1 combine les deux approches : financer des infrastructures et améliorer les conditions de marché.",
           "Reste une contrainte que le secteur télécom ne peut pas résoudre seul : l'énergie. Un site radio sans alimentation fiable est un site hors service, et un point de présence sans secours électrique est un point de fragilité. Le déploiement s'appuie donc sur des solutions énergétiques dimensionnées pour les sites isolés, et se coordonne avec les politiques d'électrification.",
         ],
         en: [
           "Transport networks display the classic features that justify public financing: very high fixed costs, low marginal cost, increasing returns, and benefits largely captured by third parties — schools, hospitals, administrations, businesses — that take no part in the investment decision. A single operator has no reason to carry a backbone alone when its competitors will benefit from it; the State does have an interest in that backbone existing and being open to all.",
-          "Part of the answer, moreover, costs almost nothing in capital: passive infrastructure sharing between operators, simpler rights of way, wholesale tariff transparency and quality-of-service monitoring bring prices down through rules rather than spending. Component 1 deliberately combines both levers — laying infrastructure, and correcting the market conditions that would otherwise render it useless.",
+          "Part of the answer, moreover, costs almost nothing in capital: passive infrastructure sharing between operators, simpler rights of way, wholesale tariff transparency and quality-of-service monitoring can bring prices down without heavy investment. Component 1 combines both approaches: financing infrastructure and improving market conditions.",
           "One constraint remains that the telecoms sector cannot solve alone: energy. A radio site without reliable power is an out-of-service site, and a point of presence without backup power is a point of fragility. Deployment therefore relies on energy solutions sized for isolated sites, and is coordinated with electrification policy.",
         ],
       },
@@ -81,15 +81,15 @@ export const composantesDetail: ComposanteDetail[] = [
     },
     chapeau: {
       fr: [
-        "La Composante 1 couvre la chaîne de la connectivité dans son entier : la capacité internationale qui ouvre le pays sur le réseau mondial, les dorsales de transmission qui relient les provinces, les réseaux régionaux qui irriguent les territoires, la couverture mobile des communautés non desservies, et le raccordement des institutions publiques au bout de cette chaîne. Chacun de ces maillons conditionne le suivant : c'est pourquoi ils relèvent d'une même composante et non de projets séparés.",
-        "Elle intervient par deux leviers de nature différente, et c'est leur combinaison qui fait sa cohérence. Le premier est l'investissement dans des infrastructures de transport ouvertes, mises à disposition des opérateurs sur une base non discriminatoire. Le second est l'appui au cadre sectoriel — partage des infrastructures passives, droits de passage, transparence des tarifs de gros, suivi de la qualité de service — qui agit sur le prix payé par l'usager sans engager d'investissement supplémentaire.",
-        "Son périmètre géographique est national, avec une priorisation assumée : les dix provinces du Cadre de Partenariat-Pays d'abord, puis les zones que le marché ne dessert pas spontanément. Le ciblage n'est pas seulement territorial ; il porte aussi sur les publics dont l'accès reste le plus contraint, notamment en milieu rural et parmi les femmes.",
+        "La Composante 1 couvre la chaîne de la connectivité dans son entier : la capacité internationale qui relie le pays au réseau mondial, les dorsales de transmission qui relient les provinces, les réseaux régionaux qui desservent les territoires, la couverture mobile des communautés non desservies, et le raccordement des institutions publiques au bout de cette chaîne. Chacun de ces maillons conditionne le suivant : c'est pourquoi ils relèvent d'une même composante.",
+        "Elle intervient de deux façons. La première est l'investissement dans des infrastructures de transport ouvertes, mises à disposition des opérateurs sur une base non discriminatoire. La seconde est l'appui au cadre sectoriel — partage des infrastructures passives, droits de passage, transparence des tarifs de gros, suivi de la qualité de service — qui agit sur le prix payé par l'usager sans engager d'investissement supplémentaire.",
+        "Son périmètre géographique est national, avec une priorisation : les dix provinces du Cadre de Partenariat-Pays d'abord, puis les zones que le marché ne dessert pas spontanément. Le ciblage porte aussi sur les publics dont l'accès reste le plus contraint, notamment en milieu rural et parmi les femmes.",
         "La composante ne se substitue pas aux opérateurs : elle ne vend pas d'abonnement et n'exploite pas de réseau commercial. Elle crée les conditions — infrastructure de transport, règles du jeu, raccordement des institutions publiques — à partir desquelles des acteurs privés et des administrations peuvent, chacun dans son rôle, servir des usagers.",
       ],
       en: [
-        "Component 1 covers the connectivity chain in full: the international capacity that opens the country to the global network, the transmission backbones that link the provinces, the regional networks that irrigate the territories, mobile coverage of underserved communities, and the connection of public institutions at the end of that chain. Each link conditions the next: hence a single component rather than separate projects.",
-        "It works through two levers of different natures, and their combination is what gives it coherence. The first is investment in open transport infrastructure, made available to operators on a non-discriminatory basis. The second is support to the sector framework — passive infrastructure sharing, rights of way, wholesale tariff transparency, quality-of-service monitoring — which acts on the price paid by the user without requiring further investment.",
-        "Its geographic scope is national, with an explicit prioritisation: the ten provinces of the Country Partnership Framework first, then the areas the market does not serve on its own. Targeting is not only territorial; it also concerns the groups whose access remains most constrained, particularly in rural areas and among women.",
+        "Component 1 covers the connectivity chain in full: the international capacity that connects the country to the global network, the transmission backbones that link the provinces, the regional networks that serve the territories, mobile coverage of underserved communities, and the connection of public institutions at the end of that chain. Each link conditions the next: hence a single component.",
+        "It works in two ways. The first is investment in open transport infrastructure, made available to operators on a non-discriminatory basis. The second is support to the sector framework — passive infrastructure sharing, rights of way, wholesale tariff transparency, quality-of-service monitoring — which acts on the price paid by the user without requiring further investment.",
+        "Its geographic scope is national, with a prioritisation: the ten provinces of the Country Partnership Framework first, then the areas the market does not serve on its own. Targeting also concerns the groups whose access remains most constrained, particularly in rural areas and among women.",
         "The component does not stand in for operators: it sells no subscriptions and runs no commercial network. It creates the conditions — transport infrastructure, rules of the game, connection of public institutions — from which private actors and administrations can each, in their own role, serve users.",
       ],
     },
@@ -109,14 +109,14 @@ export const composantesDetail: ComposanteDetail[] = [
       {
         n: "01", slug: "backbone-fibre", img: "fibre",
         titre: { fr: "Le backbone national en fibre optique", en: "The national fibre-optic backbone" },
-        statut: { fr: "Infrastructure structurante", en: "Structuring infrastructure" },
+        statut: { fr: "Infrastructure de transport", en: "Transport infrastructure" },
         corps: {
           fr: [
-            "L'extension des réseaux de transmission constitue la première brique de la connectivité nationale. Le cadre de résultats retient 11 500 kilomètres de fibre optique additionnelle, résiliente au climat, en priorité sur les axes qui relient les provinces entre elles et aux points d'atterrissement internationaux.",
+            "L'extension des réseaux de transmission est le premier volet de la composante. Le cadre de résultats retient 11 500 kilomètres de fibre optique additionnelle, résiliente au climat, en priorité sur les axes qui relient les provinces entre elles et aux points d'atterrissement internationaux.",
             "Ces liaisons de transport constituent l'ossature sur laquelle les opérateurs et les fournisseurs d'accès construisent ensuite leurs réseaux de distribution. Sans elles, la couverture de proximité reste coûteuse, instable et cantonnée aux grands centres urbains.",
           ],
           en: [
-            "Extending transmission networks is the first building block of national connectivity. The results framework sets a target of 11,500 kilometres of additional, climate-resilient fibre optic, prioritising the routes that link provinces to one another and to international landing points.",
+            "Extending transmission networks is the first strand of the component. The results framework sets a target of 11,500 kilometres of additional, climate-resilient fibre optic, prioritising the routes that link provinces to one another and to international landing points.",
             "These transport links form the backbone on which operators and service providers then build their distribution networks. Without them, local coverage remains costly, unstable and confined to major urban centres.",
           ],
         },
@@ -127,8 +127,8 @@ export const composantesDetail: ComposanteDetail[] = [
           { fr: "résilience accrue par la redondance des itinéraires", en: "greater resilience through route redundancy" },
         ],
         chute: {
-          fr: "L'objectif final n'est pas le linéaire déployé, mais la baisse du coût de gros de la bande passante — condition d'un accès abordable pour l'utilisateur final.",
-          en: "The end goal is not kilometres deployed, but the fall in wholesale bandwidth costs — the condition for affordable access for the end user.",
+          fr: "L'objectif est de faire baisser le coût de gros de la bande passante, condition d'un accès abordable pour l'utilisateur final.",
+          en: "The aim is to lower wholesale bandwidth costs, a condition for affordable access for the end user.",
         },
       },
       {
@@ -136,11 +136,11 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "L'extension de la couverture mobile haut débit", en: "Extending mobile broadband coverage" },
         corps: {
           fr: [
-            "Dans la plupart des territoires congolais, le mobile est — et restera pour longtemps — le principal moyen d'accéder à internet. Le projet accompagne l'extension de la couverture haut débit vers plusieurs centaines de communautés aujourd'hui non desservies.",
+            "Dans la plupart des territoires congolais, le mobile est le principal moyen d'accéder à internet. Le projet accompagne l'extension de la couverture haut débit vers plusieurs centaines de communautés aujourd'hui non desservies.",
             "Ces zones sont, par construction, celles que le marché ne couvre pas spontanément : densité faible, revenu limité, accès énergétique difficile. Le projet y intervient par des mécanismes ciblés d'appui au déploiement, en lien avec le fonds de service universel et les opérateurs.",
           ],
           en: [
-            "Across most Congolese territories, mobile is — and will long remain — the main way to access the internet. The project supports extending broadband coverage to several hundred currently underserved communities.",
+            "Across most Congolese territories, mobile is the main way to access the internet. The project supports extending broadband coverage to several hundred currently underserved communities.",
             "These areas are, by construction, the ones the market does not cover spontaneously: low density, limited income, difficult energy access. The project intervenes through targeted deployment support mechanisms, working with the universal service fund and operators.",
           ],
         },
@@ -176,11 +176,11 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "La connexion des universités et des établissements d'enseignement", en: "Connecting universities and education institutions" },
         corps: {
           fr: [
-            "Les établissements d'enseignement supérieur constituent un point d'entrée décisif : ils concentrent des usages intensifs, forment les compétences dont le pays a besoin et diffusent les pratiques numériques dans leur environnement.",
+            "Les établissements d'enseignement supérieur concentrent des usages intensifs, forment les compétences dont le pays a besoin et diffusent les pratiques numériques dans leur environnement.",
             "En lien avec le Ministère de l'Enseignement Supérieur et Universitaire, le projet accompagne le raccordement des campus, l'accès aux ressources documentaires en ligne et la mise en place de réseaux d'établissements mutualisant leur connectivité.",
           ],
           en: [
-            "Higher education institutions are a decisive entry point: they concentrate intensive usage, train the skills the country needs and spread digital practices across their environment.",
+            "Higher education institutions concentrate intensive usage, train the skills the country needs and spread digital practices across their environment.",
             "Working with the Ministry of Higher Education, the project supports campus connections, access to online scholarly resources and the creation of institution networks pooling their connectivity.",
           ],
         },
@@ -215,14 +215,14 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "L'inclusion numérique et l'abordabilité", en: "Digital inclusion and affordability" },
         corps: {
           fr: [
-            "L'accès ne se réduit pas à la disponibilité du signal. Il suppose aussi un terminal, un forfait abordable, des contenus utiles et les compétences pour s'en servir. Un réseau disponible au-dessus des moyens de ceux qu'il couvre ne produit aucune inclusion : il déplace la barrière, il ne la lève pas.",
-            "C'est pourquoi l'abordabilité se mesure en part du revenu et non en valeur absolue. Le cadre de résultats suit le prix de détail d'un forfait mensuel standard de données mobiles rapporté au revenu national brut par habitant, et vise son passage de 10,3 % à 5,1 %. Diviser cet effort par deux ne se décrète pas : le prix de détail suit le coût de gros, lequel dépend de la capacité de transport disponible, du partage des infrastructures passives et de la concurrence effective sur le marché de gros. C'est l'articulation directe entre ce projet et les deux précédents.",
-            "L'usage effectif est la seule mesure qui compte au bout de la chaîne. Le cadre de résultats vise 30 millions de personnes utilisant l'internet à haut débit, dont 15 millions de femmes. Cette seconde cible n'est pas une déclinaison arithmétique de la première : sans ciblage explicite des dispositifs d'accès, l'extension de la couverture reproduit l'écart d'usage entre femmes et hommes au lieu de le réduire.",
+            "L'accès ne se réduit pas à la disponibilité du signal. Il suppose aussi un terminal, un forfait abordable, des contenus utiles et les compétences pour s'en servir. Un réseau dont le prix dépasse les moyens de ceux qu'il couvre ne réduit pas l'exclusion.",
+            "C'est pourquoi l'abordabilité se mesure en part du revenu et non en valeur absolue. Le cadre de résultats suit le prix de détail d'un forfait mensuel standard de données mobiles rapporté au revenu national brut par habitant, et vise son passage de 10,3 % à 5,1 %. Cette baisse dépend du coût de gros, lui-même lié à la capacité de transport disponible, au partage des infrastructures passives et à la concurrence effective sur le marché de gros. C'est le lien direct entre ce projet et les deux précédents.",
+            "Au bout de la chaîne, l'indicateur suivi est l'usage effectif. Le cadre de résultats vise 30 millions de personnes utilisant l'internet à haut débit, dont 15 millions de femmes. Cette seconde cible suppose un ciblage explicite des dispositifs d'accès : sans lui, l'extension de la couverture reproduit l'écart d'usage entre femmes et hommes au lieu de le réduire.",
           ],
           en: [
-            "Access is not just signal availability. It also requires a device, an affordable plan, useful content and the skills to use it. A network available beyond the means of those it covers produces no inclusion: it moves the barrier rather than removing it.",
-            "Affordability is therefore measured as a share of income, not in absolute terms. The results framework tracks the retail price of a standard monthly mobile data plan against gross national income per capita, and targets a fall from 10.3 per cent to 5.1 per cent. Halving that effort cannot be decreed: retail prices follow wholesale costs, which depend on available transport capacity, passive infrastructure sharing and effective competition in the wholesale market. That is the direct articulation between this project and the two preceding ones.",
-            "Actual usage is the only measure that counts at the end of the chain. The results framework targets 30 million people using high-speed internet, of whom 15 million women. That second target is not an arithmetical restatement of the first: without explicit targeting of access schemes, extending coverage reproduces the usage gap between women and men instead of narrowing it.",
+            "Access is not just signal availability. It also requires a device, an affordable plan, useful content and the skills to use it. A network priced beyond the means of those it covers does not reduce exclusion.",
+            "Affordability is therefore measured as a share of income, not in absolute terms. The results framework tracks the retail price of a standard monthly mobile data plan against gross national income per capita, and targets a fall from 10.3 per cent to 5.1 per cent. That fall depends on wholesale costs, which in turn depend on available transport capacity, passive infrastructure sharing and effective competition in the wholesale market. That is the direct link between this project and the two preceding ones.",
+            "At the end of the chain, the indicator tracked is actual usage. The results framework targets 30 million people using high-speed internet, of whom 15 million women. That second target requires explicit targeting of access schemes: without it, extending coverage reproduces the usage gap between women and men instead of narrowing it.",
           ],
         },
         points: [
@@ -237,11 +237,11 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "La connectivité internationale et l'intégration régionale", en: "International connectivity and regional integration" },
         corps: {
           fr: [
-            "La bande passante internationale par habitant est l'indicateur le plus direct de la capacité d'un pays à participer à l'économie numérique. Le projet vise sa progression sensible à l'horizon 2029, d'un niveau de départ de 6,65 kbit/s vers une cible de 20 kbit/s.",
+            "La bande passante internationale par habitant est un indicateur courant de la capacité d'un pays à participer à l'économie numérique. Le projet vise sa progression à l'horizon 2029, d'un niveau de départ de 6,65 kbit/s vers une cible de 20 kbit/s.",
             "Cette progression suppose des liaisons internationales renforcées et une meilleure intégration régionale, dans le cadre de l'approche APM IDEA de digitalisation inclusive en Afrique orientale et australe.",
           ],
           en: [
-            "International bandwidth per capita is the most direct measure of a country's ability to take part in the digital economy. The project targets a marked rise by 2029, from a starting level of 6.65 kbit/s towards a target of 20 kbit/s.",
+            "International bandwidth per capita is a standard measure of a country's ability to take part in the digital economy. The project targets an increase by 2029, from a starting level of 6.65 kbit/s towards a target of 20 kbit/s.",
             "That progression requires strengthened international links and deeper regional integration, within the APM IDEA approach to inclusive digitalisation in Eastern and Southern Africa.",
           ],
         },
@@ -256,11 +256,11 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "La mobilisation des capitaux privés", en: "Mobilising private capital" },
         corps: {
           fr: [
-            "Le financement public ne peut pas, à lui seul, couvrir les besoins d'infrastructure du pays. Le projet vise la mobilisation de capitaux privés significatifs — de l'ordre de 165 millions de dollars — en complément de l'enveloppe publique.",
+            "Le financement public ne peut pas, à lui seul, couvrir les besoins d'infrastructure du pays. Le projet vise la mobilisation de capitaux privés, de l'ordre de 165 millions de dollars, en complément de l'enveloppe publique.",
             "Cette mobilisation passe par des mécanismes de partenariat public-privé, un partage des risques adapté aux zones peu rentables et un cadre réglementaire lisible pour les investisseurs.",
           ],
           en: [
-            "Public financing alone cannot cover the country's infrastructure needs. The project seeks to mobilise significant private capital — in the order of 165 million dollars — alongside the public envelope.",
+            "Public financing alone cannot cover the country's infrastructure needs. The project seeks to mobilise private capital, in the order of 165 million dollars, alongside the public envelope.",
             "This is pursued through public-private partnership mechanisms, risk-sharing adapted to low-return areas and a readable regulatory framework for investors.",
           ],
         },
@@ -274,23 +274,23 @@ export const composantesDetail: ComposanteDetail[] = [
     ecosysteme: {
       titre: { fr: "De la dorsale au dernier kilomètre", en: "From the backbone to the last mile" },
       lead: {
-        fr: "La connectivité n'est utile que si toute la chaîne tient. Chaque maillon conditionne le suivant — et c'est l'ensemble, non un segment isolé, qui fait baisser le prix de l'accès.",
-        en: "Connectivity is only useful if the whole chain holds. Each link conditions the next — and it is the whole, not an isolated segment, that brings the price of access down.",
+        fr: "La connectivité n'est utile que si toute la chaîne tient. Chaque maillon conditionne le suivant, et la baisse du prix de l'accès dépend de l'ensemble.",
+        en: "Connectivity is only useful if the whole chain holds. Each link conditions the next, and lower access prices depend on the whole chain.",
       },
       couches: [
-        { t: { fr: "Connectivité internationale", en: "International connectivity" }, d: { fr: "ouvre le pays sur le réseau mondial", en: "opens the country to the global network" } },
+        { t: { fr: "Connectivité internationale", en: "International connectivity" }, d: { fr: "relie le pays au réseau mondial", en: "connects the country to the global network" } },
         { t: { fr: "Dorsales nationales", en: "National backbones" }, d: { fr: "relient les provinces entre elles", en: "link the provinces to one another" } },
-        { t: { fr: "Réseaux régionaux", en: "Regional networks" }, d: { fr: "irriguent les territoires", en: "irrigate the territories" } },
+        { t: { fr: "Réseaux régionaux", en: "Regional networks" }, d: { fr: "desservent les territoires", en: "serve the territories" } },
         { t: { fr: "Couverture mobile", en: "Mobile coverage" }, d: { fr: "atteint les communautés", en: "reaches the communities" } },
         { t: { fr: "Raccordements", en: "Connections" }, d: { fr: "branchent écoles, santé et administrations", en: "hook up schools, health and administrations" } },
         { t: { fr: "Abordabilité", en: "Affordability" }, d: { fr: "rend l'accès possible au quotidien", en: "makes access possible day to day" } },
       ],
     },
     finalite: {
-      titre: { fr: "Un accès qui change le quotidien", en: "Access that changes daily life" },
+      titre: { fr: "Ce que l'accès doit permettre", en: "What access should make possible" },
       lead: {
-        fr: "La Composante 1 se mesure moins en kilomètres qu'en usages rendus possibles.",
-        en: "Component 1 is measured less in kilometres than in the uses it makes possible.",
+        fr: "Les résultats de la Composante 1 se mesurent aussi aux usages qu'elle rend possibles.",
+        en: "Component 1's results are also measured by the uses it makes possible.",
       },
       points: [
         { fr: "suivre des cours et accéder aux ressources en ligne depuis sa province", en: "study and access online resources from one's own province" },
@@ -321,8 +321,8 @@ export const composantesDetail: ComposanteDetail[] = [
       en: "Building the digital foundations of the Congolese State",
     },
     soustitre: {
-      fr: "Une transformation numérique fondée sur des infrastructures souveraines, sécurisées et interopérables.",
-      en: "A digital transformation founded on sovereign, secure and interoperable infrastructure.",
+      fr: "Des infrastructures numériques partagées et sécurisées pour l'administration publique.",
+      en: "Shared, secure digital infrastructure for public administration.",
     },
     problematique: {
       titre: {
@@ -330,15 +330,15 @@ export const composantesDetail: ComposanteDetail[] = [
         en: "Each administration built its own system: the State pays several times over for the same function.",
       },
       lead: {
-        fr: "La difficulté n'est pas l'absence d'informatique publique — les administrations congolaises en ont. Elle tient à ce que chaque système a été conçu verticalement, avec son propre identifiant, son propre hébergement et ses propres règles, sans socle partagé. Ce n'est pas un défaut d'équipement : c'est un défaut d'architecture.",
-        en: "The difficulty is not an absence of public IT — Congolese administrations have it. It is that each system was designed vertically, with its own identifier, its own hosting and its own rules, without a shared foundation. This is not an equipment problem: it is an architecture problem.",
+        fr: "La difficulté n'est pas l'absence d'informatique publique — les administrations congolaises en ont. Elle tient à ce que chaque système a été conçu verticalement, avec son propre identifiant, son propre hébergement et ses propres règles, sans socle partagé. Le problème est donc d'architecture plus que d'équipement.",
+        en: "The difficulty is not an absence of public IT — Congolese administrations have it. It is that each system was designed vertically, with its own identifier, its own hosting and its own rules, without a shared foundation. The problem is therefore one of architecture more than equipment.",
       },
       axes: [
         {
           t: { fr: "Des systèmes conçus les uns sans les autres", en: "Systems designed independently of one another" },
           d: {
-            fr: "Les applications publiques ont été acquises projet par projet, souvent au rythme des financements disponibles. Chacune a créé son référentiel de personnes, ses formats, son mode d'authentification, son hébergement. Le résultat n'est pas un système d'information de l'État, mais une juxtaposition de systèmes d'information d'administrations, dont aucun ne sait interroger les autres.",
-            en: "Public applications were acquired project by project, often at the pace of available financing. Each created its own register of people, its own formats, its own authentication, its own hosting. The result is not a State information system, but a juxtaposition of departmental information systems, none of which can query the others.",
+            fr: "Les applications publiques ont été acquises projet par projet, souvent au rythme des financements disponibles. Chacune a créé son référentiel de personnes, ses formats, son mode d'authentification, son hébergement. Le résultat est une juxtaposition de systèmes d'information d'administrations, dont aucun ne sait interroger les autres.",
+            en: "Public applications were acquired project by project, often at the pace of available financing. Each created its own register of people, its own formats, its own authentication, its own hosting. The result is a juxtaposition of departmental information systems, none of which can query the others.",
           },
         },
         {
@@ -358,13 +358,13 @@ export const composantesDetail: ComposanteDetail[] = [
       ],
       appui: {
         fr: [
-          "Une infrastructure publique numérique se comporte comme un bien commun à effet de réseau : sa valeur croît avec le nombre d'administrations qui la réutilisent, et aucune d'elles n'a intérêt à la financer seule pour le bénéfice des autres. C'est précisément ce type de défaillance qu'un investissement central corrige — d'où le choix de porter des briques mutualisées (hébergement souverain, réseau gouvernemental, supervision de sécurité, identité, échange de données) plutôt qu'une application de plus.",
-          "Ce choix engage aussi la maîtrise publique des données : héberger hors du pays les registres critiques de l'État revient à déléguer une part de sa capacité de décision, et rend la continuité de service dépendante de contrats et de juridictions extérieurs. La souveraineté visée ici n'est pas une posture, c'est une condition de continuité et de sécurité juridique.",
+          "Une infrastructure publique numérique se comporte comme un bien commun à effet de réseau : sa valeur croît avec le nombre d'administrations qui la réutilisent, et aucune d'elles n'a intérêt à la financer seule pour le bénéfice des autres. C'est ce type de défaillance qu'un investissement central peut corriger — d'où le choix de porter des briques mutualisées (hébergement souverain, réseau gouvernemental, supervision de sécurité, identité, échange de données) plutôt qu'une application de plus.",
+          "Ce choix engage aussi la maîtrise publique des données : héberger hors du pays les registres critiques de l'État revient à déléguer une part de sa capacité de décision, et rend la continuité de service dépendante de contrats et de juridictions extérieurs. L'hébergement national est ici une condition de continuité et de sécurité juridique.",
           "Enfin, une architecture ne s'impose pas par la technique seule. Elle suppose un plan directeur opposable, des normes d'interopérabilité, un cadre juridique qui donne valeur à la signature électronique et protège les données personnelles — et une autorité capable d'arbitrer entre administrations. Sans cette part institutionnelle, les briques techniques restent inutilisées.",
         ],
         en: [
-          "Digital public infrastructure behaves like a common good with network effects: its value grows with the number of administrations that reuse it, and none of them has an interest in financing it alone for the benefit of others. That is precisely the kind of failure a central investment corrects — hence the choice to build shared components (sovereign hosting, a government network, security supervision, identity, data exchange) rather than one more application.",
-          "This choice also engages public control of data: hosting the State's critical registries outside the country amounts to delegating part of its decision-making capacity, and makes service continuity dependent on external contracts and jurisdictions. The sovereignty sought here is not a posture; it is a condition of continuity and legal certainty.",
+          "Digital public infrastructure behaves like a common good with network effects: its value grows with the number of administrations that reuse it, and none of them has an interest in financing it alone for the benefit of others. That is the kind of failure a central investment can correct — hence the choice to build shared components (sovereign hosting, a government network, security supervision, identity, data exchange) rather than one more application.",
+          "This choice also engages public control of data: hosting the State's critical registries outside the country amounts to delegating part of its decision-making capacity, and makes service continuity dependent on external contracts and jurisdictions. National hosting is therefore a condition of continuity and legal certainty.",
           "Finally, an architecture is not imposed by technology alone. It requires an enforceable master plan, interoperability standards, a legal framework that gives electronic signature its value and protects personal data — and an authority able to arbitrate between administrations. Without that institutional dimension, the technical building blocks go unused.",
         ],
       },
@@ -377,16 +377,16 @@ export const composantesDetail: ComposanteDetail[] = [
     },
     chapeau: {
       fr: [
-        "Dans le cadre du Projet d'Appui à la Transformation Numérique (PTN), la Composante 2 accompagne le Gouvernement de la République Démocratique du Congo dans la mise en place des fondations numériques indispensables à la modernisation de l'administration publique et au développement de services publics numériques accessibles, sécurisés et centrés sur les citoyens.",
+        "Dans le cadre du Projet d'Appui à la Transformation Numérique (PTN), la Composante 2 accompagne le Gouvernement de la République Démocratique du Congo dans la mise en place des fondations numériques nécessaires à la modernisation de l'administration publique et au développement de services publics numériques accessibles, sécurisés et centrés sur les citoyens.",
         "La transformation numérique de l'État ne repose pas uniquement sur la dématérialisation des procédures administratives. Elle nécessite également des infrastructures fiables, une connectivité performante, des plateformes numériques communes, des mécanismes d'identification sécurisés, une gouvernance efficace des données ainsi qu'un environnement de cybersécurité capable de protéger les systèmes d'information et les données critiques de l'État.",
-        "La Composante 2 du PTN intervient précisément sur ces différents piliers afin de permettre à la RDC de disposer progressivement d'un écosystème numérique public cohérent, souverain, interopérable et durable.",
-        "Son ambition est de favoriser le passage d'une logique dans laquelle chaque administration développe ses propres systèmes isolés à une approche fondée sur des infrastructures numériques publiques partagées — Digital Public Infrastructure (DPI) — pouvant être réutilisées par l'ensemble des institutions de l'État.",
+        "La Composante 2 du PTN intervient sur chacun de ces éléments afin que la RDC dispose progressivement d'infrastructures numériques publiques cohérentes et interopérables.",
+        "Elle vise à favoriser le passage d'une logique dans laquelle chaque administration développe ses propres systèmes isolés à une approche fondée sur des infrastructures numériques publiques partagées — Digital Public Infrastructure (DPI) — pouvant être réutilisées par l'ensemble des institutions de l'État.",
       ],
       en: [
         "Within the Digital Transformation Project (PTN), Component 2 supports the Government of the Democratic Republic of the Congo in putting in place the digital foundations required to modernise public administration and to develop digital public services that are accessible, secure and citizen-centred.",
         "The State's digital transformation does not rest on the dematerialisation of administrative procedures alone. It also requires reliable infrastructure, high-performance connectivity, shared digital platforms, secure identification mechanisms, effective data governance and a cybersecurity environment capable of protecting the State's information systems and critical data.",
-        "Component 2 works precisely on these pillars, so that the DRC progressively acquires a coherent, sovereign, interoperable and sustainable public digital ecosystem.",
-        "Its ambition is to shift from a logic in which each administration develops its own isolated systems to an approach founded on shared digital public infrastructure (DPI) that can be reused by all State institutions.",
+        "Component 2 works on each of these elements so that the DRC progressively acquires coherent, interoperable public digital infrastructure.",
+        "It aims to support the shift from a logic in which each administration develops its own isolated systems to an approach founded on shared digital public infrastructure (DPI) that can be reused by all State institutions.",
       ],
     },
     objectifs: [
@@ -405,15 +405,15 @@ export const composantesDetail: ComposanteDetail[] = [
       {
         n: "01", slug: "cloud-souverain", img: "datacenter",
         titre: { fr: "Le Cloud Souverain du Gouvernement", en: "The Government Sovereign Cloud" },
-        statut: { fr: "Infrastructure stratégique", en: "Strategic infrastructure" },
+        statut: { fr: "Infrastructure de l'État", en: "State infrastructure" },
         corps: {
           fr: [
-            "Le Cloud Souverain de la République Démocratique du Congo constitue l'une des infrastructures stratégiques de la transformation numérique de l'État.",
+            "Le Cloud Souverain de la République Démocratique du Congo est l'une des infrastructures prévues par la Composante 2.",
             "Cette infrastructure permettra d'héberger, dans un environnement sécurisé et maîtrisé, des plateformes gouvernementales ainsi que les applications et registres critiques de l'État.",
             "Le Cloud Souverain est conçu pour fournir différents modèles de services numériques :",
           ],
           en: [
-            "The Sovereign Cloud of the Democratic Republic of the Congo is one of the strategic infrastructures of the State's digital transformation.",
+            "The Sovereign Cloud of the Democratic Republic of the Congo is one of the infrastructures planned under Component 2.",
             "It will host government platforms as well as the State's critical applications and registries in a secure, controlled environment.",
             "The Sovereign Cloud is designed to provide several digital service models:",
           ],
@@ -424,8 +424,8 @@ export const composantesDetail: ComposanteDetail[] = [
           { fr: "Software as a Service — SaaS", en: "Software as a Service — SaaS" },
         ],
         chute: {
-          fr: "Il permettra aux administrations publiques de disposer de capacités informatiques mutualisées sans devoir investir individuellement dans des infrastructures de centres de données. Le projet vise ainsi à améliorer la disponibilité des services publics numériques, réduire les coûts liés à la multiplication des infrastructures informatiques, renforcer la résilience des systèmes de l'État et améliorer la maîtrise ainsi que la protection des données publiques. Le Cloud Souverain constitue également une infrastructure essentielle pour accueillir progressivement les plateformes critiques et les futurs services numériques de l'administration congolaise.",
-          en: "It will give public administrations pooled computing capacity without each having to invest in its own data centre infrastructure. The project therefore aims to improve the availability of digital public services, cut the costs of duplicated IT infrastructure, strengthen the resilience of State systems and improve control over and protection of public data. The Sovereign Cloud is also an essential platform for progressively hosting critical platforms and the future digital services of the Congolese administration.",
+          fr: "Il permettra aux administrations publiques de disposer de capacités informatiques mutualisées sans devoir investir individuellement dans des infrastructures de centres de données. Le projet vise ainsi à améliorer la disponibilité des services publics numériques, réduire les coûts liés à la multiplication des infrastructures informatiques, renforcer la résilience des systèmes de l'État et améliorer la maîtrise ainsi que la protection des données publiques. Il doit également accueillir progressivement les plateformes critiques et les futurs services numériques de l'administration congolaise.",
+          en: "It will give public administrations pooled computing capacity without each having to invest in its own data centre infrastructure. The project therefore aims to improve the availability of digital public services, cut the costs of duplicated IT infrastructure, strengthen the resilience of State systems and improve control over and protection of public data. It is also intended to host, progressively, the critical platforms and the future digital services of the Congolese administration.",
         },
       },
       {
@@ -434,12 +434,12 @@ export const composantesDetail: ComposanteDetail[] = [
         statut: { fr: "Réseau gouvernemental", en: "Government network" },
         corps: {
           fr: [
-            "Le GOVNET est le projet de réseau gouvernemental destiné à interconnecter progressivement les administrations et institutions publiques de la République Démocratique du Congo. Il doit constituer la colonne vertébrale des échanges numériques de l'État.",
+            "Le GOVNET est le projet de réseau gouvernemental destiné à interconnecter progressivement les administrations et institutions publiques de la République Démocratique du Congo. Il doit servir de réseau principal pour les échanges numériques de l'État.",
             "À travers cette infrastructure, les administrations pourront communiquer et accéder aux plateformes gouvernementales à travers un réseau sécurisé et maîtrisé, plutôt que de dépendre exclusivement de connexions Internet publiques indépendantes.",
             "Le GOVNET permettra notamment :",
           ],
           en: [
-            "GOVNET is the government network project intended to progressively interconnect the administrations and public institutions of the Democratic Republic of the Congo. It is to become the backbone of the State's digital exchanges.",
+            "GOVNET is the government network project intended to progressively interconnect the administrations and public institutions of the Democratic Republic of the Congo. It is to serve as the main network for the State's digital exchanges.",
             "Through this infrastructure, administrations will be able to communicate and reach government platforms over a secure, controlled network, rather than depending solely on separate public internet connections.",
             "GOVNET will notably enable:",
           ],
@@ -463,12 +463,12 @@ export const composantesDetail: ComposanteDetail[] = [
         statut: { fr: "Cybersécurité", en: "Cybersecurity" },
         corps: {
           fr: [
-            "Avec la transformation numérique croissante de l'administration publique, la protection des infrastructures et des données de l'État devient une priorité nationale.",
+            "Avec la transformation numérique croissante de l'administration publique, la protection des infrastructures et des données de l'État devient une priorité.",
             "Le Government Security Operations Center — GOVSOC constitue le dispositif central de surveillance et de réponse aux incidents de cybersécurité affectant les infrastructures numériques critiques du Gouvernement.",
             "Le GOVSOC permettra notamment :",
           ],
           en: [
-            "As public administration digitalises further, protecting the State's infrastructure and data becomes a national priority.",
+            "As public administration digitalises further, protecting the State's infrastructure and data becomes a priority.",
             "The Government Security Operations Center — GOVSOC is the central facility for monitoring and responding to cybersecurity incidents affecting the Government's critical digital infrastructure.",
             "GOVSOC will notably enable:",
           ],
@@ -492,12 +492,12 @@ export const composantesDetail: ComposanteDetail[] = [
         statut: { fr: "Briques partagées", en: "Shared building blocks" },
         corps: {
           fr: [
-            "La Composante 2 accompagne également le Gouvernement dans la construction d'une véritable Infrastructure Publique Numérique — Digital Public Infrastructure (DPI).",
+            "La Composante 2 accompagne également le Gouvernement dans la construction d'une Infrastructure Publique Numérique — Digital Public Infrastructure (DPI).",
             "La DPI repose sur des composants numériques fondamentaux pouvant être utilisés par plusieurs administrations pour développer rapidement et de manière cohérente de nouveaux services publics numériques.",
             "Ces briques peuvent notamment concerner :",
           ],
           en: [
-            "Component 2 also supports the Government in building genuine Digital Public Infrastructure (DPI).",
+            "Component 2 also supports the Government in building Digital Public Infrastructure (DPI).",
             "DPI rests on foundational digital components that several administrations can use to build new digital public services quickly and coherently.",
             "These building blocks may notably cover:",
           ],
@@ -510,8 +510,8 @@ export const composantesDetail: ComposanteDetail[] = [
           { fr: "les plateformes gouvernementales partagées", en: "shared government platforms" },
         ],
         chute: {
-          fr: "Cette approche permet d'éviter que chaque ministère ou institution développe séparément les mêmes fonctions techniques. La DPI constitue ainsi une fondation essentielle pour accélérer la digitalisation des services publics tout en améliorant leur interopérabilité, leur sécurité et leur capacité à évoluer.",
-          en: "This approach avoids each ministry or institution separately rebuilding the same technical functions. DPI is therefore an essential foundation for accelerating the digitalisation of public services while improving their interoperability, security and ability to evolve.",
+          fr: "Cette approche permet d'éviter que chaque ministère ou institution développe séparément les mêmes fonctions techniques. La DPI doit ainsi faciliter la digitalisation des services publics et améliorer leur interopérabilité, leur sécurité et leur capacité à évoluer.",
+          en: "This approach avoids each ministry or institution separately rebuilding the same technical functions. DPI should therefore make it easier to digitalise public services and improve their interoperability, security and ability to evolve.",
         },
       },
       {
@@ -557,12 +557,12 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "La gouvernance des données publiques", en: "Public data governance" },
         corps: {
           fr: [
-            "Les données constituent l'un des actifs stratégiques de la transformation numérique de l'État.",
+            "Les données sont l'un des principaux actifs de l'administration.",
             "La Composante 2 soutient la mise en place d'un cadre national permettant d'améliorer la gouvernance, la qualité, la protection, le partage et la valorisation des données publiques.",
             "Cette démarche vise notamment à :",
           ],
           en: [
-            "Data is one of the strategic assets of the State's digital transformation.",
+            "Data is one of the administration's main assets.",
             "Component 2 supports a national framework to improve the governance, quality, protection, sharing and value of public data.",
             "This effort aims notably to:",
           ],
@@ -576,8 +576,8 @@ export const composantesDetail: ComposanteDetail[] = [
           { fr: "développer progressivement les capacités d'analyse et de valorisation des données publiques", en: "progressively build capacity to analyse and derive value from public data" },
         ],
         chute: {
-          fr: "La gouvernance des données constitue également une condition essentielle pour permettre à l'État d'exploiter de manière responsable les technologies émergentes, notamment l'intelligence artificielle.",
-          en: "Data governance is also an essential condition for the State to make responsible use of emerging technologies, notably artificial intelligence.",
+          fr: "La gouvernance des données est également une condition pour que l'État puisse exploiter de manière responsable les technologies émergentes, notamment l'intelligence artificielle.",
+          en: "Data governance is also a precondition for the State to make responsible use of emerging technologies, notably artificial intelligence.",
         },
       },
       {
@@ -602,7 +602,7 @@ export const composantesDetail: ComposanteDetail[] = [
       },
       {
         n: "09", slug: "infrastructures-internet", img: "tour",
-        titre: { fr: "Les infrastructures Internet stratégiques de l'État", en: "The State's strategic internet infrastructure" },
+        titre: { fr: "Les infrastructures Internet de l'État", en: "The State's internet infrastructure" },
         corps: {
           fr: [
             "La Composante 2 intervient également sur plusieurs infrastructures nécessaires à la présence et à l'autonomie numérique de la République Démocratique du Congo.",
@@ -620,8 +620,8 @@ export const composantesDetail: ComposanteDetail[] = [
           { fr: "le renforcement de la résilience et de la sécurité des infrastructures Internet nationales", en: "strengthening the resilience and security of national internet infrastructure" },
         ],
         chute: {
-          fr: "Ces initiatives contribuent à renforcer la souveraineté numérique du pays et à créer un environnement plus favorable au développement des services numériques.",
-          en: "These initiatives help strengthen the country's digital sovereignty and create a more favourable environment for digital services to develop.",
+          fr: "Ces initiatives contribuent à renforcer la maîtrise par le pays de ses ressources Internet et à créer un environnement plus favorable au développement des services numériques.",
+          en: "These initiatives help strengthen the country's control over its internet resources and create a more favourable environment for digital services to develop.",
         },
       },
       {
@@ -655,10 +655,10 @@ export const composantesDetail: ComposanteDetail[] = [
       },
     ],
     ecosysteme: {
-      titre: { fr: "Vers un véritable écosystème numérique gouvernemental", en: "Towards a genuine government digital ecosystem" },
+      titre: { fr: "Des infrastructures conçues pour fonctionner ensemble", en: "Infrastructure designed to work together" },
       lead: {
-        fr: "L'ensemble de ces projets ne constitue pas une succession d'initiatives indépendantes : ils sont conçus comme les différentes composantes d'un écosystème numérique gouvernemental intégré. Ces infrastructures constituent ensemble les fondations nécessaires au développement de services publics numériques modernes.",
-        en: "These projects are not a succession of independent initiatives: they are designed as the parts of one integrated government digital ecosystem. Together, they form the foundations required to develop modern digital public services.",
+        fr: "Ces projets sont conçus pour fonctionner ensemble : chacun assure une fonction dont les autres dépendent. Ensemble, ils forment la base technique des services publics numériques.",
+        en: "These projects are designed to work together: each provides a function the others depend on. Together, they form the technical base for digital public services.",
       },
       couches: [
         { t: { fr: "GOVNET", en: "GOVNET" }, d: { fr: "assure la connectivité entre les institutions", en: "provides connectivity between institutions" } },
@@ -671,10 +671,10 @@ export const composantesDetail: ComposanteDetail[] = [
       ],
     },
     finalite: {
-      titre: { fr: "Une transformation numérique au service du citoyen", en: "A digital transformation serving the citizen" },
+      titre: { fr: "Des services publics plus simples pour les citoyens", en: "Simpler public services for citizens" },
       lead: {
-        fr: "La finalité de la Composante 2 dépasse la construction d'infrastructures technologiques : elle vise à contribuer à un changement durable dans la manière dont l'administration congolaise fonctionne et fournit ses services. À terme, ces investissements doivent permettre :",
-        en: "Component 2's purpose goes beyond building technological infrastructure: it aims to contribute to a lasting change in how the Congolese administration works and delivers its services. In time, these investments should make it possible:",
+        fr: "Au-delà des infrastructures, la Composante 2 vise à améliorer la manière dont l'administration congolaise fonctionne et fournit ses services. À terme, ces investissements doivent permettre :",
+        en: "Beyond the infrastructure, Component 2 aims to improve how the Congolese administration works and delivers its services. In time, these investments should make it possible:",
       },
       points: [
         { fr: "de simplifier les démarches administratives", en: "to simplify administrative procedures" },
@@ -703,21 +703,21 @@ export const composantesDetail: ComposanteDetail[] = [
     img: "formation",
     odp: ["ODP-4"],
     titreLong: {
-      fr: "Former une génération et faire émerger l'innovation congolaise",
-      en: "Training a generation and growing Congolese innovation",
+      fr: "Former des compétences numériques et soutenir l'innovation congolaise",
+      en: "Building digital skills and supporting Congolese innovation",
     },
     soustitre: {
-      fr: "Des compétences numériques avancées, des établissements d'enseignement outillés et un écosystème d'innovation local capable de créer des emplois et des solutions.",
-      en: "Advanced digital skills, equipped education institutions and a local innovation ecosystem able to create jobs and solutions.",
+      fr: "Des compétences numériques avancées, des établissements d'enseignement outillés et un appui à l'innovation locale et à la création d'emplois.",
+      en: "Advanced digital skills, equipped education institutions and support for local innovation and job creation.",
     },
     problematique: {
       titre: {
-        fr: "Une infrastructure se livre en trois ans. Les compétences qui la font vivre se construisent en dix.",
-        en: "Infrastructure is delivered in three years. The skills that keep it running take ten to build.",
+        fr: "Former les équipes qui exploitent une infrastructure prend plus de temps que de la construire.",
+        en: "Training the teams who run infrastructure takes longer than building it.",
       },
       lead: {
-        fr: "Le pays entre dans un cycle d'investissement numérique avec une population parmi les plus jeunes du continent — c'est un atout de long terme. Le point de tension est ailleurs : entre le moment où les systèmes sont livrés et celui où des équipes congolaises savent les exploiter, il existe un décalage que ni le matériel ni le financement ne comblent.",
-        en: "The country is entering a digital investment cycle with one of the continent's youngest populations — a long-term asset. The tension lies elsewhere: between the moment systems are delivered and the moment Congolese teams can run them, there is a gap that neither equipment nor financing closes.",
+        fr: "Le pays entre dans un cycle d'investissement numérique avec une population parmi les plus jeunes du continent. Mais entre le moment où les systèmes sont livrés et celui où des équipes congolaises savent les exploiter, il existe un décalage que ni le matériel ni le financement ne comblent.",
+        en: "The country is entering a digital investment cycle with one of the continent's youngest populations. But between the moment systems are delivered and the moment Congolese teams can run them, there is a gap that neither equipment nor financing closes.",
       },
       axes: [
         {
@@ -737,42 +737,42 @@ export const composantesDetail: ComposanteDetail[] = [
         {
           t: { fr: "Une infrastructure sans exploitants devient une dette", en: "Infrastructure without operators becomes a liability" },
           d: {
-            fr: "Un équipement non maintenu se dégrade plus vite qu'il ne s'amortit ; un système non administré finit par être contourné ; un dispositif de sécurité sans analystes ne produit que des alertes que personne ne traite. Le pays paie alors deux fois : une fois pour construire, une fois pour réparer — et perd entre-temps le service qu'il attendait.",
-            en: "Unmaintained equipment degrades faster than it depreciates; an unadministered system ends up being bypassed; a security facility without analysts produces only alerts that nobody handles. The country then pays twice — once to build, once to repair — and loses in the meantime the service it was expecting.",
+            fr: "Un équipement non maintenu se dégrade plus vite qu'il ne s'amortit ; un système non administré finit par être contourné ; un dispositif de sécurité sans analystes ne produit que des alertes que personne ne traite. Le pays paie alors deux fois, pour construire puis pour réparer, et perd entre-temps le service attendu.",
+            en: "Unmaintained equipment degrades faster than it depreciates; an unadministered system ends up being bypassed; a security facility without analysts produces only alerts that nobody handles. The country then pays twice, to build and then to repair, and loses the expected service in the meantime.",
           },
         },
       ],
       appui: {
         fr: [
           "Le marché seul sous-investit dans la formation, et pour une raison connue : une entreprise qui forme ne capte pas tout le rendement de cet effort, puisque le salarié formé peut être recruté ailleurs. L'étudiant, de son côté, hésite à s'engager dans une filière technique dont le débouché n'est pas lisible. Ce double sous-investissement justifie un cofinancement public, adossé à des cursus construits avec ceux qui recrutent.",
-          "Le projet privilégie pour cela des mécanismes qui paient le résultat plutôt que l'intention : les subventions à la performance ne sont versées qu'au fil de jalons vérifiables, et les centres d'innovation mutualisent des équipements qu'un porteur de projet isolé ne pourrait pas financer. L'objectif n'est pas de multiplier les formations, mais d'aligner le contenu enseigné sur des compétences que quelqu'un est prêt à rémunérer.",
-          "Une politique de compétences n'a de sens que si la demande existe. Former sans marché local revient à organiser une émigration qualifiée. C'est pourquoi le soutien aux entreprises, aux contenus et aux services numériques produits en RDC fait partie de la même composante : il crée la contrepartie qui retient les compétences sur le territoire.",
+          "Le projet privilégie pour cela des mécanismes qui paient le résultat plutôt que l'intention : les subventions à la performance ne sont versées qu'au fil de jalons vérifiables, et les centres d'innovation mutualisent des équipements qu'un porteur de projet isolé ne pourrait pas financer. L'objectif est d'aligner le contenu enseigné sur les compétences que les employeurs recherchent.",
+          "Une politique de compétences n'a de sens que si la demande existe. Sans marché local, les personnes formées partent chercher un emploi ailleurs. C'est pourquoi le soutien aux entreprises, aux contenus et aux services numériques produits en RDC fait partie de la même composante : il crée la contrepartie qui retient les compétences sur le territoire.",
         ],
         en: [
           "The market alone underinvests in training, for a well-known reason: a firm that trains does not capture the full return, since the trained employee can be hired elsewhere. Students, for their part, hesitate to commit to a technical track whose outlet is unclear. This double underinvestment justifies public co-financing, anchored in curricula built with those who do the hiring.",
-          "The project therefore favours mechanisms that pay for results rather than intentions: performance-based grants are released only as verifiable milestones are met, and innovation centres pool equipment that an isolated project holder could not finance. The aim is not to multiply training courses, but to align what is taught with skills someone is willing to pay for.",
-          "A skills policy only makes sense if demand exists. Training without a local market amounts to organising qualified emigration. That is why support to businesses, content and digital services produced in the DRC belongs to the same component: it creates the counterpart that keeps skills in the country.",
+          "The project therefore favours mechanisms that pay for results rather than intentions: performance-based grants are released only as verifiable milestones are met, and innovation centres pool equipment that an isolated project holder could not finance. The aim is to align what is taught with the skills employers are looking for.",
+          "A skills policy only makes sense if demand exists. Without a local market, trained people leave to find work elsewhere. That is why support to businesses, content and digital services produced in the DRC belongs to the same component: it creates the counterpart that keeps skills in the country.",
         ],
       },
       liens: [
         { code: "C2", t: { fr: "Le cloud souverain, le réseau gouvernemental et le centre de cybersécurité ne tiennent que par les équipes qui les exploitent au quotidien.", en: "The sovereign cloud, the government network and the cybersecurity centre hold together only through the teams that run them day to day." } },
         { code: "C1", t: { fr: "Sans campus raccordés, la formation à distance et l'accès aux ressources scientifiques restent des intentions.", en: "Without connected campuses, distance learning and access to scientific resources remain intentions." } },
         { t: { fr: "Enseignement supérieur : la modernisation des cursus se décide avec le ministère et les établissements, pas à côté d'eux.", en: "Higher education: curriculum reform is decided with the ministry and the institutions, not alongside them." } },
-        { t: { fr: "Secteur privé : sans demande d'emploi solvable, la formation produit de l'émigration qualifiée.", en: "Private sector: without solvent labour demand, training produces qualified emigration." } },
+        { t: { fr: "Secteur privé : sans emplois disponibles localement, les diplômés partent travailler ailleurs.", en: "Private sector: without local jobs, graduates leave to work elsewhere." } },
       ],
     },
     chapeau: {
       fr: [
         "La Composante 3 porte le volet humain et économique du projet, structuré en deux sous-composantes : la formation de compétences numériques avancées, en appui aux établissements d'enseignement supérieur et aux centres d'innovation, et le développement du contenu local et de l'innovation. Le lien entre les deux est intentionnel : l'une produit des compétences, l'autre crée la demande qui les retient dans le pays.",
-        "Sur le versant formation, l'intervention porte moins sur le volume que sur l'alignement. Les parcours visent les métiers effectivement recherchés par les administrations, les opérateurs et les entreprises du secteur — administration réseau et systèmes, cybersécurité, ingénierie et gouvernance des données, cloud, conduite de projet numérique — et sont construits avec ceux qui recrutent, de façon que le diplôme constitue un signal vérifiable pour l'employeur.",
+        "Sur le versant formation, l'intervention vise d'abord l'adéquation des formations aux emplois. Les parcours visent les métiers effectivement recherchés par les administrations, les opérateurs et les entreprises du secteur — administration réseau et systèmes, cybersécurité, ingénierie et gouvernance des données, cloud, conduite de projet numérique — et sont construits avec ceux qui recrutent, de façon que le diplôme constitue un signal vérifiable pour l'employeur.",
         "L'appui aux établissements accompagne cette exigence : laboratoires et salles équipés, formation des enseignants, actualisation des programmes, mutualisation de la connectivité entre établissements. L'objectif est que la capacité reste installée dans les institutions congolaises après le projet, plutôt que dans des dispositifs temporaires.",
-        "Sur le versant innovation, la composante finance à la performance : les subventions ne sont versées qu'au fil de jalons vérifiables, et le réseau de centres d'innovation mutualise des équipements et un accompagnement qu'un porteur de projet isolé ne pourrait pas financer. L'inclusion des femmes n'y est pas un volet séparé mais une cible suivie, sur la formation comme sur l'entrepreneuriat.",
+        "Sur le versant innovation, la composante finance à la performance : les subventions ne sont versées qu'au fil de jalons vérifiables, et le réseau de centres d'innovation mutualise des équipements et un accompagnement qu'un porteur de projet isolé ne pourrait pas financer. L'inclusion des femmes y fait l'objet d'une cible suivie, sur la formation comme sur l'entrepreneuriat.",
       ],
       en: [
         "Component 3 carries the project's human and economic strand, structured into two sub-components: advanced digital skills training, in support of higher-education institutions and innovation centres, and the development of local content and innovation. The link between the two is intentional: one produces skills, the other creates the demand that keeps them in the country.",
-        "On the training side, the intervention is less about volume than about alignment. Pathways target the trades actually sought by administrations, operators and sector firms — network and systems administration, cybersecurity, data engineering and governance, cloud, digital project management — and are built with those who recruit, so that the qualification is a verifiable signal for employers.",
+        "On the training side, the intervention focuses first on matching training to jobs. Pathways target the trades actually sought by administrations, operators and sector firms — network and systems administration, cybersecurity, data engineering and governance, cloud, digital project management — and are built with those who recruit, so that the qualification is a verifiable signal for employers.",
         "Support to institutions serves that requirement: equipped laboratories and classrooms, teacher training, updated syllabuses, pooled connectivity across institutions. The aim is for capacity to remain installed in Congolese institutions after the project, rather than in temporary arrangements.",
-        "On the innovation side, the component finances on performance: grants are released only as verifiable milestones are met, and the innovation-centre network pools equipment and guidance that an isolated project holder could not finance. Women's inclusion is not a separate strand but a tracked target, in training as in entrepreneurship.",
+        "On the innovation side, the component finances on performance: grants are released only as verifiable milestones are met, and the innovation-centre network pools equipment and guidance that an isolated project holder could not finance. Women's inclusion is a tracked target, in training as in entrepreneurship.",
       ],
     },
     objectifs: [
@@ -794,12 +794,12 @@ export const composantesDetail: ComposanteDetail[] = [
         statut: { fr: "Programme national", en: "National programme" },
         corps: {
           fr: [
-            "Le programme de compétences numériques avancées constitue le cœur de la Composante 3. Il vise la formation de profils directement mobilisables par l'administration, les opérateurs et les entreprises du secteur.",
-            "Les parcours couvrent les domaines les plus tendus du marché : développement logiciel, cybersécurité, administration de réseaux et de systèmes, science et gouvernance des données, cloud et intelligence artificielle appliquée.",
+            "Le programme de compétences numériques avancées est le principal volet de la Composante 3. Il vise la formation de profils directement mobilisables par l'administration, les opérateurs et les entreprises du secteur.",
+            "Les parcours couvrent les domaines où la demande est la plus forte : développement logiciel, cybersécurité, administration de réseaux et de systèmes, science et gouvernance des données, cloud et intelligence artificielle appliquée.",
           ],
           en: [
-            "The advanced digital skills programme is the heart of Component 3. It aims to train profiles that the administration, operators and sector companies can put to work directly.",
-            "The pathways cover the tightest areas of the market: software development, cybersecurity, network and systems administration, data science and governance, cloud and applied artificial intelligence.",
+            "The advanced digital skills programme is the main strand of Component 3. It aims to train profiles that the administration, operators and sector companies can put to work directly.",
+            "The pathways cover the areas of highest demand: software development, cybersecurity, network and systems administration, data science and governance, cloud and applied artificial intelligence.",
           ],
         },
         points: [
@@ -873,11 +873,11 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "L'inclusion des femmes dans les métiers du numérique", en: "Including women in digital careers" },
         corps: {
           fr: [
-            "L'inclusion des femmes n'est pas une ligne d'accompagnement : c'est une cible chiffrée et suivie du cadre de résultats. Une part substantielle des diplômés visés et des startups soutenues devrait concerner des femmes ou des entreprises qu'elles dirigent.",
+            "L'inclusion des femmes est une cible chiffrée et suivie du cadre de résultats. Une part substantielle des diplômés visés et des startups soutenues devrait concerner des femmes ou des entreprises qu'elles dirigent.",
             "Cette cible suppose des mesures spécifiques : sensibilisation en amont, dispositifs de mentorat, aménagement des conditions de formation et suivi désagrégé des inscriptions et des sorties.",
           ],
           en: [
-            "Women's inclusion is not a side note: it is a quantified, tracked target of the results framework. A substantial share of the graduates targeted and of the startups supported should be women or women-led.",
+            "Women's inclusion is a quantified, tracked target of the results framework. A substantial share of the graduates targeted and of the startups supported should be women or women-led.",
             "That target requires specific measures: upstream outreach, mentoring schemes, adapted training conditions and disaggregated tracking of enrolment and completion.",
           ],
         },
@@ -892,11 +892,11 @@ export const composantesDetail: ComposanteDetail[] = [
         titre: { fr: "Le contenu local et l'économie numérique", en: "Local content and the digital economy" },
         corps: {
           fr: [
-            "Un réseau performant ne sert pleinement le pays que si des services et des contenus congolais y circulent. La sous-composante 3.2 soutient la production de contenus locaux, l'hébergement national et le développement de services numériques adaptés aux usages du pays.",
+            "Un réseau est plus utile au pays si des services et des contenus congolais y circulent. La sous-composante 3.2 soutient la production de contenus locaux, l'hébergement national et le développement de services numériques adaptés aux usages du pays.",
             "L'enjeu est aussi économique : héberger et produire localement retient de la valeur sur le territoire, réduit les coûts de transit international et améliore la qualité perçue des services.",
           ],
           en: [
-            "A high-performing network only fully serves the country if Congolese services and content flow across it. Sub-component 3.2 supports local content production, national hosting and the development of digital services suited to the country's uses.",
+            "A network is more useful to the country when Congolese services and content flow across it. Sub-component 3.2 supports local content production, national hosting and the development of digital services suited to the country's uses.",
             "The stakes are economic too: hosting and producing locally retains value in the country, reduces international transit costs and improves the perceived quality of services.",
           ],
         },
@@ -910,8 +910,8 @@ export const composantesDetail: ComposanteDetail[] = [
     ecosysteme: {
       titre: { fr: "De la formation à l'emploi, une chaîne continue", en: "From training to employment, one continuous chain" },
       lead: {
-        fr: "Former sans débouché, ou financer des startups sans compétences disponibles, ne produit rien de durable. La Composante 3 est conçue comme une chaîne : chaque maillon alimente le suivant.",
-        en: "Training without outlets, or financing startups without available skills, produces nothing lasting. Component 3 is designed as a chain: each link feeds the next.",
+        fr: "Former sans débouché, ou financer des startups sans compétences disponibles, donne peu de résultats durables. La Composante 3 est conçue comme une chaîne : chaque maillon alimente le suivant.",
+        en: "Training without outlets, or financing startups without available skills, yields few lasting results. Component 3 is designed as a chain: each link feeds the next.",
       },
       couches: [
         { t: { fr: "Établissements", en: "Institutions" }, d: { fr: "équipés, connectés, enseignants formés", en: "equipped, connected, teachers trained" } },
@@ -925,8 +925,8 @@ export const composantesDetail: ComposanteDetail[] = [
     finalite: {
       titre: { fr: "Des compétences qui restent au pays", en: "Skills that stay in the country" },
       lead: {
-        fr: "L'objectif final de la Composante 3 est qu'à l'horizon du projet, la RDC dispose des compétences nécessaires pour faire vivre elle-même son écosystème numérique.",
-        en: "Component 3's ultimate goal is for the DRC to hold, over the project horizon, the skills needed to run its own digital ecosystem.",
+        fr: "La Composante 3 vise à ce que, d'ici la fin du projet, la RDC dispose de davantage de compétences locales pour exploiter ses systèmes numériques.",
+        en: "Component 3 aims for the DRC to have, by the end of the project, more local skills to run its digital systems.",
       },
       points: [
         { fr: "des jeunes formés à des métiers réellement demandés", en: "young people trained for genuinely in-demand jobs" },
@@ -934,7 +934,7 @@ export const composantesDetail: ComposanteDetail[] = [
         { fr: "des entreprises congolaises capables de servir le marché national", en: "Congolese companies able to serve the national market" },
         { fr: "une administration qui recrute des compétences disponibles localement", en: "an administration recruiting locally available skills" },
         { fr: "des solutions conçues pour les usages et les langues du pays", en: "solutions designed for the country's uses and languages" },
-        { fr: "une capacité d'innovation qui survit à la fin du projet", en: "an innovation capacity that outlives the project" },
+        { fr: "des dispositifs d'innovation maintenus après la fin du projet", en: "innovation arrangements that continue after the project" },
       ],
     },
     video: {
@@ -952,8 +952,8 @@ export const composantesDetail: ComposanteDetail[] = [
     slug: "c4",
     img: "hub",
     titreLong: {
-      fr: "Exécuter avec rigueur, mesurer et rendre compte",
-      en: "Delivering with rigour, measuring and accounting",
+      fr: "Exécuter le projet, mesurer et rendre compte",
+      en: "Delivering the project, measuring and accounting",
     },
     soustitre: {
       fr: "La fonction d'exécution du projet : coordination, passation des marchés, gestion fiduciaire, suivi-évaluation, sauvegardes environnementales et sociales, et redevabilité envers les citoyens comme envers les bailleurs.",
@@ -965,8 +965,8 @@ export const composantesDetail: ComposanteDetail[] = [
         en: "The binding constraint is not financing: it is the capacity to spend it properly.",
       },
       lead: {
-        fr: "Un accord signé ne construit rien. Entre la signature et la mise en service, il y a des dossiers d'appel d'offres à préparer, des avis de non-objection à obtenir, des instruments environnementaux et sociaux à faire valider, des contrats à superviser et des résultats à mesurer sur vingt-six provinces. C'est cette chaîne, et non l'enveloppe, qui détermine le rythme réel du projet.",
-        en: "A signed agreement builds nothing. Between signature and commissioning there are bidding documents to prepare, no-objections to obtain, environmental and social instruments to clear, contracts to supervise and results to measure across twenty-six provinces. That chain, not the envelope, sets the project's real pace.",
+        fr: "Entre la signature et la mise en service, il y a des dossiers d'appel d'offres à préparer, des avis de non-objection à obtenir, des instruments environnementaux et sociaux à faire valider, des contrats à superviser et des résultats à mesurer sur vingt-six provinces. C'est cette chaîne, et non l'enveloppe, qui détermine le rythme réel du projet.",
+        en: "Between signature and commissioning there are bidding documents to prepare, no-objections to obtain, environmental and social instruments to clear, contracts to supervise and results to measure across twenty-six provinces. That chain, not the envelope, sets the project's real pace.",
       },
       axes: [
         {
@@ -979,12 +979,12 @@ export const composantesDetail: ComposanteDetail[] = [
         {
           t: { fr: "Un maillon mal préparé se paie en mois, pas en jours", en: "A poorly prepared link costs months, not days" },
           d: {
-            fr: "Un dossier d'appel d'offres incomplet retarde l'avis de non-objection ; l'avis retardé décale la publication ; la publication décalée fait manquer la fenêtre de travaux et repousse le chantier à la saison suivante. De même, un instrument de sauvegarde non divulgué avant travaux bloque le démarrage. Les retards ne s'ajoutent pas les uns aux autres, ils se composent.",
-            en: "An incomplete bidding document delays the no-objection; a delayed no-objection pushes back publication; delayed publication misses the works window and defers the site to the next season. Likewise, a safeguard instrument not disclosed before works blocks the start. Delays do not add up; they compound.",
+            fr: "Un dossier d'appel d'offres incomplet retarde l'avis de non-objection ; l'avis retardé décale la publication ; la publication décalée fait manquer la fenêtre de travaux et repousse le chantier à la saison suivante. De même, un instrument de sauvegarde non divulgué avant travaux bloque le démarrage. Chaque retard aggrave le suivant.",
+            en: "An incomplete bidding document delays the no-objection; a delayed no-objection pushes back publication; delayed publication misses the works window and defers the site to the next season. Likewise, a safeguard instrument not disclosed before works blocks the start. Each delay adds to the next.",
           },
         },
         {
-          t: { fr: "Un décaissement lent est une perte sèche", en: "Slow disbursement is a dead loss" },
+          t: { fr: "Un décaissement lent peut faire perdre des financements", en: "Slow disbursement can mean lost financing" },
           d: {
             fr: "Les financements ont une date limite de décaissement : ce qui n'a pas été engagé et payé dans la fenêtre n'est pas reporté, il est perdu pour le pays. À cette perte financière s'ajoute une perte de crédit : un projet incapable de démontrer la traçabilité de ses décisions fragilise la confiance qui conditionne les financements suivants.",
             en: "Financing comes with a disbursement deadline: what has not been committed and paid within the window is not carried over, it is lost to the country. To that financial loss is added a loss of credit: a project unable to demonstrate the traceability of its decisions weakens the confidence on which the next financing depends.",
@@ -993,14 +993,14 @@ export const composantesDetail: ComposanteDetail[] = [
       ],
       appui: {
         fr: [
-          "C'est la raison pour laquelle la gestion du projet est une composante à part entière, et non une ligne de frais généraux. Planifier, passer les marchés, contractualiser, superviser et mesurer sont des fonctions productives : elles déterminent la part du financement qui se transforme effectivement en kilomètres de fibre, en plateformes en service et en diplômés.",
-          "La redevabilité relève de la même logique. Publier les avis, rendre publiques les attributions, ouvrir le dépôt documentaire et faire fonctionner un mécanisme de plaintes accessible ne sont pas des exercices de communication : ce sont les dispositifs qui rendent l'exécution contestable, donc corrigeable, avant que l'erreur ne devienne coûteuse.",
-          "Enfin, cette composante porte la protection des personnes et de l'environnement. Un chantier de fibre traverse des terrains, des activités et des communautés ; il crée des risques sociaux, dont ceux de violences basées sur le genre, que le projet doit prévenir et traiter selon des règles écrites à l'avance, non improvisées au moment où le problème survient.",
+          "C'est la raison pour laquelle la gestion du projet est une composante à part entière. Planifier, passer les marchés, contractualiser, superviser et mesurer sont des fonctions productives : elles déterminent la part du financement qui se transforme effectivement en kilomètres de fibre, en plateformes en service et en diplômés.",
+          "La redevabilité relève de la même logique. Publier les avis, rendre publiques les attributions, ouvrir le dépôt documentaire et faire fonctionner un mécanisme de plaintes accessible permettent de contester l'exécution, et donc de la corriger, avant qu'une erreur ne devienne coûteuse.",
+          "Enfin, cette composante porte la protection des personnes et de l'environnement. Un chantier de fibre traverse des terrains, des activités et des communautés ; il crée des risques sociaux, dont ceux de violences basées sur le genre, que le projet doit prévenir et traiter selon des règles écrites à l'avance.",
         ],
         en: [
-          "This is why project management is a component in its own right, not an overhead line. Planning, procuring, contracting, supervising and measuring are productive functions: they determine how much of the financing actually turns into kilometres of fibre, platforms in service and graduates.",
-          "Accountability follows the same logic. Publishing notices, making awards public, opening the document repository and operating an accessible grievance mechanism are not communication exercises: they are the arrangements that make delivery contestable, and therefore correctable, before an error becomes costly.",
-          "Finally, this component carries the protection of people and the environment. A fibre worksite crosses land, activities and communities; it creates social risks, including gender-based violence, that the project must prevent and address under rules written in advance, not improvised when the problem arises.",
+          "This is why project management is a component in its own right. Planning, procuring, contracting, supervising and measuring are productive functions: they determine how much of the financing actually turns into kilometres of fibre, platforms in service and graduates.",
+          "Accountability follows the same logic. Publishing notices, making awards public, opening the document repository and operating an accessible grievance mechanism allow delivery to be challenged, and therefore corrected, before an error becomes costly.",
+          "Finally, this component carries the protection of people and the environment. A fibre worksite crosses land, activities and communities; it creates social risks, including gender-based violence, that the project must prevent and address under rules written in advance.",
         ],
       },
       liens: [
@@ -1015,13 +1015,13 @@ export const composantesDetail: ComposanteDetail[] = [
         "La Composante 4 couvre les fonctions d'exécution du projet : coordination et pilotage, passation des marchés, gestion fiduciaire et audits, suivi-évaluation, sauvegardes environnementales et sociales, mécanisme de gestion des plaintes, communication et engagement citoyen. Elle ne construit pas d'infrastructure et ne forme pas directement ; elle rend possible ce que font les trois autres composantes.",
         "Son cycle de travail est le même quel que soit l'objet du marché : traduire le manuel d'exécution en plan de travail et de passation daté, mettre en concurrence selon les Règlements de Passation de la Banque mondiale, évaluer et obtenir l'avis de non-objection du bailleur, contractualiser, superviser l'exécution, puis mesurer et rendre compte. Ce cycle est reproductible : c'est ce qui permet de traiter simultanément des marchés de travaux, de fournitures et de prestations intellectuelles.",
         "Le suivi-évaluation s'appuie sur le cadre de résultats du projet et sur des outils de suivi géoréférencé, de manière à rapporter l'avancement province par province plutôt qu'en moyenne nationale — une exigence directement liée à l'étendue du territoire couvert.",
-        "Le partage des rôles est intangible. Les ministères définissent la politique et exercent la tutelle ; les organes de gouvernance orientent et arbitrent ; l'Unité exécute, mesure et rend compte. Le Manuel d'Exécution du Projet reste la source de vérité : l'Unité l'applique sans le réécrire, et les prérogatives des cofinanceurs sont intégralement préservées.",
+        "Le partage des rôles est fixé. Les ministères définissent la politique et exercent la tutelle ; les organes de gouvernance orientent et arbitrent ; l'Unité exécute, mesure et rend compte. Le Manuel d'Exécution du Projet reste la source de vérité : l'Unité l'applique sans le réécrire, et les prérogatives des cofinanceurs sont préservées.",
       ],
       en: [
         "Component 4 covers the project's delivery functions: coordination and steering, procurement, fiduciary management and audits, monitoring and evaluation, environmental and social safeguards, the grievance mechanism, communication and citizen engagement. It builds no infrastructure and trains no one directly; it makes possible what the other three components do.",
         "Its working cycle is the same whatever the object of the contract: translate the implementation manual into a dated work and procurement plan, compete under the World Bank Procurement Regulations, evaluate and obtain the donor's no-objection, contract, supervise delivery, then measure and account. That cycle is repeatable: it is what allows works, goods and consultancy contracts to be handled in parallel.",
         "Monitoring and evaluation draws on the project's results framework and on geo-referenced tracking tools, so that progress is reported province by province rather than as a national average — a requirement that follows directly from the extent of the territory covered.",
-        "The division of roles is not negotiable. Ministries set policy and exercise oversight; the governance bodies steer and arbitrate; the Unit delivers, measures and accounts. The Project Implementation Manual remains the source of truth: the Unit applies it without rewriting it, and co-financiers' prerogatives are fully preserved.",
+        "The division of roles is fixed. Ministries set policy and exercise oversight; the governance bodies steer and arbitrate; the Unit delivers, measures and accounts. The Project Implementation Manual remains the source of truth: the Unit applies it without rewriting it, and co-financiers' prerogatives are preserved.",
       ],
     },
     objectifs: [
@@ -1173,8 +1173,8 @@ export const composantesDetail: ComposanteDetail[] = [
     ecosysteme: {
       titre: { fr: "Du financement aux résultats, en cinq temps", en: "From financing to results, in five moves" },
       lead: {
-        fr: "L'Unité transforme un accord de financement en connectivité, en services et en compétences, par un cycle discipliné et reproductible.",
-        en: "The Unit turns a financing agreement into connectivity, services and skills, through a disciplined, repeatable cycle.",
+        fr: "L'Unité transforme un accord de financement en connectivité, en services et en compétences, par un cycle reproductible.",
+        en: "The Unit turns a financing agreement into connectivity, services and skills, through a repeatable cycle.",
       },
       couches: [
         { t: { fr: "Planifier", en: "Plan" }, d: { fr: "traduire le MEP en plan daté (PTBA / PPM)", en: "translate the PIM into a dated plan (AWPB / PP)" } },
@@ -1196,7 +1196,7 @@ export const composantesDetail: ComposanteDetail[] = [
         { fr: "chaque plainte instruite, dans un délai visé de 30 jours", en: "every grievance investigated, within a target of 30 days" },
         { fr: "les personnes et l'environnement protégés à chaque étape", en: "people and the environment protected at every step" },
         { fr: "des données cloisonnées et des règles d'accès strictes", en: "siloed data and strict access rules" },
-        { fr: "les prérogatives des bailleurs intégralement préservées", en: "donor prerogatives fully preserved" },
+        { fr: "les prérogatives des bailleurs préservées", en: "donor prerogatives preserved" },
       ],
     },
     video: {
@@ -1214,8 +1214,8 @@ export const composantesDetail: ComposanteDetail[] = [
     slug: "c5",
     img: "tour",
     titreLong: {
-      fr: "Une réserve d'intervention, mobilisable sans délai",
-      en: "A response reserve, mobilisable without delay",
+      fr: "Une réserve d'intervention, mobilisable rapidement",
+      en: "A response reserve that can be mobilised quickly",
     },
     soustitre: {
       fr: "La composante de réponse d'urgence contingente (CERC) n'est pas dotée à ce stade : c'est un mécanisme, pas un programme de dépenses.",
@@ -1274,13 +1274,13 @@ export const composantesDetail: ComposanteDetail[] = [
         "La Composante 5 est une composante de réponse d'urgence contingente — Contingent Emergency Response Component (CERC), un instrument standard des opérations financées par la Banque mondiale. Elle figure dans l'architecture du projet sans dotation, et n'engage aucune dépense tant qu'elle n'est pas activée.",
         "Son périmètre n'est pas thématique mais procédural. Elle ne porte pas d'activités propres : elle définit à l'avance dans quelles circonstances, selon quelle séquence et sous quelles conditions des ressources déjà engagées sur les autres composantes peuvent être réaffectées vers une réponse d'urgence.",
         "L'activation relève d'une décision conjointe : elle suppose une crise entrant dans les cas d'éligibilité prévus, une demande formelle du Gouvernement, puis l'accord du bailleur sur le principe et sur le périmètre des dépenses admissibles. Elle n'est ni automatique, ni à la main de l'Unité seule.",
-        "Une fois activée, la composante ne suspend rien des règles ordinaires du projet : la passation, la gestion financière, les sauvegardes environnementales et sociales et la reddition de comptes continuent de s'appliquer. C'est précisément ce qui distingue un mécanisme d'urgence préparé d'une réaffectation improvisée.",
+        "Une fois activée, la composante ne suspend rien des règles ordinaires du projet : la passation, la gestion financière, les sauvegardes environnementales et sociales et la reddition de comptes continuent de s'appliquer. C'est ce qui distingue un mécanisme d'urgence préparé d'une réaffectation improvisée.",
       ],
       en: [
         "Component 5 is a Contingent Emergency Response Component (CERC), a standard instrument in World Bank-financed operations. It appears in the project architecture without an allocation, and commits no expenditure until it is activated.",
         "Its scope is procedural rather than thematic. It carries no activities of its own: it defines in advance the circumstances, the sequence and the conditions under which resources already committed to the other components may be reallocated towards an emergency response.",
         "Activation is a joint decision: it requires a crisis falling within the foreseen eligibility cases, a formal request from the Government, then the donor's agreement on the principle and on the scope of admissible expenditure. It is neither automatic nor within the Unit's sole discretion.",
-        "Once activated, the component suspends none of the project's ordinary rules: procurement, financial management, environmental and social safeguards and accountability continue to apply. That is precisely what distinguishes a prepared emergency mechanism from an improvised reallocation.",
+        "Once activated, the component suspends none of the project's ordinary rules: procurement, financial management, environmental and social safeguards and accountability continue to apply. That is what distinguishes a prepared emergency mechanism from an improvised reallocation.",
       ],
     },
     objectifs: [
