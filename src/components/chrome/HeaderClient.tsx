@@ -153,7 +153,7 @@ export function HeaderClient({
       <header className="border-b border-c-20 bg-[rgba(255,255,255,0.96)] backdrop-blur-[6px] max-[760px]:backdrop-blur-none">
         {/* Les marges latérales composent le gabarit et la zone sûre : max() garde
             le contenu hors de l'encoche en paysage. */}
-        <div className="mx-auto flex h-[calc(64px+var(--sa-t))] max-w-(--maxw) items-center justify-between gap-[18px] pt-(--sa-t) pr-[max(var(--pad-x),var(--sa-r))] pb-0 pl-[max(var(--pad-x),var(--sa-l))]">
+        <div className="mx-auto box-content flex h-16 max-w-(--maxw) items-center justify-between gap-[18px] pt-(--sa-t) pr-[max(var(--pad-x),var(--sa-r))] pb-0 pl-[max(var(--pad-x),var(--sa-l))]">
           <Link href={route(lang)} className="flex items-center" aria-label={`UGPTN — ${t.nav.accueil}`}>
             {/* Le mot-symbole seul : dans une barre de 64 px, la carte du logo
                 complet ne rendait plus qu'un fouillis de traits. Le lien porte

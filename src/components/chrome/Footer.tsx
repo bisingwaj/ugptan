@@ -41,7 +41,11 @@ export function Footer({ lang }: { lang: Lang }) {
       : { uniteLong: meta.uniteLong, tutelleLong: meta.tutelleLong, bailleurs: meta.bailleurs, adresse: contact.adresse, quartier: contact.quartier };
   return (
     <footer className="bg-c-black text-c-30">
-      <div className="footer-grid mx-auto grid max-w-(--maxw) grid-cols-[1.6fr_repeat(4,1fr)] gap-x-[clamp(24px,3vw,48px)] gap-y-[clamp(32px,4vw,44px)] px-(--pad-x) pt-[clamp(54px,7vw,88px)] pb-10">
+      {/* Même gabarit que `.section` / `.section__inner` : 1600 px de CONTENU,
+          marges latérales en plus (`box-content`), zone sûre comprise. Avec la
+          marge comptée dans les 1600 px, le pied s'alignait 80 px en retrait
+          des sections sur un grand écran. */}
+      <div className="footer-grid mx-auto box-content grid max-w-(--maxw) grid-cols-[1.6fr_repeat(4,1fr)] gap-x-[clamp(24px,3vw,48px)] gap-y-[clamp(32px,4vw,44px)] pr-[max(var(--pad-x),var(--sa-r))] pl-[max(var(--pad-x),var(--sa-l))] pt-[clamp(54px,7vw,88px)] pb-10">
         <div className="footer-brand">
           {/* Fond noir : c'est la variante à encre blanche qui s'y lit. */}
           <div className="mb-[18px] flex items-center">
@@ -87,7 +91,7 @@ export function Footer({ lang }: { lang: Lang }) {
       </div>
 
       <div className="border-t border-c-80">
-        <div className="mx-auto flex max-w-(--maxw) flex-wrap justify-between gap-3 px-(--pad-x) py-[18px] font-mono text-[11px] text-c-50">
+        <div className="mx-auto box-content flex max-w-(--maxw) flex-wrap justify-between gap-3 pr-[max(var(--pad-x),var(--sa-r))] pl-[max(var(--pad-x),var(--sa-l))] py-[18px] font-mono text-[11px] text-c-50">
           <span>© {t.words.year} UGPTN · {meta.code} · {meta.ville}</span>
           <nav className="footer-legal" aria-label={t.foot.legalLabel}>
             {NAV_LEGAL.map((item) => (
