@@ -1430,10 +1430,10 @@ export function dict(lang: Lang) {
         "Déposer une plainte liée au PTN-RDC, gratuitement et au besoin de façon anonyme, puis en suivre l'instruction. Canal confidentiel distinct pour les cas EAS/HS.",
         "File a grievance about the PTN-RDC, free of charge and anonymously if needed, then follow its handling. A separate confidential channel handles SEA/SH cases.",
       ),
-      heroTitle: t("Signaler une difficulté ne vous expose à rien.", "Reporting a difficulty exposes you to nothing."),
+      heroTitle: t("Déposer une plainte ou signaler un problème.", "File a grievance or report a problem."),
       heroLead: t(
-        "Le dépôt est gratuit, possible en plusieurs langues, et peut rester anonyme. Vous recevez un numéro de référence qui permet de suivre l'instruction sans avoir à vous déplacer. Aucune représaille n'est tolérée, et un canal strictement séparé traite les cas de violences basées sur le genre. L'Unité vise un traitement dans un délai de 30 jours.",
-        "Filing is free, available in several languages, and may remain anonymous. You receive a reference number that lets you follow the case without travelling. No retaliation is tolerated, and a strictly separate channel handles gender-based violence cases. The Unit aims to handle cases within 30 days.",
+        "Le dépôt est gratuit, peut rester anonyme et n'expose à aucune représaille. Vous recevez un numéro pour suivre votre dossier ; les violences basées sur le genre sont traitées par un canal séparé et confidentiel.",
+        "Filing is free, may remain anonymous and carries no risk of retaliation. You receive a number to follow your case; gender-based violence is handled through a separate, confidential channel.",
       ),
       slaBadge: t("Objectif 30 jours · dépôt gratuit · anonymat possible", "30-day objective · free to file · anonymity possible"),
       formTitle: t("Déposer une plainte", "File a grievance"),
