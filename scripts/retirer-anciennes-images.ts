@@ -42,25 +42,52 @@ type Entree = {
 
 const segment = (url: string): string | null => /\/upload\/(?:[^/]+\/)*?(v\d+\/.+)$/.exec(url)?.[1] ?? null;
 
-/** L'ancienne adresse est-elle encore citée quelque part ? (une requête par colonne) */
-async function encoreCitee(motif: string): Promise<string | null> {
-  const colonnes = await db().$queryRawUnsafe<{ t: string; c: string }[]>(
+/** 45 s au plus par requête, trois essais : la liaison vers la base coupe parfois. */
+async function avecReprise<T>(travail: () => Promise<T>): Promise<T> {
+  for (let essai = 1; ; essai += 1) {
+    try {
+      return await Promise.race([
+        travail(),
+        new Promise<never>((_, rejet) => setTimeout(() => rejet(new Error("délai dépassé (45 s)")), 45_000)),
+      ]);
+    } catch (erreur) {
+      if (essai >= 3) throw erreur;
+      await new Promise((fin) => setTimeout(fin, 2000 * essai));
+    }
+  }
+}
+
+/**
+ * Pour chaque ancienne adresse, la première colonne qui la cite encore.
+ * UNE requête par colonne pour toutes les adresses à la fois.
+ */
+async function citations(motifs: string[]): Promise<Map<string, string>> {
+  const cites = new Map<string, string>();
+  if (!motifs.length) return cites;
+  const colonnes = await avecReprise(() => db().$queryRawUnsafe<{ t: string; c: string }[]>(
     `SELECT table_name::text AS t, column_name::text AS c FROM information_schema.columns
      WHERE table_schema = 'public' AND data_type IN ('text', 'character varying', 'jsonb', 'json')`,
-  );
+  ));
   for (const { t, c } of colonnes) {
-    const [{ n }] = await db().$queryRawUnsafe<{ n: bigint }[]>(
-      `SELECT count(*) AS n FROM "${t}" WHERE "${c}"::text LIKE $1`,
-      `%${motif}%`,
-    );
-    if (Number(n) > 0) return `${t}.${c}`;
+    const lignes = await avecReprise(() => db().$queryRawUnsafe<{ motif: string }[]>(
+      `SELECT DISTINCT m AS motif FROM unnest($1::text[]) AS m
+       JOIN "${t}" x ON x."${c}"::text LIKE '%' || m || '%'`,
+      motifs,
+    ));
+    for (const { motif } of lignes) if (!cites.has(motif)) cites.set(motif, `${t}.${c}`);
   }
-  return null;
+  return cites;
 }
 
 (async () => {
   const limite = Date.now() - DELAI_H * 3600_000;
   let retires = 0;
+
+  // Toutes les anciennes adresses en attente, cherchées en une passe.
+  const enAttente = JOURNAUX.filter(existsSync).flatMap((j) =>
+    readFileSync(j, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l) as Entree).filter((e) => !e.retire),
+  );
+  const cites = await citations(enAttente.map((e) => segment(e.ancienneUrl)).filter((m): m is string => m !== null));
 
   for (const journal of JOURNAUX.filter(existsSync)) {
     const entrees: Entree[] = readFileSync(journal, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
@@ -80,7 +107,7 @@ async function encoreCitee(motif: string): Promise<string | null> {
         continue;
       }
       const motif = segment(e.ancienneUrl);
-      const cite = motif ? await encoreCitee(motif) : "adresse illisible";
+      const cite = motif ? cites.get(motif) ?? null : "adresse illisible";
       if (cite) {
         console.log(`garde  ${nom} : encore cité (${cite})`);
         continue;
