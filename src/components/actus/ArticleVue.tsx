@@ -122,6 +122,38 @@ export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = fals
             </Reveal>
           )}
 
+          {/* Le PDF vient APRÈS le texte : c'est la version officielle à
+              conserver, pas la porte d'entrée. Même bloc que la pièce jointe
+              d'un document publié (cf. components/docs/DocumentVue.tsx). */}
+          {actu.fichier && (
+            <Reveal>
+              <section className="doc-piece" aria-label={t.pdfTitre}>
+                <div className="doc-piece__tete">
+                  <span className="doc-card__ext mono" aria-hidden="true">{actu.fichier.format}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="doc-piece__titre">{t.pdfTitre}</div>
+                    <p className="doc-piece__note">{t.pdfLead}</p>
+                    <p className="mono doc-piece__meta">
+                      {[actu.fichier.format, actu.fichier.poids].filter(Boolean).join(" · ")}
+                    </p>
+                  </div>
+                </div>
+                <div className="doc-piece__actions">
+                  {actu.fichier.apercu && (
+                    <a href={actu.fichier.url} target="_blank" rel="noopener noreferrer" className="btn btn--outline btn--sm">
+                      {t.pdfOuvrir} ↗
+                    </a>
+                  )}
+                  {/* `download` seul ne suffit pas sur une origine tierce : c'est
+                      l'URL qui porte la demande (cf. lib/docs/fichier.ts). */}
+                  <a href={actu.fichier.urlDl} className="btn btn--primary btn--sm" download>
+                    <span className="arrow">↓</span> {t.pdfTelecharger}
+                  </a>
+                </div>
+              </section>
+            </Reveal>
+          )}
+
           {actu.tags.length > 0 && (
             <Reveal>
               <div className="actu-tags">

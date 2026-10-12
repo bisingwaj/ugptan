@@ -13,6 +13,7 @@ import { STATUT_LABEL, statutEffectif } from "@/lib/actus/statut";
 import { ArticleActions } from "@/components/dashboard/actus/ArticleActions";
 import { ArticleEditeur } from "@/components/dashboard/actus/ArticleEditeur";
 import { vuesDe } from "@/lib/ia/suivi";
+import { cloudinaryActif } from "@/lib/cloudinary";
 
 export const metadata: Metadata = { title: ADMIN_ACTUS.modifier };
 
@@ -108,6 +109,7 @@ export default async function ModifierArticlePage(props: {
           assets={referentiels.assets}
           apercuUrl={apercuUrl}
           etatsIA={etatsIA}
+          stockageActif={cloudinaryActif()}
         />
       </div>
     </>

@@ -457,6 +457,20 @@ model Article {
   /// les articles repris de la version statique du site.
   coverKey     String?
 
+  /// --- Pièce jointe PDF : RÉFÉRENCES Cloudinary, jamais d'octets ----------
+  /// Le texte officiel d'un communiqué, proposé au téléchargement sous
+  /// l'article. Même jeu de colonnes que `Document`, et pour les mêmes raisons
+  /// (cf. ce modèle). Toutes nulles tant qu'aucun fichier n'est attaché.
+  fileUrl      String?
+  /// Seule prise pour retirer le fichier du compte au remplacement, au retrait
+  /// ou à la suppression de l'article.
+  filePublicId String?
+  /// Nom d'origine : il nomme le fichier téléchargé.
+  fileName     String?
+  fileMime     String?
+  fileSize     Int     @default(0)
+  fileFormat   String?
+
   /// Auteur affiché, quand c'est un compte de la console.
   authorId   String?
   author     User?   @relation("ArticleAuteur", fields: [authorId], references: [id], onDelete: SetNull)

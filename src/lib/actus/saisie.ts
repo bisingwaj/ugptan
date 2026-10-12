@@ -58,6 +58,8 @@ export type ArticleSaisie = {
   authorId: string;
   authorName: string;
   tagIds: string[];
+  /** PDF joint, `null` s'il n'y en a pas (cf. ArticleFichier). */
+  fichier: { url: string; nom: string; taille: number } | null;
   traductions: Record<Lang, TraductionSaisie>;
 };
 

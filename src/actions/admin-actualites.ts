@@ -49,6 +49,9 @@ import { revaliderActualites } from "@/lib/actus/cache";
 import { codesComposantes } from "@/lib/projet/query";
 import { apresEnregistrementLangue } from "@/lib/ia/planifier";
 import { oublierTraductions } from "@/lib/ia/suivi";
+import { cloudinaryActif, deposerFichier, supprimerFichier } from "@/lib/cloudinary";
+import { contenuCorrespond, poidsLisible, tailleMaxPour } from "@/lib/medias";
+import { MIME_PDF } from "@/lib/actus/fichier";
 
 /** État partagé par tous les formulaires du module. */
 export type ActuFormState = { error: string | null; ok: string | null };
@@ -524,14 +527,144 @@ export async function supprimerArticleAction(
   const id = texte(formData, "id");
   if (!id) return { error: "Article introuvable.", ok: null };
 
-  const existe = await db().article.findUnique({ where: { id }, select: { id: true } });
+  const existe = await db().article.findUnique({
+    where: { id },
+    select: { id: true, filePublicId: true, fileMime: true },
+  });
   if (!existe) return { error: "Article introuvable.", ok: null };
 
   // Traductions et rattachements d'étiquettes tombent en cascade (cf. schéma).
   await db().article.delete({ where: { id } });
+  // Base d'abord, hébergeur ensuite : un échec réseau laisse un fichier
+  // orphelin, jamais une fiche qui désigne un fichier effacé.
+  if (existe.filePublicId) await supprimerFichier(existe.filePublicId, existe.fileMime ?? MIME_PDF);
   // Le suivi des traductions, lui, n'est rattaché par aucune clé étrangère.
   await oublierTraductions("article", id);
 
   revaliderActualites();
   redirect(`${ACTUS_PATH}?supprime=1`);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Pièce jointe PDF                                                            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Attache le PDF d'un article, ou remplace celui qui est déjà là.
+ *
+ * Formulaire séparé de la fiche, comme pour les documents publiés (cf.
+ * actions/admin-documents.ts) : renvoyer plusieurs mégaoctets à chaque
+ * correction de date n'aurait pas de sens.
+ *
+ * PDF seulement : c'est le format du texte officiel d'un communiqué, et le seul
+ * que tous les visiteurs savent ouvrir sans logiciel bureautique.
+ *
+ * Ordre des opérations : dépôt du nouveau, bascule de la ligne, retrait de
+ * l'ancien. À aucun instant l'article ne désigne un fichier absent.
+ */
+export async function joindrePdfArticleAction(
+  _prev: ActuFormState,
+  formData: FormData,
+): Promise<ActuFormState> {
+  await assertPermission("actualites");
+
+  const id = texte(formData, "id");
+  if (!id) return { error: "Article introuvable.", ok: null };
+
+  const ancien = await db().article.findUnique({
+    where: { id },
+    select: { filePublicId: true, fileMime: true, fileName: true },
+  });
+  if (!ancien) return { error: "Article introuvable.", ok: null };
+
+  const fichier = formData.get("fichier");
+  if (!(fichier instanceof File) || fichier.size === 0) {
+    return { error: "Aucun fichier reçu. Choisissez le PDF à joindre.", ok: null };
+  }
+  if (fichier.type !== MIME_PDF) {
+    return { error: "Seuls les fichiers PDF sont acceptés.", ok: null };
+  }
+  const plafond = tailleMaxPour(fichier.type);
+  if (fichier.size > plafond) {
+    return {
+      error: `Fichier trop lourd (${poidsLisible(fichier.size)}). Limite : ${poidsLisible(plafond)}.`,
+      ok: null,
+    };
+  }
+  if (!cloudinaryActif()) {
+    return {
+      error: "Stockage des fichiers non configuré : le dépôt est impossible tant que CLOUDINARY_URL n'est pas renseignée dans l'environnement.",
+      ok: null,
+    };
+  }
+
+  const nom = fichier.name.slice(0, 180) || "communique.pdf";
+  const octets = new Uint8Array(await fichier.arrayBuffer());
+  // Le type annoncé par le navigateur ne prouve rien ; l'en-tête « %PDF- » si.
+  if (!contenuCorrespond(octets, fichier.type)) {
+    return { error: "Le contenu du fichier n'est pas un PDF valide. Dépôt refusé.", ok: null };
+  }
+
+  let depot;
+  try {
+    depot = await deposerFichier(octets, { filename: nom, mimeType: fichier.type, sousDossier: "actualites/pdf" });
+  } catch (erreur) {
+    console.error("[actus] dépôt Cloudinary impossible", erreur);
+    return { error: "Téléversement refusé par le service de stockage. Réessayez.", ok: null };
+  }
+
+  try {
+    await db().article.update({
+      where: { id },
+      data: {
+        fileUrl: depot.url,
+        filePublicId: depot.publicId,
+        fileName: nom,
+        fileMime: fichier.type,
+        fileSize: depot.size || fichier.size,
+        fileFormat: depot.format ?? "pdf",
+      },
+    });
+  } catch (erreur) {
+    // Le fichier est déjà chez l'hébergeur : ne pas l'y laisser orphelin.
+    await supprimerFichier(depot.publicId, fichier.type);
+    throw erreur;
+  }
+
+  if (ancien.filePublicId) await supprimerFichier(ancien.filePublicId, ancien.fileMime ?? MIME_PDF);
+
+  revaliderActualites();
+  return {
+    error: null,
+    ok: ancien.fileName
+      ? `PDF remplacé : « ${nom} » succède à « ${ancien.fileName} ».`
+      : `PDF « ${nom} » joint à l'article.`,
+  };
+}
+
+/** Retire le PDF d'un article. L'article lui-même reste en ligne. */
+export async function retirerPdfArticleAction(
+  _prev: ActuFormState,
+  formData: FormData,
+): Promise<ActuFormState> {
+  await assertPermission("actualites");
+
+  const id = texte(formData, "id");
+  if (!id) return { error: "Article introuvable.", ok: null };
+
+  const article = await db().article.findUnique({
+    where: { id },
+    select: { filePublicId: true, fileMime: true, fileName: true },
+  });
+  if (!article) return { error: "Article introuvable.", ok: null };
+  if (!article.fileName) return { error: "Aucun PDF à retirer.", ok: null };
+
+  await db().article.update({
+    where: { id },
+    data: { fileUrl: null, filePublicId: null, fileName: null, fileMime: null, fileSize: 0, fileFormat: null },
+  });
+  if (article.filePublicId) await supprimerFichier(article.filePublicId, article.fileMime ?? MIME_PDF);
+
+  revaliderActualites();
+  return { error: null, ok: `PDF « ${article.fileName} » retiré.` };
 }

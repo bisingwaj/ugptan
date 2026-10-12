@@ -21,6 +21,7 @@ import type { Lang } from "@/lib/pick";
 import { lecteur } from "@/lib/lecture";
 import { type ArticleStatut } from "@/lib/actus/statut";
 import { describeError } from "@/lib/errors";
+import { fichierActu, type ActuFichier } from "@/lib/actus/fichier";
 import { bornerPage, cacheJson, normaliserRecherche, TAG, TTL } from "@/lib/cache/redis";
 
 /** Longueur d'un résumé déduit du corps, faute de résumé saisi. */
@@ -49,6 +50,7 @@ const articleSelect = {
   videoYt: true,
   comps: true,
   coverKey: true,
+  fileUrl: true, fileName: true, fileMime: true, fileSize: true, fileFormat: true,
   updatedAt: true,
   authorName: true,
   author: { select: { id: true, name: true, email: true } },
@@ -105,6 +107,8 @@ export type ActuVue = {
   tags: ActuTag[];
   auteur: { nom: string; role: string | null } | null;
   visuel: Visuel;
+  /** PDF joint (texte officiel d'un communiqué), à télécharger. */
+  fichier: ActuFichier | null;
   /** Durée de lecture estimée, en minutes. */
   lecture: number;
   /** Langue réellement servie — diffère de la langue demandée en cas de repli. */
@@ -126,6 +130,11 @@ type LigneArticle = {
   videoYt: string | null;
   comps: string[];
   coverKey: string | null;
+  fileUrl: string | null;
+  fileName: string | null;
+  fileMime: string | null;
+  fileSize: number;
+  fileFormat: string | null;
   updatedAt: Date;
   authorName: string | null;
   author: { id: string; name: string | null; email: string } | null;
@@ -187,6 +196,7 @@ function toVue(row: LigneArticle, lang: Lang): ActuVue | null {
        ne se traduit pas, « Cellule communication » si. */
     auteur: auteurNom ? { nom: auteurNom, role: tr.authorRole } : null,
     visuel: couverture({ coverMedia: row.coverMedia, coverKey: row.coverKey, coverAlt: tr.coverAlt }, langue, tr.title),
+    fichier: fichierActu(row),
     lecture: readingMinutes(tr.contentHtml),
     langue,
     traduit: demandee !== undefined,

@@ -25,6 +25,7 @@ import type { Lang } from "@/lib/pick";
 import type { ArticleSaisie, ReferentielsSaisie } from "@/lib/actus/saisie";
 import type { MediaRef } from "@/lib/medias";
 import { ArticleReglages } from "@/components/dashboard/actus/ArticleReglages";
+import { ArticleFichier } from "@/components/dashboard/actus/ArticleFichier";
 import { ArticleTraduction } from "@/components/dashboard/actus/ArticleTraduction";
 import { PastilleTraduction } from "@/components/dashboard/ia/PastilleTraduction";
 import { sourcePourTraduire, type EtatVue } from "@/lib/ia/statut";
@@ -43,9 +44,11 @@ type Props = {
    * antérieur à sa mise en service.
    */
   etatsIA: Partial<Record<Lang, EtatVue>>;
+  /** Stockage des fichiers configuré : sinon, le dépôt du PDF est désactivé. */
+  stockageActif: boolean;
 };
 
-export function ArticleEditeur({ article, referentiels, assets, apercuUrl, etatsIA }: Props) {
+export function ArticleEditeur({ article, referentiels, assets, apercuUrl, etatsIA, stockageActif }: Props) {
   const t = ADMIN_ACTUS;
   const [langue, setLangue] = useState<Lang>("fr");
 
@@ -99,6 +102,7 @@ export function ArticleEditeur({ article, referentiels, assets, apercuUrl, etats
           assets={assets}
           apercuUrl={apercuUrl}
         />
+        <ArticleFichier id={article.id} fichier={article.fichier} stockageActif={stockageActif} />
       </aside>
     </div>
   );

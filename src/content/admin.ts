@@ -470,6 +470,22 @@ export const ADMIN_ACTUS = {
   mediasDocument: "Document",
   mediasOuvrir: "Ouvrir le fichier",
   mediasStockageAbsent: "Stockage des fichiers non configuré : le téléversement est indisponible tant que CLOUDINARY_URL n'est pas renseignée dans l'environnement. Le référencement d'un média externe reste possible.",
+
+  /* --- PDF joint ----------------------------------------------------------- */
+  pdfBloc: "PDF à télécharger",
+  pdfAucun: "Aucun PDF joint. Joignez le texte officiel du communiqué : les visiteurs pourront le télécharger depuis l'article.",
+  pdfChoisir: "Fichier PDF",
+  pdfJoindre: "Joindre le PDF",
+  pdfEnvoi: "Envoi…",
+  pdfAide: "PDF uniquement, 10 Mo au plus. Le fichier est commun aux deux langues.",
+  pdfOuvrir: "Ouvrir",
+  pdfTelecharger: "Télécharger",
+  pdfRemplacer: "Remplacer le PDF",
+  pdfRemplacerAide: "Le nouveau PDF prend la place de l'ancien, qui est retiré du stockage. Les liens déjà partagés vers l'ancien fichier cesseront de fonctionner.",
+  pdfRetirer: "Retirer",
+  pdfRetirerConfirm: "Retirer ce PDF ? Le fichier sera supprimé du stockage. L'article, lui, reste en ligne.",
+  pdfRefusFormat: "Seuls les fichiers PDF sont acceptés.",
+  pdfStockageAbsent: "Stockage des fichiers non configuré : le dépôt est indisponible tant que CLOUDINARY_URL n'est pas renseignée dans l'environnement.",
 } as const;
 
 /**

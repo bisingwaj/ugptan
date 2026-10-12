@@ -52,7 +52,7 @@ export function ActuCard({ actu, lang, priority = false }: { actu: ActuVue; lang
 
       <div style={{ padding: "22px clamp(18px,2vw,24px) 24px", display: "flex", flexDirection: "column", flex: 1 }}>
         <div className="mono" style={{ fontSize: 11.5, color: "var(--c-60)" }}>
-          {actu.dateLabel}{actu.lieu ? ` · ${actu.lieu}` : ""}
+          {actu.dateLabel}{actu.lieu ? ` · ${actu.lieu}` : ""}{actu.fichier ? " · PDF" : ""}
         </div>
 
         <h3 style={{ margin: "12px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.32 }}>{actu.title}</h3>
