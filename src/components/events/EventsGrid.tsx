@@ -132,12 +132,15 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
                 <div className="mono" style={{ fontSize: 11.5, color: "var(--c-60)" }}>
                   {e.dateCourte}{e.lieu ? ` · ${e.lieu}` : ""}
                 </div>
-                <h3 style={{ margin: "12px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.32, flex: 1 }}>
+                <h3 className="evt-card__titre" style={{ margin: "12px 0 0", fontSize: 17.5, fontWeight: 600, lineHeight: 1.32 }}>
                   <Link href={evenementRoute(lang, e.slug)} className="evt-card__lien">{e.title}</Link>
                 </h3>
                 {e.excerpt && (
-                  <p style={{ margin: "10px 0 0", fontSize: 13.5, lineHeight: 1.55, color: "var(--c-70)" }}>{e.excerpt}</p>
+                  <p className="evt-card__resume" style={{ margin: "10px 0 0", fontSize: 13.5, lineHeight: 1.55, color: "var(--c-70)" }}>{e.excerpt}</p>
                 )}
+                {/* Le vide se loge AVANT le pied, pas entre le titre et le
+                    résumé : le résumé suit son titre, le pied reste aligné. */}
+                <div style={{ flex: 1 }} aria-hidden="true" />
                 <div className="evt-card__pied">
                   {e.aVenir && e.places && (
                     <span className="mono" style={{ fontSize: 11.5, color: "var(--c-70)" }}>{e.places}</span>
@@ -154,7 +157,7 @@ export function EventsGrid({ lang, events, withImage = false }: Props) {
                 ) : <span />}
                 <span className="mono" style={{ fontSize: 11.5, color: "var(--c-60)" }}>{e.dateCourte}</span>
               </div>
-              <h3 style={{ margin: "16px 0 0", fontSize: 16.5, fontWeight: 600, lineHeight: 1.32, flex: 1 }}>
+              <h3 className="evt-card__titre" style={{ margin: "16px 0 0", fontSize: 16.5, fontWeight: 600, lineHeight: 1.32, flex: 1 }}>
                 <Link href={evenementRoute(lang, e.slug)} className="evt-card__lien">{e.title}</Link>
               </h3>
               <div className="evt-card__pied" style={{ paddingTop: 14 }}>

@@ -1626,6 +1626,15 @@ a.actu-nav__lien:hover { background: var(--c-10); }
 .evt-card .duo > img { transition: transform var(--dur-3) var(--ease); }
 .evt-card:hover .duo > img { transform: scale(1.045); }
 .evt-card__lien { color: inherit; transition: color var(--dur-1) var(--ease); }
+/* Titre sur trois lignes au plus, résumé sur quatre, comme les cartes
+   d'actualité. Le lien étiré (::after) n'est pas coupé : son bloc conteneur
+   est la carte, ancêtre du titre. */
+.evt-card__titre {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
+}
+.evt-card__resume {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden;
+}
 .evt-card__lien::after { content: ""; position: absolute; inset: 0; z-index: 4; }
 .evt-card:hover .evt-card__lien { color: var(--ac); }
 .evt-card__lien:focus-visible { outline: 2px solid var(--ac); outline-offset: 3px; }
