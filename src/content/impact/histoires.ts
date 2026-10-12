@@ -86,21 +86,21 @@ export const histoiresSeed: ImpactSeedSection[] = [
     ctaUrl: "/project",
     fr: {
       kicker: "Impact humain",
-      titre: "Ce que ces ambitions représentent, une fois traduites.",
-      lead: "Ces ambitions ne sont pas des abstractions — ce sont des écoles en ligne, des femmes dans les métiers du numérique et des villages raccordés.",
+      titre: "Les cibles du projet, en chiffres.",
+      lead: "Les cibles portent sur des établissements à raccorder, des femmes à former aux métiers du numérique et des communautés rurales à desservir.",
       ctaLabel: "Découvrir le projet",
     },
     en: {
       kicker: "Human impact",
-      titre: "What these ambitions mean, once translated.",
-      lead: "These ambitions are not abstractions — they are schools online, women in digital careers and villages brought onto the network.",
+      titre: "The project's targets, in figures.",
+      lead: "The targets cover institutions to be connected, women to be trained for digital careers and rural communities to be served.",
       ctaLabel: "Discover the project",
     },
     items: [
       {
         valeur: "30 M",
-        fr: { surtitre: "utilisateurs visés", texte: "— l'ambition d'un Congolais sur trois en ligne à l'horizon du projet." },
-        en: { surtitre: "users targeted", texte: "— the ambition of one Congolese in three online over the project horizon." },
+        fr: { surtitre: "utilisateurs visés", texte: "soit un Congolais sur trois en ligne à l'horizon du projet." },
+        en: { surtitre: "users targeted", texte: "that is, one Congolese in three online over the project horizon." },
       },
       {
         valeur: "1 000",
@@ -129,13 +129,13 @@ export const histoiresSeed: ImpactSeedSection[] = [
     position: 0,
     fr: {
       kicker: "Histoires & impact",
-      titre: "Au-delà des chiffres, des vies qui changent.",
-      lead: "Celles et ceux pour qui le Projet existe — des visages, des métiers, des territoires.",
+      titre: "Témoignages de bénéficiaires.",
+      lead: "Des usagers de plusieurs métiers et de plusieurs provinces.",
     },
     en: {
       kicker: "Stories & impact",
-      titre: "Beyond the numbers, lives that change.",
-      lead: "The people the Project is for — faces, trades and places across the country.",
+      titre: "Beneficiary testimonials.",
+      lead: "Users from several trades and provinces.",
     },
     items: temoignages,
   },
@@ -155,14 +155,14 @@ export const histoiresSeed: ImpactSeedSection[] = [
     sourceKey: "resultats-histoires",
     fr: {
       kicker: "Histoires & impact",
-      titre: "Au-delà des chiffres, des vies qui changent.",
-      lead: "Celles et ceux pour qui le Projet existe — des visages, des métiers, des territoires.",
+      titre: "Témoignages de bénéficiaires.",
+      lead: "Des usagers de plusieurs métiers et de plusieurs provinces.",
       ctaLabel: "Voir toutes les histoires & vidéos",
     },
     en: {
       kicker: "Stories & impact",
-      titre: "Beyond the numbers, lives that change.",
-      lead: "The people the Project is for — faces, trades and places across the country.",
+      titre: "Beneficiary testimonials.",
+      lead: "Users from several trades and provinces.",
       ctaLabel: "See all stories & videos",
     },
     items: [],
@@ -177,12 +177,12 @@ export const histoiresSeed: ImpactSeedSection[] = [
     position: 0,
     fr: {
       kicker: "Dialogues sectoriels",
-      titre: "Le numérique n'est utile qu'appliqué à un métier.",
+      titre: "Les usages, secteur par secteur.",
       lead: "Une infrastructure ne produit d'effet qu'à travers les politiques sectorielles qui s'en saisissent. Ces dialogues servent à identifier, avec chaque ministère et chaque profession, l'usage précis qui justifie l'investissement.",
     },
     en: {
       kicker: "Sector dialogues",
-      titre: "Digital is only useful when applied to a trade.",
+      titre: "Uses, sector by sector.",
       lead: "Infrastructure only produces effects through the sector policies that take hold of it. These dialogues serve to identify, with each ministry and each profession, the precise use that justifies the investment.",
     },
     items: [
@@ -276,13 +276,13 @@ export const histoiresSeed: ImpactSeedSection[] = [
     position: 0,
     fr: {
       kicker: "Ce que ça change pour vous",
-      titre: "Ce qui change vraiment tient souvent à une seule chose : ne plus avoir à se déplacer pour prouver ce que l'administration sait déjà.",
-      lead: "Un projet d'infrastructure ne se juge pas à ce qu'il installe, mais à ce qu'il rend possible — et à ce qu'il cesse d'imposer. Voici, secteur par secteur, la contrainte d'aujourd'hui et le mécanisme précis qui la lève.",
+      titre: "Objectif : ne plus avoir à se déplacer pour prouver ce que l'administration sait déjà.",
+      lead: "Voici, secteur par secteur, la contrainte actuelle et le mécanisme prévu pour la lever.",
     },
     en: {
       kicker: "What it changes for you",
-      titre: "What really changes often comes down to one thing: no longer travelling to prove what the administration already knows.",
-      lead: "An infrastructure project is judged not by what it installs, but by what it makes possible — and by what it stops imposing. Here, sector by sector, is today's constraint and the precise mechanism that lifts it.",
+      titre: "The aim: no longer having to travel to prove what the administration already knows.",
+      lead: "Here, sector by sector, is the current constraint and the mechanism planned to lift it.",
     },
     items: [
       {
@@ -302,12 +302,12 @@ export const histoiresSeed: ImpactSeedSection[] = [
         valeur: "02",
         fr: {
           titre: "École & université",
-          texteSecondaire: "L'accès aux ressources dépend d'exemplaires physiques rares et d'une bande passante partagée, quand le campus est raccordé. Le savoir circule à la vitesse du papier.",
+          texteSecondaire: "L'accès aux ressources dépend d'exemplaires physiques rares et d'une bande passante partagée, quand le campus est raccordé.",
           texte: "Un établissement raccordé ouvre à tous ses étudiants les mêmes fonds documentaires, au même moment, quelle que soit la province.",
         },
         en: {
           titre: "School & university",
-          texteSecondaire: "Access to resources depends on scarce physical copies and shared bandwidth, where the campus is connected at all. Knowledge travels at the speed of paper.",
+          texteSecondaire: "Access to resources depends on scarce physical copies and shared bandwidth, where the campus is connected at all.",
           texte: "A connected institution opens the same collections to all its students, at the same time, whatever the province.",
         },
       },

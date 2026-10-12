@@ -195,12 +195,12 @@ export const equipeSeedMembres: EquipeSeedMembre[] = [
     photoPath: "/portraits/coordonnateur-litanga.jpg",
     fr: {
       role: "Coordonnateur",
-      mandat: "Dirige l'Unité, garantit la cohérence et la relation avec les bailleurs.",
+      mandat: "Dirige l'Unité, veille à la cohérence d'ensemble et tient la relation avec les bailleurs.",
       bio: "La Composante 4 est portée directement par la coordination de l'Unité, appuyée par les pôles fiduciaire, passation, suivi-évaluation et sauvegardes.",
     },
     en: {
       role: "Coordinator",
-      mandat: "Leads the Unit, secures coherence and the relationship with donors.",
+      mandat: "Leads the Unit, oversees overall coherence and holds the relationship with donors.",
       bio: "Component 4 is carried directly by the Unit's coordination, supported by the fiduciary, procurement, M&E and safeguards clusters.",
     },
   },

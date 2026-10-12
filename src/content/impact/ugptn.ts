@@ -28,12 +28,12 @@ export const ugptnSeed: ImpactSeedSection[] = [
     position: 0,
     fr: {
       titre:
-        "Faire du numérique un droit, et non un privilège : un investissement structurant pour qu'un nombre croissant de Congolaises et de Congolais puisse accéder, apprendre et entreprendre.",
+        "Étendre l'accès au numérique pour qu'un nombre croissant de Congolaises et de Congolais puisse se connecter, apprendre et entreprendre.",
       note: "Créée par arrêté ministériel · CAB/MIN/PT&N/AKIM/KL/Kbs/017/2025 · 15 avril 2025",
     },
     en: {
       titre:
-        "Making digital a right, not a privilege: a structuring investment so that a growing number of Congolese women and men can connect, learn and build.",
+        "Extending digital access so that a growing number of Congolese women and men can connect, learn and start businesses.",
       note: "Created by ministerial order · CAB/MIN/PT&N/AKIM/KL/Kbs/017/2025 · 15 avril 2025",
     },
     items: [],
@@ -48,12 +48,12 @@ export const ugptnSeed: ImpactSeedSection[] = [
     position: 0,
     fr: {
       kicker: "Mandat",
-      titre: "La capacité d'exécution est un actif. Elle se construit, elle ne se décrète pas.",
-      lead: "Un financement international n'est utile qu'à proportion de ce qu'une équipe sait en faire : préparer des dossiers qui passent la revue du bailleur, mettre en concurrence sans contentieux, superviser des chantiers dispersés sur un territoire immense, et rendre compte de chaque étape. C'est ce métier-là que l'Unité exerce.",
+      titre: "Exécuter le projet et en rendre compte.",
+      lead: "Un financement international n'est utile qu'à proportion de ce qu'une équipe sait en faire : préparer des dossiers qui passent la revue du bailleur, mettre en concurrence sans contentieux, superviser des chantiers dispersés sur un vaste territoire, et rendre compte de chaque étape. C'est ce métier-là que l'Unité exerce.",
     },
     en: {
       kicker: "Mandate",
-      titre: "Delivery capacity is an asset. It is built, not decreed.",
+      titre: "Delivering the project and accounting for it.",
       lead: "International financing is only as useful as a team's ability to use it: preparing files that pass donor review, competing contracts without litigation, supervising sites scattered across a vast territory, and accounting for every step. That is the trade the Unit practises.",
     },
     items: [
@@ -83,11 +83,11 @@ export const ugptnSeed: ImpactSeedSection[] = [
         valeur: "03",
         fr: {
           titre: "Supervision technique",
-          texte: "Vérifier que ce qui est livré correspond à ce qui a été spécifié, et que les normes structurantes — interopérabilité, identité, cybersécurité — sont respectées avant réception, pas constatées après.",
+          texte: "Vérifier que ce qui est livré correspond à ce qui a été spécifié, et que les normes techniques (interopérabilité, identité, cybersécurité) sont respectées avant la réception.",
         },
         en: {
           titre: "Technical supervision",
-          texte: "Checking that what is delivered matches what was specified, and that the structuring standards — interoperability, identity, cybersecurity — are met before acceptance, not observed afterwards.",
+          texte: "Checking that what is delivered matches what was specified, and that the technical standards (interoperability, identity, cybersecurity) are met before acceptance.",
         },
       },
       {
@@ -172,18 +172,18 @@ export const ugptnSeed: ImpactSeedSection[] = [
     theme: "GRIS",
     position: 1,
     enchaine: true,
-    fr: { titre: "Des engagements vérifiables, pas des intentions." },
-    en: { titre: "Verifiable commitments, not intentions." },
+    fr: { titre: "Des engagements vérifiables." },
+    en: { titre: "Verifiable commitments." },
     items: [
       {
         color: "#0f62fe",
         fr: {
           titre: "Transparence",
-          texte: "Chaque avis publié, chaque attribution rendue publique — y compris quand le résultat ne nous arrange pas.",
+          texte: "Chaque avis et chaque attribution sont rendus publics.",
         },
         en: {
           titre: "Transparency",
-          texte: "Every notice published, every award made public — including when the outcome is inconvenient.",
+          texte: "Every notice and every award is made public.",
         },
       },
       {
@@ -232,12 +232,12 @@ export const ugptnSeed: ImpactSeedSection[] = [
     fr: {
       kicker: "Organisation interne",
       titre: "L'organisation, pôle par pôle.",
-      lead: "Un pôle se juge à ses livrables datés, pas à son organigramme. Chacun porte une responsabilité distincte, et un dossier en cours dont l'avancement est vérifiable.",
+      lead: "Chaque pôle a une responsabilité distincte et un dossier en cours dont l'avancement est vérifiable.",
     },
     en: {
       kicker: "Internal organisation",
       titre: "The organisation, cluster by cluster.",
-      lead: "A cluster is judged by its dated deliverables, not by its org chart. Each carries a distinct responsibility, and a live file whose progress can be checked.",
+      lead: "Each cluster has a distinct responsibility and a live file whose progress can be checked.",
     },
     /* Ces trois chiffres étaient DÉRIVÉS des tables du site (nombre de pôles,
        nombre d'organes de gouvernance, année de l'arrêté). Ils deviennent
@@ -513,11 +513,11 @@ export const ugptnSeed: ImpactSeedSection[] = [
       {
         fr: {
           titre: "L'Unité décide-t-elle des attributions ?",
-          texte: "Non, pas seule. L'évaluation applique les critères publiés dans le dossier d'appel d'offres, elle est conduite par une commission et son résultat est soumis à l'avis de non-objection du bailleur avant toute notification. C'est ce triple verrou — critères annoncés, évaluation collégiale, revue externe — qui rend une attribution contestable et défendable.",
+          texte: "Non, pas seule. L'évaluation applique les critères publiés dans le dossier d'appel d'offres, elle est conduite par une commission et son résultat est soumis à l'avis de non-objection du bailleur avant toute notification. Ces trois étapes (critères annoncés, évaluation collégiale, revue externe) permettent de contester une attribution comme de la justifier.",
         },
         en: {
           titre: "Does the Unit decide who wins contracts?",
-          texte: "No, not alone. Evaluation applies the criteria published in the bidding document, is conducted by a committee, and its result is submitted for the donor's no-objection before any notification. It is this triple lock — announced criteria, collegial evaluation, external review — that makes an award both challengeable and defensible.",
+          texte: "No, not alone. Evaluation applies the criteria published in the bidding document, is conducted by a committee, and its result is submitted for the donor's no-objection before any notification. These three steps (announced criteria, collegial evaluation, external review) make it possible both to challenge an award and to justify it.",
         },
       },
       {

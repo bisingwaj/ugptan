@@ -53,7 +53,7 @@ export const videoSlots: VideoSlot[] = [
     page: { fr: "Composantes (page dédiée C1 → C5)", en: "Components (dedicated page C1 → C5)" },
     zone: { fr: "Bandeau « Vidéo de présentation » de la page de composante", en: "« Presentation video » banner on the component page" },
     ratio: "16:9", duree: "2–4 min", count: 5, status: "a_fournir",
-    note: { fr: "Un film par composante, présenté par son responsable : périmètre, projets phares, résultats attendus. Renseigner video.yt (id YouTube) ou video.src (fichier) dans content/composantes-detail.ts. Tant qu'aucune vidéo n'est fournie, l'emplacement affiche un état « à venir » assumé.", en: "One film per component, presented by its lead: scope, flagship projects, expected results. Set video.yt (YouTube id) or video.src (file) in content/composantes-detail.ts. Until a video is supplied, the slot shows an explicit « coming soon » state." },
+    note: { fr: "Un film par composante, présenté par son responsable : périmètre, projets principaux, résultats attendus. Renseigner video.yt (id YouTube) ou video.src (fichier) dans content/composantes-detail.ts. Tant qu'aucune vidéo n'est fournie, l'emplacement affiche un état « à venir » assumé.", en: "One film per component, presented by its lead: scope, main projects, expected results. Set video.yt (YouTube id) or video.src (file) in content/composantes-detail.ts. Until a video is supplied, the slot shows an explicit « coming soon » state." },
   },
   {
     key: "marche-banner",

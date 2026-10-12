@@ -29,7 +29,7 @@ export const projetSeed: ImpactSeedSection[] = [
     position: 0,
     fr: {
       kicker: "Contexte & raison d'être",
-      titre: "Le retard n'est pas technologique. Il est géographique, énergétique et institutionnel.",
+      titre: "Les obstacles au déploiement sont géographiques, énergétiques et institutionnels.",
       lead: "Les technologies de réseau sont disponibles et éprouvées ; ce qui manque, ce sont les conditions qui les rendent rentables à déployer. Un territoire de 2,3 millions de kilomètres carrés, une population dispersée, une électrification partielle et des systèmes publics conçus séparément les uns des autres : chacun de ces facteurs renchérit l'accès ou empêche l'usage. Le projet s'ancre dans l'approche régionale APM IDEA, qui mutualise l'intégration numérique de l'Afrique orientale et australe — parce que la capacité internationale et les corridors de transit se négocient à l'échelle de la région, pas d'un pays isolé.",
       /* Cette légende était le seul texte de la page écrit en dur dans le JSX,
          hors du dictionnaire (cf. l'ancien `project/page.tsx`). */
@@ -37,7 +37,7 @@ export const projetSeed: ImpactSeedSection[] = [
     },
     en: {
       kicker: "Context & rationale",
-      titre: "The gap is not technological. It is geographic, energy-related and institutional.",
+      titre: "The obstacles to rollout are geographic, energy-related and institutional.",
       lead: "Network technologies are available and proven; what is missing are the conditions that make them viable to deploy. A territory of 2.3 million square kilometres, a dispersed population, partial electrification, and public systems designed independently of one another: each of these factors raises the cost of access or prevents its use. The project is anchored in the regional APM IDEA approach, which pools digital integration across Eastern and Southern Africa — because international capacity and transit corridors are negotiated at regional, not national, scale.",
       note: "Fibre rollout · digital inclusion",
     },
@@ -54,8 +54,8 @@ export const projetSeed: ImpactSeedSection[] = [
       },
       {
         valeur: "2029",
-        fr: { texte: "horizon de la transformation" },
-        en: { texte: "horizon of the transformation" },
+        fr: { texte: "achèvement technique prévu" },
+        en: { texte: "planned technical completion" },
       },
     ],
   },
@@ -93,11 +93,11 @@ export const projetSeed: ImpactSeedSection[] = [
       {
         fr: {
           titre: "Femmes",
-          texte: "Une part suivie et rapportée dans la formation comme dans l'entrepreneuriat : l'inclusion est une cible mesurée, pas une intention affichée.",
+          texte: "Une part suivie et rapportée dans la formation comme dans l'entrepreneuriat, avec une cible chiffrée.",
         },
         en: {
           titre: "Women",
-          texte: "A share that is tracked and reported, in training as in entrepreneurship: inclusion is a measured target, not a stated intention.",
+          texte: "A share that is tracked and reported, in training as in entrepreneurship, against a quantified target.",
         },
       },
       {
@@ -144,13 +144,13 @@ export const projetSeed: ImpactSeedSection[] = [
     fr: {
       kicker: "Les cinq composantes",
       titre: "Cinq composantes, un seul projet.",
-      lead: "Le projet se découpe en cinq volets, dont chacun a sa page : périmètre, objectifs, projets phares et responsable.",
+      lead: "Le projet se découpe en cinq volets, dont chacun a sa page : périmètre, objectifs, projets principaux et responsable.",
       ctaLabel: "Découvrir les 5 composantes",
     },
     en: {
       kicker: "The five components",
       titre: "Five components, one project.",
-      lead: "The project is split into five strands, each with its own page: scope, objectives, flagship projects and lead.",
+      lead: "The project is split into five strands, each with its own page: scope, objectives, main projects and lead.",
       ctaLabel: "Explore the 5 components",
     },
     items: [],
@@ -166,12 +166,12 @@ export const projetSeed: ImpactSeedSection[] = [
     ctaUrl: "/results",
     fr: {
       kicker: "Ce que nous nous engageons à mesurer",
-      titre: "Des ambitions chiffrées, revues au fil de l'exécution.",
+      titre: "Des cibles chiffrées, revues au fil de l'exécution.",
       ctaLabel: "Voir le cadre de résultats",
     },
     en: {
       kicker: "What we commit to measuring",
-      titre: "Quantified ambitions, reviewed as implementation proceeds.",
+      titre: "Quantified targets, reviewed as implementation proceeds.",
       ctaLabel: "See the results framework",
     },
     items: [],
@@ -190,21 +190,21 @@ export const projetSeed: ImpactSeedSection[] = [
       {
         fr: {
           titre: "En quoi ce projet me concerne-t-il, concrètement ?",
-          texte: "De trois façons, selon votre situation : le réseau se rapproche de chez vous, les démarches qui exigeaient un déplacement passent progressivement en ligne, et des formations techniques s'ouvrent dans les établissements du pays. L'effet n'arrive pas partout en même temps : le déploiement suit un ordre de priorité publié.",
+          texte: "De trois façons, selon votre situation : le réseau doit se rapprocher de chez vous, les démarches qui exigent un déplacement doivent passer progressivement en ligne, et des formations techniques sont prévues dans les établissements du pays. L'effet n'arrive pas partout en même temps : le déploiement suit un ordre de priorité publié.",
         },
         en: {
           titre: "How does this project concern me, concretely?",
-          texte: "In three ways, depending on your situation: the network moves closer to you, procedures that required travel move progressively online, and technical training opens in the country's institutions. The effect does not reach everywhere at once: deployment follows a published order of priority.",
+          texte: "In three ways, depending on your situation: the network is to move closer to you, procedures that require travel are to move progressively online, and technical training is planned in the country's institutions. The effect does not reach everywhere at once: deployment follows a published order of priority.",
         },
       },
       {
         fr: {
           titre: "Quand verra-t-on les premiers effets ?",
-          texte: "Par étapes, et pas dans le même ordre partout. Un marché d'infrastructure se prépare, se met en concurrence, s'attribue puis s'exécute : entre la publication d'un avis et la mise en service d'un tronçon, il s'écoule normalement plusieurs saisons. Les premiers marchés structurants sont lancés ; leur calendrier prévisionnel est publié sur la page Marchés.",
+          texte: "Par étapes, et pas dans le même ordre partout. Un marché d'infrastructure se prépare, se met en concurrence, s'attribue puis s'exécute : entre la publication d'un avis et la mise en service d'un tronçon, il s'écoule normalement plusieurs saisons. Les premiers marchés sont lancés ; leur calendrier prévisionnel est publié sur la page Marchés.",
         },
         en: {
           titre: "When will the first effects be visible?",
-          texte: "In stages, and not in the same order everywhere. An infrastructure contract is prepared, competed, awarded and then delivered: between the publication of a notice and a section entering service, several seasons normally pass. The first structuring contracts are under way; their indicative schedules are published on the Tenders page.",
+          texte: "In stages, and not in the same order everywhere. An infrastructure contract is prepared, competed, awarded and then delivered: between the publication of a notice and a section entering service, several seasons normally pass. The first contracts are under way; their indicative schedules are published on the Tenders page.",
         },
       },
       {
