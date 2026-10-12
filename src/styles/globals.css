@@ -1438,15 +1438,18 @@ a.actu-hero__crumb-lien:hover { color: #fff; border-bottom-color: #fff; }
 .actu-hero__pdf { margin-top: 22px; gap: 10px; }
 /* --- Article avec galerie : deux colonnes ------------------------------------
    Même gabarit que la fiche d'un événement (.evt-corps) : bords alignés sur le
-   bandeau, texte limité à 760 px (la mesure de lecture des articles), galerie
-   calée à droite et collée sous l'en-tête. La colonne de droite couvre les
+   bandeau, les deux colonnes remplissent le conteneur, galerie à droite et
+   collée sous l'en-tête. La colonne de droite couvre les
    deux zones de gauche : c'est sa hauteur qui donne au bloc collé sa course.
    Sous 960 px, une seule colonne, la galerie entre le texte et les
    étiquettes. Un écran trop bas pour la tenir entière la laisse défiler avec
    la page plutôt que d'en cacher le bas. */
 .actu-2col {
   max-width: calc(var(--maxw) - 2 * var(--pad-x)); margin: 0 auto;
-  display: grid; grid-template-columns: minmax(0, 760px) 340px; justify-content: space-between;
+  /* Le texte prend toute la place que la galerie laisse : plafonné, il
+     laissait un vide au milieu de la page sur un grand écran. La galerie
+     grandit avec l'écran, entre 340 et 440 px. */
+  display: grid; grid-template-columns: minmax(0, 1fr) clamp(340px, 30%, 440px);
   column-gap: clamp(32px, 4vw, 64px);
   grid-template-areas: "corps aside" "fin aside"; grid-template-rows: auto 1fr;
 }
@@ -1730,10 +1733,10 @@ a.actu-nav__lien:hover { background: var(--c-10); }
    suite : on lit la date et le lieu avant le programme. */
 .evt-corps {
   /* Même bord gauche et droit que le contenu du bandeau (.actu-hero__inner :
-     --maxw marges comprises). Le texte garde une mesure de lecture (820 px
-     au plus) ; l'encadré se cale sur le bord droit. */
+     --maxw marges comprises). Les deux colonnes remplissent le conteneur :
+     le texte prend la place que laisse l'encadré (340 à 400 px). */
   max-width: calc(var(--maxw) - 2 * var(--pad-x)); margin: 0 auto;
-  display: grid; grid-template-columns: minmax(0, 820px) 340px; justify-content: space-between;
+  display: grid; grid-template-columns: minmax(0, 1fr) clamp(340px, 28%, 400px);
   column-gap: clamp(32px, 4vw, 64px);
   grid-template-areas: "tete aside" "suite aside"; grid-template-rows: auto 1fr;
 }
