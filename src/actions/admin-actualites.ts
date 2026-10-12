@@ -204,8 +204,30 @@ async function lireFiche(formData: FormData) {
     authorId: optionnel(texte(formData, "authorId")),
     authorName: optionnel(texte(formData, "authorName")),
     tagIds: await resoudreTags(formData),
+    galerieIds: await lireGalerie(formData),
   };
 }
+
+/**
+ * Images de la galerie, dans l'ordre du formulaire.
+ *
+ * Réduites aux médias qui existent ET sont des images : l'identifiant vient du
+ * navigateur, et un document de la bibliothèque n'a rien à faire dans une
+ * galerie. Les doublons sont écartés (clé primaire article + média).
+ */
+async function lireGalerie(formData: FormData): Promise<string[]> {
+  const demandes = [...new Set(formData.getAll("galerie").map(String).filter(Boolean))].slice(0, 60);
+  if (!demandes.length) return [];
+  const admis = await db().mediaAsset.findMany({
+    where: { id: { in: demandes }, mimeType: { startsWith: "image/" } },
+    select: { id: true },
+  });
+  const ids = new Set(admis.map(({ id }) => id));
+  return demandes.filter((id) => ids.has(id));
+}
+
+/** Lignes de galerie à créer, rang compris. */
+const lignesGalerie = (ids: string[]) => ids.map((mediaId, position) => ({ mediaId, position }));
 
 /** Une langue est-elle publiable ? Un titre ne suffit pas, il faut un corps. */
 const estComplete = (t: { title: string; contentHtml: string }): boolean =>
@@ -247,7 +269,7 @@ export async function creerArticleAction(
   const date = resoudreDate(statut, texte(formData, "publishedAt"), null);
   if ("error" in date) return { error: date.error, ok: null };
 
-  const { tagIds, ...fiche } = await lireFiche(formData);
+  const { tagIds, galerieIds, ...fiche } = await lireFiche(formData);
   traduction.slug = await slugUnique(locale, traduction.slug, null);
 
   const article = await db().article.create({
@@ -258,6 +280,7 @@ export async function creerArticleAction(
       createdById: acteur.id,
       translations: { create: [{ locale, ...traduction }] },
       tags: { create: tagIds.map((tagId) => ({ tagId })) },
+      galerie: { create: lignesGalerie(galerieIds) },
     },
     select: { id: true },
   });
@@ -302,12 +325,19 @@ export async function enregistrerFicheAction(
   const date = resoudreDate(statut, texte(formData, "publishedAt"), article.publishedAt);
   if ("error" in date) return { error: date.error, ok: null };
 
-  const { tagIds, ...fiche } = await lireFiche(formData);
+  const { tagIds, galerieIds, ...fiche } = await lireFiche(formData);
 
-  await db().article.update({
-    where: { id },
-    data: { ...fiche, status: statut, publishedAt: date.date },
-  });
+  // La galerie est réécrite en entier : ordre et contenu sont ceux du
+  // formulaire. Une transaction, pour qu'une lecture publique ne tombe jamais
+  // entre l'effacement et la réécriture.
+  await db().$transaction([
+    db().article.update({
+      where: { id },
+      data: { ...fiche, status: statut, publishedAt: date.date },
+    }),
+    db().articleImage.deleteMany({ where: { articleId: id } }),
+    db().articleImage.createMany({ data: lignesGalerie(galerieIds).map((l) => ({ ...l, articleId: id })) }),
+  ]);
 
   await db().articleTag.deleteMany({ where: { articleId: id, tagId: { notIn: tagIds } } });
   if (tagIds.length) {
@@ -471,7 +501,11 @@ export async function dupliquerArticleAction(
 
   const source = await db().article.findUnique({
     where: { id },
-    include: { translations: true, tags: { select: { tagId: true } } },
+    include: {
+      translations: true,
+      tags: { select: { tagId: true } },
+      galerie: { orderBy: { position: "asc" }, select: { mediaId: true } },
+    },
   });
   if (!source) return { error: "Article introuvable.", ok: null };
 
@@ -510,6 +544,9 @@ export async function dupliquerArticleAction(
       createdById: acteur.id,
       translations: { create: copies },
       tags: { create: source.tags.map(({ tagId }) => ({ tagId })) },
+      // Les images sont des RÉFÉRENCES à la bibliothèque : la copie peut les
+      // partager sans risque, contrairement au PDF joint.
+      galerie: { create: lignesGalerie(source.galerie.map(({ mediaId }) => mediaId)) },
     },
     select: { id: true },
   });

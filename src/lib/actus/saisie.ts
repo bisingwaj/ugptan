@@ -40,6 +40,9 @@ export type TraductionSaisie = {
   version: string;
 };
 
+/** Une image de la galerie, telle que la console l'affiche. */
+export type ImageGalerie = { id: string; src: string; alt: string };
+
 /** La fiche, indépendante de toute langue. */
 export type ArticleSaisie = {
   id: string | null;
@@ -58,6 +61,8 @@ export type ArticleSaisie = {
   authorId: string;
   authorName: string;
   tagIds: string[];
+  /** Galerie d'images, dans l'ordre d'affichage (cf. ArticleGalerieChamp). */
+  galerie: ImageGalerie[];
   /** PDF joint, `null` s'il n'y en a pas (cf. ArticleFichier). */
   fichier: { url: string; nom: string; taille: number } | null;
   traductions: Record<Lang, TraductionSaisie>;

@@ -471,6 +471,19 @@ export const ADMIN_ACTUS = {
   mediasOuvrir: "Ouvrir le fichier",
   mediasStockageAbsent: "Stockage des fichiers non configuré : le téléversement est indisponible tant que CLOUDINARY_URL n'est pas renseignée dans l'environnement. Le référencement d'un média externe reste possible.",
 
+  /* --- Galerie d'images ---------------------------------------------------- */
+  galerieBloc: "Galerie d'images",
+  galerieAucune: "Aucune image. La galerie s'affiche sous le texte de l'article, et chaque image s'agrandit au clic.",
+  galerieBibliotheque: "Choisir dans la bibliothèque",
+  galerieTeleverser: "Téléverser des images",
+  galerieEnvoi: "Envoi…",
+  galerieAide: "Plusieurs images peuvent être téléversées d'un coup (5 Mo au plus chacune). Les flèches règlent l'ordre. La galerie est enregistrée avec les réglages de l'article.",
+  galerieAvant: "Avancer l'image",
+  galerieApres: "Reculer l'image",
+  galerieRetirer: "Retirer l'image",
+  galerieRefusFormat: "format non accepté (JPEG, PNG, WebP, AVIF ou GIF).",
+  galerieEchec: "envoi interrompu, réessayez.",
+
   /* --- PDF joint ----------------------------------------------------------- */
   pdfBloc: "PDF à télécharger",
   pdfApresCreation: "Le PDF du communiqué se joint juste après la création : cliquez sur « Créer l'article », il apparaît alors à cette place.",

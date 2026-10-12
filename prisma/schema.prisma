@@ -384,6 +384,8 @@ model MediaAsset {
   herosComposante Composante[]     @relation("ComposanteCouverture")
   /// Visuels des projets phares d'une composante.
   visuelsProjet   ComposanteBloc[] @relation("ComposanteBlocVisuel")
+  /// Galeries d'articles où figure ce média.
+  galeriesArticle ArticleImage[]
 
   @@index([createdAt])
 }
@@ -490,10 +492,28 @@ model Article {
 
   translations ArticleTranslation[]
   tags         ArticleTag[]
+  /// Galerie d'images affichée sous l'article, dans l'ordre de `position`.
+  galerie      ArticleImage[]
 
   @@index([status, publishedAt])
   @@index([categoryId])
   @@index([featured])
+}
+
+/// Une image de la galerie d'un article : un média de la bibliothèque, à son
+/// rang. Table de liaison plutôt qu'un tableau d'identifiants sur l'article :
+/// la suppression d'un média le retire de lui-même des galeries (cascade), au
+/// lieu de laisser un identifiant orphelin que chaque lecture devrait filtrer.
+model ArticleImage {
+  articleId String
+  mediaId   String
+  /// Rang dans la galerie, à partir de 0.
+  position  Int        @default(0)
+  article   Article    @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  media     MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, mediaId])
+  @@index([mediaId])
 }
 
 /// Version d'un article dans une langue. Tout ce qui se lit est ici.

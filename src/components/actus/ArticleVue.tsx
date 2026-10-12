@@ -23,6 +23,7 @@ import { VideoButton } from "@/components/video/VideoButton";
 import { ActuCard, cheminArticle } from "@/components/actus/ActuCard";
 import { ProseRiche } from "@/components/prose/ProseRiche";
 import { PartageArticle } from "@/components/actus/PartageArticle";
+import { ArticleGalerie } from "@/components/actus/ArticleGalerie";
 
 type Props = {
   actu: ActuVue;
@@ -130,6 +131,9 @@ export function ArticleVue({ actu, lang, lies, precedent, suivant, apercu = fals
               </VideoButton>
             </Reveal>
           )}
+
+          {/* Galerie : après le texte et la vidéo, avant le PDF. */}
+          {actu.galerie?.length > 0 && <ArticleGalerie images={actu.galerie} lang={lang} titre={t.galerieTitre} />}
 
           {/* Le PDF vient APRÈS le texte : c'est la version officielle à
               conserver, pas la porte d'entrée. Même bloc que la pièce jointe

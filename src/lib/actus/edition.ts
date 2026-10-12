@@ -84,6 +84,7 @@ export const articleVierge = (): ArticleSaisie => ({
   authorId: "",
   authorName: "",
   tagIds: [],
+  galerie: [],
   fichier: null,
   traductions: traductionsVides(),
 });
@@ -104,6 +105,7 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
       authorId: true, authorName: true,
       fileUrl: true, fileName: true, fileSize: true,
       coverMedia: { select: mediaSelect },
+      galerie: { orderBy: { position: "asc" }, select: { media: { select: mediaSelect } } },
       translations: {
         select: {
           locale: true, title: true, slug: true, excerpt: true, contentHtml: true,
@@ -162,6 +164,11 @@ export async function chargerArticle(id: string): Promise<(ArticleSaisie & { id:
     authorId: article.authorId ?? "",
     authorName: article.authorName ?? "",
     tagIds: article.tags.map(({ tagId }) => tagId),
+    galerie: article.galerie.map(({ media }) => ({
+      id: media.id,
+      src: mediaSrc(media),
+      alt: media.altFr ?? media.filename,
+    })),
     fichier: article.fileUrl
       ? { url: article.fileUrl, nom: article.fileName ?? "communique.pdf", taille: article.fileSize }
       : null,

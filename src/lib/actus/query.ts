@@ -16,7 +16,7 @@
 import { db } from "@/lib/db";
 import { anneeArticle, formatArticleDate } from "@/lib/format";
 import { htmlToText, readingMinutes, truncate } from "@/lib/html/sanitize";
-import { couverture, type MediaRef, type Visuel } from "@/lib/medias";
+import { couverture, estOptimisable, mediaAlt, mediaSrc, type MediaRef, type Visuel } from "@/lib/medias";
 import type { Lang } from "@/lib/pick";
 import { lecteur } from "@/lib/lecture";
 import { type ArticleStatut } from "@/lib/actus/statut";
@@ -56,6 +56,7 @@ const articleSelect = {
   author: { select: { id: true, name: true, email: true } },
   category: { select: { id: true, slug: true, nomFr: true, nomEn: true, color: true } },
   coverMedia: { select: mediaSelect },
+  galerie: { orderBy: { position: "asc" }, select: { media: { select: mediaSelect } } },
   translations: {
     select: {
       locale: true, title: true, slug: true, excerpt: true, contentHtml: true,
@@ -86,6 +87,9 @@ const lecture = lecteur("actus");
 export type ActuCategorie = { slug: string; nom: string; color: string | null };
 export type ActuTag = { slug: string; nom: string };
 
+/** Une image de galerie, prête pour la grille et la visionneuse. */
+export type ImageActu = Visuel & { id: string; legende: string | null };
+
 /** Un article résolu dans une langue, prêt à l'affichage. */
 export type ActuVue = {
   id: string;
@@ -107,6 +111,8 @@ export type ActuVue = {
   tags: ActuTag[];
   auteur: { nom: string; role: string | null } | null;
   visuel: Visuel;
+  /** Galerie d'images, dans l'ordre choisi en console. */
+  galerie: ImageActu[];
   /** PDF joint (texte officiel d'un communiqué), à télécharger. */
   fichier: ActuFichier | null;
   /** Durée de lecture estimée, en minutes. */
@@ -140,6 +146,7 @@ type LigneArticle = {
   author: { id: string; name: string | null; email: string } | null;
   category: { id: string; slug: string; nomFr: string; nomEn: string; color: string | null } | null;
   coverMedia: MediaRef | null;
+  galerie?: { media: MediaRef }[];
   translations: {
     locale: string; title: string; slug: string; excerpt: string | null;
     contentHtml: string; seoTitle: string | null; seoDescription: string | null; coverAlt: string | null;
@@ -196,6 +203,18 @@ function toVue(row: LigneArticle, lang: Lang): ActuVue | null {
        ne se traduit pas, « Cellule communication » si. */
     auteur: auteurNom ? { nom: auteurNom, role: tr.authorRole } : null,
     visuel: couverture({ coverMedia: row.coverMedia, coverKey: row.coverKey, coverAlt: tr.coverAlt }, langue, tr.title),
+    galerie: (row.galerie ?? []).map(({ media }) => {
+      const src = mediaSrc(media);
+      return {
+        id: media.id,
+        src,
+        // Repli sur le titre de l'article : une image sans texte alternatif
+        // serait annoncée par son seul nom de fichier.
+        alt: mediaAlt(media, langue) || tr.title,
+        unoptimized: !estOptimisable(src),
+        legende: media.legende?.trim() || null,
+      };
+    }),
     fichier: fichierActu(row),
     lecture: readingMinutes(tr.contentHtml),
     langue,

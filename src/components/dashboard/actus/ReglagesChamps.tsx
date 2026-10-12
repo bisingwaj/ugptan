@@ -17,6 +17,7 @@ import type { ArticleSaisie, ReferentielsSaisie } from "@/lib/actus/saisie";
 import { mediaSrc, type MediaRef } from "@/lib/medias";
 import { vignette } from "@/lib/images";
 import { MediaPicker, type ChoixMedia } from "@/components/dashboard/actus/MediaPicker";
+import { ArticleGalerieChamp } from "@/components/dashboard/actus/ArticleGalerieChamp";
 
 type Props = {
   article: ArticleSaisie;
@@ -136,6 +137,8 @@ export function ReglagesChamps({ article, referentiels, assets }: Props) {
           <p className="adm-hint" style={{ marginTop: 6 }}>{t.champVideoAide}</p>
         </div>
       </div>
+
+      <ArticleGalerieChamp initial={article.galerie} assets={assets} />
 
       <div className="adm-panel adm-edit__bloc">
         <div className="label-mono">{t.blocClassement}</div>

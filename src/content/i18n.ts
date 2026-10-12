@@ -1016,6 +1016,7 @@ export function dict(lang: Lang) {
         "Each release at its date, most recent first. Featured articles are not promoted here: the order is that of the calendar.",
       ),
       relatedVideo: t("Voir la vidéo associée", "Watch the related video"),
+      galerieTitre: t("Galerie", "Gallery"),
       pdfTitre: t("Version PDF", "PDF version"),
       pdfLead: t("Le texte officiel de ce communiqué, à télécharger.", "The official text of this release, to download."),
       pdfOuvrir: t("Ouvrir", "Open"),
