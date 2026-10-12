@@ -64,11 +64,18 @@ async function colonnesTexte(): Promise<{ table: string; colonne: string; type: 
     .map((l) => ({ table: l.table_name, colonne: l.column_name, type: l.data_type }));
 }
 
-/** Trois essais : la liaison vers la base coupe parfois sur une longue série. */
+/**
+ * Trois essais, et 45 s au plus par essai : la liaison vers la base coupe
+ * parfois sur une longue série, et une requête figée sans délai bloquait le
+ * script indéfiniment.
+ */
 async function avecReprise<T>(travail: () => Promise<T>): Promise<T> {
   for (let essai = 1; ; essai += 1) {
     try {
-      return await travail();
+      return await Promise.race([
+        travail(),
+        new Promise<never>((_, rejet) => setTimeout(() => rejet(new Error("délai dépassé (45 s)")), 45_000)),
+      ]);
     } catch (erreur) {
       if (essai >= 3) throw erreur;
       await new Promise((fin) => setTimeout(fin, 2000 * essai));
