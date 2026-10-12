@@ -82,182 +82,191 @@ export function EvenementVue({ evt, lang, lies, precedent, suivant }: Props) {
       </header>
 
       {/* ===== Corps ===== */}
+      {/* Deux colonnes sur grand écran : le texte à gauche, les informations
+          pratiques et l'inscription à droite, collées pendant le défilement.
+          Sur un écran étroit, une seule colonne, l'encadré placé juste après
+          le chapeau (cf. `.evt-corps` dans globals.css). */}
       <div className="actu-corps">
-        <div className="actu-corps__inner">
-          {/* Traduction absente : on le dit, plutôt que de laisser croire à un
-              texte rédigé dans la langue de navigation. Le lien renvoie vers la
-              version servie, dans son propre contexte de langue. */}
-          {!evt.traduit && (
-            <p className="actu-avis" role="note">
-              {t.traductionAbsente(evt.langue)}
-              {evt.slugs[evt.langue] && (
-                <>
-                  {" "}
-                  <Link href={evenementRoute(evt.langue, evt.slugs[evt.langue]!)} className="actu-avis__lien">
-                    {t.lireDansLaLangue(evt.langue)} →
-                  </Link>
-                </>
-              )}
-            </p>
-          )}
-
-          {/* Avis d'état. Il tient lieu de contexte : sans lui, une fiche
-              détaillant une inscription close se lirait comme une invitation. */}
-          {evt.phase === "TERMINE" && <p className="evt-avis" role="note">{t.termine}</p>}
-          {evt.phase === "EN_COURS" && (
-            <p className="evt-avis evt-avis--encours" role="note">{t.enCoursAvis}</p>
-          )}
-
-          {evt.excerpt && <p className="actu-chapeau">{evt.excerpt}</p>}
-
-          {/* ===== Encadré pratique =====
-              Le titre est HORS de la liste : `<dl>` n'admet que `<dt>`, `<dd>`
-              et des `<div>` qui les regroupent. Un intertitre glissé dedans
-              serait du balisage invalide, que les lecteurs d'écran annoncent de
-              façon imprévisible. */}
-          <Reveal>
-            <section className="evt-pratique" aria-label={t.blocPratique}>
-              <div className="mono evt-pratique__titre">{t.blocPratique}</div>
-              <dl className="evt-pratique__liste">
-                <div>
-                  <dt>{t.quand}</dt>
-                  <dd>
-                    <strong>{evt.dateLabel}</strong>
-                    <br />
-                    {evt.allDay ? t.journee : evt.heureLabel}
-                  </dd>
-                </div>
-
-                <div>
-                  <dt>{t.ou}</dt>
-                  <dd>
-                    {evt.lieu && <><strong>{evt.lieu}</strong><br /></>}
-                    {modeLabel}
-                    {evt.adresse && <><br />{evt.adresse}</>}
-                  </dd>
-                </div>
-
-                {evt.places && (
-                  <div>
-                    <dt>{t.jauge}</dt>
-                    <dd>{evt.places}</dd>
-                  </div>
+        <div className="evt-corps">
+          <div className="evt-corps__tete">
+            {/* Traduction absente : on le dit, plutôt que de laisser croire à un
+                texte rédigé dans la langue de navigation. Le lien renvoie vers la
+                version servie, dans son propre contexte de langue. */}
+            {!evt.traduit && (
+              <p className="actu-avis" role="note">
+                {t.traductionAbsente(evt.langue)}
+                {evt.slugs[evt.langue] && (
+                  <>
+                    {" "}
+                    <Link href={evenementRoute(evt.langue, evt.slugs[evt.langue]!)} className="actu-avis__lien">
+                      {t.lireDansLaLangue(evt.langue)} →
+                    </Link>
+                  </>
                 )}
+              </p>
+            )}
 
-                {evt.organisateur && (
+            {/* Avis d'état. Il tient lieu de contexte : sans lui, une fiche
+                détaillant une inscription close se lirait comme une invitation. */}
+            {evt.phase === "TERMINE" && <p className="evt-avis" role="note">{t.termine}</p>}
+            {evt.phase === "EN_COURS" && (
+              <p className="evt-avis evt-avis--encours" role="note">{t.enCoursAvis}</p>
+            )}
+
+            {evt.excerpt && <p className="actu-chapeau">{evt.excerpt}</p>}
+          </div>
+
+          <aside className="evt-corps__aside" aria-label={t.blocPratique}>
+            {/* Fondu SEUL, sans translation : la modale d'inscription (.scrim,
+                position fixe) est rendue dans ce bloc, et un ancêtre transformé
+                la calerait sur lui au lieu de la fenêtre. */}
+            <Reveal variant="fade" className="evt-corps__colle">
+              {/* ===== Encadré pratique =====
+                  Le titre est HORS de la liste : `<dl>` n'admet que `<dt>`, `<dd>`
+                  et des `<div>` qui les regroupent. Un intertitre glissé dedans
+                  serait du balisage invalide, que les lecteurs d'écran annoncent de
+                  façon imprévisible. */}
+              <section className="evt-pratique" aria-label={t.blocPratique}>
+                <div className="mono evt-pratique__titre">{t.blocPratique}</div>
+                <dl className="evt-pratique__liste">
                   <div>
-                    <dt>{t.organisateur}</dt>
+                    <dt>{t.quand}</dt>
                     <dd>
-                      <strong>{evt.organisateur.nom}</strong>
-                      {evt.organisateur.email && (
-                        <>
-                          <br />
-                          <a href={`mailto:${evt.organisateur.email}`} className="evt-pratique__lien">
-                            {evt.organisateur.email}
-                          </a>
-                        </>
-                      )}
-                      {evt.organisateur.telephone && <><br />{evt.organisateur.telephone}</>}
-                      {evt.organisateur.url && (
-                        <>
-                          <br />
-                          <a
-                            href={evt.organisateur.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="evt-pratique__lien"
-                          >
-                            {t.enSavoirPlus} ↗
-                          </a>
-                        </>
-                      )}
+                      <strong>{evt.dateLabel}</strong>
+                      <br />
+                      {evt.allDay ? t.journee : evt.heureLabel}
                     </dd>
                   </div>
-                )}
 
-                {evt.infos && (
                   <div>
-                    <dt>{t.complement}</dt>
-                    <dd>{evt.infos}</dd>
+                    <dt>{t.ou}</dt>
+                    <dd>
+                      {evt.lieu && <><strong>{evt.lieu}</strong><br /></>}
+                      {modeLabel}
+                      {evt.adresse && <><br />{evt.adresse}</>}
+                    </dd>
                   </div>
-                )}
-              </dl>
-            </section>
-          </Reveal>
 
-          {/* ===== Appels à l'action =====
-              Rien n'est proposé sur une rencontre terminée : un bouton
-              « s'inscrire » sur une date passée serait une impasse.
+                  {evt.places && (
+                    <div>
+                      <dt>{t.jauge}</dt>
+                      <dd>{evt.places}</dd>
+                    </div>
+                  )}
 
-              L'inscription prend UNE forme ou l'AUTRE, jamais les deux : quand
-              un service externe tient la billetterie, c'est lui qui fait
-              autorité sur les places, et ouvrir en plus le formulaire intégré
-              produirait deux listes dont aucune ne serait complète. La server
-              action applique la même règle de son côté (cf.
-              actions/evenements-inscription.ts) : le choix ne dépend pas de ce
-              que la page a bien voulu afficher. */}
-          {/* Fondu SEUL (aucune transformation) : la modale d'inscription
-              (.scrim, position fixe) est rendue DANS ce bloc, et un ancêtre
-              transformé la calerait sur lui au lieu de la fenêtre. */}
-          {evt.aVenir && (
-            <Reveal variant="fade" delay={0.1}>
-              <div className="evt-actions">
-                {evt.registrationUrl ? (
-                  <a href={evt.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn--primary">
-                    {t.register}<span className="arrow">↗</span>
-                  </a>
-                ) : (
-                  <BoutonInscription evt={evt} lang={lang} />
-                )}
-                {evt.onlineUrl && (
-                  <a href={evt.onlineUrl} target="_blank" rel="noopener noreferrer" className="btn btn--outline">
-                    {t.rejoindre} ↗
-                  </a>
-                )}
-                {evt.externalUrl && (
-                  <a href={evt.externalUrl} target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
-                    {t.enSavoirPlus} ↗
-                  </a>
-                )}
-              </div>
+                  {evt.organisateur && (
+                    <div>
+                      <dt>{t.organisateur}</dt>
+                      <dd>
+                        <strong>{evt.organisateur.nom}</strong>
+                        {evt.organisateur.email && (
+                          <>
+                            <br />
+                            <a href={`mailto:${evt.organisateur.email}`} className="evt-pratique__lien">
+                              {evt.organisateur.email}
+                            </a>
+                          </>
+                        )}
+                        {evt.organisateur.telephone && <><br />{evt.organisateur.telephone}</>}
+                        {evt.organisateur.url && (
+                          <>
+                            <br />
+                            <a
+                              href={evt.organisateur.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="evt-pratique__lien"
+                            >
+                              {t.enSavoirPlus} ↗
+                            </a>
+                          </>
+                        )}
+                      </dd>
+                    </div>
+                  )}
+
+                  {evt.infos && (
+                    <div>
+                      <dt>{t.complement}</dt>
+                      <dd>{evt.infos}</dd>
+                    </div>
+                  )}
+                </dl>
+              </section>
+
+              {/* ===== Appels à l'action =====
+                  Rien n'est proposé sur une rencontre terminée : un bouton
+                  « s'inscrire » sur une date passée serait une impasse.
+
+                  L'inscription prend UNE forme ou l'AUTRE, jamais les deux : quand
+                  un service externe tient la billetterie, c'est lui qui fait
+                  autorité sur les places, et ouvrir en plus le formulaire intégré
+                  produirait deux listes dont aucune ne serait complète. La server
+                  action applique la même règle de son côté (cf.
+                  actions/evenements-inscription.ts) : le choix ne dépend pas de ce
+                  que la page a bien voulu afficher. */}
+              {evt.aVenir && (
+                <div className="evt-actions">
+                  {evt.registrationUrl ? (
+                    <a href={evt.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn--primary">
+                      {t.register}<span className="arrow">↗</span>
+                    </a>
+                  ) : (
+                    <BoutonInscription evt={evt} lang={lang} />
+                  )}
+                  {evt.onlineUrl && (
+                    <a href={evt.onlineUrl} target="_blank" rel="noopener noreferrer" className="btn btn--outline">
+                      {t.rejoindre} ↗
+                    </a>
+                  )}
+                  {evt.externalUrl && (
+                    <a href={evt.externalUrl} target="_blank" rel="noopener noreferrer" className="btn btn--ghost">
+                      {t.enSavoirPlus} ↗
+                    </a>
+                  )}
+                </div>
+              )}
             </Reveal>
-          )}
+          </aside>
 
-          {/* Assainissement et dessin des graphiques : cf. components/prose/ProseRiche.tsx. */}
-          {evt.contentHtml && (
-            <ProseRiche html={evt.contentHtml} lang={lang} style={{ marginTop: 34 }} />
-          )}
+          <div className="evt-corps__suite">
 
-          <Reveal>
-            <PartageArticle lang={lang} titre={evt.title} />
-          </Reveal>
+            {/* Assainissement et dessin des graphiques : cf. components/prose/ProseRiche.tsx. */}
+            {evt.contentHtml && (
+              <ProseRiche html={evt.contentHtml} lang={lang} />
+            )}
 
-          {/* ===== Navigation entre événements ===== */}
-          {(precedent || suivant) && (
             <Reveal>
-              <nav className="actu-nav" aria-label={t.navigationLabel}>
-                {precedent ? (
-                  <Link href={evenementRoute(lang, precedent.slug)} className="actu-nav__lien">
-                    <span className="mono actu-nav__sens">← {t.precedent}</span>
-                    <span className="actu-nav__titre">{precedent.title}</span>
-                  </Link>
-                ) : <span />}
-
-                {suivant ? (
-                  <Link href={evenementRoute(lang, suivant.slug)} className="actu-nav__lien actu-nav__lien--droite">
-                    <span className="mono actu-nav__sens">{t.suivant} →</span>
-                    <span className="actu-nav__titre">{suivant.title}</span>
-                  </Link>
-                ) : <span />}
-              </nav>
+              <PartageArticle lang={lang} titre={evt.title} />
             </Reveal>
-          )}
 
-          <Reveal variant="fade">
-            <p className="actu-retour">
-              <Link href={route(lang, NAV.evenements)} className="mono actu-retour__lien">← {t.allEvents}</Link>
-            </p>
-          </Reveal>
+            {/* ===== Navigation entre événements ===== */}
+            {(precedent || suivant) && (
+              <Reveal>
+                <nav className="actu-nav" aria-label={t.navigationLabel}>
+                  {precedent ? (
+                    <Link href={evenementRoute(lang, precedent.slug)} className="actu-nav__lien">
+                      <span className="mono actu-nav__sens">← {t.precedent}</span>
+                      <span className="actu-nav__titre">{precedent.title}</span>
+                    </Link>
+                  ) : <span />}
+
+                  {suivant ? (
+                    <Link href={evenementRoute(lang, suivant.slug)} className="actu-nav__lien actu-nav__lien--droite">
+                      <span className="mono actu-nav__sens">{t.suivant} →</span>
+                      <span className="actu-nav__titre">{suivant.title}</span>
+                    </Link>
+                  ) : <span />}
+                </nav>
+              </Reveal>
+            )}
+
+            <Reveal variant="fade">
+              <p className="actu-retour">
+                <Link href={route(lang, NAV.evenements)} className="mono actu-retour__lien">← {t.allEvents}</Link>
+              </p>
+            </Reveal>
+          </div>
         </div>
       </div>
 

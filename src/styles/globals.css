@@ -1674,6 +1674,36 @@ a.actu-nav__lien:hover { background: var(--c-10); }
 /* --- Appels à l'action de la fiche ----------------------------------------- */
 .evt-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 
+/* --- Fiche à deux colonnes ----------------------------------------------------
+   Le texte à gauche (tête : avis et chapeau ; suite : corps, partage,
+   navigation), les informations pratiques à droite, collées sous l'en-tête
+   du site pendant le défilement. La colonne de droite couvre les deux zones
+   de gauche : c'est sa hauteur qui donne au bloc collé sa course.
+   Sous 960 px, une seule colonne, l'encadré glissé entre la tête et la
+   suite : on lit la date et le lieu avant le programme. */
+.evt-corps {
+  /* Même bord gauche et droit que le contenu du bandeau (.actu-hero__inner :
+     --maxw marges comprises). Le texte garde une mesure de lecture (820 px
+     au plus) ; l'encadré se cale sur le bord droit. */
+  max-width: calc(var(--maxw) - 2 * var(--pad-x)); margin: 0 auto;
+  display: grid; grid-template-columns: minmax(0, 820px) 340px; justify-content: space-between;
+  column-gap: clamp(32px, 4vw, 64px);
+  grid-template-areas: "tete aside" "suite aside"; grid-template-rows: auto 1fr;
+}
+.evt-corps__tete { grid-area: tete; min-width: 0; }
+.evt-corps__suite { grid-area: suite; min-width: 0; }
+.evt-corps__aside { grid-area: aside; min-width: 0; }
+.evt-corps__colle { position: sticky; top: calc(64px + var(--sa-t) + 24px); }
+.evt-corps__aside .evt-pratique { margin: 0; }
+.evt-corps__aside .evt-pratique__liste { grid-template-columns: 1fr; gap: 18px; }
+.evt-corps__aside .evt-actions { margin-top: 14px; }
+.evt-corps__aside .evt-actions > * { flex: 1 1 100%; justify-content: center; }
+@media (max-width: 960px) {
+  .evt-corps { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tete" "aside" "suite"; grid-template-rows: auto; }
+  .evt-corps__colle { position: static; }
+  .evt-corps__aside { margin-bottom: 34px; }
+}
+
 /* Avis d'état — terminé, en cours. Même forme que `.actu-avis`, autre propos. */
 .evt-avis {
   margin-bottom: 26px; padding: 14px 18px; border-left: 3px solid var(--c-30);
