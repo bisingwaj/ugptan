@@ -38,10 +38,11 @@ export function ArticleGalerieChamp({ initial, assets }: { initial: ImageGalerie
       return [...courantes, ...nouvelles.filter((i) => !deja.has(i.id))].slice(0, MAX_IMAGES);
     });
 
-  const choisir = (choix: ChoixMedia) => {
+  const choisir = (choix: ChoixMedia[]) => {
     setPicker(false);
-    if (choix.kind !== "asset") return;
-    ajouter([{ id: choix.asset.id, src: mediaSrc(choix.asset), alt: choix.alt }]);
+    ajouter(
+      choix.flatMap((c) => (c.kind === "asset" ? [{ id: c.asset.id, src: mediaSrc(c.asset), alt: c.alt }] : [])),
+    );
   };
 
   /** Téléverse les fichiers choisis un par un : une erreur n'arrête pas les autres. */
@@ -169,7 +170,8 @@ export function ArticleGalerieChamp({ initial, assets }: { initial: ImageGalerie
         open={picker}
         assets={assets}
         onClose={() => setPicker(false)}
-        onSelect={choisir}
+        onSelect={() => {}}
+        onSelectMany={choisir}
         titre={t.galerieBloc}
       />
     </div>

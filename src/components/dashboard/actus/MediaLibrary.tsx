@@ -12,12 +12,13 @@
  * document n'ayant pas de vignette, sa carte affiche son extension et un lien
  * d'ouverture plutôt qu'une image cassée.
  */
-import { useActionState } from "react";
+import { useActionState, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import {
   enregistrerMediaExterneAction,
   mettreAJourMediaAction,
   supprimerMediaAction,
-  televerserDepuisFormulaireAction,
+  televerserMediaAction,
 } from "@/actions/admin-medias";
 import type { ActuFormState } from "@/actions/admin-actualites";
 import { ADMIN_ACTUS } from "@/content/admin";
@@ -39,13 +40,61 @@ export type MediaAvecUsage = MediaRef & { usage: number };
 
 export function MediaLibrary({ medias, stockageActif }: { medias: MediaAvecUsage[]; stockageActif: boolean }) {
   const t = ADMIN_ACTUS;
-  const [etatFichier, actionFichier, fichierEnCours] = useActionState(televerserDepuisFormulaireAction, etatInitial);
+  const router = useRouter();
+  const [etatFichier, setEtatFichier] = useState<ActuFormState>(etatInitial);
+  const [progression, setProgression] = useState<string | null>(null);
+  const fichierEnCours = progression !== null;
+
+  /**
+   * Téléversement de PLUSIEURS fichiers : un envoi par fichier, et non un
+   * formulaire unique. Le corps d'une requête est plafonné (14 Mo, cf.
+   * next.config) : dix photos d'un même envoi l'auraient dépassé. Un refus
+   * n'arrête pas les fichiers suivants ; le bilan les reprend tous.
+   *
+   * Les textes alternatifs saisis ne valent que pour un envoi d'un seul
+   * fichier : appliqués à dix images différentes, ils seraient faux pour neuf.
+   */
+  const televerser = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formulaire = event.currentTarget;
+    const donnees = new FormData(formulaire);
+    const fichiers = donnees.getAll("fichier").filter((f): f is File => f instanceof File && f.size > 0);
+    if (!fichiers.length) return;
+
+    const refus: string[] = [];
+    let recus = 0;
+    for (const [rang, fichier] of fichiers.entries()) {
+      setProgression(fichiers.length > 1 ? `${rang + 1}/${fichiers.length}` : "");
+      const envoi = new FormData();
+      envoi.set("fichier", fichier);
+      if (fichiers.length === 1) {
+        envoi.set("altFr", String(donnees.get("altFr") ?? ""));
+        envoi.set("altEn", String(donnees.get("altEn") ?? ""));
+      }
+      try {
+        const resultat = await televerserMediaAction(envoi);
+        if (resultat.ok) recus += 1;
+        else refus.push(fichiers.length > 1 ? `${fichier.name} : ${resultat.error}` : resultat.error);
+      } catch {
+        refus.push(`${fichier.name} : envoi interrompu, réessayez.`);
+      }
+    }
+    setProgression(null);
+    setEtatFichier({
+      ok: recus ? (recus > 1 ? `${recus} médias ajoutés à la bibliothèque.` : "Média ajouté à la bibliothèque.") : null,
+      error: refus.length ? refus.join(" · ") : null,
+    });
+    if (recus) {
+      formulaire.reset();
+      router.refresh();
+    }
+  };
   const [etatExterne, actionExterne, externeEnCours] = useActionState(enregistrerMediaExterneAction, etatInitial);
 
   return (
     <>
       <div className="adm-medias__ajout">
-        <form action={actionFichier} className="adm-panel">
+        <form onSubmit={televerser} className="adm-panel">
           <div className="label-mono">{t.mediasTeleverser}</div>
           {!stockageActif && <div className="auth-error" role="alert">{t.mediasStockageAbsent}</div>}
           {etatFichier.error && <div className="auth-error" role="alert">{etatFichier.error}</div>}
@@ -56,6 +105,7 @@ export function MediaLibrary({ medias, stockageActif }: { medias: MediaAvecUsage
               type="file"
               name="fichier"
               accept={MIMES_ACCEPTES.join(",")}
+              multiple
               required
               disabled={!stockageActif}
               className="field"
@@ -64,6 +114,8 @@ export function MediaLibrary({ medias, stockageActif }: { medias: MediaAvecUsage
               Images JPEG, PNG, WebP, AVIF ou GIF · {poidsLisible(TAILLE_MAX)} maximum.
               <br />
               Documents PDF, Word, Excel, PowerPoint ou CSV · {poidsLisible(TAILLE_MAX_DOCUMENT)} maximum.
+              <br />
+              Plusieurs fichiers peuvent être choisis d'un coup ; les textes alternatifs ne s'appliquent qu'à un envoi d'un seul fichier.
             </p>
           </div>
 
@@ -79,7 +131,7 @@ export function MediaLibrary({ medias, stockageActif }: { medias: MediaAvecUsage
           </div>
 
           <button type="submit" className="btn btn--primary btn--sm" disabled={fichierEnCours || !stockageActif}>
-            {fichierEnCours ? "Téléversement…" : t.mediasTeleverser}
+            {fichierEnCours ? `Téléversement…${progression ? ` ${progression}` : ""}` : t.mediasTeleverser}
           </button>
         </form>
 

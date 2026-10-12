@@ -176,17 +176,6 @@ export async function televerserMediaAction(formData: FormData): Promise<Telever
   };
 }
 
-/** Variante formulaire du téléversement, pour la page « Médias ». */
-export async function televerserDepuisFormulaireAction(
-  _prev: ActuFormState,
-  formData: FormData,
-): Promise<ActuFormState> {
-  const resultat = await televerserMediaAction(formData);
-  return resultat.ok
-    ? { error: null, ok: "Média ajouté à la bibliothèque." }
-    : { error: resultat.error, ok: null };
-}
-
 /**
  * Enregistre un média hébergé ailleurs.
  *

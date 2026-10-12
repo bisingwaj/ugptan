@@ -38,11 +38,21 @@ type Props = {
   /** Proposer le registre d'images du site. Réservé à la couverture. */
   avecRegistre?: boolean;
   titre?: string;
+  /**
+   * Sélection MULTIPLE (galerie d'un article). Fourni, le sélecteur coche au
+   * lieu de choisir : chaque clic ajoute ou retire une image, le téléversement
+   * accepte plusieurs fichiers, et le bouton du pied renvoie la sélection
+   * entière, dans l'ordre des clics. `onSelect` n'est alors pas appelé.
+   */
+  onSelectMany?: (choix: ChoixMedia[]) => void;
 };
 
 const CLES_REGISTRE = Object.keys(registre.img) as ImgKey[];
 
-export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = false, titre = "Choisir un visuel" }: Props) {
+export function MediaPicker({
+  open, onClose, onSelect, assets, avecRegistre = false, titre = "Choisir un visuel", onSelectMany,
+}: Props) {
+  const multiple = onSelectMany !== undefined;
   // Copie locale : un téléversement fait depuis la modale doit apparaître tout
   // de suite, sans attendre le rechargement de la page qui porte la liste.
   const [bibliotheque, setBibliotheque] = useState<MediaRef[]>(() => assets.filter((a) => estImage(a.mimeType)));
@@ -50,6 +60,17 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
   const [erreur, setErreur] = useState<string | null>(null);
   const [enCours, setEnCours] = useState(false);
   const fichierRef = useRef<HTMLInputElement>(null);
+  /** Identifiants cochés, dans l'ordre des clics (mode multiple). */
+  const [selection, setSelection] = useState<string[]>([]);
+  const [progression, setProgression] = useState<string | null>(null);
+
+  // Chaque ouverture repart d'une sélection vide.
+  useEffect(() => {
+    if (open) setSelection([]);
+  }, [open]);
+
+  const basculer = (id: string) =>
+    setSelection((courante) => (courante.includes(id) ? courante.filter((x) => x !== id) : [...courante, id]));
 
   useEffect(() => setBibliotheque(assets.filter((a) => estImage(a.mimeType))), [assets]);
 
@@ -60,18 +81,13 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  const televerser = useCallback(async (fichier: File) => {
-    setErreur(null);
-    setEnCours(true);
+  /** Dépose UN fichier et renvoie le média créé, ou le motif du refus. */
+  const deposer = useCallback(async (fichier: File): Promise<MediaRef | string> => {
     try {
       const formData = new FormData();
       formData.set("fichier", fichier);
       const resultat = await televerserMediaAction(formData);
-
-      if (!resultat.ok) {
-        setErreur(resultat.error);
-        return;
-      }
+      if (!resultat.ok) return resultat.error;
 
       const nouveau: MediaRef = {
         id: resultat.id,
@@ -88,15 +104,45 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
         altEn: null,
         legende: null,
       };
-      setBibliotheque((liste) => [nouveau, ...liste]);
-      onSelect({ kind: "asset", asset: nouveau, src: resultat.src, alt: "" });
+      return nouveau;
     } catch {
-      setErreur("Téléversement impossible. Vérifiez votre connexion et réessayez.");
-    } finally {
-      setEnCours(false);
-      if (fichierRef.current) fichierRef.current.value = "";
+      return "Téléversement impossible. Vérifiez votre connexion et réessayez.";
     }
-  }, [onSelect]);
+  }, []);
+
+  /**
+   * Téléverse les fichiers choisis, un par un : une erreur n'arrête pas les
+   * suivants. En sélection simple, le premier média reçu est choisi aussitôt ;
+   * en sélection multiple, les médias reçus s'ajoutent à la sélection.
+   */
+  const televerser = useCallback(async (liste: FileList | null) => {
+    const fichiers = [...(liste ?? [])];
+    if (!fichiers.length) return;
+    setErreur(null);
+    setEnCours(true);
+    const refus: string[] = [];
+    const recus: MediaRef[] = [];
+    for (const [rang, fichier] of fichiers.entries()) {
+      if (fichiers.length > 1) setProgression(`${rang + 1}/${fichiers.length}`);
+      const resultat = await deposer(fichier);
+      if (typeof resultat === "string") refus.push(fichiers.length > 1 ? `${fichier.name} : ${resultat}` : resultat);
+      else recus.push(resultat);
+    }
+    setEnCours(false);
+    setProgression(null);
+    if (fichierRef.current) fichierRef.current.value = "";
+    if (refus.length) setErreur(refus.join(" · "));
+    if (!recus.length) return;
+
+    // La bibliothèque affiche le plus récent en tête ; la sélection garde
+    // l'ordre d'envoi, qui est celui dans lequel les fichiers ont été choisis.
+    setBibliotheque((courante) => [...[...recus].reverse(), ...courante]);
+    if (multiple) {
+      setSelection((courante) => [...courante, ...recus.map((m) => m.id).filter((id) => !courante.includes(id))]);
+    } else {
+      onSelect({ kind: "asset", asset: recus[0], src: mediaSrc(recus[0]), alt: "" });
+    }
+  }, [deposer, multiple, onSelect]);
 
   if (!open) return null;
 
@@ -124,17 +170,15 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
             style={{ maxWidth: 280 }}
           />
           <label className="btn btn--outline btn--sm" style={{ cursor: enCours ? "progress" : "pointer" }}>
-            {enCours ? "Téléversement…" : "Téléverser une image"}
+            {enCours ? `Téléversement…${progression ? ` ${progression}` : ""}` : multiple ? "Téléverser des images" : "Téléverser une image"}
             <input
               ref={fichierRef}
               type="file"
               accept={MIMES_IMAGE.join(",")}
+              multiple={multiple}
               hidden
               disabled={enCours}
-              onChange={(event) => {
-                const fichier = event.target.files?.[0];
-                if (fichier) void televerser(fichier);
-              }}
+              onChange={(event) => void televerser(event.target.files)}
             />
           </label>
           <span className="adm-hint">JPEG, PNG, WebP, AVIF ou GIF · {poidsLisible(TAILLE_MAX)} maximum</span>
@@ -153,13 +197,18 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
               <div className="adm-medias">
                 {visibles.map((asset) => {
                   const src = mediaSrc(asset);
+                  const rang = selection.indexOf(asset.id);
                   return (
                     <button
                       key={asset.id}
                       type="button"
-                      className="adm-media"
-                      onClick={() => onSelect({ kind: "asset", asset, src, alt: asset.altFr ?? "" })}
+                      className={`adm-media${rang >= 0 ? " is-selected" : ""}`}
+                      aria-pressed={multiple ? rang >= 0 : undefined}
+                      onClick={() =>
+                        multiple ? basculer(asset.id) : onSelect({ kind: "asset", asset, src, alt: asset.altFr ?? "" })
+                      }
                     >
+                      {rang >= 0 && <span className="adm-media__rang mono" aria-hidden="true">{rang + 1}</span>}
                       {/* Le sélecteur affiche des dizaines de fichiers à la fois,
                           dans des cases de 152 px : servis en pleine définition,
                           ils feraient plusieurs dizaines de mégaoctets à chaque
@@ -180,7 +229,7 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
             </>
           )}
 
-          {avecRegistre && (
+          {avecRegistre && !multiple && (
             <>
               <div className="label-mono" style={{ marginTop: 22 }}>Registre du site</div>
               <p className="adm-hint" style={{ marginBottom: 12 }}>
@@ -204,6 +253,32 @@ export function MediaPicker({ open, onClose, onSelect, assets, avecRegistre = fa
             </>
           )}
         </div>
+
+        {multiple && (
+          <div className="adm-modal__pied">
+            <span className="adm-hint">
+              {selection.length === 0
+                ? "Cliquez sur les images à ajouter, ou téléversez-en plusieurs d'un coup."
+                : `${selection.length} image${selection.length > 1 ? "s" : ""} sélectionnée${selection.length > 1 ? "s" : ""}`}
+            </span>
+            <button
+              type="button"
+              className="btn btn--primary btn--sm"
+              disabled={selection.length === 0 || enCours}
+              onClick={() => {
+                const parId = new Map(bibliotheque.map((a) => [a.id, a]));
+                onSelectMany(
+                  selection
+                    .map((id) => parId.get(id))
+                    .filter((a): a is MediaRef => a !== undefined)
+                    .map((asset) => ({ kind: "asset", asset, src: mediaSrc(asset), alt: asset.altFr ?? "" })),
+                );
+              }}
+            >
+              Ajouter {selection.length > 0 ? selection.length : ""} à la galerie
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
