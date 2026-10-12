@@ -43,3 +43,6 @@ next-env.d.ts
 /.windsurf/
 .vercel
 .env*
+
+# Journaux des scripts de maintenance (adresses converties, etc.)
+scripts/sorties/
