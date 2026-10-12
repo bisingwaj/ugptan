@@ -78,6 +78,14 @@ export function ArticleCreation({
       </div>
 
       <aside className="adm-edit__aside">
+        {/* Le PDF s'envoie par son propre formulaire, qui suppose un article
+            existant (cf. ArticleFichier) : on l'annonce ici pour qu'il ne
+            reste pas introuvable. */}
+        <div className="adm-panel">
+          <div className="label-mono">{t.pdfBloc}</div>
+          <p className="adm-hint" style={{ marginTop: 8 }}>{t.pdfApresCreation}</p>
+        </div>
+
         <ReglagesChamps article={article} referentiels={referentiels} assets={assets} />
 
         <div className="adm-edit__barre">

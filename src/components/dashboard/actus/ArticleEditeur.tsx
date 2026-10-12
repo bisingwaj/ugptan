@@ -96,13 +96,15 @@ export function ArticleEditeur({ article, referentiels, assets, apercuUrl, etats
       </div>
 
       <aside className="adm-edit__aside">
+        {/* En TÊTE de colonne : les réglages font plusieurs écrans de haut, et
+            le bloc placé dessous passait inaperçu sous la barre d'enregistrement. */}
+        <ArticleFichier id={article.id} fichier={article.fichier} stockageActif={stockageActif} />
         <ArticleReglages
           article={article}
           referentiels={referentiels}
           assets={assets}
           apercuUrl={apercuUrl}
         />
-        <ArticleFichier id={article.id} fichier={article.fichier} stockageActif={stockageActif} />
       </aside>
     </div>
   );

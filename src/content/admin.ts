@@ -473,6 +473,7 @@ export const ADMIN_ACTUS = {
 
   /* --- PDF joint ----------------------------------------------------------- */
   pdfBloc: "PDF à télécharger",
+  pdfApresCreation: "Le PDF du communiqué se joint juste après la création : cliquez sur « Créer l'article », il apparaît alors à cette place.",
   pdfAucun: "Aucun PDF joint. Joignez le texte officiel du communiqué : les visiteurs pourront le télécharger depuis l'article.",
   pdfChoisir: "Fichier PDF",
   pdfJoindre: "Joindre le PDF",
