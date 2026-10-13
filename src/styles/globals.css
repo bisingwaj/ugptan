@@ -1465,13 +1465,13 @@ a.actu-hero__crumb-lien:hover { color: #fff; border-bottom-color: #fff; }
 }
 @media (max-height: 640px) { .actu-2col__colle { position: static; } }
 
-/* Galerie d'un article : deux vignettes par rangée dans la colonne de droite,
-   trois sur un écran étroit (pleine largeur). */
+/* Galerie d'un article : trois vignettes par rangée, dans la colonne de
+   droite comme sur un écran étroit (pleine largeur). */
 .actu-galerie { margin: 36px 0 8px; }
 .actu-galerie__titre { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-60); margin-bottom: 12px; }
 /* Double classe : `.gal-grille` est déclarée plus bas dans cette feuille, avec
    sa propre colonne de 280 px, et l'emporterait à spécificité égale. */
-.gal-grille.actu-galerie__grille { grid-template-columns: repeat(2, minmax(0, 1fr)); border: 1px solid var(--c-20); background: var(--c-20); }
+.gal-grille.actu-galerie__grille { grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--c-20); background: var(--c-20); }
 .actu-galerie__grille .gal-cell__btn { aspect-ratio: 1; }
 @media (max-width: 960px) { .gal-grille.actu-galerie__grille { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 /* Dernière vignette d'une galerie plus longue : le nombre d'images restantes. */

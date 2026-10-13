@@ -20,11 +20,11 @@ import { RevealGroup, RevealItem } from "@/components/motion/RevealGroup";
 
 /**
  * Vignettes montrées au plus. La galerie vit dans une colonne collée à
- * l'écran : au-delà de six, elle dépasserait la hauteur d'un portable et son
- * bas deviendrait inaccessible. La dernière vignette annonce le reste (« +4 »),
- * et la visionneuse parcourt toutes les images.
+ * l'écran : trois rangées de trois la gardent sous la hauteur d'un portable,
+ * au-delà son bas deviendrait inaccessible. La dernière vignette annonce le
+ * reste (« +18 »), et la visionneuse parcourt toutes les images.
  */
-const VIGNETTES_MAX = 6;
+const VIGNETTES_MAX = 9;
 
 export function ArticleGalerie({ images, lang, titre }: { images: ImageActu[]; lang: Lang; titre: string }) {
   const t = dict(lang).galerie;
