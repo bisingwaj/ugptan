@@ -10,6 +10,7 @@
  * dans l'article, elle n'a pas besoin d'un lien par photo.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { dict } from "@/content/i18n";
 import type { Lang } from "@/lib/pick";
 import type { ImageActu } from "@/lib/actus/query";
@@ -112,7 +113,10 @@ export function ArticleGalerie({ images, lang, titre }: { images: ImageActu[]; l
         </button>
       )}
 
-      {ouverte && index !== null && (
+      {/* Portail vers <body> : rendue dans la colonne collée (position:
+          sticky, qui crée son propre empilement), la visionneuse restait
+          sous le bandeau de l'article malgré son z-index. */}
+      {ouverte && index !== null && createPortal(
         <div className="scrim scrim--center gal-scrim" onClick={fermer}>
           <div
             ref={panneau}
@@ -164,7 +168,8 @@ export function ArticleGalerie({ images, lang, titre }: { images: ImageActu[]; l
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </section>
   );
